@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from config.utils.singleton import Singleton
+from daikon.utils.singleton import Singleton
 
 
 def test_singleton():

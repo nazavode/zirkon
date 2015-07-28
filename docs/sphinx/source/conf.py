@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from config.version import VERSION_INFO
+from daikon.version import VERSION_INFO
 
 # General configuration
 # ---------------------
@@ -23,7 +23,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Config'
+project = 'daikon'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -53,4 +53,4 @@ html_use_modindex = True
 # If false, no index is generated.
 html_use_index = True
 
-#html_logo = "img/logo.jpg"
+html_logo = "img/logo.jpg"

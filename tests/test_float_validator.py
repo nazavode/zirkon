@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from config.validator.error import MinValidationError, \
+from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from config.validator.float_validator import FloatValidator
+from daikon.validator.float_validator import FloatValidator
 
 def test_basic():
     fv = FloatValidator()

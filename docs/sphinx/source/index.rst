@@ -1,4 +1,4 @@
-Config Documentation
+Daikon documentation
 ====================
 
 Contents:

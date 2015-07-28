@@ -30,7 +30,7 @@ from common.fixtures import simple_container, \
                             SIMPLE_SECTION_REPR, \
                             SIMPLE_SECTION_STR
 
-from config.section import Section
+from daikon.section import Section
 
 def test_Section_create(simple_container, string_io):
     section = Section(container=simple_container)

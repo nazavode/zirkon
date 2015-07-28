@@ -5,20 +5,20 @@ import os
 
 import pytest
 
-from config.validator.error import InvalidOptionValidationError, \
+from daikon.validator.error import InvalidOptionValidationError, \
                                    MinValidationError, \
                                    MaxValidationError, \
                                    MinLenValidationError, \
                                    MaxLenValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from config.validator.int_validator import IntListValidator, \
+from daikon.validator.int_validator import IntListValidator, \
                                            IntTupleValidator
-from config.validator.float_validator import FloatListValidator, \
+from daikon.validator.float_validator import FloatListValidator, \
                                              FloatTupleValidator
-from config.validator.str_validator import StrListValidator, \
+from daikon.validator.str_validator import StrListValidator, \
                                            StrTupleValidator
-from config.validator.bool_validator import BoolListValidator, \
+from daikon.validator.bool_validator import BoolListValidator, \
                                             BoolTupleValidator
 
 from common.test_scenarios import pytest_generate_tests

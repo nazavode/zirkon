@@ -31,8 +31,8 @@ from common.fixtures import simple_container, \
                             SIMPLE_CONFIG_JSON_SERIALIZATION, \
                             SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
-from config.config import Config
-from config.serializer import JSONSerializer, \
+from daikon.config import Config
+from daikon.serializer import JSONSerializer, \
                               ConfigObjSerializer, \
                               PickleSerializer
 

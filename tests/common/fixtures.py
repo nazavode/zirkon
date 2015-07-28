@@ -37,8 +37,8 @@ import tempfile
 
 import pytest
 
-from config.section import Section
-from config.config import Config
+from daikon.section import Section
+from daikon.config import Config
 
 @pytest.fixture
 def string_io():

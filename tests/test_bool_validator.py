@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-from config.validator.error import TypeValidationError, \
+from daikon.validator.error import TypeValidationError, \
                                    UndefinedKeyValidationError
-from config.validator.bool_validator import BoolValidator
+from daikon.validator.bool_validator import BoolValidator
 
 def test_basic():
     bv = BoolValidator()

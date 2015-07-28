@@ -5,12 +5,12 @@ import os
 
 import pytest
 
-from config.validator.error import InvalidOptionValidationError, \
+from daikon.validator.error import InvalidOptionValidationError, \
                                    TypeValidationError
-from config.validator.int_validator import IntOptionValidator
-from config.validator.float_validator import FloatOptionValidator
-from config.validator.str_validator import StrOptionValidator
-from config.validator.bool_validator import BoolOptionValidator
+from daikon.validator.int_validator import IntOptionValidator
+from daikon.validator.float_validator import FloatOptionValidator
+from daikon.validator.str_validator import StrOptionValidator
+from daikon.validator.bool_validator import BoolOptionValidator
 
 from common.test_scenarios import pytest_generate_tests
     

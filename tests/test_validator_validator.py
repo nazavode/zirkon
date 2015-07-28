@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-from config import validator
-from config.validator.error import TypeValidationError
-from config.validator.validator_validator import ValidatorValidator
+from daikon import validator
+from daikon.validator.error import TypeValidationError
+from daikon.validator.validator_validator import ValidatorValidator
 
 @pytest.fixture
 def validator_validator():

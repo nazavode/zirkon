@@ -11,8 +11,8 @@ from common.fixtures import simple_config, \
                             string_io, \
                             tmp_raw_file
 
-from config.config import Config
-from config.serializer.pickle_serializer import PickleSerializer
+from daikon.config import Config
+from daikon.serializer.pickle_serializer import PickleSerializer
 
 @pytest.fixture
 def serializer():

@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from config import validator
-from config.validator.validator_validator import ValidatorValidator
+from daikon import validator
+from daikon.validator.validator_validator import ValidatorValidator
 
 from common.test_scenarios import pytest_generate_tests
 

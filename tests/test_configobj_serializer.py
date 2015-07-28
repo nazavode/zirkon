@@ -12,8 +12,8 @@ from common.fixtures import simple_config, \
                             tmp_text_file, \
                             SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
-from config.config import Config
-from config.serializer.configobj_serializer import ConfigObjSerializer
+from daikon.config import Config
+from daikon.serializer.configobj_serializer import ConfigObjSerializer
 
 @pytest.fixture
 def serializer():

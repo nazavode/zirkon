@@ -2,7 +2,7 @@
 
 import pytest
 
-from config.utils.undefined import UNDEFINED
+from daikon.utils.undefined import UNDEFINED
 
 
 def test_undefined():

@@ -33,7 +33,7 @@ if __name__ == "__main__":
         py_dirname = DIRNAME
         sys.path.insert(0, py_dirname)
     
-        from config.version import VERSION
+        from daikon.version import VERSION
         version = VERSION
     finally:
         del sys.path[0]
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             scripts.append(filepath)
     
     # search packages
-    root_packages = ['config']
+    root_packages = ['daikon']
     packages = []
     for package in root_packages:
         package_dirname = os.path.join(DIRNAME, package)
@@ -70,6 +70,7 @@ if __name__ == "__main__":
     data_files = []
     for data_dirname, patterns in [('requirements', ('*.txt', )),
                                    ('docs/sphinx/source', ('conf.py', '*.rst')),
+                                   ('docs/sphinx/source/img', ('*.jpg', )),
                                   ]:
         files = []
         for pattern in patterns:
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     print(data_files)
     
     setup(
-        name="config",
+        name="daikon",
         version=version,
         requires=[],
         description="Config Project",

@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from config.validator.error import MinValidationError, \
+from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from config.validator.int_validator import IntValidator
+from daikon.validator.int_validator import IntValidator
 
 def test_basic():
     iv = IntValidator()

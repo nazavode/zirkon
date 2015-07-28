@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from config.validator.error import MinLenValidationError, \
+from daikon.validator.error import MinLenValidationError, \
                                    MaxLenValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from config.validator.str_validator import StrValidator
+from daikon.validator.str_validator import StrValidator
 
 def test_basic():
     sv = StrValidator()

@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from config.utils import loader
+from daikon.utils import loader
 
 
 def test_load_module_mypack():
