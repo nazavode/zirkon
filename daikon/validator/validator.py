@@ -31,14 +31,20 @@ from ..utils.compose import Composer, ArgumentStore
 from .key_value import KeyValue
 
 
-class Validator(Plugin):
-    CHECK_CLASSES = ()
+class MetaValidator(type(Plugin)):
+    def __new__(mcls, class_name, class_bases, class_dict):
+        cls = super().__new__(mcls, class_name, class_bases, class_dict)
+        if cls.CHECK_CLASSES is not None:
+            cls.CHECK_BUILDER = Composer(*cls.CHECK_CLASSES)
+        return cls
+
+class Validator(Plugin, metaclass=MetaValidator):
+    CHECK_CLASSES = None
     def __init__(self, *, argument_store=None, **arguments):
         if argument_store is None:
             argument_store = ArgumentStore()
         argument_store.update(arguments)
         self.argument_store = argument_store
-        self.check_composer = Composer(*self.CHECK_CLASSES)
 
         self.checks = self.bind_arguments(self.argument_store, prefix='')
 
@@ -48,8 +54,12 @@ class Validator(Plugin):
         for check in self.checks:
             check.auto_validate(validator=self)
 
+    @classmethod
+    def check_builder(cls):
+        return cls.CHECK_BUILDER
+
     def bind_arguments(self, argument_store, prefix=''):
-        return self.check_composer.partial(argument_store, prefix=prefix)
+        return self.check_builder().partial(argument_store, prefix=prefix)
 
     def __repr__(self):
         args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
