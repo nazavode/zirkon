@@ -113,3 +113,23 @@ def test_Composer_sub_unexpected():
     with pytest.raises(TypeError) as exc_info:
         composer.verify_argument_store(argument_store)
     assert str(exc_info.value) == "unexpected arguments: sub_d=444, zz=45"
+
+def test_ArgumentStore_split_merge():
+    d = dict(min_len=1, max_len=5, default=[5, 6, 7], item_min=3, item_max=18)
+    argument_store = ArgumentStore(d)
+    sub_argument_store = argument_store.split(prefix='item_')
+    l = list(sub_argument_store.items())
+    l.sort(key=lambda x: x[0])
+    assert l[0][0] == 'max'
+    assert l[0][1] == 18
+    assert l[1][0] == 'min'
+    assert l[1][1] == 3
+    assert sub_argument_store.get('min') == 3
+    assert argument_store.get('max_len') == 5
+    argument_store.merge(sub_argument_store, prefix='item_')
+    assert argument_store.get('default') == [5, 6, 7]
+    assert argument_store.get_used('item_min')
+    assert not argument_store.get_used('item_max')
+    assert not argument_store.get_used('min_len')
+    assert argument_store.get_used('max_len')
+    assert argument_store.get_used('default')
