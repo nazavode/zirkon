@@ -29,6 +29,8 @@ __all__ = [
     'IntTupleValidator',
 ]
 
+from ..utils.compose import Composer
+
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
@@ -43,16 +45,16 @@ from .check_sequence import CheckList, \
 
 
 class IntValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckInt, CheckMin, CheckMax]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckMin, CheckMax)
 
 class IntOptionValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckInt, CheckOption]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckOption)
 
 class IntListValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckList, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = IntValidator
 
 class IntTupleValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = IntValidator
 

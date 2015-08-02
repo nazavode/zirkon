@@ -29,6 +29,8 @@ __all__ = [
     'BoolTupleValidator',
 ]
 
+from ..utils.compose import Composer
+
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
@@ -43,15 +45,15 @@ from .check_sequence import CheckList, \
 
 
 class BoolValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckBool]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
 class BoolOptionValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckBool, CheckOption]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckOption)
 
 class BoolListValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckList, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = BoolValidator
 
 class BoolTupleValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = BoolValidator

@@ -26,9 +26,11 @@ __all__ = [
     'ValidatorValidator',
 ]
 
+from ..utils.compose import Composer
+
 from .validator import Validator
 from .check_validator import CheckValidator
 
 
 class ValidatorValidator(Validator):
-    CHECK_CLASSES = [CheckValidator]
+    CHECK_COMPOSER = Composer(CheckValidator)

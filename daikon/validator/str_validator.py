@@ -29,6 +29,8 @@ __all__ = [
     'StrTupleValidator',
 ]
 
+from ..utils.compose import Composer
+
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
@@ -40,15 +42,15 @@ from .check_sequence import CheckList, \
 
 
 class StrValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckStr, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
 class StrOptionValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckStr, CheckOption]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckOption)
 
 class StrListValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckList, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = StrValidator
 
 class StrTupleValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = StrValidator

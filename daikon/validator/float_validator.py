@@ -17,7 +17,7 @@
 
 """\
 config.validator.float_validator
-==============================
+================================
 Implementation of the IntValidator classes
 """
 
@@ -28,6 +28,8 @@ __all__ = [
     'FloatListValidator',
     'FloatTupleValidator',
 ]
+
+from ..utils.compose import Composer
 
 from .validator import Validator
 from .sequence_validator import SequenceValidator
@@ -43,15 +45,15 @@ from .check_sequence import CheckList, \
 
 
 class FloatValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckFloat, CheckMin, CheckMax]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
 
 class FloatOptionValidator(Validator):
-    CHECK_CLASSES = [CheckDefault, CheckFloat, CheckOption]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckOption)
 
 class FloatListValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckList, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = FloatValidator
 
 class FloatTupleValidator(SequenceValidator):
-    CHECK_CLASSES = [CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen]
+    CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = FloatValidator
