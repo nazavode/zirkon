@@ -34,26 +34,7 @@ import inspect
 from .key_value import KeyValue
 
 
-class CheckMeta(abc.ABCMeta):
-    """CheckMeta()
-    """
-
-    ParameterInfo = collections.namedtuple('ParameterInfo', ('has_default', ))
-    def __new__(mcls, class_name, class_bases, class_dict):
-        cls = super().__new__(mcls, class_name, class_bases, class_dict)
-        init_method = getattr(cls, '__init__', None)
-        parameters_info = collections.OrderedDict()
-        if init_method is not None:
-           signature = inspect.signature(cls.__init__)
-           parameters = signature.parameters
-           for parameter_name, parameter_value in tuple(parameters.items())[1:]:
-               parameter_default = parameter_value.default
-               has_default = parameter_default is not parameter_value.empty
-               parameters_info[parameter_name] = mcls.ParameterInfo(has_default=has_default)
-        cls.PARAMETERS_INFO = parameters_info
-        return cls
-    
-class Check(metaclass=CheckMeta):
+class Check(metaclass=abc.ABCMeta):
     """Check()
        Abstract base class for cheks. Checks must implement
        check(key_value) method.
