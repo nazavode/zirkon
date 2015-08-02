@@ -33,17 +33,18 @@ from .validator import Validator
 
 class CheckValidator(CheckType):
     TYPE = Validator
-    def check(self, key_value):
-        if key_value.defined:
-            if isinstance(key_value.value, str):
-                try:
-                    validator = Validator.validator_unrepr(key_value.value)
-                except Exception as err:
-                    raise TypeValidationError(key_value, "cannot create a validator from string {!r}: {}: {}".format(
-                        key_value.value,
-                        type(err).__name__,
-                        err,
-                    ))
-                key_value.value = validator
-        return super().check(key_value)
 
+    def on_load(self, key_value):
+        if not isinstance(key_value.value, Validator):
+            try:
+                key_value.value = Validator.validator_unrepr(key_value.value)
+            except Exception as err:
+                raise TypeValidationError(key_value, "cannot create a validator from string {!r}: {}: {}".format(
+                    key_value.value,
+                    type(err).__name__,
+                    err,
+                ))
+
+    def on_store(self, key_value):
+        if isinstance(key_value.value, Validator):
+            key_value.value = key_value.value.validator_repr()

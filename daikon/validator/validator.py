@@ -71,18 +71,16 @@ class Validator(Plugin):
             name = name[:-len(suffix)]
         return name
 
-    def validate(self, key, defined, value):
+    def validate(self, key, defined, value, mode=None):
         key_value = KeyValue(key=key, defined=defined, value=value)
-        return self.validate_key_value(key_value)
+        return self.validate_key_value(key_value, mode=mode)
 
-    def validate_key_value(self, key_value):
+    def validate_key_value(self, key_value, mode=None):
         for check in self.checks:
-            check.check(key_value)
+            check.do_check(key_value, mode=mode)
         return key_value.value
 
     def __eq__(self, validator):
-        print(type(self) == type(validator))
-        print(self.option_store == validator.option_store)
         if self.__class__ != validator.__class__:
             return False
         return self.option_store == validator.option_store

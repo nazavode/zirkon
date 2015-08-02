@@ -62,8 +62,21 @@ class Check(metaclass=CheckMeta):
     def __init__(self):
         pass
 
+    def do_check(self, key_value, mode=None):
+        if mode == 'load':
+            self.on_load(key_value)
+        self.check(key_value)
+        if mode == 'store':
+            self.on_store(key_value)
+
     @abc.abstractmethod
     def check(self, key_value):
+        pass
+
+    def on_load(self, key_value):
+        pass
+
+    def on_store(self, key_value):
         pass
 
     @classmethod

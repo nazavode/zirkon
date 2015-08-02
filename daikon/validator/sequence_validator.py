@@ -49,16 +49,15 @@ class SequenceValidator(Validator):
         super().__init__(option_store=option_store)
     
 
-    def validate_key_value(self, key_value):
-        for check in self.checks:
-            check.check(key_value)
+    def validate_key_value(self, key_value, mode=None):
+        super().validate_key_value(key_value, mode=mode)
         if key_value.defined and key_value.value:
             validated_item_values = []
             changed = False
             for item_idx, item_value in enumerate(key_value.value):
                 item_key = "{}[{}]".format(key_value.key, item_idx)
                 item_key_value = KeyValue(key=item_key, value=item_value, defined=True)
-                validated_item_value = self.item_validator.validate_key_value(item_key_value)
+                validated_item_value = self.item_validator.validate_key_value(item_key_value, mode=mode)
                 validated_item_values.append(validated_item_value)
                 if item_value != validated_item_value:
                     changed = True

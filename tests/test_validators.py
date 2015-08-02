@@ -100,10 +100,10 @@ class TestWithScenarios(object):
         validator_plugin = validator.Validator.get_plugin(validator_name)
         assert validator_plugin is validator_class
         validator_instance = validator_plugin(**validator_options)
-        assert validator_instance is validator_validator.validate(key='<key>', value=validator_instance, defined=True)
+        assert validator_instance is validator_validator.validate(key='<key>', value=validator_instance, defined=True, mode='load')
         
         validator_repr = validator_instance.validator_repr()
-        validator_instance2 = validator_validator.validate('<key>', value=validator_repr, defined=True)
+        validator_instance2 = validator_validator.validate('<key>', value=validator_repr, defined=True, mode='load')
         assert validator_instance == validator_instance2
 
         validator_instance3 = validator.Validator.validator_unrepr(validator_instance2.validator_repr())
