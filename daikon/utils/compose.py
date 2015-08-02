@@ -34,7 +34,7 @@ import inspect
 
 class ArgumentStore(object):
     def __init__(self, arguments=None):
-        self._arguments = collections.OrderedDict()
+        self._arguments = {}
         self._used = {}
         if arguments:
             self.update(arguments)
@@ -52,6 +52,9 @@ class ArgumentStore(object):
 
     def __contains__(self, key):
         return key in self._arguments
+
+    def get_used(self, argument_name):
+        return self._used[argument_name]
 
     def set_used(self, argument_name, used=True):
         self._used[argument_name] = used
@@ -71,7 +74,24 @@ class ArgumentStore(object):
     def __eq__(self, argument_store):
         return self._arguments == argument_store._arguments
 
+    def split(self, prefix):
+        sub_arguments = {}
+        for argument_name, argument_value in self._arguments.items():
+            if argument_name.startswith(prefix):
+                sub_argument_name = argument_name[len(prefix):]
+                sub_arguments[sub_argument_name] = argument_value
+        return self.__class__(sub_arguments)
 
+    def merge(self, argument_store, prefix):
+        for sub_argument_name in argument_store._arguments:
+            if argument_store._used[sub_argument_name]:
+                argument_name = prefix + sub_argument_name
+                print("!!!", repr(sub_argument_name), repr(argument_name), repr(prefix))
+                self._used[argument_name] = True
+
+    def __repr__(self):
+        v = ", ".join("{}={!r}[{}]".format(n, v, self._used[n]) for n, v in self._arguments.items())
+        return "{}({})".format(self.__class__.__name__, v)
 
 class Composer(object):
     ParameterInfo = collections.namedtuple('ParameterInfo', ('has_default', ))

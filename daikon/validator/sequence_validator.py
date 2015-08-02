@@ -29,25 +29,18 @@ __all__ = [
 import collections
 
 from .key_value import KeyValue
-from .option_store import OptionStore
 from .validator import Validator
 
 
 class SequenceValidator(Validator):
     ITEM_VALIDATOR_CLASS = None
-    def __init__(self, *, option_store=None, **options):
-        option_store = OptionStore(options)
-        # sub options:
-        item_prefix = "item_"
-        sub_options = collections.OrderedDict()
-        for option_name in options:
-            if option_name.startswith(item_prefix):
-                sub_option_name = option_name[len(item_prefix):]
-                sub_options[sub_option_name] = option_store.get(option_name)
-        sub_option_store = OptionStore(sub_options)
-        self.item_validator = self.ITEM_VALIDATOR_CLASS(option_store=sub_option_store)
-        super().__init__(option_store=option_store)
-    
+    def bind_arguments(self, argument_store, prefix=''):
+        sub_prefix = prefix + 'item_'
+        sub_argument_store = argument_store.split(prefix=sub_prefix)
+        self.item_validator = self.ITEM_VALIDATOR_CLASS(argument_store=sub_argument_store)
+        argument_store.merge(sub_argument_store, prefix=sub_prefix)
+        return super().bind_arguments(argument_store, prefix=prefix)
+        
 
     def validate_key_value(self, key_value, mode=None):
         super().validate_key_value(key_value, mode=mode)

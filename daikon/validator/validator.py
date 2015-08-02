@@ -27,32 +27,32 @@ __all__ = [
 ]
 
 from ..utils.plugin import Plugin
+from ..utils.compose import Composer, ArgumentStore
 from .key_value import KeyValue
-from .option_store import OptionStore
+
 
 class Validator(Plugin):
     CHECK_CLASSES = ()
-    def __init__(self, *, option_store=None, **options):
-        if option_store is None:
-            option_store = OptionStore()
-        option_store.update(options)
-        self.checks = []
-        for check_class in self.CHECK_CLASSES:
-            check = check_class.build(option_store)
-            self.checks.append(check)
-        invalid_options = list(option_store.invalid())
-        if invalid_options:
-            raise TypeError("{}: invalid options {}".format(
-                self.__class__.__name__,
-                ', '.join(invalid_options),
-            ))
-        self.option_store = option_store
+    def __init__(self, *, argument_store=None, **arguments):
+        if argument_store is None:
+            argument_store = ArgumentStore()
+        argument_store.update(arguments)
+        self.argument_store = argument_store
+        self.check_composer = Composer(*self.CHECK_CLASSES)
+
+        self.checks = self.bind_arguments(self.argument_store, prefix='')
+
+        Composer.verify_argument_store(self.argument_store)
+
         # check auto-validation:
         for check in self.checks:
             check.auto_validate(validator=self)
 
+    def bind_arguments(self, argument_store, prefix=''):
+        return self.check_composer.partial(argument_store, prefix=prefix)
+
     def __repr__(self):
-        args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.option_store.items())
+        args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.__class__.__name__, args)
 
     @classmethod
@@ -60,7 +60,7 @@ class Validator(Plugin):
         return eval(vstring, cls.subclasses_dict())
 
     def validator_repr(self):
-        args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.option_store.items())
+        args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.plugin_name(), args)
 
     @classmethod
@@ -83,6 +83,6 @@ class Validator(Plugin):
     def __eq__(self, validator):
         if self.__class__ != validator.__class__:
             return False
-        return self.option_store == validator.option_store
+        return self.argument_store == validator.argument_store
         
      

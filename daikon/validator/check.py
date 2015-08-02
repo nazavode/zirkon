@@ -79,18 +79,5 @@ class Check(metaclass=CheckMeta):
     def on_store(self, key_value):
         pass
 
-    @classmethod
-    def build(cls, option_store):
-        arguments = collections.OrderedDict()
-        for option_name in option_store:
-            if option_name in cls.PARAMETERS_INFO:
-                option_value = option_store.get(option_name)
-                arguments[option_name] = option_value
-        for option_name, option_info in cls.PARAMETERS_INFO.items():
-            if not option_info.has_default:
-                if option_name not in arguments:
-                    raise TypeError("{}: missing required option {}".format(cls.__name__, option_name))
-        return cls(**arguments)
-
     def auto_validate(self, validator):
         pass
