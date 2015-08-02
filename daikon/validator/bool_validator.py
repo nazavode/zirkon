@@ -17,7 +17,7 @@
 
 """\
 config.validator.bool_validator
-==============================
+===============================
 Implementation of the BoolValidator classes
 """
 
