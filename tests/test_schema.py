@@ -94,9 +94,3 @@ def test_Schema_get_serializer_ConfigObj():
 
 def test_Schema_get_serializer_Pickle():
     assert isinstance(Schema.get_serializer("Pickle"), PickleSerializer)
-
-def test_Schema_serialize_deserialize(simple_schema, tmp_text_file):
-    for protocol in "JSON", "ConfigObj", "Pickle":
-        simple_schema.to_file(tmp_text_file.name, protocol)
-        loaded_schema = Schema.from_file(tmp_text_file.name, protocol)
-        assert loaded_schema == simple_schema

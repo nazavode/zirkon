@@ -95,12 +95,3 @@ def test_Config_get_serializer_ConfigObj():
 
 def test_Config_get_serializer_Pickle():
     assert isinstance(Config.get_serializer("Pickle"), PickleSerializer)
-
-def test_Config_read_write(simple_content, tmp_text_file):
-    prefix = 'www.'
-    config = Config(simple_content, prefix=prefix)
-    for protocol in "JSON", "ConfigObj", "Pickle":
-        config.write(tmp_text_file.name, protocol)
-        config2 = Config(prefix=prefix)
-        config2.read(tmp_text_file.name, protocol)
-        assert compare_dicts(config, config2)
