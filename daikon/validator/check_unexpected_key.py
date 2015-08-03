@@ -16,25 +16,24 @@
 #
 
 """\
-config.validator.validator_validator
-====================================
-Implementation of the ValidatorValidator class
+config.validator.check_unexpected_key
+=====================================
+Implementation of the CheckUnexpectedKey class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ValidatorValidator',
+    'CheckRequired',
 ]
 
-from ..utils.compose import Composer
-
-from .validator import Validator
-from .check_validator import CheckValidator
+from .check import Check
+from .error import UnexpectedKeyValidationError
 
 
-class ValidatorValidator(Validator):
-    """ValidatorValidator()
-       Validator for a Validator key/value instance.
+class CheckUnexpectedKey(Check):
+    """CheckRequired()
+       Check if a required key/value is available (no default).
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
 
+    def check(self, key_value):
+        raise UnexpectedKeyValidationError(key_value, "unexpected key {!r}".format(key_value.key))

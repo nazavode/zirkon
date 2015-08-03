@@ -15,26 +15,27 @@
 # limitations under the License.
 #
 
-"""\
-config.validator.validator_validator
-====================================
-Implementation of the ValidatorValidator class
+"""
+validation_section
+==================
+Implementation of the SectionSchema class
 """
 
 __author__ = "Simone Campagna"
-__all__ = [
-    'ValidatorValidator',
-]
 
-from ..utils.compose import Composer
+import collections
 
-from .validator import Validator
-from .check_validator import CheckValidator
+from .section import Section
+from .validator.error import ValidationError
 
 
-class ValidatorValidator(Validator):
-    """ValidatorValidator()
-       Validator for a Validator key/value instance.
+class ValidationSection(Section):
+    """ValidationSection(container, *, prefix='', init=None, unexpected_key_validator=None)
+       A Section to store ValidationResult values.
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
+    SUPPORTED_VALUE_TYPES = (ValidationError, )
+
+    @classmethod
+    def subsection_class(cls):
+        return ValidationSection
 

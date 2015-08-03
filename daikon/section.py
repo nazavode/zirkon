@@ -68,7 +68,7 @@ class Section(collections.abc.Mapping):
        >>>
     """
     RE_VALID_KEY = re.compile(r"^[a-zA-Z_]\w*$")
-    SUPPORTED_VALUE_TYPES = (int, float, bool, str, type(None))
+    SUPPORTED_VALUE_TYPES = (int, float, bool, str, type(None), list, tuple)
     DOT = '.'
     SECTION_PLACEHOLDER = None
 
@@ -156,8 +156,8 @@ class Section(collections.abc.Mapping):
         else:
             if sub_prefix in self.container:
                 raise KeyError("cannot replace section [{}]{} with parameter".format(self.prefix, key))
-            if abs_key in self.container:
-                del self.container[abs_key]
+            #if abs_key in self.container:
+            #    del self.container[abs_key]
             if isinstance(value, self.SUPPORTED_VALUE_TYPES):
                 self.container[abs_key] = value
             else:
@@ -345,3 +345,8 @@ class Section(collections.abc.Mapping):
                     return False
             return True
 
+    def __bool__(self):
+        for _ in self._iter_keys():
+            return True
+        else:
+            return False

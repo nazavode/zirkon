@@ -16,25 +16,21 @@
 #
 
 """\
-config.validator.validator_validator
-====================================
-Implementation of the ValidatorValidator class
+config.schema
+=============
 """
 
 __author__ = "Simone Campagna"
-__all__ = [
-    'ValidatorValidator',
-]
 
-from ..utils.compose import Composer
+import collections
 
-from .validator import Validator
-from .check_validator import CheckValidator
+from .config import Config
+from .section_schema import SectionSchema
 
 
-class ValidatorValidator(Validator):
-    """ValidatorValidator()
-       Validator for a Validator key/value instance.
+class Schema(Config, SectionSchema):
+    """Schema(container=None)
+       Schema config.
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
 
+    CONTAINER_FACTORY = collections.OrderedDict

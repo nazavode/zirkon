@@ -30,7 +30,7 @@ from .serializer import Serializer
 
 
 class Config(Section):
-    """Config(container=None)
+    """Config(init=None, *, container=None, prefix='')
        Given a flattened 'container' (by default, OrderedDict()), Config implements
        a nested subsection view on it.
 
@@ -69,10 +69,10 @@ class Config(Section):
 
     CONTAINER_FACTORY = collections.OrderedDict
 
-    def __init__(self, init=None, *, container=None):
+    def __init__(self, init=None, *, container=None, prefix=''):
         if container is None:
             container = self.CONTAINER_FACTORY()
-        super().__init__(container=container, prefix='', init=init)
+        super().__init__(container=container, prefix=prefix, init=init)
 
     @classmethod
     def get_serializer(cls, protocol):

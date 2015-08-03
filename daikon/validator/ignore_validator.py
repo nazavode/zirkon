@@ -16,25 +16,23 @@
 #
 
 """\
-config.validator.validator_validator
-====================================
-Implementation of the ValidatorValidator class
+config.validator.ignore_validator
+=========================================
+Implementation of the IgnoreValidator class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ValidatorValidator',
+    'IgnoreValidator',
 ]
 
 from ..utils.compose import Composer
 
 from .validator import Validator
-from .check_validator import CheckValidator
 
 
-class ValidatorValidator(Validator):
-    """ValidatorValidator()
-       Validator for a Validator key/value instance.
+class IgnoreValidator(Validator):
+    """IgnoreValidator()
+       Ignore key/value.
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
-
+    CHECK_COMPOSER = Composer()
