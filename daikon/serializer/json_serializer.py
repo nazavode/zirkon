@@ -82,7 +82,6 @@ class JSONSerializer(Serializer):
     def from_string(self, config_class, serialization, *, container=None):
         decode = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
         content = decode.decode(serialization)
-        print("JSON:", config_class, content)
         config = config_class(init=content, container=container)
         return config
 
