@@ -94,5 +94,5 @@ class Plugin(object):
            Iterator over plugin names.
         """
         for plugin_name in cls.subclasses_dict(include_self=include_self,
-                                              include_abstract=include_abstract):
+                                               include_abstract=include_abstract):
             yield plugin_name

@@ -34,19 +34,36 @@ from .check_type import CheckType
 
 
 class CheckScalarType(CheckType):
+    """CheckScalarType()
+       Check if key/value has scalar type 'TYPE'.
+    """
     pass
 
 class CheckInt(CheckScalarType):
+    """CheckScalarType()
+       Check if key/value has scalar type 'int'.
+    """
     TYPE = int
-                   
+
 class CheckFloat(CheckScalarType):
+    """CheckScalarType()
+       Check if key/value has scalar type 'float' (int is accepted
+       and converted to float).
+    """
     TYPE = float
     SECONDARY_TYPES = (int, )
-                   
+
 class CheckStr(CheckScalarType):
+    """CheckScalarType()
+       Check if key/value has scalar type 'str'.
+    """
     TYPE = str
-                   
+
 class CheckBool(CheckScalarType):
+    """CheckScalarType()
+       Check if key/value has scalar type 'bool' (int is accepted
+       and converted to bool).
+    """
     TYPE = bool
     SECONDARY_TYPES = (int, )
-                   
+

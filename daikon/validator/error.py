@@ -37,7 +37,7 @@ class ValidationError(Exception):
     """ValidationError()
     """
 
-    def __init__(self, key_value , message):
+    def __init__(self, key_value, message):
         self.key_value = key_value
         super().__init__("{}: {}".format(key_value, message))
 

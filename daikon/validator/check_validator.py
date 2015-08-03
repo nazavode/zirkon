@@ -32,6 +32,9 @@ from .validator import Validator
 
 
 class CheckValidator(CheckType):
+    """CheckValidator()
+       Check if key/value is a Validator instance.
+    """
     TYPE = Validator
 
     def on_load(self, key_value):

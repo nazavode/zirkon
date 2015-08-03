@@ -33,6 +33,10 @@ import inspect
 
 
 class ArgumentStore(object):
+    """ArgumentStore(arguments=None)
+       Dict-like object to store arguments and track their usage.
+    """
+
     def __init__(self, arguments=None):
         self._arguments = {}
         self._used = {}
@@ -40,6 +44,9 @@ class ArgumentStore(object):
             self.update(arguments)
 
     def update(self, arguments):
+        """update(arguments)
+           Updates with new arguments.
+        """
         if arguments:
             self._arguments.update(arguments)
             for argument_name in arguments:
@@ -54,27 +61,54 @@ class ArgumentStore(object):
         return key in self._arguments
 
     def get_used(self, argument_name):
+        """get_used(argument_name)
+           Gets 'used' status for 'argument_name'.
+        """
         return self._used[argument_name]
 
     def set_used(self, argument_name, used=True):
+        """set_used(argument_name, used=True)
+           Sets 'used' status for 'argument_name'.
+        """
         self._used[argument_name] = used
 
     def get(self, argument_name):
+        """get(argument_name)
+           Gets arguments and tracks usage.
+        """
         self._used[argument_name] = True
         return self._arguments[argument_name]
 
-    def unexpected_arguments(self):
-        for argument_name,argument_value in self._arguments.items():
+    def unused_arguments(self):
+        """unused_arguments()
+           Iterates over unused arguments.
+        """
+        for argument_name, argument_value in self._arguments.items():
             if not self._used[argument_name]:
                 yield argument_name, argument_value
 
     def items(self):
+        """items()
+           Iterates over arguments items().
+        """
         yield from self._arguments.items()
 
+    def arguments(self):
+        """arguments()
+           Returns the internal _arguments dict.
+        """
+        return self._arguments
+
     def __eq__(self, argument_store):
-        return self._arguments == argument_store._arguments
+        if isinstance(argument_store, ArgumentStore):
+            return self._arguments == argument_store.arguments()
+        else:
+            return self._arguments == argument_store
 
     def split(self, prefix):
+        """split(prefix)
+           Returns a new ArgumentStore containing arguments starting with 'prefix'.
+        """
         sub_arguments = {}
         for argument_name, argument_value in self._arguments.items():
             if argument_name.startswith(prefix):
@@ -83,18 +117,39 @@ class ArgumentStore(object):
         return self.__class__(sub_arguments)
 
     def merge(self, argument_store, prefix):
-        for sub_argument_name in argument_store._arguments:
-            if argument_store._used[sub_argument_name]:
+        """merge(prefix)
+           Merges an ArgumentStore obtained with split(prefix).
+        """
+        for sub_argument_name in argument_store.arguments():
+            if argument_store.get_used(sub_argument_name):
                 argument_name = prefix + sub_argument_name
-                print("!!!", repr(sub_argument_name), repr(argument_name), repr(prefix))
                 self._used[argument_name] = True
 
     def __repr__(self):
-        v = ", ".join("{}={!r}[{}]".format(n, v, self._used[n]) for n, v in self._arguments.items())
-        return "{}({})".format(self.__class__.__name__, v)
+        vstring = ", ".join("{}={!r}[{}]".format(n, v, self._used[n]) for n, v in self._arguments.items())
+        return "{}({})".format(self.__class__.__name__, vstring)
 
 class Composer(object):
+    """Composer(*functions)
+       Function calls composer; given a list of functions, returns a callable
+       object whose __call__ method merges all the function's arguments.
+       For instance:
+       >>> class Alpha(object):
+       ...     def __init__(self, x, y):
+       ...         self.x, self.y = x, y
+       ...     def __repr__(self):
+       ...         return "Alpha(x={}, y={})".format(self.x, self.y)
+       >>> def f_abc(b, c, a=100):
+       ...     return a + b + c
+       >>> def f_bxd(b, x, d):
+       ...     return [b, x, d]
+       >>> composer = Composer(Alpha, f_abc, f_bxd)
+       >>> composer(x=1, y=2, b=10, c=20, d=30)
+       [Alpha(x=1, y=2), 130, [10, 1, 30]]
+       >>>
+    """
     ParameterInfo = collections.namedtuple('ParameterInfo', ('has_default', ))
+
     def __init__(self, *functions):
         self._function_info = []
         for function in functions:
@@ -115,19 +170,26 @@ class Composer(object):
 
     @classmethod
     def verify_argument_store(cls, argument_store):
-        unexpected_arguments = sorted(list(argument_store.unexpected_arguments()), key=lambda x: x[0])
-        if unexpected_arguments:
+        """verify_argument_store(argument_store)
+           Raises a TypeError in case of unused arguments.
+        """
+        unused_arguments = sorted(list(argument_store.unused_arguments()), key=lambda x: x[0])
+        if unused_arguments:
             raise TypeError("unexpected arguments: {}".format(
-                ', '.join("{}={!r}".format(argument_name, argument_value) for argument_name, argument_value in unexpected_arguments),
+                ', '.join("{}={!r}".format(a_name, a_value) for a_name, a_value in unused_arguments),
             ))
 
     def partial(self, argument_store, prefix=''):
+        """partial(argument_store, prefix='')
+           Partial binding from argument_store with prefix.
+           If prefix is given, only arguments starting with prefix are selected,
+           and copied to the functions' arguments without prefix.
+        """
         objects = []
         for function, parameters_info in self._function_info:
             parameters = collections.OrderedDict()
             for parameter_name, parameter_info in parameters_info.items():
                 argument_name = prefix + parameter_name
-                print(function, repr(parameter_name), repr(prefix), repr(argument_name))
                 if argument_name in argument_store:
                     parameter_value = argument_store.get(argument_name)
                     parameters[parameter_name] = parameter_value
@@ -138,4 +200,7 @@ class Composer(object):
         return objects
 
 def compose(*functions):
+    """compose(*functions)
+       Returns a Composer for the given functions.
+    """
     return Composer(*functions)

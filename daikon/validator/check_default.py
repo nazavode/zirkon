@@ -33,6 +33,12 @@ from .check_required import CheckRequired
 from .key_value import KeyValue
 
 class CheckDefault(CheckRequired):
+    """CheckDefault(default=UNDEFINED)
+       Check if key/value is defined; if not:
+       * if default is UNDEFINED, behaves like CheckRequired;
+       * if default is not UNDEFINED, set key_value.value to default.
+    """
+
     def __init__(self, default=UNDEFINED):
         self.default = default
         super().__init__()

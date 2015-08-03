@@ -26,13 +26,15 @@ __all__ = [
     'SequenceValidator',
 ]
 
-import collections
-
 from .key_value import KeyValue
 from .validator import Validator
 
 
 class SequenceValidator(Validator):
+    """SequenceValidator(...)
+       Base class for sequence (list, tuple) validators.
+    """
+
     ITEM_VALIDATOR_CLASS = None
     def bind_arguments(self, argument_store, prefix=''):
         sub_prefix = prefix + 'item_'
@@ -40,7 +42,6 @@ class SequenceValidator(Validator):
         self.item_validator = self.ITEM_VALIDATOR_CLASS(argument_store=sub_argument_store)
         argument_store.merge(sub_argument_store, prefix=sub_prefix)
         return super().bind_arguments(argument_store, prefix=prefix)
-        
 
     def validate_key_value(self, key_value, mode=None):
         super().validate_key_value(key_value, mode=mode)

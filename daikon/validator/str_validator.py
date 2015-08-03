@@ -42,15 +42,27 @@ from .check_sequence import CheckList, \
 
 
 class StrValidator(Validator):
+    """StrValidator()
+       Validator for a str scalar key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
 class StrOptionValidator(Validator):
+    """StrValidator()
+       Validator for a str option key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckOption)
 
 class StrListValidator(SequenceValidator):
+    """StrValidator()
+       Validator for a str list key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = StrValidator
 
 class StrTupleValidator(SequenceValidator):
+    """StrValidator()
+       Validator for a str tuple key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = StrValidator

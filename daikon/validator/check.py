@@ -23,15 +23,10 @@ Implementation of the Check base class
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CheckMeta',
     'Check',
 ]
 
 import abc
-import collections
-import inspect
-
-from .key_value import KeyValue
 
 
 class Check(metaclass=abc.ABCMeta):
@@ -44,6 +39,12 @@ class Check(metaclass=abc.ABCMeta):
         pass
 
     def do_check(self, key_value, mode=None):
+        """do_check(key_value, mode=None)
+           Execute
+           * on_load(key_value) if mode == 'load';
+           * check(key_value);
+           * on_store(key_value) if mode == 'store'.
+        """
         if mode == 'load':
             self.on_load(key_value)
         self.check(key_value)
@@ -52,13 +53,25 @@ class Check(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def check(self, key_value):
+        """check(key_value)
+           Run key/value check (can change key_value.value!)
+        """
         pass
 
     def on_load(self, key_value):
+        """on_load(key_value)
+           Convert key/value on load (can change key_value.value!)
+        """
         pass
 
     def on_store(self, key_value):
+        """on_store(key_value)
+           Convert key/value on store (can change key_value.value!)
+        """
         pass
 
     def auto_validate(self, validator):
+        """auto_validate(validator)
+           Use validator to validate check's attributes.
+        """
         pass

@@ -27,21 +27,31 @@ __all__ = [
 ]
 
 class KeyValue(object):
+    """KeyValue(key, value, *, defined=None)
+       Key/value ocject.
+    """
     def __init__(self, key, value, *, defined=None):
         self.key = key
         self.value = value
         self.defined = defined
 
     def copy(self):
+        """copy()
+           Return a copy of the KeyValue object.
+        """
         return self.__class__(key=self.key, value=self.value, defined=self.defined)
 
     def __repr__(self):
-        return "{}(key={!r}, value={!r}, defined={!r})".format(self.__class__.__name__, self.key, self.value, self.defined)
+        return "{}(key={!r}, value={!r}, defined={!r})".format(
+            self.__class__.__name__,
+            self.key,
+            self.value,
+            self.defined)
 
     def __str__(self):
         if self.defined:
-            vs = repr(self.value)
+            vstring = repr(self.value)
         else:
-            vs = '<undefined>'
-        return "{}={}".format(self.key, vs)
+            vstring = '<undefined>'
+        return "{}={}".format(self.key, vstring)
 

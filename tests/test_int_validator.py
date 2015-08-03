@@ -35,6 +35,14 @@ def test_bad_default_type():
     with pytest.raises(TypeValidationError):
         iv = IntValidator(default='ten')
 
+def test_bad_default_min():
+    with pytest.raises(TypeValidationError):
+        iv = IntValidator(min=4.5)
+
+def test_bad_default_max():
+    with pytest.raises(TypeValidationError):
+        iv = IntValidator(max=4.5)
+
 def test_default_min():
     iv = IntValidator(default=10, min=3)
     with pytest.raises(MinValidationError):
@@ -44,11 +52,11 @@ def test_default_min():
     v = iv.validate(key='alpha', defined=False, value=None)
     assert v == 10
 
-def test_bad_default_min():
+def test_bad_min_type():
     with pytest.raises(MinValidationError):
         iv = IntValidator(default=2, min=3)
 
-def test_bad_default_max():
+def test_bad_max_type():
     with pytest.raises(MaxValidationError):
         iv = IntValidator(default=101, max=100)
 

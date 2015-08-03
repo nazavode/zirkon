@@ -17,7 +17,7 @@
 
 """\
 config.serializer.configobj_serializer
-=================================
+======================================
 Implementation of the ConfigObj Serializer
 """
 

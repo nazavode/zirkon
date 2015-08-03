@@ -31,6 +31,10 @@ from .error import TypeValidationError
 
 
 class CheckType(Check):
+    """CheckType()
+       Check if key/value has type 'TYPE' or 'SECONDARY_TYPES'.
+       If isinstance(value, SECONDARY_TYPES) then value is converted to 'TYPE'.
+    """
     TYPE = None
     SECONDARY_TYPES = None
 

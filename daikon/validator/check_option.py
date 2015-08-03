@@ -23,7 +23,7 @@ Implementation of the CheckOption class
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CheckOptionType',
+    'CheckOption',
 ]
 
 from .check_type import CheckType
@@ -32,13 +32,19 @@ from .error import InvalidOptionValidationError
 
 
 class CheckOption(CheckType):
+    """CheckOption(values)
+       Check if key_value.value is in 'values'.
+    """
     def __init__(self, values):
         self.values = values
+        super().__init__()
 
     def check(self, key_value):
         if key_value.defined:
             if not key_value.value in self.values:
-                raise InvalidOptionValidationError(key_value, "{!r} is not a valid option value".format(key_value.value))
+                raise InvalidOptionValidationError(
+                    key_value,
+                    "{!r} is not a valid option value".format(key_value.value))
 
     def auto_validate(self, validator):
         for value in self.values:

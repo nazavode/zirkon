@@ -33,4 +33,7 @@ from .check_validator import CheckValidator
 
 
 class ValidatorValidator(Validator):
+    """ValidatorValidator()
+       Validator for a Validator key/value instance.
+    """
     CHECK_COMPOSER = Composer(CheckValidator)

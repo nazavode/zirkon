@@ -39,6 +39,14 @@ def test_bad_default_type():
     with pytest.raises(TypeValidationError):
         fv = FloatValidator(default='ten')
 
+def test_bad_min_type():
+    with pytest.raises(TypeValidationError):
+        iv = FloatValidator(min="abc")
+
+def test_bad_max_type():
+    with pytest.raises(TypeValidationError):
+        iv = FloatValidator(max="abc")
+
 def test_default_min():
     fv = FloatValidator(default=10.01, min=3.3)
     with pytest.raises(MinValidationError):

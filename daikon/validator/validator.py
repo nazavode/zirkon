@@ -32,7 +32,11 @@ from .key_value import KeyValue
 
 
 class Validator(Plugin):
+    """Validator(*, argument_store, **arguments)
+       Base class for validators.
+    """
     CHECK_COMPOSER = None
+
     def __init__(self, *, argument_store=None, **arguments):
         if argument_store is None:
             argument_store = ArgumentStore()
@@ -48,6 +52,9 @@ class Validator(Plugin):
             check.auto_validate(validator=self)
 
     def bind_arguments(self, argument_store, prefix=''):
+        """bind_arguments(argument_store, prefix='')
+           Binds actual arguments to the CHECK_COMPOSER instance.
+        """
         return self.CHECK_COMPOSER.partial(argument_store, prefix=prefix)
 
     def __repr__(self):
@@ -56,9 +63,15 @@ class Validator(Plugin):
 
     @classmethod
     def validator_unrepr(cls, vstring):
+        """validator_unrepr(vstring) -> validator
+           Return a Validator from a validator's repr string.
+        """
         return eval(vstring, cls.subclasses_dict())
 
     def validator_repr(self):
+        """validator_repr() -> validator repr
+           Return the validator's repr string.
+        """
         args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.plugin_name(), args)
 
@@ -70,11 +83,17 @@ class Validator(Plugin):
             name = name[:-len(suffix)]
         return name
 
-    def validate(self, key, defined, value, mode=None):
+    def validate(self, key, value, defined, mode=None):
+        """validate(key, value, defined, mode=None) -> validator repr
+           Validate a key/value.
+        """
         key_value = KeyValue(key=key, defined=defined, value=value)
         return self.validate_key_value(key_value, mode=mode)
 
     def validate_key_value(self, key_value, mode=None):
+        """validate(key, value, defined, mode=None) -> validator repr
+           Validate a KeyValue object.
+        """
         for check in self.checks:
             check.do_check(key_value, mode=mode)
         return key_value.value
@@ -83,5 +102,4 @@ class Validator(Plugin):
         if self.__class__ != validator.__class__:
             return False
         return self.argument_store == validator.argument_store
-        
-     
+

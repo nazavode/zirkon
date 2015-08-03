@@ -45,16 +45,28 @@ from .check_sequence import CheckList, \
 
 
 class IntValidator(Validator):
+    """IntValidator()
+       Validator for a int scalar key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckMin, CheckMax)
 
 class IntOptionValidator(Validator):
+    """IntValidator()
+       Validator for a int option key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckOption)
 
 class IntListValidator(SequenceValidator):
+    """IntValidator()
+       Validator for a int list key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = IntValidator
 
 class IntTupleValidator(SequenceValidator):
+    """IntValidator()
+       Validator for a int tuple key/value.
+    """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = IntValidator
 
