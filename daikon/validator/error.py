@@ -33,6 +33,7 @@ __all__ = [
     'InvalidOptionValidationError',
 ]
 
+
 class ValidationError(Exception):
     """ValidationError()
     """
@@ -41,38 +42,44 @@ class ValidationError(Exception):
         self.key_value = key_value
         super().__init__("{}: {}".format(key_value, message))
 
+
 class UndefinedKeyValidationError(ValidationError):
     """UndefinedValidationError()
     """
     pass
+
 
 class TypeValidationError(ValidationError):
     """RangeValidationError()
     """
     pass
 
+
 class MinValidationError(ValidationError):
     """MinValidationError()
     """
     pass
+
 
 class MaxValidationError(ValidationError):
     """MaxValidationError()
     """
     pass
 
+
 class MinLenValidationError(ValidationError):
     """MinLenValidationError()
     """
     pass
+
 
 class MaxLenValidationError(ValidationError):
     """MaxLenValidationError()
     """
     pass
 
+
 class InvalidOptionValidationError(ValidationError):
     """InvalidOptionValidationError()
     """
     pass
-

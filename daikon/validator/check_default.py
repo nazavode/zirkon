@@ -32,6 +32,7 @@ from ..utils.undefined import UNDEFINED
 from .check_required import CheckRequired
 from .key_value import KeyValue
 
+
 class CheckDefault(CheckRequired):
     """CheckDefault(default=UNDEFINED)
        Check if key/value is defined; if not:

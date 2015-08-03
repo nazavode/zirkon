@@ -50,7 +50,7 @@ class ArgumentStore(object):
         if arguments:
             self._arguments.update(arguments)
             for argument_name in arguments:
-                if not argument_name in self._used:
+                if argument_name not in self._used:
                     self._used[argument_name] = False
 
     def __iter__(self):
@@ -129,6 +129,7 @@ class ArgumentStore(object):
         vstring = ", ".join("{}={!r}[{}]".format(n, v, self._used[n]) for n, v in self._arguments.items())
         return "{}({})".format(self.__class__.__name__, vstring)
 
+
 class Composer(object):
     """Composer(*functions)
        Function calls composer; given a list of functions, returns a callable
@@ -198,6 +199,7 @@ class Composer(object):
                         raise TypeError("{}: missing required argument {}".format(function.__name__, parameter_name))
             objects.append(function(**parameters))
         return objects
+
 
 def compose(*functions):
     """compose(*functions)

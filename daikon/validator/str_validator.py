@@ -37,8 +37,7 @@ from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
 from .check_scalar import CheckStr
 from .check_option import CheckOption
-from .check_sequence import CheckList, \
-                            CheckTuple
+from .check_sequence import CheckList, CheckTuple
 
 
 class StrValidator(Validator):
@@ -47,11 +46,13 @@ class StrValidator(Validator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
+
 class StrOptionValidator(Validator):
     """StrValidator()
        Validator for a str option key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckOption)
+
 
 class StrListValidator(SequenceValidator):
     """StrValidator()
@@ -59,6 +60,7 @@ class StrListValidator(SequenceValidator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = StrValidator
+
 
 class StrTupleValidator(SequenceValidator):
     """StrValidator()

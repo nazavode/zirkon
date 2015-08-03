@@ -31,13 +31,14 @@ __all__ = [
 
 from .check import Check
 from .error import MinValidationError, \
-                   MaxValidationError, \
-                   MinLenValidationError, \
-                   MaxLenValidationError
+    MaxValidationError, \
+    MinLenValidationError, \
+    MaxLenValidationError
+
 from .key_value import KeyValue
 
 
-class CheckRange(Check):
+class CheckRange(Check):  # pylint: disable=W0223
     """CheckRange(value)
        Base class for CheckMin, CheckMax.
     """
@@ -51,13 +52,14 @@ class CheckRange(Check):
             key_value = KeyValue(key=key, value=value, defined=True)
             validator.validate_key_value(key_value)
 
+
 class CheckMin(CheckRange):
     """CheckMin(min=None)
        If min is not None, check if key/value is >= min.
     """
     ATTRIBUTE_NAME = 'min'
 
-    def __init__(self, min=None):
+    def __init__(self, min=None):  # pylint: disable=W0622
         self.min = min
         super().__init__()
 
@@ -75,7 +77,7 @@ class CheckMax(CheckRange):
     """
     ATTRIBUTE_NAME = 'max'
 
-    def __init__(self, max=None):
+    def __init__(self, max=None):  # pylint: disable=W0622
         self.max = max
         super().__init__()
 
@@ -85,6 +87,7 @@ class CheckMax(CheckRange):
             if value > self.max:
                 raise MaxValidationError(key_value,
                                          "value {!r} is greater than max {!r}".format(value, self.max))
+
 
 class CheckMinLen(Check):
     """CheckMinLen(min_len=None)

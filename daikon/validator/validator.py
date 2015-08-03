@@ -66,7 +66,7 @@ class Validator(Plugin):
         """validator_unrepr(vstring) -> validator
            Return a Validator from a validator's repr string.
         """
-        return eval(vstring, cls.subclasses_dict())
+        return eval(vstring, cls.subclasses_dict())  # pylint: disable=W0123
 
     def validator_repr(self):
         """validator_repr() -> validator repr

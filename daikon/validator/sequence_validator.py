@@ -34,8 +34,8 @@ class SequenceValidator(Validator):
     """SequenceValidator(...)
        Base class for sequence (list, tuple) validators.
     """
+    ITEM_VALIDATOR_CLASS = type(None)
 
-    ITEM_VALIDATOR_CLASS = None
     def bind_arguments(self, argument_store, prefix=''):
         sub_prefix = prefix + 'item_'
         sub_argument_store = argument_store.split(prefix=sub_prefix)

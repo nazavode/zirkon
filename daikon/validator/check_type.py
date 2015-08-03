@@ -35,7 +35,7 @@ class CheckType(Check):
        Check if key/value has type 'TYPE' or 'SECONDARY_TYPES'.
        If isinstance(value, SECONDARY_TYPES) then value is converted to 'TYPE'.
     """
-    TYPE = None
+    TYPE = type(None)
     SECONDARY_TYPES = None
 
     def check(self, key_value):

@@ -34,14 +34,12 @@ from ..utils.compose import Composer
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
-from .check_range import CheckMin, \
-                         CheckMinLen, \
-                         CheckMax, \
-                         CheckMaxLen
+from .check_range import CheckMin, CheckMax, \
+    CheckMinLen, CheckMaxLen
+
 from .check_scalar import CheckFloat
 from .check_option import CheckOption
-from .check_sequence import CheckList, \
-                            CheckTuple
+from .check_sequence import CheckList, CheckTuple
 
 
 class FloatValidator(Validator):
@@ -50,11 +48,13 @@ class FloatValidator(Validator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
 
+
 class FloatOptionValidator(Validator):
     """FloatValidator()
        Validator for a float option key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckOption)
+
 
 class FloatListValidator(SequenceValidator):
     """FloatValidator()
@@ -62,6 +62,7 @@ class FloatListValidator(SequenceValidator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = FloatValidator
+
 
 class FloatTupleValidator(SequenceValidator):
     """FloatValidator()

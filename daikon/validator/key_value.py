@@ -26,6 +26,7 @@ __all__ = [
     'KeyValue',
 ]
 
+
 class KeyValue(object):
     """KeyValue(key, value, *, defined=None)
        Key/value ocject.
@@ -34,6 +35,12 @@ class KeyValue(object):
         self.key = key
         self.value = value
         self.defined = defined
+
+    def is_defined(self):
+        """is_defined()
+           Returns defined attribute.
+        """
+        return self.defined
 
     def copy(self):
         """copy()

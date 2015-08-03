@@ -29,7 +29,7 @@ __all__ = [
 from .singleton import Singleton
 
 
-class UndefinedType(metaclass=Singleton):
+class UndefinedType(metaclass=Singleton):  # pylint: disable=R0903
     """UndefinedType()
     """
 

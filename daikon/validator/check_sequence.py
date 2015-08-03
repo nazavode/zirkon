@@ -29,7 +29,6 @@ __all__ = [
 ]
 
 from .check_type import CheckType
-from .key_value import KeyValue
 
 
 class CheckSequenceType(CheckType):
@@ -37,11 +36,13 @@ class CheckSequenceType(CheckType):
        Base class for CheckList, CheckTuple.
     """
 
+
 class CheckList(CheckSequenceType):
     """CheckList()
        Check if key/value is a list.
     """
     TYPE = list
+
 
 class CheckTuple(CheckSequenceType):
     """CheckList()

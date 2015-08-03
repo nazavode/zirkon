@@ -34,12 +34,11 @@ from ..utils.compose import Composer
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
-from .check_range import CheckMinLen, \
-                         CheckMaxLen
+from .check_range import CheckMinLen, CheckMaxLen
+
 from .check_scalar import CheckBool
 from .check_option import CheckOption
-from .check_sequence import CheckList, \
-                            CheckTuple
+from .check_sequence import CheckList, CheckTuple
 
 
 class BoolValidator(Validator):
@@ -48,11 +47,13 @@ class BoolValidator(Validator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
+
 class BoolOptionValidator(Validator):
     """BoolValidator()
        Validator for a bool option key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckOption)
+
 
 class BoolListValidator(SequenceValidator):
     """BoolValidator()
@@ -60,6 +61,7 @@ class BoolListValidator(SequenceValidator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = BoolValidator
+
 
 class BoolTupleValidator(SequenceValidator):
     """BoolValidator()

@@ -39,11 +39,13 @@ class CheckScalarType(CheckType):
     """
     pass
 
+
 class CheckInt(CheckScalarType):
     """CheckScalarType()
        Check if key/value has scalar type 'int'.
     """
     TYPE = int
+
 
 class CheckFloat(CheckScalarType):
     """CheckScalarType()
@@ -53,11 +55,13 @@ class CheckFloat(CheckScalarType):
     TYPE = float
     SECONDARY_TYPES = (int, )
 
+
 class CheckStr(CheckScalarType):
     """CheckScalarType()
        Check if key/value has scalar type 'str'.
     """
     TYPE = str
+
 
 class CheckBool(CheckScalarType):
     """CheckScalarType()

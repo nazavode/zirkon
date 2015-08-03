@@ -34,14 +34,12 @@ from ..utils.compose import Composer
 from .validator import Validator
 from .sequence_validator import SequenceValidator
 from .check_default import CheckDefault
-from .check_range import CheckMin, \
-                         CheckMinLen, \
-                         CheckMax, \
-                         CheckMaxLen
+from .check_range import CheckMin, CheckMax, \
+    CheckMinLen, CheckMaxLen
+
 from .check_scalar import CheckInt
 from .check_option import CheckOption
-from .check_sequence import CheckList, \
-                            CheckTuple
+from .check_sequence import CheckList, CheckTuple
 
 
 class IntValidator(Validator):
@@ -50,11 +48,13 @@ class IntValidator(Validator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckMin, CheckMax)
 
+
 class IntOptionValidator(Validator):
     """IntValidator()
        Validator for a int option key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckOption)
+
 
 class IntListValidator(SequenceValidator):
     """IntValidator()
@@ -62,6 +62,7 @@ class IntListValidator(SequenceValidator):
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = IntValidator
+
 
 class IntTupleValidator(SequenceValidator):
     """IntValidator()
