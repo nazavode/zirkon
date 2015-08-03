@@ -23,8 +23,9 @@ import io
 import pytest
 
 from common.fixtures import simple_container, \
-                            string_io
-
+    string_io
+from common.schema_fixtures import simple_section_content, \
+    simple_schema_content
 from daikon.section import Section
 from daikon.section_schema import SectionSchema
 from daikon.validation_section import ValidationSection
@@ -35,36 +36,6 @@ from daikon.validator.remove import Remove
 from daikon.validator.error import TypeValidationError, \
     OptionValidationError, UnexpectedParameterValidationError
 
-
-@pytest.fixture
-def simple_schema_content():
-    return collections.OrderedDict((
-        ('a', 'Int(min=1)'),
-        ('sub', collections.OrderedDict((
-            ('sa', 'Float(max=10)'),
-            ('sb', Int(default=3)),
-            ('sc', Str()),
-            ('subsub', collections.OrderedDict((
-                           ('ssx', StrOption(values=("alpha", "beta", "gamma"))),
-                           ('ssy', 'FloatTuple(item_max=5.5)'),
-            ))),
-        ))),
-    ))
-
-@pytest.fixture
-def simple_section_content():
-    return collections.OrderedDict((
-        ('a', 10),
-        ('sub', collections.OrderedDict((
-            ('sa', 0.4),
-            ('sb', 10),
-            ('sc', "a.dat"),
-            ('subsub', collections.OrderedDict((
-                ('ssx', "beta"),
-                ('ssy', (0.3, 0.4, 0.5, 0.6)),
-            ))),
-        ))),
-    ))
 
 def test_SectionSchema_create(simple_container, string_io):
     section_schema = SectionSchema(container=simple_container)
