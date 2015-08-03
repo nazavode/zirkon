@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.validator.error import InvalidOptionValidationError, \
+from daikon.validator.error import OptionValidationError, \
                                    TypeValidationError
 from daikon.validator.int_validators import IntOption
 from daikon.validator.float_validators import FloatOption
@@ -46,7 +46,7 @@ class TestOptionWithScenarios(object):
         for value in values:
             v = iv.validate(key='alpha', defined=True, value=value)
             assert v == value
-        with pytest.raises(InvalidOptionValidationError):
+        with pytest.raises(OptionValidationError):
             v = iv.validate(key='alpha', defined=True, value=invalid_value)
 
     def test_bad_option_value(self, validator_class, values, invalid_value, invalid_option):

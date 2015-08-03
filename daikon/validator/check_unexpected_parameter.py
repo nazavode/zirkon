@@ -16,8 +16,8 @@
 #
 
 """\
-config.validator.check_unexpected_key
-=====================================
+config.validator.check_unexpected_parameter
+===========================================
 Implementation of the CheckUnexpectedKey class
 """
 
@@ -27,13 +27,13 @@ __all__ = [
 ]
 
 from .check import Check
-from .error import UnexpectedKeyValidationError
+from .error import UnexpectedParameterValidationError
 
 
-class CheckUnexpectedKey(Check):
+class CheckUnexpectedParameter(Check):
     """CheckRequired()
        Check if a required key/value is available (no default).
     """
 
     def check(self, key_value):
-        raise UnexpectedKeyValidationError(key_value, "unexpected key {!r}".format(key_value.key))
+        raise UnexpectedParameterValidationError(key_value, "unexpected parameter {!r}".format(key_value.key))

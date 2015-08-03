@@ -30,9 +30,9 @@ __all__ = [
     'MaxValidationError',
     'MinLenValidationError',
     'MaxLenValidationError',
-    'InvalidOptionValidationError',
-    'UnexpectedKeyValidationError',
+    'OptionValidationError',
     'UnexpectedSectionValidationError',
+    'UnexpectedParameterValidationError',
 ]
 
 
@@ -81,14 +81,8 @@ class MaxLenValidationError(ValidationError):
     pass
 
 
-class InvalidOptionValidationError(ValidationError):
-    """InvalidOptionValidationError()
-    """
-    pass
-
-
-class UnexpectedKeyValidationError(ValidationError):
-    """UnexpectedKeyValidationError()
+class OptionValidationError(ValidationError):
+    """OptionValidationError()
     """
     pass
 
@@ -98,8 +92,9 @@ class UnexpectedSectionValidationError(ValidationError):
     """
     pass
 
-
 class UnexpectedParameterValidationError(ValidationError):
     """UnexpectedParameterValidationError()
     """
     pass
+
+

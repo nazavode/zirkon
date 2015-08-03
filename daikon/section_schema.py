@@ -29,7 +29,7 @@ from .section import Section
 from .validation_section import ValidationSection
 from .validator import ValidatorBase
 from .validator.validator import Validator
-from .validator.unexpected_key import UnexpectedKey
+from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
 from .validator.error import ValidationError, \
     UnexpectedSectionValidationError, \
@@ -37,38 +37,40 @@ from .validator.error import ValidationError, \
 
 
 class SectionSchema(Section):
-    """SectionSchema(container, *, prefix='', init=None, unexpected_key_validator=None)
+    """SectionSchema(container, *, prefix='', init=None, unexpected_parameter_validator=None)
        Provides validation methods.
     """
     SUPPORTED_VALUE_TYPES = (str, ValidatorBase, )
 
-    def __init__(self, container, *, prefix='', init=None, unexpected_key_validator=None, auto_validate=True):
+    def __init__(self, container, *, prefix='', init=None, unexpected_parameter_validator=None, auto_validate=True):
+        if unexpected_parameter_validator is None:
+            unexpected_parameter_validator = UnexpectedParameter()
+        self.unexpected_parameter_validator = unexpected_parameter_validator
         super().__init__(container=container, prefix=prefix, init=init)
-        if unexpected_key_validator is None:
-            unexpected_key_validator = UnexpectedKey()
-        self.unexpected_key_validator = unexpected_key_validator
         if auto_validate:
             schema_validator = self.subsection_class()(container=collections.OrderedDict(),
-                                                       unexpected_key_validator=Validator(),
+                                                       unexpected_parameter_validator=Validator(),
                                                        auto_validate=False)
             schema_validator.impl_validate(self, mode='load', ignore_errors=False)
 
     @classmethod
     def subsection_class(cls):
-        """subsection_class(cls)
-           Return the class to be used for subsections (it must be derived from Section)
-        """
         return SectionSchema
 
-    @property
-    def unexpected_key_validator(self):
-        return self._unexpected_key_validator
+    def subsection(self, prefix):
+        return self.subsection_class()(container=self.container,
+                                       unexpected_parameter_validator=self.unexpected_parameter_validator,
+                                       prefix=prefix)
 
-    @unexpected_key_validator.setter
-    def unexpected_key_validator(self, validator):
+    @property
+    def unexpected_parameter_validator(self):
+        return self._unexpected_parameter_validator
+
+    @unexpected_parameter_validator.setter
+    def unexpected_parameter_validator(self, validator):
         if not isinstance(validator, ValidatorBase):
             raise TypeError("{!r} is not a ValidatorBase".format(validator))
-        self._unexpected_key_validator = validator
+        self._unexpected_parameter_validator = validator
 
     def validate(self, section, *, mode=None, ignore_errors=True):
         return self.impl_validate(section, mode=mode, ignore_errors=ignore_errors)
@@ -101,7 +103,7 @@ class SectionSchema(Section):
                 sub_section_fqname = parent_fqname + sub_section_name + self.DOT
                 sub_section_schema = self.subsection_class()(container=collections.OrderedDict(),
                                                              prefix=self.prefix,
-                                                             unexpected_key_validator=self.unexpected_key_validator)
+                                                             unexpected_parameter_validator=self.unexpected_parameter_validator)
                 sub_validation_section = sub_section_schema.impl_validate(section[sub_section_name],
                                                                          mode=mode,
                                                                          ignore_errors=ignore_errors,
@@ -124,29 +126,33 @@ class SectionSchema(Section):
                     defined = False
                 key_value = KeyValue(key=key, value=value, defined=defined)
                 try:
-                    mod_value = validator.validate_key_value(key_value, mode=mode)
+                    validator.validate_key_value(key_value, mode=mode)
                 except ValidationError as err:
                     validation_section[parameter_name] = err
                     if not ignore_errors:
                         raise
                 else:
-                    if mod_value is not value:
-                        section[parameter_name] = mod_value
+                    if not key_value.defined:
+                        del section[parameter_name]
+                    elif key_value.value is not value:
+                        section[parameter_name] = key_value.value
         # unexpected parameters:
         unexpected_parameter_names = set()
         for parameter_name, parameter_value in section.parameters():
             if parameter_name not in expected_parameter_names:
                 unexpected_parameter_names.add(parameter_name)
-                validator = self.unexpected_key_validator
+                validator = self.unexpected_parameter_validator
                 key = parent_fqname + parameter_name
                 key_value = KeyValue(key=key, value=parameter_value, defined=True)
                 try:
-                    mod_value = validator.validate_key_value(key_value, mode=mode)
+                    validator.validate_key_value(key_value, mode=mode)
                 except ValidationError as err:
                     validation_section[parameter_name] = err
                     if not ignore_errors:
                         raise
                 else:
-                    if mod_value is not parameter_value:
-                        section[parameter_name] = mod_value
+                    if not key_value.defined:
+                        del section[parameter_name]
+                    elif key_value.value is not parameter_value:
+                        section[parameter_name] = key_value.value
         return validation_section

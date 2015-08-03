@@ -16,24 +16,24 @@
 #
 
 """\
-config.validator.unexpected_key
-===============================
-Implementation of the UnexpectedKey class
+config.validator.remove
+=======================
+Implementation of the Remove class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'UnexpectedKey',
+    'Remove',
 ]
 
 from ..utils.compose import Composer
 
+from .check_remove import CheckRemove
 from .validator_base import ValidatorBase
-from .check_unexpected_key import CheckUnexpectedKey
 
 
-class UnexpectedKey(ValidatorBase):
-    """UnexpectedKey()
-       Validator for unexpected parameters
+class Remove(ValidatorBase):
+    """Remove()
+       Ignore key/value.
     """
-    CHECK_COMPOSER = Composer(CheckUnexpectedKey)
+    CHECK_COMPOSER = Composer(CheckRemove)

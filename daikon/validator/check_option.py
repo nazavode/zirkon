@@ -28,7 +28,7 @@ __all__ = [
 
 from .check_type import CheckType
 from .key_value import KeyValue
-from .error import InvalidOptionValidationError
+from .error import OptionValidationError
 
 
 class CheckOption(CheckType):
@@ -42,7 +42,7 @@ class CheckOption(CheckType):
     def check(self, key_value):
         if key_value.defined:
             if key_value.value not in self.values:
-                raise InvalidOptionValidationError(
+                raise OptionValidationError(
                     key_value,
                     "{!r} is not a valid option value".format(key_value.value))
 

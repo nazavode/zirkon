@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.validator.error import InvalidOptionValidationError, \
+from daikon.validator.error import OptionValidationError, \
                                    MinValidationError, \
                                    MaxValidationError, \
                                    MinLenValidationError, \
