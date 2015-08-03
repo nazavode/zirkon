@@ -9,10 +9,10 @@ from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from daikon.validator.int_validator import IntValidator
+from daikon.validator.int_validators import Int
 
 def test_basic():
-    iv = IntValidator()
+    iv = Int()
     v = iv.validate(key='alpha', defined=True, value=2)
     assert v == 2
     v = iv.validate(key='alpha', defined=True, value=-2000)
@@ -23,7 +23,7 @@ def test_basic():
         v = iv.validate(key='alpha', defined=False, value=None)
 
 def test_default():
-    iv = IntValidator(default=10)
+    iv = Int(default=10)
     v = iv.validate(key='alpha', defined=True, value=2)
     assert v == 2
     v = iv.validate(key='alpha', defined=False, value=None)
@@ -33,18 +33,18 @@ def test_default():
 
 def test_bad_default_type():
     with pytest.raises(TypeValidationError):
-        iv = IntValidator(default='ten')
+        iv = Int(default='ten')
 
 def test_bad_default_min():
     with pytest.raises(TypeValidationError):
-        iv = IntValidator(min=4.5)
+        iv = Int(min=4.5)
 
 def test_bad_default_max():
     with pytest.raises(TypeValidationError):
-        iv = IntValidator(max=4.5)
+        iv = Int(max=4.5)
 
 def test_default_min():
-    iv = IntValidator(default=10, min=3)
+    iv = Int(default=10, min=3)
     with pytest.raises(MinValidationError):
         v = iv.validate(key='alpha', defined=True, value=2)
     v = iv.validate(key='alpha', defined=True, value=3)
@@ -54,14 +54,14 @@ def test_default_min():
 
 def test_bad_min_type():
     with pytest.raises(MinValidationError):
-        iv = IntValidator(default=2, min=3)
+        iv = Int(default=2, min=3)
 
 def test_bad_max_type():
     with pytest.raises(MaxValidationError):
-        iv = IntValidator(default=101, max=100)
+        iv = Int(default=101, max=100)
 
 def test_default_max():
-    iv = IntValidator(default=10, min=3, max=100)
+    iv = Int(default=10, min=3, max=100)
     with pytest.raises(MinValidationError):
         v = iv.validate(key='alpha', defined=True, value=2)
     with pytest.raises(MaxValidationError):

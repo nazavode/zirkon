@@ -16,24 +16,23 @@
 #
 
 """\
-config.validator.unexpected_key_validator
-=========================================
-Implementation of the UnexpectedKeyValidator class
+config.validator.ignore
+=======================
+Implementation of the Ignore class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'UnexpectedKeyValidator',
+    'Ignore',
 ]
 
 from ..utils.compose import Composer
 
-from .validator import Validator
-from .check_unexpected_key import CheckUnexpectedKey
+from .validator_base import ValidatorBase
 
 
-class UnexpectedKeyValidator(Validator):
-    """UnexpectedKeyValidator()
-       Validator for unexpected parameters
+class Ignore(ValidatorBase):
+    """Ignore()
+       Ignore key/value.
     """
-    CHECK_COMPOSER = Composer(CheckUnexpectedKey)
+    CHECK_COMPOSER = Composer()

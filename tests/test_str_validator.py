@@ -9,10 +9,10 @@ from daikon.validator.error import MinLenValidationError, \
                                    MaxLenValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from daikon.validator.str_validator import StrValidator
+from daikon.validator.str_validators import Str
 
 def test_basic():
-    sv = StrValidator()
+    sv = Str()
     v = sv.validate(key='alpha', defined=True, value='abc')
     assert v == 'abc'
     v = sv.validate(key='alpha', defined=True, value=' fg ')
@@ -25,7 +25,7 @@ def test_basic():
         v = sv.validate(key='alpha', defined=False, value=None)
 
 def test_default():
-    sv = StrValidator(default='x.dat')
+    sv = Str(default='x.dat')
     v = sv.validate(key='alpha', defined=True, value='a.dat')
     assert v == 'a.dat'
     v = sv.validate(key='alpha', defined=False, value=None)
@@ -33,10 +33,10 @@ def test_default():
 
 def test_bad_default_type():
     with pytest.raises(TypeValidationError):
-        sv = StrValidator(default=2)
+        sv = Str(default=2)
 
 def test_default_min_len():
-    iv = StrValidator(default="abcd", min_len=3)
+    iv = Str(default="abcd", min_len=3)
     with pytest.raises(MinLenValidationError):
         v = iv.validate(key='alpha', defined=True, value="x")
     v = iv.validate(key='alpha', defined=True, value="xxx")
@@ -46,14 +46,14 @@ def test_default_min_len():
 
 def test_bad_default_min_len():
     with pytest.raises(MinLenValidationError):
-        iv = StrValidator(default="ab", min_len=3)
+        iv = Str(default="ab", min_len=3)
 
 def test_bad_default_max_len():
     with pytest.raises(MaxLenValidationError):
-        iv = StrValidator(default="abcd", max_len=3)
+        iv = Str(default="abcd", max_len=3)
 
 def test_default_max_len():
-    iv = StrValidator(default="abcd", min_len=3, max_len=10)
+    iv = Str(default="abcd", min_len=3, max_len=10)
     with pytest.raises(MinLenValidationError):
         v = iv.validate(key='alpha', defined=True, value="ab")
     with pytest.raises(MaxLenValidationError):
@@ -67,6 +67,6 @@ def test_default_max_len():
 
 def test_invalid_min_max():
     with pytest.raises(TypeError):
-        StrValidator(default="abcd", min_len=3, min=3)
+        Str(default="abcd", min_len=3, min=3)
     with pytest.raises(TypeError):
-        StrValidator(default="abcd", min_len=3, max=10)
+        Str(default="abcd", min_len=3, max=10)

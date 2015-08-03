@@ -16,56 +16,55 @@
 #
 
 """\
-config.validator.bool_validator
+config.validator.str_validators
 ===============================
-Implementation of the BoolValidator classes
+Implementation of the str validator classes
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'BoolValidator',
-    'BoolOptionValidator',
-    'BoolListValidator',
-    'BoolTupleValidator',
+    'Str',
+    'StrOption',
+    'StrList',
+    'StrTuple',
 ]
 
 from ..utils.compose import Composer
 
-from .validator import Validator
-from .sequence_validator import SequenceValidator
+from .validator_base import ValidatorBase
+from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
-
-from .check_scalar import CheckBool
+from .check_scalar import CheckStr
 from .check_option import CheckOption
 from .check_sequence import CheckList, CheckTuple
 
 
-class BoolValidator(Validator):
-    """BoolValidator()
-       Validator for a scalar bool key/value.
+class Str(ValidatorBase):
+    """Str()
+       Validator for a str scalar key/value.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
 
-class BoolOptionValidator(Validator):
-    """BoolValidator()
-       Validator for a bool option key/value.
+class StrOption(ValidatorBase):
+    """StrOption()
+       Validator for a str option key/value.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckOption)
 
 
-class BoolListValidator(SequenceValidator):
-    """BoolValidator()
-       Validator for a bool list key/value.
+class StrList(Sequence):
+    """StrList()
+       Validator for a str list key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
-    ITEM_VALIDATOR_CLASS = BoolValidator
+    ITEM_VALIDATOR_CLASS = Str
 
 
-class BoolTupleValidator(SequenceValidator):
-    """BoolValidator()
-       Validator for a bool tuple key/value.
+class StrTuple(Sequence):
+    """StrTuple()
+       Validator for a str tuple key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
-    ITEM_VALIDATOR_CLASS = BoolValidator
+    ITEM_VALIDATOR_CLASS = Str

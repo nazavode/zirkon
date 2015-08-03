@@ -16,25 +16,24 @@
 #
 
 """\
-config.validator.validator_validator
-====================================
-Implementation of the ValidatorValidator class
+config.validator.unexpected_key
+===============================
+Implementation of the UnexpectedKey class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ValidatorValidator',
+    'UnexpectedKey',
 ]
 
 from ..utils.compose import Composer
 
-from .validator import Validator
-from .check_validator import CheckValidator
+from .validator_base import ValidatorBase
+from .check_unexpected_key import CheckUnexpectedKey
 
 
-class ValidatorValidator(Validator):
-    """ValidatorValidator()
-       Validator for a Validator key/value instance.
+class UnexpectedKey(ValidatorBase):
+    """UnexpectedKey()
+       Validator for unexpected parameters
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
-
+    CHECK_COMPOSER = Composer(CheckUnexpectedKey)

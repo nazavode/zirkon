@@ -6,35 +6,35 @@ Parameter validator classes
 """
 
 __all__ = [
-    'Validator',
-    'IntValidator',
-    'IntListValidator',
-    'IntTupleValidator',
-    'IntOptionValidator',
-    'FloatValidator',
-    'FloatListValidator',
-    'FloatTupleValidator',
-    'FloatOptionValidator',
-    'StrValidator',
-    'StrListValidator',
-    'StrTupleValidator',
-    'StrOptionValidator',
-    'BoolValidator',
-    'BoolListValidator',
-    'BoolTupleValidator',
-    'BoolOptionValidator',
+    'ValidatorBase',
+    'Int',
+    'IntList',
+    'IntTuple',
+    'IntOption',
+    'Float',
+    'FloatList',
+    'FloatTuple',
+    'FloatOption',
+    'Str',
+    'StrList',
+    'StrTuple',
+    'StrOption',
+    'Bool',
+    'BoolList',
+    'BoolTuple',
+    'BoolOption',
 ]
 
-from .validator import Validator
+from .validator_base import ValidatorBase
 
-from .int_validator import IntValidator, \
-    IntListValidator, IntTupleValidator, IntOptionValidator
+from .int_validators import Int, \
+    IntList, IntTuple, IntOption
 
-from .float_validator import FloatValidator, \
-    FloatListValidator, FloatTupleValidator, FloatOptionValidator
+from .float_validators import Float, \
+    FloatList, FloatTuple, FloatOption
 
-from .str_validator import StrValidator, \
-    StrListValidator, StrTupleValidator, StrOptionValidator
+from .str_validators import Str, \
+    StrList, StrTuple, StrOption
 
-from .bool_validator import BoolValidator, \
-    BoolListValidator, BoolTupleValidator, BoolOptionValidator
+from .bool_validators import Bool, \
+    BoolList, BoolTuple, BoolOption

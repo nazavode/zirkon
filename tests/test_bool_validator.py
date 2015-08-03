@@ -7,10 +7,10 @@ import pytest
 
 from daikon.validator.error import TypeValidationError, \
                                    UndefinedKeyValidationError
-from daikon.validator.bool_validator import BoolValidator
+from daikon.validator.bool_validators import Bool
 
 def test_basic():
-    bv = BoolValidator()
+    bv = Bool()
     v = bv.validate(key='alpha', defined=True, value=True)
     assert v == True
     v = bv.validate(key='alpha', defined=True, value=False)
@@ -27,7 +27,7 @@ def test_basic():
         v = bv.validate(key='alpha', defined=False, value=None)
 
 def test_default():
-    bv = BoolValidator(default=True)
+    bv = Bool(default=True)
     v = bv.validate(key='alpha', defined=True, value=False)
     assert v == False
     v = bv.validate(key='alpha', defined=False, value=None)
@@ -35,6 +35,6 @@ def test_default():
 
 def test_bad_default_type():
     with pytest.raises(TypeValidationError):
-        bv = BoolValidator(default=2.9)
+        bv = Bool(default=2.9)
 
 

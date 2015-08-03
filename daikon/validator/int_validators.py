@@ -16,57 +16,58 @@
 #
 
 """\
-config.validator.float_validator
-================================
-Implementation of the IntValidator classes
+config.validator.int_validators
+===============================
+Implementation of the int validator classes
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'FloatValidator',
-    'FloatOptionValidator',
-    'FloatListValidator',
-    'FloatTupleValidator',
+    'Int',
+    'IntOption',
+    'IntList',
+    'IntTuple',
 ]
 
 from ..utils.compose import Composer
 
-from .validator import Validator
-from .sequence_validator import SequenceValidator
+from .validator_base import ValidatorBase
+from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMin, CheckMax, \
     CheckMinLen, CheckMaxLen
 
-from .check_scalar import CheckFloat
+from .check_scalar import CheckInt
 from .check_option import CheckOption
 from .check_sequence import CheckList, CheckTuple
 
 
-class FloatValidator(Validator):
-    """FloatValidator()
-       Validator for a float scalar key/value.
+class Int(ValidatorBase):
+    """Int()
+       Validator for a int scalar key/value.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckMin, CheckMax)
 
 
-class FloatOptionValidator(Validator):
-    """FloatValidator()
-       Validator for a float option key/value.
+class IntOption(ValidatorBase):
+    """IntOption()
+       Validator for a int option key/value.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckOption)
 
 
-class FloatListValidator(SequenceValidator):
-    """FloatValidator()
-       Validator for a float list key/value.
+class IntList(Sequence):
+    """IntList()
+       Validator for a int list key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
-    ITEM_VALIDATOR_CLASS = FloatValidator
+    ITEM_VALIDATOR_CLASS = Int
 
 
-class FloatTupleValidator(SequenceValidator):
-    """FloatValidator()
-       Validator for a float tuple key/value.
+class IntTuple(Sequence):
+    """IntTuple()
+       Validator for a int tuple key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
-    ITEM_VALIDATOR_CLASS = FloatValidator
+    ITEM_VALIDATOR_CLASS = Int
+

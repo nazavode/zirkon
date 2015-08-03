@@ -9,10 +9,10 @@ from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from daikon.validator.float_validator import FloatValidator
+from daikon.validator.float_validators import Float
 
 def test_basic():
-    fv = FloatValidator()
+    fv = Float()
     v = fv.validate(key='alpha', defined=True, value=2.0)
     assert v == 2.0
     v = fv.validate(key='alpha', defined=True, value=-2000.234)
@@ -26,7 +26,7 @@ def test_basic():
         v = fv.validate(key='alpha', defined=False, value=None)
 
 def test_default():
-    fv = FloatValidator(default=10)
+    fv = Float(default=10)
     v = fv.validate(key='alpha', defined=True, value=2.2)
     assert v == 2.2
     v = fv.validate(key='alpha', defined=False, value=None)
@@ -37,18 +37,18 @@ def test_default():
 
 def test_bad_default_type():
     with pytest.raises(TypeValidationError):
-        fv = FloatValidator(default='ten')
+        fv = Float(default='ten')
 
 def test_bad_min_type():
     with pytest.raises(TypeValidationError):
-        iv = FloatValidator(min="abc")
+        iv = Float(min="abc")
 
 def test_bad_max_type():
     with pytest.raises(TypeValidationError):
-        iv = FloatValidator(max="abc")
+        iv = Float(max="abc")
 
 def test_default_min():
-    fv = FloatValidator(default=10.01, min=3.3)
+    fv = Float(default=10.01, min=3.3)
     with pytest.raises(MinValidationError):
         v = fv.validate(key='alpha', defined=True, value=3.2)
     v = fv.validate(key='alpha', defined=True, value=3.3)
@@ -60,14 +60,14 @@ def test_default_min():
 
 def test_bad_default_min():
     with pytest.raises(MinValidationError):
-        fv = FloatValidator(default=2.9, min=3.0)
+        fv = Float(default=2.9, min=3.0)
 
 def test_bad_default_max():
     with pytest.raises(MaxValidationError):
-        fv = FloatValidator(default=3.1, max=3.0)
+        fv = Float(default=3.1, max=3.0)
 
 def test_default_max():
-    fv = FloatValidator(default=10.01, min=3.2, max=100.1)
+    fv = Float(default=10.01, min=3.2, max=100.1)
     with pytest.raises(MinValidationError):
         v = fv.validate(key='alpha', defined=True, value=3.199)
     with pytest.raises(MaxValidationError):

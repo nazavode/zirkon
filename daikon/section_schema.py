@@ -27,9 +27,9 @@ import collections
 
 from .section import Section
 from .validation_section import ValidationSection
-from .validator import Validator
-from .validator.validator_validator import ValidatorValidator
-from .validator.unexpected_key_validator import UnexpectedKeyValidator
+from .validator import ValidatorBase
+from .validator.validator import Validator
+from .validator.unexpected_key import UnexpectedKey
 from .validator.key_value import KeyValue
 from .validator.error import ValidationError, \
     UnexpectedSectionValidationError, \
@@ -40,16 +40,16 @@ class SectionSchema(Section):
     """SectionSchema(container, *, prefix='', init=None, unexpected_key_validator=None)
        Provides validation methods.
     """
-    SUPPORTED_VALUE_TYPES = (str, Validator, )
+    SUPPORTED_VALUE_TYPES = (str, ValidatorBase, )
 
     def __init__(self, container, *, prefix='', init=None, unexpected_key_validator=None, auto_validate=True):
         super().__init__(container=container, prefix=prefix, init=init)
         if unexpected_key_validator is None:
-            unexpected_key_validator = UnexpectedKeyValidator()
+            unexpected_key_validator = UnexpectedKey()
         self.unexpected_key_validator = unexpected_key_validator
         if auto_validate:
             schema_validator = self.subsection_class()(container=collections.OrderedDict(),
-                                                       unexpected_key_validator=ValidatorValidator(),
+                                                       unexpected_key_validator=Validator(),
                                                        auto_validate=False)
             schema_validator.impl_validate(self, mode='load', ignore_errors=False)
 
@@ -66,8 +66,8 @@ class SectionSchema(Section):
 
     @unexpected_key_validator.setter
     def unexpected_key_validator(self, validator):
-        if not isinstance(validator, Validator):
-            raise TypeError("{!r} is not a Validator".format(validator))
+        if not isinstance(validator, ValidatorBase):
+            raise TypeError("{!r} is not a ValidatorBase".format(validator))
         self._unexpected_key_validator = validator
 
     def validate(self, section, *, mode=None, ignore_errors=True):

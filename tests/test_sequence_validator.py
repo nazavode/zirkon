@@ -12,14 +12,10 @@ from daikon.validator.error import InvalidOptionValidationError, \
                                    MaxLenValidationError, \
                                    TypeValidationError, \
                                    UndefinedKeyValidationError
-from daikon.validator.int_validator import IntListValidator, \
-                                           IntTupleValidator
-from daikon.validator.float_validator import FloatListValidator, \
-                                             FloatTupleValidator
-from daikon.validator.str_validator import StrListValidator, \
-                                           StrTupleValidator
-from daikon.validator.bool_validator import BoolListValidator, \
-                                            BoolTupleValidator
+from daikon.validator.int_validators import IntList, IntTuple
+from daikon.validator.float_validators import FloatList, FloatTuple
+from daikon.validator.str_validators import StrList, StrTuple
+from daikon.validator.bool_validators import BoolList, BoolTuple
 
 from common.test_scenarios import pytest_generate_tests
     
@@ -28,56 +24,56 @@ def sequence(sequence_type, value, mult):
 
 class TestSequenceWithScenarios(object):
     scenario_int_list = ('int_list',
-        dict(vclass=IntListValidator,
+        dict(vclass=IntList,
              vseq=lambda *, m: sequence(list, m, m),
              bseq=lambda *, m: sequence(list, m * 1.1, m),
              oseq=lambda *, m: sequence(tuple, m, m),
              vscalar=2,
         ))
     scenario_int_tuple = ('int_tuple',
-        dict(vclass=IntTupleValidator,
+        dict(vclass=IntTuple,
              vseq=lambda *, m: sequence(tuple, m, m),
              bseq=lambda *, m: sequence(tuple, m * 1.1, m),
              oseq=lambda *, m: sequence(list, m, m),
              vscalar=2,
         ))
     scenario_float_list = ('float_list',
-        dict(vclass=FloatListValidator,
+        dict(vclass=FloatList,
              vseq=lambda *, m: sequence(list, m * 1.1, m),
              bseq=lambda *, m: sequence(list, str(m), m),
              oseq=lambda *, m: sequence(tuple, m * 1.1, m),
              vscalar=2.4,
         ))
     scenario_float_tuple = ('float_tuple',
-        dict(vclass=FloatTupleValidator,
+        dict(vclass=FloatTuple,
              vseq=lambda *, m: sequence(tuple, m * 1.1, m),
              bseq=lambda *, m: sequence(list, str(m), m),
              oseq=lambda *, m: sequence(list, m * 1.1, m),
              vscalar=2.4,
         ))
     scenario_str_list = ('str_list',
-        dict(vclass=StrListValidator,
+        dict(vclass=StrList,
              vseq=lambda *, m: sequence(list, str(m), m),
              bseq=lambda *, m: sequence(list, m, m),
              oseq=lambda *, m: sequence(tuple, str(m), m),
              vscalar='abc',
         ))
     scenario_str_tuple = ('str_tuple',
-        dict(vclass=StrTupleValidator,
+        dict(vclass=StrTuple,
              vseq=lambda *, m: sequence(tuple, str(m), m),
              bseq=lambda *, m: sequence(tuple, m, m),
              oseq=lambda *, m: sequence(list, str(m), m),
              vscalar='abc',
         ))
     scenario_bool_list = ('bool_list',
-        dict(vclass=BoolListValidator,
+        dict(vclass=BoolList,
              vseq=lambda *, m: sequence(list, m % 2 == 0, m),
              bseq=lambda *, m: sequence(list, m * 1.1, m),
              oseq=lambda *, m: sequence(tuple, m % 2 == 0, m),
              vscalar=True,
         ))
     scenario_bool_tuple = ('bool_tuple',
-        dict(vclass=BoolTupleValidator,
+        dict(vclass=BoolTuple,
              vseq=lambda *, m: sequence(tuple, m % 2 == 0, m),
              bseq=lambda *, m: sequence(tuple, m * 1.1, m),
              oseq=lambda *, m: sequence(list, m % 2 == 0, m),

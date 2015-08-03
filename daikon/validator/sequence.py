@@ -16,22 +16,22 @@
 #
 
 """\
-config.validator.sequence_validator
-===================================
-Implementation of the SequenceValidator class
+config.validator.sequence
+=========================
+Implementation of the Sequence class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'SequenceValidator',
+    'Sequence',
 ]
 
 from .key_value import KeyValue
-from .validator import Validator
+from .validator_base import ValidatorBase
 
 
-class SequenceValidator(Validator):
-    """SequenceValidator(...)
+class Sequence(ValidatorBase):
+    """Sequence(...)
        Base class for sequence (list, tuple) validators.
     """
     ITEM_VALIDATOR_CLASS = type(None)

@@ -28,8 +28,8 @@ from common.fixtures import simple_container, \
 from daikon.section import Section
 from daikon.section_schema import SectionSchema
 from daikon.validation_section import ValidationSection
-from daikon.validator import IntValidator, StrValidator, \
-    FloatTupleValidator, StrOptionValidator
+from daikon.validator import Int, Str, \
+    FloatTuple, StrOption
 from daikon.validator.error import TypeValidationError
 
 
@@ -39,10 +39,10 @@ def simple_schema_content():
         ('a', 'Int(min=1)'),
         ('sub', collections.OrderedDict((
             ('sa', 'Float(max=10)'),
-            ('sb', IntValidator(default=3)),
-            ('sc', StrValidator()),
+            ('sb', Int(default=3)),
+            ('sc', Str()),
             ('subsub', collections.OrderedDict((
-                           ('ssx', StrOptionValidator(values=("alpha", "beta", "gamma"))),
+                           ('ssx', StrOption(values=("alpha", "beta", "gamma"))),
                            ('ssy', 'FloatTuple(item_max=5.5)'),
             ))),
         ))),
@@ -73,14 +73,14 @@ def test_SectionSchema_init(simple_container, string_io, simple_schema_content):
     section_schema.dump()
     section_schema.dump(stream=string_io)
     assert string_io.getvalue() == """\
-a = IntValidator(min=1)
+a = Int(min=1)
 [sub]
-    sa = FloatValidator(max=10)
-    sb = IntValidator(default=3)
-    sc = StrValidator()
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
     [subsub]
-        ssx = StrOptionValidator(values=('alpha', 'beta', 'gamma'))
-        ssy = FloatTupleValidator(item_max=5.5)
+        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssy = FloatTuple(item_max=5.5)
 """
 
 def test_SectionSchema_err(simple_container, string_io, simple_schema_content):
