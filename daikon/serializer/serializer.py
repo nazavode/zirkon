@@ -67,20 +67,29 @@ class Serializer(Plugin, metaclass=abc.ABCMeta):
             return self.to_stream(config, f_stream)
 
     @abc.abstractmethod
-    def from_string(self, config_class, serialization, *, container=None):
-        """from_string(config_class, serialization, *, container=None) -> config
+    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+        """from_string(config_class, serialization, *, container=None, prefix='', filename=None) -> config
            Load a Config from string 'serialization'.
         """
         pass
 
-    def from_stream(self, config_class, stream, *, container=None):
-        """from_stream(config_class, stream, *, container=None) -> config
+    def from_stream(self, config_class, stream, *, container=None, prefix='', filename=None):
+        """from_stream(config_class, stream, *, container=None, prefix='', filename=None) -> config
            Load a Config from stream 'stream'.
         """
-        return self.from_string(config_class=config_class, serialization=stream.read(), container=container)
+        if filename is None:
+            if hasattr(stream, 'name'):
+                filename = stream.name
+            else:
+                filename = repr(stream)
+        return self.from_string(config_class=config_class,
+                                serialization=stream.read(),
+                                container=container,
+                                prefix=prefix,
+                                filename=filename)
 
-    def from_file(self, config_class, filename, *, container=None):
-        """from_file(config_class, filename, *, container=None) -> config
+    def from_file(self, config_class, filename, *, container=None, prefix=''):
+        """from_file(config_class, filename, *, container=None, prefix='') -> config
            Load a Config from file 'filename'.
         """
         createdir(filename)
@@ -88,4 +97,4 @@ class Serializer(Plugin, metaclass=abc.ABCMeta):
         if self.is_binary():
             mode += 'b'
         with open(filename, mode) as f_stream:
-            return self.from_stream(config_class=config_class, stream=f_stream, container=container)
+            return self.from_stream(config_class=config_class, stream=f_stream, container=container, prefix=prefix, filename=filename)

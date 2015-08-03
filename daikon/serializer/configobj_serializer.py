@@ -66,8 +66,10 @@ class ConfigObjSerializer(Serializer):
         self._dump_section(lines, config)
         return '\n'.join(lines) + '\n'
 
-    def from_string(self, config_class, serialization, *, container=None):
-        config = config_class(container=container)
+    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+        if filename is None:
+            filename = '<string>'
+        config = config_class(container=container, prefix=prefix)
         section_stack = [config]
         current_section, current_level = section_stack[-1], len(section_stack) - 1
         for line_no, source_line in enumerate(serialization.split('\n')):
@@ -89,7 +91,7 @@ class ConfigObjSerializer(Serializer):
                     del section_stack[level:]
                     current_section, current_level = section_stack[-1], len(section_stack) - 1
                 else:
-                    raise ValueError("invalid value at line {}: invalid section level {}".format(line_no, level))
+                    raise ValueError("invalid value at line {}@{}: invalid section level {}".format(line_no, filename, level))
                 section_name = line.strip()
                 current_section[section_name] = {}
                 section_stack.append(current_section[section_name])
@@ -100,6 +102,6 @@ class ConfigObjSerializer(Serializer):
                 try:
                     current_section[key.strip()] = eval(val, _EVAL_GLOBALS)  # pylint: disable=W0123
                 except Exception as err:
-                    raise ValueError("invalid value at line {}: {}: {}".format(line_no, type(err).__name__, err))
+                    raise ValueError("invalid value at line {}@{}: {}: {}".format(line_no, filename, type(err).__name__, err))
         return config
 

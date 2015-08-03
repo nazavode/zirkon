@@ -79,9 +79,9 @@ class JSONSerializer(Serializer):
         content = config.as_dict()
         return json.dumps(content, cls=JSONPluggableEncoder, indent=4) + '\n'
 
-    def from_string(self, config_class, serialization, *, container=None):
-        decode = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
-        content = decode.decode(serialization)
-        config = config_class(init=content, container=container)
+    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+        decoder = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
+        content = decoder.decode(serialization)
+        config = config_class(init=content, container=container, prefix=prefix)
         return config
 

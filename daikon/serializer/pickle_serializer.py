@@ -45,8 +45,8 @@ class PickleSerializer(Serializer):
         content = config.as_dict()
         return pickle.dumps(content)
 
-    def from_string(self, config_class, serialization, *, container=None):
+    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
         content = pickle.loads(serialization)
-        config = config_class(init=content, container=container)
+        config = config_class(init=content, container=container, prefix=prefix)
         return config
 

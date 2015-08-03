@@ -95,9 +95,38 @@ class Config(Section):
         serializer.to_file(self, filename)
 
     @classmethod
-    def from_file(cls, filename, protocol, *, container=None):
-        """from_file(filename, protocol, *, container=None)
+    def from_file(cls, filename, protocol, *, container=None, prefix=''):
+        """from_file(filename, protocol, *, container=None, prefix='')
            Deserialize from file 'filename' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
-        return serializer.from_file(cls, filename, container=container)
+        return serializer.from_file(cls, filename, container=container, prefix=prefix)
+
+    @classmethod
+    def from_stream(cls, stream, protocol, *, container=None, prefix='', filename=None):
+        """from_stream(stream, protocol, *, container=None, prefix='', filename=None)
+           Deserialize from stream 'stream' according to 'protocol'.
+        """
+        serializer = cls.get_serializer(protocol)
+        return serializer.from_stream(cls, stream, container=container, prefix=prefix, filename=filename)
+
+    @classmethod
+    def from_string(cls, string, protocol, *, container=None, prefix='', filename=None):
+        """from_string(string, protocol, *, container=None, prefix='', filename=None)
+           Deserialize from string 'string' according to 'protocol'.
+        """
+        serializer = cls.get_serializer(protocol)
+        return serializer.from_string(cls, string, container=container, prefix=prefix, filename=filename)
+
+    def read(self, filename, protocol):
+        """read(filename, protocol)
+           Read from file 'filename' according to 'protocol'.
+        """
+        self.clear()
+        self.from_file(filename=filename, protocol=protocol, container=self.container, prefix=self.prefix)
+
+    def write(self, filename, protocol):
+        """write(filename, protocol)
+           Write to file 'filename' according to 'protocol'.
+        """
+        self.to_file(filename, protocol)
