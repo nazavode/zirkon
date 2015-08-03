@@ -26,8 +26,11 @@ __all__ = [
     'ValidatorBase',
 ]
 
+import collections
+
 from ..utils.plugin import Plugin
 from ..utils.compose import Composer, ArgumentStore
+from ..serializer import json_serializer
 from .key_value import KeyValue
 
 
@@ -95,3 +98,8 @@ class ValidatorBase(Plugin):
             return False
         return self.argument_store == validator.argument_store
 
+json_serializer.add_coder(
+    class_=ValidatorBase,
+    encoder=(lambda obj: collections.OrderedDict([('__validator_repr__', obj.validator_repr())])),
+    decoder=(lambda dct: ValidatorBase.validator_unrepr(dct['__validator_repr__'])),
+)

@@ -17,8 +17,12 @@
 
 __author__ = "Simone Campagna"
 __all__ = [
+    'simple_schema',
     'simple_schema_content',
     'simple_section_content',
+    'SIMPLE_SCHEMA_DUMP',
+    'SIMPLE_SCHEMA_JSON_SERIALIZATION',
+    'SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION',
 ]
 
 import collections
@@ -26,6 +30,9 @@ import collections
 import pytest
 
 from daikon.validator import Int, Str, StrOption
+from daikon.schema import Schema
+
+from .fixtures import simple_container
 
 @pytest.fixture
 def simple_schema_content():
@@ -42,6 +49,17 @@ def simple_schema_content():
         ))),
     ))
 
+SIMPLE_SCHEMA_DUMP = """\
+a = Int(min=1)
+[sub]
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
+    [subsub]
+        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssy = FloatTuple(item_max=5.5)
+"""
+
 @pytest.fixture
 def simple_section_content():
     return collections.OrderedDict((
@@ -56,3 +74,44 @@ def simple_section_content():
             ))),
         ))),
     ))
+
+@pytest.fixture
+def simple_schema(simple_container, simple_schema_content):
+    schema = Schema(container=simple_container, init=simple_schema_content)
+    return schema
+
+SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
+{
+    "a": {
+        "__class_name__": "ValidatorBase",
+        "__validator_repr__": "Int(min=1)"
+    },
+    "sub": {
+        "sa": {
+            "__class_name__": "ValidatorBase",
+            "__validator_repr__": "Float(max=10)"
+        },
+        "sb": {
+            "__class_name__": "ValidatorBase",
+            "__validator_repr__": "Int(default=3)"
+        },
+        "sc": {
+            "__class_name__": "ValidatorBase",
+            "__validator_repr__": "Str()"
+        },
+        "subsub": {
+            "ssx": {
+                "__class_name__": "ValidatorBase",
+                "__validator_repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
+            },
+            "ssy": {
+                "__class_name__": "ValidatorBase",
+                "__validator_repr__": "FloatTuple(item_max=5.5)"
+            }
+        }
+    }
+}
+"""
+
+SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION = """\
+"""
