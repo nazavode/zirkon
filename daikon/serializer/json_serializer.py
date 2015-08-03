@@ -32,15 +32,15 @@ from .serializer import Serializer
 _JSON_CODERS = {}
 _CLASS_NAME_KEY = '__class_name__'
 
-Coder = collections.namedtuple('Coder', ('class_', 'encoder', 'decoder'))
+Coder = collections.namedtuple('Coder', ('class_', 'encode', 'decode'))
 
 def class_mapper(class_):
     return class_.__name__
 
-def add_coder(class_, encoder, decoder, *, class_name=None):
+def add_coder(class_, encode, decode, *, class_name=None):
     if class_name is None:
         class_name = class_mapper(class_)
-    _JSON_CODERS[class_name] = Coder(class_=class_, encoder=encoder, decoder=decoder)
+    _JSON_CODERS[class_name] = Coder(class_=class_, encode=encode, decode=decode)
 
 class JSONPluggableEncoder(json.JSONEncoder):
     """JSONPluggableEncoder()
@@ -51,17 +51,20 @@ class JSONPluggableEncoder(json.JSONEncoder):
             if isinstance(obj, coder.class_):
                 dct = collections.OrderedDict()
                 dct[_CLASS_NAME_KEY] = class_name
-                dct.update(coder.encoder(obj))
+                dct.update(coder.encode(obj))
                 return dct
         else:
             super().default(obj)
 
-def _object_hook(dct):
+def _object_pairs_hook(pairs):
+    dct = collections.OrderedDict(pairs)
     if _CLASS_NAME_KEY in dct:
         class_name = dct[_CLASS_NAME_KEY]
         coder = _JSON_CODERS[class_name]
         del dct[_CLASS_NAME_KEY]
         return coder.decode(dct)
+    else:
+        return dct
 
 class JSONSerializer(Serializer):
     """JSONSerializer()
@@ -77,8 +80,9 @@ class JSONSerializer(Serializer):
         return json.dumps(content, cls=JSONPluggableEncoder, indent=4) + '\n'
 
     def from_string(self, config_class, serialization, *, container=None):
-        decoder = json.JSONDecoder(object_pairs_hook=collections.OrderedDict, object_hook=_object_hook)
-        content = decoder.decode(serialization)
+        decode = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
+        content = decode.decode(serialization)
+        print("JSON:", config_class, content)
         config = config_class(init=content, container=container)
         return config
 

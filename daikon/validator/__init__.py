@@ -23,7 +23,16 @@ __all__ = [
     'BoolList',
     'BoolTuple',
     'BoolOption',
+    'Validator',
+    'Ignore',
+    'Remove',
+    'UnexpectedParameter',
 ]
+
+import collections
+
+from ..serializer import json_serializer
+from ..serializer import configobj_serializer
 
 from .validator_base import ValidatorBase
 
@@ -38,3 +47,17 @@ from .str_validators import Str, \
 
 from .bool_validators import Bool, \
     BoolList, BoolTuple, BoolOption
+
+from .validator import Validator
+from .unexpected_parameter import UnexpectedParameter
+from .ignore import Ignore
+from .remove import Remove
+
+json_serializer.add_coder(
+    class_=ValidatorBase,
+    encode=(lambda obj: collections.OrderedDict([('__validator_repr__', obj.validator_repr())])),
+    decode=(lambda dct: ValidatorBase.validator_unrepr(dct['__validator_repr__'])),
+)
+
+configobj_serializer.update_globals(ValidatorBase.subclasses_dict())
+

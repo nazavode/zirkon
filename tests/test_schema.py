@@ -80,7 +80,7 @@ def test_Schema_to_file_ConfigObj(simple_schema, tmp_text_file):
     assert serialization == SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION
 
 def test_Schema_from_file_ConfigObj(simple_schema, tmp_text_file):
-    tmp_text_file.write(SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION)
+    tmp_text_file.write(SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     schema = Schema.from_file(filename=tmp_text_file.name, protocol="ConfigObj")

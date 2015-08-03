@@ -114,4 +114,12 @@ SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 """
 
 SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION = """\
+a = Int(min=1)
+[sub]
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
+    [[subsub]]
+        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssy = FloatTuple(item_max=5.5)
 """

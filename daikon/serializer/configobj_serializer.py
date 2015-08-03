@@ -22,9 +22,17 @@ Implementation of the ConfigObj Serializer
 """
 
 __author__ = "Simone Campagna"
+__all__ = [
+    'update_globals',
+    'ConfigObjSerializer',
+]
 
 from .serializer import Serializer
 
+_EVAL_GLOBALS = {}
+
+def update_globals(dct):
+    _EVAL_GLOBALS.update(dct)
 
 class ConfigObjSerializer(Serializer):
     """JSONSerializer()
@@ -88,9 +96,9 @@ class ConfigObjSerializer(Serializer):
                 current_section, current_level = section_stack[-1], len(section_stack) - 1
             else:
                 # key:
-                key, val = line.split('=')
+                key, val = line.split('=', 1)
                 try:
-                    current_section[key.strip()] = eval(val)  # pylint: disable=W0123
+                    current_section[key.strip()] = eval(val, _EVAL_GLOBALS)  # pylint: disable=W0123
                 except Exception as err:
                     raise ValueError("invalid value at line {}: {}: {}".format(line_no, type(err).__name__, err))
         return config
