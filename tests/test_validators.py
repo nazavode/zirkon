@@ -102,9 +102,9 @@ class TestWithScenarios(object):
         validator_instance = validator_plugin(**validator_options)
         assert validator_instance is validator_validator.validate(key='<key>', value=validator_instance, defined=True)
         
-        validator_repr = validator_instance.validator_repr()
+        validator_repr = validator_instance.repr()
         validator_instance2 = validator_validator.validate('<key>', value=validator_repr, defined=True)
         assert validator_instance == validator_instance2
 
-        validator_instance3 = validator.ValidatorBase.validator_unrepr(validator_instance2.validator_repr())
+        validator_instance3 = validator.ValidatorBase.unrepr(validator_instance2.repr())
         assert validator_instance == validator_instance3

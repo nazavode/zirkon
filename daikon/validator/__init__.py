@@ -55,8 +55,8 @@ from .remove import Remove
 
 json_serializer.add_coder(
     class_=ValidatorBase,
-    encode=(lambda obj: collections.OrderedDict([('__validator_repr__', obj.validator_repr())])),
-    decode=(lambda dct: ValidatorBase.validator_unrepr(dct['__validator_repr__'])),
+    encode=(lambda obj: collections.OrderedDict([('__repr__', obj.repr())])),
+    decode=(lambda dct: ValidatorBase.unrepr(dct['__repr__'])),
 )
 
 configobj_serializer.update_globals(ValidatorBase.subclasses_dict())

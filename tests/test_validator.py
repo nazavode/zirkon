@@ -40,7 +40,7 @@ def test_validator_to_string(validator_validator):
     validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))"
     validator_instance = validator_validator.validate(key='<key>', value=validator_string, defined=True)
     assert isinstance(validator_instance, validator.IntTuple)
-    validator_instance_string = validator_instance.validator_repr()
+    validator_instance_string = validator_instance.repr()
     validator_instance2 = validator_validator.validate(key='<key>', value=validator_instance_string, defined=True)
     assert isinstance(validator_instance2, validator.IntTuple)
     assert validator_instance == validator_instance2

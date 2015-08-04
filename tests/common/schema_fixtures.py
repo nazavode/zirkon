@@ -84,29 +84,29 @@ SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 {
     "a": {
         "__class_name__": "ValidatorBase",
-        "__validator_repr__": "Int(min=1)"
+        "__repr__": "Int(min=1)"
     },
     "sub": {
         "sa": {
             "__class_name__": "ValidatorBase",
-            "__validator_repr__": "Float(max=10)"
+            "__repr__": "Float(max=10)"
         },
         "sb": {
             "__class_name__": "ValidatorBase",
-            "__validator_repr__": "Int(default=3)"
+            "__repr__": "Int(default=3)"
         },
         "sc": {
             "__class_name__": "ValidatorBase",
-            "__validator_repr__": "Str()"
+            "__repr__": "Str()"
         },
         "subsub": {
             "ssx": {
                 "__class_name__": "ValidatorBase",
-                "__validator_repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
+                "__repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
             },
             "ssy": {
                 "__class_name__": "ValidatorBase",
-                "__validator_repr__": "FloatTuple(item_max=5.5)"
+                "__repr__": "FloatTuple(item_max=5.5)"
             }
         }
     }
