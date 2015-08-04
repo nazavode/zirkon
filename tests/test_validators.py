@@ -6,13 +6,12 @@ import os
 import pytest
 
 from daikon import validator
-from daikon.validator.validator import Validator
 
 from common.test_scenarios import pytest_generate_tests
 
 @pytest.fixture
 def validator_validator():
-    return validator.ValidatorBase.get_plugin('Validator')()
+    return validator.ValidatorBase.get_plugin('ValidatorInstance')()
 
 class TestWithScenarios(object):
     scenario_Int = ('Int',
@@ -83,9 +82,9 @@ class TestWithScenarios(object):
              validator_class=validator.BoolOption,
              validator_options={'values': (True, False)}))
 
-    scenario_Validator = ('Validator',
-        dict(validator_name='Validator',
-             validator_class=Validator,
+    scenario_ValidatorInstance = ('ValidatorInstance',
+        dict(validator_name='ValidatorInstance',
+             validator_class=validator.ValidatorInstance,
              validator_options={}))
 
     scenarios = (
@@ -93,7 +92,7 @@ class TestWithScenarios(object):
         scenario_Float, scenario_FloatList, scenario_FloatTuple, scenario_FloatOption,
         scenario_Str, scenario_StrList, scenario_StrTuple, scenario_StrOption,
         scenario_Bool, scenario_BoolList, scenario_BoolTuple, scenario_BoolOption,
-        scenario_Validator,
+        scenario_ValidatorInstance,
     )
 
     def test_validator(self, validator_validator, validator_name, validator_class, validator_options):

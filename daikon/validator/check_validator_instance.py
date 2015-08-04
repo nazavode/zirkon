@@ -16,14 +16,14 @@
 #
 
 """\
-config.validator.check_validator
-================================
-Implementation of the CheckValidator class
+config.validator.check_validator_instance
+=========================================
+Implementation of the CheckValidatorInstance class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CheckValidator',
+    'CheckValidatorInstance',
 ]
 
 from .check_type import CheckType
@@ -31,8 +31,8 @@ from .error import TypeValidationError
 from .validator_base import ValidatorBase
 
 
-class CheckValidator(CheckType):
-    """CheckValidator()
+class CheckValidatorInstance(CheckType):
+    """CheckValidatorInstance()
        Check if key/value is a ValidatorBase instance.
     """
     TYPE = ValidatorBase

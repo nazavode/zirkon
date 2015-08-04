@@ -27,8 +27,7 @@ import collections
 
 from .section import Section
 from .validation_section import ValidationSection
-from .validator import ValidatorBase
-from .validator.validator import Validator
+from .validator import ValidatorInstance, ValidatorBase
 from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
 from .validator.error import ValidationError, \
@@ -49,7 +48,7 @@ class SectionSchema(Section):
         super().__init__(container=container, prefix=prefix, init=init)
         if auto_validate:
             schema_validator = self.subsection_class()(container=collections.OrderedDict(),
-                                                       unexpected_parameter_validator=Validator(),
+                                                       unexpected_parameter_validator=ValidatorInstance(),
                                                        auto_validate=False)
             schema_validator.impl_validate(self, ignore_errors=False)
 

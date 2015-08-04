@@ -7,11 +7,11 @@ import pytest
 
 from daikon import validator
 from daikon.validator.error import TypeValidationError
-from daikon.validator.validator import Validator
+from daikon.validator import ValidatorInstance
 
 @pytest.fixture
 def validator_validator():
-    return validator.ValidatorBase.get_plugin('Validator')()
+    return validator.ValidatorBase.get_plugin('ValidatorInstance')()
 
 def test_validator_from_string_ok(validator_validator):
     validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))"

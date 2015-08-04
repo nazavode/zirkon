@@ -16,25 +16,25 @@
 #
 
 """\
-config.validator.validator
-==========================
-Implementation of the Validator class
+config.validator.validator_instance
+===================================
+Implementation of the ValidatorInstance class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'Validator',
+    'ValidatorInstance',
 ]
 
 from ..utils.compose import Composer
 
 from .validator_base import ValidatorBase
-from .check_validator import CheckValidator
+from .check_validator_instance import CheckValidatorInstance
 
 
-class Validator(ValidatorBase):
-    """Validator()
-       Validator for a Validator key/value instance.
+class ValidatorInstance(ValidatorBase):
+    """ValidatorInstance()
+       Validator for a key/value Validator instance.
     """
-    CHECK_COMPOSER = Composer(CheckValidator)
+    CHECK_COMPOSER = Composer(CheckValidatorInstance)
 

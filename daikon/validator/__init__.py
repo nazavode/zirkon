@@ -23,7 +23,7 @@ __all__ = [
     'BoolList',
     'BoolTuple',
     'BoolOption',
-    'Validator',
+    'ValidatorInstance',
     'Ignore',
     'Remove',
     'UnexpectedParameter',
@@ -48,7 +48,7 @@ from .str_validators import Str, \
 from .bool_validators import Bool, \
     BoolList, BoolTuple, BoolOption
 
-from .validator import Validator
+from .validator_instance import ValidatorInstance
 from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
