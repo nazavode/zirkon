@@ -23,7 +23,7 @@ import io
 import pytest
 
 from common.utils import compare_dicts
-from common.fixtures import simple_content, \
+from common.fixtures import simple_config_content, \
                             simple_schema_content, \
                             tmp_text_file
 
@@ -42,7 +42,7 @@ def prefix(request):
 Parameters = collections.namedtuple('Parameters', ('config_class', 'config_content'))
 
 _config_parameters = [
-    Parameters(config_class=Config, config_content=simple_content()),
+    Parameters(config_class=Config, config_content=simple_config_content()),
     Parameters(config_class=Schema, config_content=simple_schema_content()),
 ]
 @pytest.fixture(params=_config_parameters, ids=[c.config_class.__name__ for c in _config_parameters])

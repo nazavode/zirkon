@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-from common.fixtures import simple_config, \
+from common.fixtures import simple_config_content, \
                             simple_container, \
-                            simple_content, \
+                            simple_config, \
                             string_io, \
                             tmp_text_file, \
                             SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION

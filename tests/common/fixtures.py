@@ -19,7 +19,7 @@ __author__ = "Simone Campagna"
 __all__ = [
     'string_io',
     'simple_container',
-    'simple_content',
+    'simple_config_content',
     'simple_section',
     'simple_config',
     'simple_schema',
@@ -57,7 +57,7 @@ def simple_container():
     return collections.OrderedDict()
 
 @pytest.fixture
-def simple_content():
+def simple_config_content():
     epsilon = collections.OrderedDict((
         ('epsilon_x', 10),
         ('epsilon_y', 20),
@@ -84,13 +84,13 @@ def simple_content():
     
 
 @pytest.fixture
-def simple_section(simple_container, simple_content):
-    section = Section(container=simple_container, init=simple_content)
+def simple_section(simple_container, simple_config_content):
+    section = Section(container=simple_container, init=simple_config_content)
     return section
 
 @pytest.fixture
-def simple_config(simple_container, simple_content):
-    config = Config(container=simple_container, init=simple_content)
+def simple_config(simple_container, simple_config_content):
+    config = Config(container=simple_container, init=simple_config_content)
     return config
 
 @pytest.fixture

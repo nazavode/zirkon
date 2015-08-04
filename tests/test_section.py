@@ -23,7 +23,7 @@ import io
 import pytest
 
 from common.fixtures import simple_container, \
-                            simple_content, \
+                            simple_config_content, \
                             simple_section, \
                             string_io, \
                             SIMPLE_SECTION_DUMP, \
@@ -37,19 +37,19 @@ def test_Section_create(simple_container, string_io):
     section.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Section_create_init(simple_container, simple_content, string_io):
-    section = Section(container=simple_container, init=simple_content)
+def test_Section_create_init(simple_container, simple_config_content, string_io):
+    section = Section(container=simple_container, init=simple_config_content)
     section.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
 
-def test_Section_create_prefix(simple_container, simple_content, string_io):
-    section = Section(container=simple_container, init=simple_content)
+def test_Section_create_prefix(simple_container, simple_config_content, string_io):
+    section = Section(container=simple_container, init=simple_config_content)
     options = Section(container=simple_container, prefix='options.')
     assert section['options'] == options
 
-def test_Section_update(simple_container, simple_content, string_io):
+def test_Section_update(simple_container, simple_config_content, string_io):
     section = Section(container=simple_container)
-    section.update(simple_content)
+    section.update(simple_config_content)
     section.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
 
