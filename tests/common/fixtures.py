@@ -22,6 +22,9 @@ __all__ = [
     'simple_content',
     'simple_section',
     'simple_config',
+    'simple_schema',
+    'simple_schema_content',
+    'simple_section_content',
     'tmp_text_file',
     'tmp_raw_file',
     'SIMPLE_SECTION_DUMP',
@@ -29,6 +32,9 @@ __all__ = [
     'SIMPLE_SECTION_STR',
     'SIMPLE_CONFIG_JSON_SERIALIZATION',
     'SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION',
+    'SIMPLE_SCHEMA_DUMP',
+    'SIMPLE_SCHEMA_JSON_SERIALIZATION',
+    'SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION',
 ]
 
 import collections
@@ -39,6 +45,8 @@ import pytest
 
 from daikon.section import Section
 from daikon.config import Config
+from daikon.schema import Schema
+from daikon.validator import Int, Str, StrOption
 
 @pytest.fixture
 def string_io():
@@ -159,4 +167,93 @@ z_value = 30.3
 """
 
 ##################
+@pytest.fixture
+def simple_schema_content():
+    return collections.OrderedDict((
+        ('a', 'Int(min=1)'),
+        ('sub', collections.OrderedDict((
+            ('sa', 'Float(max=10)'),
+            ('sb', Int(default=3)),
+            ('sc', Str()),
+            ('subsub', collections.OrderedDict((
+                           ('ssx', StrOption(values=("alpha", "beta", "gamma"))),
+                           ('ssy', 'FloatTuple(item_max=5.5)'),
+            ))),
+        ))),
+    ))
+
+SIMPLE_SCHEMA_DUMP = """\
+a = Int(min=1)
+[sub]
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
+    [subsub]
+        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssy = FloatTuple(item_max=5.5)
+"""
+
+@pytest.fixture
+def simple_section_content():
+    return collections.OrderedDict((
+        ('a', 10),
+        ('sub', collections.OrderedDict((
+            ('sa', 0.4),
+            ('sb', 10),
+            ('sc', "a.dat"),
+            ('subsub', collections.OrderedDict((
+                ('ssx', "beta"),
+                ('ssy', (0.3, 0.4, 0.5, 0.6)),
+            ))),
+        ))),
+    ))
+
+@pytest.fixture
+def simple_schema(simple_container, simple_schema_content):
+    schema = Schema(container=simple_container, init=simple_schema_content)
+    return schema
+
+SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
+{
+    "a": {
+        "__class_name__": "Validator",
+        "__repr__": "Int(min=1)"
+    },
+    "sub": {
+        "sa": {
+            "__class_name__": "Validator",
+            "__repr__": "Float(max=10)"
+        },
+        "sb": {
+            "__class_name__": "Validator",
+            "__repr__": "Int(default=3)"
+        },
+        "sc": {
+            "__class_name__": "Validator",
+            "__repr__": "Str()"
+        },
+        "subsub": {
+            "ssx": {
+                "__class_name__": "Validator",
+                "__repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
+            },
+            "ssy": {
+                "__class_name__": "Validator",
+                "__repr__": "FloatTuple(item_max=5.5)"
+            }
+        }
+    }
+}
+"""
+
+SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION = """\
+a = Int(min=1)
+[sub]
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
+    [[subsub]]
+        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssy = FloatTuple(item_max=5.5)
+"""     
 

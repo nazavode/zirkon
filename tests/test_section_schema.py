@@ -23,8 +23,8 @@ import io
 import pytest
 
 from common.fixtures import simple_container, \
-    string_io
-from common.schema_fixtures import simple_section_content, \
+    string_io, \
+    simple_section_content, \
     simple_schema_content
 from daikon.section import Section
 from daikon.section_schema import SectionSchema

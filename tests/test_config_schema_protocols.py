@@ -23,8 +23,8 @@ import io
 import pytest
 
 from common.utils import compare_dicts
-from common.schema_fixtures import simple_schema_content
 from common.fixtures import simple_content, \
+                            simple_schema_content, \
                             tmp_text_file
 
 from daikon.config import Config

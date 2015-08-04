@@ -22,8 +22,10 @@ import io
 
 import pytest
 
-from common.fixtures import simple_container, string_io, tmp_text_file
-from common.schema_fixtures import simple_section_content, \
+from common.fixtures import simple_container, \
+    string_io, \
+    tmp_text_file, \
+    simple_section_content, \
     simple_schema_content, simple_schema, \
     SIMPLE_SCHEMA_DUMP, \
     SIMPLE_SCHEMA_JSON_SERIALIZATION, \
