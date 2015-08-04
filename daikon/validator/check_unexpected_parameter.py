@@ -23,7 +23,7 @@ Implementation of the CheckUnexpectedKey class
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CheckRequired',
+    'CheckUnexpectedParameter',
 ]
 
 from .check import Check

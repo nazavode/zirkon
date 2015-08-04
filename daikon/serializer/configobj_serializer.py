@@ -31,8 +31,13 @@ from .serializer import Serializer
 
 _EVAL_GLOBALS = {}
 
+
 def update_globals(dct):
+    """update_globals()
+       Update globals to be used when evaluating config values.
+    """
     _EVAL_GLOBALS.update(dct)
+
 
 class ConfigObjSerializer(Serializer):
     """JSONSerializer()
@@ -91,7 +96,8 @@ class ConfigObjSerializer(Serializer):
                     del section_stack[level:]
                     current_section, current_level = section_stack[-1], len(section_stack) - 1
                 else:
-                    raise ValueError("invalid value at line {}@{}: invalid section level {}".format(line_no, filename, level))
+                    raise ValueError("invalid value at line {}@{}: invalid section level {}".format(
+                        line_no, filename, level))
                 section_name = line.strip()
                 current_section[section_name] = {}
                 section_stack.append(current_section[section_name])
@@ -102,6 +108,7 @@ class ConfigObjSerializer(Serializer):
                 try:
                     current_section[key.strip()] = eval(val, _EVAL_GLOBALS)  # pylint: disable=W0123
                 except Exception as err:
-                    raise ValueError("invalid value at line {}@{}: {}: {}".format(line_no, filename, type(err).__name__, err))
+                    raise ValueError("invalid value at line {}@{}: {}: {}".format(
+                        line_no, filename, type(err).__name__, err))
         return config
 

@@ -26,12 +26,8 @@ __all__ = [
     'Validator',
 ]
 
-import collections
-
 from ..utils.plugin import Plugin
 from ..utils.compose import Composer, ArgumentStore
-from ..serializer import json_serializer
-from ..serializer import configobj_serializer
 from .key_value import KeyValue
 
 

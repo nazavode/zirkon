@@ -34,29 +34,37 @@ _CLASS_NAME_KEY = '__class_name__'
 
 Coder = collections.namedtuple('Coder', ('class_', 'encode', 'decode'))
 
-def class_mapper(class_):
-    return class_.__name__
 
 def add_coder(class_, encode, decode, *, class_name=None):
+    """add_coder(class_, encode, decode, *, class_name=None)
+       Add a Coder for instances of class_ (and its' subclasses).
+    """
+
     if class_name is None:
-        class_name = class_mapper(class_)
+        class_name = class_.__name__
     _JSON_CODERS[class_name] = Coder(class_=class_, encode=encode, decode=decode)
+
 
 class JSONPluggableEncoder(json.JSONEncoder):
     """JSONPluggableEncoder()
        Implementation of JSON Pluggable encoder.
     """
-    def default(self, obj):
+
+    def default(self, obj):  # pylint: disable=E0202
         for class_name, coder in _JSON_CODERS.items():
             if isinstance(obj, coder.class_):
                 dct = collections.OrderedDict()
                 dct[_CLASS_NAME_KEY] = class_name
                 dct.update(coder.encode(obj))
                 return dct
-        else:
-            super().default(obj)
+        super().default(obj)
+
 
 def _object_pairs_hook(pairs):
+    """_object_pairs_hook(pairs)
+       Hook to manage a list of pairs (a dict serialization).
+    """
+
     dct = collections.OrderedDict(pairs)
     if _CLASS_NAME_KEY in dct:
         class_name = dct[_CLASS_NAME_KEY]
@@ -65,6 +73,7 @@ def _object_pairs_hook(pairs):
         return coder.decode(dct)
     else:
         return dct
+
 
 class JSONSerializer(Serializer):
     """JSONSerializer()
@@ -80,6 +89,7 @@ class JSONSerializer(Serializer):
         return json.dumps(content, cls=JSONPluggableEncoder, indent=4) + '\n'
 
     def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+        dummy = filename
         decoder = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
         content = decoder.decode(serialization)
         config = config_class(init=content, container=container, prefix=prefix)

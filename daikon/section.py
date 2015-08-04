@@ -148,7 +148,7 @@ class Section(collections.abc.Mapping):
                 raise KeyError("cannot replace parameter [{}]{} with section".format(self.prefix, key))
             if sub_prefix in self.container:
                 # remove section to remove all section keys from flattened container
-                del self[key]
+                self[key].clear()
             subsection = self.subsection(prefix=sub_prefix)
             for sub_key, sub_value in value.items():
                 subsection[sub_key] = sub_value
@@ -156,8 +156,6 @@ class Section(collections.abc.Mapping):
         else:
             if sub_prefix in self.container:
                 raise KeyError("cannot replace section [{}]{} with parameter".format(self.prefix, key))
-            #if abs_key in self.container:
-            #    del self.container[abs_key]
             if isinstance(value, self.SUPPORTED_VALUE_TYPES):
                 self.container[abs_key] = value
             else:
@@ -348,5 +346,4 @@ class Section(collections.abc.Mapping):
     def __bool__(self):
         for _ in self._iter_keys():
             return True
-        else:
-            return False
+        return False

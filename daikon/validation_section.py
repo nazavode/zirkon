@@ -23,8 +23,6 @@ Implementation of the SectionSchema class
 
 __author__ = "Simone Campagna"
 
-import collections
-
 from .section import Section
 from .validator.error import ValidationError
 

@@ -46,6 +46,7 @@ class PickleSerializer(Serializer):
         return pickle.dumps(content)
 
     def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+        dummy = filename
         content = pickle.loads(serialization)
         config = config_class(init=content, container=container, prefix=prefix)
         return config

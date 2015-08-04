@@ -97,4 +97,5 @@ class Serializer(Plugin, metaclass=abc.ABCMeta):
         if self.is_binary():
             mode += 'b'
         with open(filename, mode) as f_stream:
-            return self.from_stream(config_class=config_class, stream=f_stream, container=container, prefix=prefix, filename=filename)
+            return self.from_stream(config_class=config_class, stream=f_stream,
+                                    container=container, prefix=prefix, filename=filename)

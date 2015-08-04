@@ -28,7 +28,7 @@ from .config import Config
 from .section_schema import SectionSchema
 
 
-class Schema(Config, SectionSchema):
+class Schema(Config, SectionSchema):  # pylint: disable=too-many-ancestors,I0011
     """Schema(container=None)
        Schema config.
     """
