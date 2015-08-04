@@ -47,11 +47,10 @@ def test_Config_create_container(container, string_io):
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_init(container, simple_config_content, string_io):
+def test_Config_create_init(simple_config_content, string_io):
     config = Config(init=simple_config_content)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
-    assert len(container) == 0
 
 def test_Config_create_container_init(container, simple_config_content, string_io):
     config = Config(container=container, init=simple_config_content)
