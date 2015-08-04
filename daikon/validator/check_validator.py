@@ -37,7 +37,7 @@ class CheckValidator(CheckType):
     """
     TYPE = ValidatorBase
 
-    def on_load(self, key_value):
+    def convert(self, key_value):
         if not isinstance(key_value.value, ValidatorBase):
             try:
                 key_value.value = ValidatorBase.validator_unrepr(key_value.value)
@@ -47,7 +47,3 @@ class CheckValidator(CheckType):
                     type(err).__name__,
                     err,
                 ))
-
-    def on_store(self, key_value):
-        if isinstance(key_value.value, ValidatorBase):
-            key_value.value = key_value.value.validator_repr()

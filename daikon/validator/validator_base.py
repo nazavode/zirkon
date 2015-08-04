@@ -79,19 +79,19 @@ class ValidatorBase(Plugin):
         args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.plugin_name(), args)
 
-    def validate(self, key, value, defined, mode=None):
-        """validate(key, value, defined, mode=None) -> validator repr
+    def validate(self, key, value, defined):
+        """validate(key, value, defined) -> validator repr
            Validate a key/value.
         """
         key_value = KeyValue(key=key, defined=defined, value=value)
-        return self.validate_key_value(key_value, mode=mode)
+        return self.validate_key_value(key_value)
 
-    def validate_key_value(self, key_value, mode=None):
-        """validate(key, value, defined, mode=None) -> validator repr
+    def validate_key_value(self, key_value):
+        """validate(key, value, defined) -> validator repr
            Validate a KeyValue object.
         """
         for check in self.checks:
-            check.do_check(key_value, mode=mode)
+            check.do_check(key_value)
         return key_value.value
 
     def __eq__(self, validator):

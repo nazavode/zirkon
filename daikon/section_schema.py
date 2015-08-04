@@ -51,7 +51,7 @@ class SectionSchema(Section):
             schema_validator = self.subsection_class()(container=collections.OrderedDict(),
                                                        unexpected_parameter_validator=Validator(),
                                                        auto_validate=False)
-            schema_validator.impl_validate(self, mode='load', ignore_errors=False)
+            schema_validator.impl_validate(self, ignore_errors=False)
 
     @classmethod
     def subsection_class(cls):
@@ -72,10 +72,10 @@ class SectionSchema(Section):
             raise TypeError("{!r} is not a ValidatorBase".format(validator))
         self._unexpected_parameter_validator = validator
 
-    def validate(self, section, *, mode=None, ignore_errors=True):
-        return self.impl_validate(section, mode=mode, ignore_errors=ignore_errors)
+    def validate(self, section, *, ignore_errors=True):
+        return self.impl_validate(section, ignore_errors=ignore_errors)
 
-    def impl_validate(self, section, *, mode=None, ignore_errors=True, parent_fqname=''):
+    def impl_validate(self, section, *, ignore_errors=True, parent_fqname=''):
         validation_section = ValidationSection(container=collections.OrderedDict())
         # expected sub_sections:
         expected_sub_section_names = set()
@@ -90,7 +90,6 @@ class SectionSchema(Section):
                     sub_section = section.add_section(sub_section_name)
                 sub_section_fqname = parent_fqname + sub_section_name + self.DOT
                 sub_validation_section = sub_section_schema.impl_validate(section[sub_section_name],
-                                                                         mode=mode,
                                                                          ignore_errors=ignore_errors,
                                                                          parent_fqname=sub_section_fqname)
                 if sub_validation_section:
@@ -105,7 +104,6 @@ class SectionSchema(Section):
                                                              prefix=self.prefix,
                                                              unexpected_parameter_validator=self.unexpected_parameter_validator)
                 sub_validation_section = sub_section_schema.impl_validate(section[sub_section_name],
-                                                                         mode=mode,
                                                                          ignore_errors=ignore_errors,
                                                                          parent_fqname=sub_section_fqname)
                 if sub_validation_section:
@@ -126,7 +124,7 @@ class SectionSchema(Section):
                     defined = False
                 key_value = KeyValue(key=key, value=value, defined=defined)
                 try:
-                    validator.validate_key_value(key_value, mode=mode)
+                    validator.validate_key_value(key_value)
                 except ValidationError as err:
                     validation_section[parameter_name] = err
                     if not ignore_errors:
@@ -145,7 +143,7 @@ class SectionSchema(Section):
                 key = parent_fqname + parameter_name
                 key_value = KeyValue(key=key, value=parameter_value, defined=True)
                 try:
-                    validator.validate_key_value(key_value, mode=mode)
+                    validator.validate_key_value(key_value)
                 except ValidationError as err:
                     validation_section[parameter_name] = err
                     if not ignore_errors:

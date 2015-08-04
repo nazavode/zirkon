@@ -38,35 +38,25 @@ class Check(metaclass=abc.ABCMeta):
     def __init__(self):
         pass
 
-    def do_check(self, key_value, mode=None):
-        """do_check(key_value, mode=None)
+    def do_check(self, key_value):
+        """do_check(key_value)
            Execute
-           * on_load(key_value) if mode == 'load';
+           * convert(key_value);
            * check(key_value);
-           * on_store(key_value) if mode == 'store'.
         """
-        if mode == 'load':
-            self.on_load(key_value)
+        self.convert(key_value)
         self.check(key_value)
-        if mode == 'store':
-            self.on_store(key_value)
 
     @abc.abstractmethod
     def check(self, key_value):
         """check(key_value)
-           Run key/value check (can change key_value.value!)
+           Run key/value check (can change key_value.value)
         """
         pass
 
-    def on_load(self, key_value):
-        """on_load(key_value)
-           Convert key/value on load (can change key_value.value!)
-        """
-        pass
-
-    def on_store(self, key_value):
-        """on_store(key_value)
-           Convert key/value on store (can change key_value.value!)
+    def convert(self, key_value):
+        """convert(key_value)
+           Convert key/value (can change key_value.value)
         """
         pass
 
