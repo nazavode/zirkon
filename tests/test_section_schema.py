@@ -22,7 +22,7 @@ import io
 
 import pytest
 
-from common.fixtures import simple_container, \
+from common.fixtures import container, \
     string_io, \
     simple_section_content, \
     simple_schema_content
@@ -37,13 +37,13 @@ from daikon.validator.error import TypeValidationError, \
     OptionValidationError, UnexpectedParameterValidationError
 
 
-def test_SectionSchema_create(simple_container, string_io):
-    section_schema = SectionSchema(container=simple_container)
+def test_SectionSchema_create(container, string_io):
+    section_schema = SectionSchema(container=container)
     section_schema.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_SectionSchema_init(simple_container, string_io, simple_schema_content):
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content)
+def test_SectionSchema_init(container, string_io, simple_schema_content):
+    section_schema = SectionSchema(container=container, init=simple_schema_content)
     section_schema.dump()
     section_schema.dump(stream=string_io)
     assert string_io.getvalue() == """\
@@ -57,29 +57,29 @@ a = Int(min=1)
         ssy = FloatTuple(item_max=5.5)
 """
 
-def test_SectionSchema_err(simple_container, string_io, simple_schema_content):
+def test_SectionSchema_err(container, string_io, simple_schema_content):
     init = simple_schema_content
     init['a'] = 2
     with pytest.raises(TypeError) as exc_info:
-        section_schema = SectionSchema(container=simple_container, init=init)
+        section_schema = SectionSchema(container=container, init=init)
 
-def test_SectionSchema_err(simple_container, string_io, simple_schema_content):
+def test_SectionSchema_err(container, string_io, simple_schema_content):
     init = simple_schema_content
     init['a'] = 'Int('
     with pytest.raises(TypeValidationError) as exc_info:
-        section_schema = SectionSchema(container=simple_container, init=init)
+        section_schema = SectionSchema(container=container, init=init)
     assert str(exc_info.value) == """a='Int(': cannot create a validator from string 'Int(': SyntaxError: unexpected EOF while parsing (<string>, line 1)"""
 
-def test_SectionSchema_validate_0(simple_container, string_io, simple_schema_content, simple_section_content):
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content)
+def test_SectionSchema_validate_0(container, string_io, simple_schema_content, simple_section_content):
+    section_schema = SectionSchema(container=container, init=simple_schema_content)
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     validation_section = section_schema.validate(section)
     assert isinstance(validation_section, ValidationSection)
     assert not validation_section
 
-def test_SectionSchema_validate_invalid_option(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_invalid_option(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['subsub']['ssx'] = "delta"
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content)
+    section_schema = SectionSchema(container=container, init=simple_schema_content)
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     validation_section = section_schema.validate(section)
     assert isinstance(validation_section, ValidationSection)
@@ -89,9 +89,9 @@ def test_SectionSchema_validate_invalid_option(simple_container, string_io, simp
     assert len(validation_section['sub']['subsub']) == 1
     assert isinstance(validation_section['sub']['subsub']['ssx'], OptionValidationError)
 
-def test_SectionSchema_validate_unexpected(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_unexpected(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content)
+    section_schema = SectionSchema(container=container, init=simple_schema_content)
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     validation_section = section_schema.validate(section)
     assert isinstance(validation_section, ValidationSection)
@@ -100,18 +100,18 @@ def test_SectionSchema_validate_unexpected(simple_container, string_io, simple_s
     assert len(validation_section['sub']) == 1
     assert isinstance(validation_section['sub']['abc'], UnexpectedParameterValidationError)
 
-def test_SectionSchema_validate_unexpected_ignored(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_unexpected_ignored(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content, unexpected_parameter_validator=Ignore())
+    section_schema = SectionSchema(container=container, init=simple_schema_content, unexpected_parameter_validator=Ignore())
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     validation_section = section_schema.validate(section)
     assert not validation_section
     assert section['sub'].has_parameter('abc')
     assert section['sub']['abc'] == 10
 
-def test_SectionSchema_validate_unexpected_sub_ignored(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_unexpected_sub_ignored(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['ssub'] = {'abc': 10}
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content, unexpected_parameter_validator=Ignore())
+    section_schema = SectionSchema(container=container, init=simple_schema_content, unexpected_parameter_validator=Ignore())
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     validation_section = section_schema.validate(section)
     assert not validation_section
@@ -119,9 +119,9 @@ def test_SectionSchema_validate_unexpected_sub_ignored(simple_container, string_
     assert section['sub']['ssub'].has_parameter('abc')
     assert section['sub']['ssub']['abc'] == 10
 
-def test_SectionSchema_validate_unexpected_removed(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_unexpected_removed(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content, unexpected_parameter_validator=Remove())
+    section_schema = SectionSchema(container=container, init=simple_schema_content, unexpected_parameter_validator=Remove())
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     assert section['sub'].has_parameter('abc')
     assert section['sub']['abc'] == 10
@@ -129,9 +129,9 @@ def test_SectionSchema_validate_unexpected_removed(simple_container, string_io, 
     assert not validation_section
     assert not section['sub'].has_parameter('abc')
 
-def test_SectionSchema_validate_unexpected_sub_removed(simple_container, string_io, simple_schema_content, simple_section_content):
+def test_SectionSchema_validate_unexpected_sub_removed(container, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['ssub'] = {'abc': 10}
-    section_schema = SectionSchema(container=simple_container, init=simple_schema_content, unexpected_parameter_validator=Remove())
+    section_schema = SectionSchema(container=container, init=simple_schema_content, unexpected_parameter_validator=Remove())
     section = Section(container=collections.OrderedDict(), init=simple_section_content)
     assert section['sub'].has_section('ssub')
     assert section['sub']['ssub'].has_parameter('abc')

@@ -6,7 +6,7 @@ import os
 import pytest
 
 from common.fixtures import simple_config, \
-                            simple_container, \
+                            container, \
                             simple_config_content, \
                             string_io, \
                             tmp_raw_file

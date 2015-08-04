@@ -23,7 +23,7 @@ import io
 import pytest
 
 from common.utils import compare_dicts
-from common.fixtures import simple_container, \
+from common.fixtures import container, \
                             simple_config_content, \
                             simple_config, \
                             string_io, \
@@ -42,22 +42,22 @@ def test_Config_create_empty(string_io):
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_container(simple_container, string_io):
-    config = Config(container=simple_container)
+def test_Config_create_container(container, string_io):
+    config = Config(container=container)
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_init(simple_container, simple_config_content, string_io):
+def test_Config_create_init(container, simple_config_content, string_io):
     config = Config(init=simple_config_content)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
-    assert len(simple_container) == 0
+    assert len(container) == 0
 
-def test_Config_create_container_init(simple_container, simple_config_content, string_io):
-    config = Config(container=simple_container, init=simple_config_content)
+def test_Config_create_container_init(container, simple_config_content, string_io):
+    config = Config(container=container, init=simple_config_content)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
-    assert len(simple_container) > 0
+    assert len(container) > 0
 
 def test_Config_to_file_JSON(simple_config, tmp_text_file):
     simple_config.to_file(filename=tmp_text_file.name, protocol="JSON")

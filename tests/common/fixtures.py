@@ -18,7 +18,7 @@
 __author__ = "Simone Campagna"
 __all__ = [
     'string_io',
-    'simple_container',
+    'container',
     'simple_config_content',
     'simple_section',
     'simple_config',
@@ -53,7 +53,7 @@ def string_io():
     return io.StringIO()
 
 @pytest.fixture
-def simple_container():
+def container():
     return collections.OrderedDict()
 
 @pytest.fixture
@@ -84,13 +84,13 @@ def simple_config_content():
     
 
 @pytest.fixture
-def simple_section(simple_container, simple_config_content):
-    section = Section(container=simple_container, init=simple_config_content)
+def simple_section(container, simple_config_content):
+    section = Section(container=container, init=simple_config_content)
     return section
 
 @pytest.fixture
-def simple_config(simple_container, simple_config_content):
-    config = Config(container=simple_container, init=simple_config_content)
+def simple_config(container, simple_config_content):
+    config = Config(container=container, init=simple_config_content)
     return config
 
 @pytest.fixture
@@ -209,8 +209,8 @@ def simple_section_content():
     ))
 
 @pytest.fixture
-def simple_schema(simple_container, simple_schema_content):
-    schema = Schema(container=simple_container, init=simple_schema_content)
+def simple_schema(container, simple_schema_content):
+    schema = Schema(container=container, init=simple_schema_content)
     return schema
 
 SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
