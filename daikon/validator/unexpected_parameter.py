@@ -28,11 +28,11 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 from .check_unexpected_parameter import CheckUnexpectedParameter
 
 
-class UnexpectedParameter(ValidatorBase):
+class UnexpectedParameter(Validator):
     """UnexpectedParameter()
        Validator for unexpected parameters
     """

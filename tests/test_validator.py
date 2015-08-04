@@ -11,7 +11,7 @@ from daikon.validator import ValidatorInstance
 
 @pytest.fixture
 def validator_validator():
-    return validator.ValidatorBase.get_plugin('ValidatorInstance')()
+    return validator.Validator.get_plugin('ValidatorInstance')()
 
 def test_validator_from_string_ok(validator_validator):
     validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))"
@@ -22,7 +22,7 @@ def test_validator_from_string_ok(validator_validator):
 #    validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))"
 #    with pytest.raises(TypeValidationError) as exc_info:
 #        validator_instance = validator_validator.validate(key='<key>', value=validator_string, defined=True)
-#    assert str(exc_info.value) == """<key>='IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))': invalid type str - expected type is ValidatorBase"""
+#    assert str(exc_info.value) == """<key>='IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))': invalid type str - expected type is Validator"""
 
 def test_validator_from_string_err0(validator_validator):
     validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2)"
@@ -34,7 +34,7 @@ def test_validator_from_string_err1(validator_validator):
     validator_string = "list((2, 3, 4))"
     with pytest.raises(TypeValidationError) as exc_info:
         validator_instance = validator_validator.validate(key='<key>', value=validator_string, defined=True)
-    assert str(exc_info.value) == """<key>=[2, 3, 4]: invalid type list - expected type is ValidatorBase"""
+    assert str(exc_info.value) == """<key>=[2, 3, 4]: invalid type list - expected type is Validator"""
 
 def test_validator_to_string(validator_validator):
     validator_string = "IntTuple(min_len=4, item_max=3, default=(0, 2, 1, 0, 2))"

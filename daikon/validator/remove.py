@@ -29,10 +29,10 @@ __all__ = [
 from ..utils.compose import Composer
 
 from .check_remove import CheckRemove
-from .validator_base import ValidatorBase
+from .validator import Validator
 
 
-class Remove(ValidatorBase):
+class Remove(Validator):
     """Remove()
        Ignore key/value.
     """

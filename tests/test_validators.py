@@ -11,7 +11,7 @@ from common.test_scenarios import pytest_generate_tests
 
 @pytest.fixture
 def validator_validator():
-    return validator.ValidatorBase.get_plugin('ValidatorInstance')()
+    return validator.Validator.get_plugin('ValidatorInstance')()
 
 class TestWithScenarios(object):
     scenario_Int = ('Int',
@@ -96,7 +96,7 @@ class TestWithScenarios(object):
     )
 
     def test_validator(self, validator_validator, validator_name, validator_class, validator_options):
-        validator_plugin = validator.ValidatorBase.get_plugin(validator_name)
+        validator_plugin = validator.Validator.get_plugin(validator_name)
         assert validator_plugin is validator_class
         validator_instance = validator_plugin(**validator_options)
         assert validator_instance is validator_validator.validate(key='<key>', value=validator_instance, defined=True)
@@ -105,5 +105,5 @@ class TestWithScenarios(object):
         validator_instance2 = validator_validator.validate('<key>', value=validator_repr, defined=True)
         assert validator_instance == validator_instance2
 
-        validator_instance3 = validator.ValidatorBase.unrepr(validator_instance2.repr())
+        validator_instance3 = validator.Validator.unrepr(validator_instance2.repr())
         assert validator_instance == validator_instance3

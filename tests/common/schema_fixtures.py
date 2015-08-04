@@ -83,29 +83,29 @@ def simple_schema(simple_container, simple_schema_content):
 SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 {
     "a": {
-        "__class_name__": "ValidatorBase",
+        "__class_name__": "Validator",
         "__repr__": "Int(min=1)"
     },
     "sub": {
         "sa": {
-            "__class_name__": "ValidatorBase",
+            "__class_name__": "Validator",
             "__repr__": "Float(max=10)"
         },
         "sb": {
-            "__class_name__": "ValidatorBase",
+            "__class_name__": "Validator",
             "__repr__": "Int(default=3)"
         },
         "sc": {
-            "__class_name__": "ValidatorBase",
+            "__class_name__": "Validator",
             "__repr__": "Str()"
         },
         "subsub": {
             "ssx": {
-                "__class_name__": "ValidatorBase",
+                "__class_name__": "Validator",
                 "__repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
             },
             "ssy": {
-                "__class_name__": "ValidatorBase",
+                "__class_name__": "Validator",
                 "__repr__": "FloatTuple(item_max=5.5)"
             }
         }

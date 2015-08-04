@@ -28,10 +28,10 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 
 
-class Ignore(ValidatorBase):
+class Ignore(Validator):
     """Ignore()
        Ignore key/value.
     """

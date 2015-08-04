@@ -16,14 +16,14 @@
 #
 
 """\
-config.validator.validator_base
-===============================
-Implementation of the ValidatorBase class
+config.validator.validator
+==========================
+Implementation of the Validator base class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ValidatorBase',
+    'Validator',
 ]
 
 import collections
@@ -35,8 +35,8 @@ from ..serializer import configobj_serializer
 from .key_value import KeyValue
 
 
-class ValidatorBase(Plugin):
-    """ValidatorBase(*, argument_store, **arguments)
+class Validator(Plugin):
+    """Validator(*, argument_store, **arguments)
        Base class for validators.
     """
     CHECK_COMPOSER = None
@@ -68,7 +68,7 @@ class ValidatorBase(Plugin):
     @classmethod
     def unrepr(cls, vstring):
         """unrepr(vstring) -> validator
-           Return a ValidatorBase from a validator's repr string.
+           Return a Validator from a validator's repr string.
         """
         return eval(vstring, cls.subclasses_dict())  # pylint: disable=W0123
 

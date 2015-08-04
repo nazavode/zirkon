@@ -27,10 +27,10 @@ __all__ = [
 ]
 
 from .key_value import KeyValue
-from .validator_base import ValidatorBase
+from .validator import Validator
 
 
-class Sequence(ValidatorBase):
+class Sequence(Validator):
     """Sequence(...)
        Base class for sequence (list, tuple) validators.
     """

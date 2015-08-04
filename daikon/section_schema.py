@@ -27,7 +27,7 @@ import collections
 
 from .section import Section
 from .validation_section import ValidationSection
-from .validator import ValidatorInstance, ValidatorBase
+from .validator import Validator, ValidatorInstance
 from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
 from .validator.error import ValidationError, \
@@ -39,7 +39,7 @@ class SectionSchema(Section):
     """SectionSchema(container, *, prefix='', init=None, unexpected_parameter_validator=None)
        Provides validation methods.
     """
-    SUPPORTED_VALUE_TYPES = (str, ValidatorBase, )
+    SUPPORTED_VALUE_TYPES = (str, Validator)
 
     def __init__(self, container, *, prefix='', init=None, unexpected_parameter_validator=None, auto_validate=True):
         if unexpected_parameter_validator is None:
@@ -67,8 +67,8 @@ class SectionSchema(Section):
 
     @unexpected_parameter_validator.setter
     def unexpected_parameter_validator(self, validator):
-        if not isinstance(validator, ValidatorBase):
-            raise TypeError("{!r} is not a ValidatorBase".format(validator))
+        if not isinstance(validator, Validator):
+            raise TypeError("{!r} is not a Validator".format(validator))
         self._unexpected_parameter_validator = validator
 
     def validate(self, section, *, ignore_errors=True):

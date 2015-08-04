@@ -31,7 +31,7 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
@@ -40,14 +40,14 @@ from .check_option import CheckOption
 from .check_sequence import CheckList, CheckTuple
 
 
-class Str(ValidatorBase):
+class Str(Validator):
     """Str()
        Validator for a str scalar key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
 
-class StrOption(ValidatorBase):
+class StrOption(Validator):
     """StrOption()
        Validator for a str option key/value.
     """

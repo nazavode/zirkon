@@ -31,7 +31,7 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
@@ -41,14 +41,14 @@ from .check_option import CheckOption
 from .check_sequence import CheckList, CheckTuple
 
 
-class Bool(ValidatorBase):
+class Bool(Validator):
     """Bool()
        Validator for a scalar bool key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
 
-class BoolOption(ValidatorBase):
+class BoolOption(Validator):
     """BoolOption()
        Validator for a bool option key/value.
     """

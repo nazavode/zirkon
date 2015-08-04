@@ -28,11 +28,11 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 from .check_validator_instance import CheckValidatorInstance
 
 
-class ValidatorInstance(ValidatorBase):
+class ValidatorInstance(Validator):
     """ValidatorInstance()
        Validator for a key/value Validator instance.
     """

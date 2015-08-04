@@ -31,7 +31,7 @@ __all__ = [
 
 from ..utils.compose import Composer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMin, CheckMax, \
@@ -42,14 +42,14 @@ from .check_option import CheckOption
 from .check_sequence import CheckList, CheckTuple
 
 
-class Float(ValidatorBase):
+class Float(Validator):
     """Float()
        Validator for a float scalar key/value.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
 
 
-class FloatOption(ValidatorBase):
+class FloatOption(Validator):
     """FloatOption()
        Validator for a float option key/value.
     """

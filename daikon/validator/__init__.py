@@ -6,7 +6,7 @@ Parameter validator classes
 """
 
 __all__ = [
-    'ValidatorBase',
+    'Validator',
     'Int',
     'IntList',
     'IntTuple',
@@ -34,7 +34,7 @@ import collections
 from ..serializer import json_serializer
 from ..serializer import configobj_serializer
 
-from .validator_base import ValidatorBase
+from .validator import Validator
 
 from .int_validators import Int, \
     IntList, IntTuple, IntOption
@@ -54,10 +54,10 @@ from .ignore import Ignore
 from .remove import Remove
 
 json_serializer.add_coder(
-    class_=ValidatorBase,
+    class_=Validator,
     encode=(lambda obj: collections.OrderedDict([('__repr__', obj.repr())])),
-    decode=(lambda dct: ValidatorBase.unrepr(dct['__repr__'])),
+    decode=(lambda dct: Validator.unrepr(dct['__repr__'])),
 )
 
-configobj_serializer.update_globals(ValidatorBase.subclasses_dict())
+configobj_serializer.update_globals(Validator.subclasses_dict())
 

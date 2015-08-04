@@ -28,19 +28,19 @@ __all__ = [
 
 from .check_type import CheckType
 from .error import TypeValidationError
-from .validator_base import ValidatorBase
+from .validator import Validator
 
 
 class CheckValidatorInstance(CheckType):
     """CheckValidatorInstance()
-       Check if key/value is a ValidatorBase instance.
+       Check if key/value is a Validator instance.
     """
-    TYPE = ValidatorBase
+    TYPE = Validator
 
     def convert(self, key_value):
-        if not isinstance(key_value.value, ValidatorBase):
+        if not isinstance(key_value.value, Validator):
             try:
-                key_value.value = ValidatorBase.unrepr(key_value.value)
+                key_value.value = Validator.unrepr(key_value.value)
             except Exception as err:
                 raise TypeValidationError(key_value, "cannot create a validator from string {!r}: {}: {}".format(
                     key_value.value,
