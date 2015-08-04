@@ -55,7 +55,9 @@ class Expression(metaclass=abc.ABCMeta):
     # binary mathematical operators:
     def __add__(self, other):
         return Add(self, other)
-    __radd__ = __add__
+
+    def __radd__(self, other):
+        return Add(other, self)
 
     def __sub__(self, other):
         return Sub(self, other)
@@ -73,50 +75,68 @@ class Expression(metaclass=abc.ABCMeta):
         return TrueDiv(self, other)
 
     def __rtruediv__(self, other):
-        return TrueDiv(Value(other), self)
+        return TrueDiv(other, self)
 
     def __floordiv__(self, other):
         return FloorDiv(self, other)
 
     def __rfloordiv__(self, other):
-        return FloorDiv(Value(other), self)
+        return FloorDiv(other, self)
 
     def __mod__(self, other):
         return Mod(self, other)
 
     def __rmod__(self, other):
-        return Mod(Value(other), self)
+        return Mod(other, self)
 
     def __divmod__(self, other):
         return DivMod(self, other)
 
     def __rdivmod__(self, other):
-        return DivMod(Value(other), self)
+        return DivMod(other, self)
 
     def __pow__(self, other):
         return Pow(self, other)
 
     def __rpow__(self, other):
-        return Pow(Value(other), self)
+        return Pow(other, self)
 
     # binary comparison operators:
     def __eq__(self, other):
         return Eq(self, other)
 
+    def __req__(self, other):
+        return Eq(other, self)
+
     def __ne__(self, other):
         return Ne(self, other)
+
+    def __rne__(self, other):
+        return Ne(other, self)
 
     def __lt__(self, other):
         return Lt(self, other)
 
+    def __rlt__(self, other):
+        return Ge(other, self)
+
     def __le__(self, other):
         return Le(self, other)
+
+    def __rle__(self, other):
+        return Gt(self, other)
 
     def __gt__(self, other):
         return Gt(self, other)
 
+    def __rgt__(self, other):
+        return Le(self, other)
+
     def __ge__(self, other):
         return Ge(self, other)
+
+    def __rge__(self, other):
+        return Lt(self, other)
 
     # utilities:
     def evaluate_operand(self, operand):
@@ -167,6 +187,10 @@ class Str(UnaryOperator):
 class Repr(UnaryOperator):
     def unary_operation(self, value):
         return Repr(value)
+
+class Not(UnaryOperator):
+    def unary_operation(self, value):
+        return Not(value)
 
 class BinaryOperator(Expression):
     def __init__(self, left_operand, right_operand):
@@ -237,5 +261,14 @@ class Gt(BinaryOperator):
 class Ge(BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return left_value >= right_value
+
+class And(BinaryOperator):
+    def binary_operation(self, left_value, right_value):
+        return left_value and right_value
+
+
+class Or(BinaryOperator):
+    def binary_operation(self, left_value, right_value):
+        return left_value or right_value
 
 

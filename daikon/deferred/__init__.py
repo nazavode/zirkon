@@ -16,9 +16,9 @@
 #
 
 """
-config.expression
+config.deferred
 =================
-Generic expressions builder.
+Deferred expressions builder.
 """
 
 __author__ = "Simone Campagna"

@@ -4,18 +4,19 @@ import collections
 
 import pytest
 
-from daikon.expression.expression import \
+from daikon.deferred.expression import \
     Expression, \
-    Value
+    Value, \
+    Repr, Str, Not
 
 
 ## unary
-_unary_int_operands = [1, 2, -3, -4, 0]
+_unary_int_operands = [1, -4, 0]
 @pytest.fixture(params=_unary_int_operands, ids=[str(o) for o in _unary_int_operands])
 def ival1(request):
     return request.param
 
-_unary_float_operands = [1.3, 2.34, -3.4, -4.0, 0.0]
+_unary_float_operands = [1.3, -3.4, 0.0]
 @pytest.fixture(params=_unary_float_operands, ids=[str(o) for o in _unary_float_operands])
 def fval1(request):
     return request.param
@@ -24,6 +25,9 @@ _unary_int_operator = collections.OrderedDict()
 _unary_int_operator['abs'] = abs
 _unary_int_operator['pos'] = lambda x: +x
 _unary_int_operator['neg'] = lambda x: -x
+_unary_int_operator['Str'] = Str
+_unary_int_operator['Repr'] = Repr
+_unary_int_operator['Not'] = Not
 @pytest.fixture(ids=tuple(_unary_int_operator.keys()), params=tuple(_unary_int_operator.values()))
 def iop1(request):
     return request.param
@@ -34,7 +38,7 @@ _unary_float_operator = _unary_int_operator
 def fop1(request):
     return request.param
 
-_binary_int_operands = [(1, 3), (2, 1), (-3, -3), (-4, 100), (10, 1)]
+_binary_int_operands = [(1, 3), (2, -1), (-3, -3), (10, 1)]
 @pytest.fixture(params=_binary_int_operands, ids=[str(o) for o in _binary_int_operands])
 def ival2(request):
     return request.param
@@ -69,18 +73,24 @@ def iop2(request):
 
 _binary_float_operator = collections.OrderedDict()
 _binary_float_operator.update(_binary_num_operator)
+@pytest.fixture(ids=tuple(_binary_float_operator.keys()), params=tuple(_binary_float_operator.values()))
+def fop2(request):
+    return request.param
 
 ###############################
+## int unary:
 def test_int_unary(iop1, ival1):
     e = iop1(Value(ival1))
     assert isinstance(e, Expression)
     assert e.evaluate() == iop1(ival1)
     
+## float unary:
 def test_float_unary(fop1, fval1):
     e = fop1(Value(fval1))
     assert isinstance(e, Expression)
     assert e.evaluate() == fop1(fval1)
   
+## int binary:
 def test_int_binary_vl(iop2, ival2):
     l, r = ival2
     e = iop2(Value(l), r)
@@ -95,4 +105,20 @@ def test_int_binary_vlr(iop2, ival2):
     l, r = ival2
     e = iop2(Value(l), Value(r))
     assert e.evaluate() == iop2(l, r)
+    
+## float binary:
+def test_float_binary_vl(fop2, fval2):
+    l, r = fval2
+    e = fop2(Value(l), r)
+    assert e.evaluate() == fop2(l, r)
+    
+def test_float_binary_vr(fop2, fval2):
+    l, r = fval2
+    e = fop2(l, Value(r))
+    assert e.evaluate() == fop2(l, r)
+    
+def test_float_binary_vlr(fop2, fval2):
+    l, r = fval2
+    e = fop2(Value(l), Value(r))
+    assert e.evaluate() == fop2(l, r)
     
