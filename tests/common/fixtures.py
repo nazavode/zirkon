@@ -18,6 +18,7 @@
 __author__ = "Simone Campagna"
 __all__ = [
     'string_io',
+    'generic_container',
     'container',
     'simple_config_content',
     'simple_section',
@@ -51,6 +52,12 @@ from daikon.validator import Int, Str, StrOption
 @pytest.fixture
 def string_io():
     return io.StringIO()
+
+_container_classes = [dict, collections.OrderedDict]
+@pytest.fixture(params=_container_classes, ids=[cc.__name__ for cc in _container_classes])
+def generic_container(request):
+    container_class = request.param
+    return container_class()
 
 @pytest.fixture
 def container():

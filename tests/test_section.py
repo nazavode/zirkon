@@ -23,6 +23,7 @@ import io
 import pytest
 
 from common.fixtures import container, \
+                            generic_container, \
                             simple_config_content, \
                             simple_section, \
                             string_io, \
@@ -32,8 +33,8 @@ from common.fixtures import container, \
 
 from daikon.section import Section
 
-def test_Section_create(container, string_io):
-    section = Section(container=container)
+def test_Section_create(generic_container, string_io):
+    section = Section(container=generic_container)
     section.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
@@ -42,9 +43,9 @@ def test_Section_create_init(container, simple_config_content, string_io):
     section.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
 
-def test_Section_create_prefix(container, simple_config_content, string_io):
-    section = Section(container=container, init=simple_config_content)
-    options = Section(container=container, prefix='options.')
+def test_Section_create_prefix(generic_container, simple_config_content, string_io):
+    section = Section(container=generic_container, init=simple_config_content)
+    options = Section(container=generic_container, prefix='options.')
     assert section['options'] == options
 
 def test_Section_update(container, simple_config_content, string_io):
@@ -238,18 +239,18 @@ def test_Section_ne_1(simple_section):
     assert simple_section != s0
     assert s0 != simple_section
 
-def test_Section_len_empty(container):
-    assert len(container) == 0
-    section = Section(container=container)
+def test_Section_len_empty(generic_container):
+    assert len(generic_container) == 0
+    section = Section(container=generic_container)
     assert len(section) == 0
-    assert len(container) == 0
+    assert len(generic_container) == 0
     section['a'] = 10
     assert len(section) == 1
-    assert len(container) == 1
+    assert len(generic_container) == 1
     section['b'] = {'x': 0, 'y': 1, 'z': 2}
     assert len(section) == 2
     assert len(section['b']) == 3
-    assert len(container) == 1 + 1 + 3
+    assert len(generic_container) == 1 + 1 + 3
 
 def test_Section_len_simple_section(simple_section):
     assert len(simple_section) == 2 + 1 + 1 + 1

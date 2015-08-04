@@ -24,6 +24,7 @@ import pytest
 
 from common.utils import compare_dicts
 from common.fixtures import container, \
+                            generic_container, \
                             simple_config_content, \
                             simple_config, \
                             string_io, \
@@ -42,8 +43,8 @@ def test_Config_create_empty(string_io):
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_container(container, string_io):
-    config = Config(container=container)
+def test_Config_create_container(generic_container, string_io):
+    config = Config(container=generic_container)
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
