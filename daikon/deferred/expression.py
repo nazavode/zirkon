@@ -27,9 +27,14 @@ import abc
 
 
 class Expression(metaclass=abc.ABCMeta):
+    """Expression()
+       Abstract base class to compose generic expressions.
+       Concrete classes must implement the evaluate() method.
+    """
 
     @abc.abstractmethod
     def evaluate(self):
+        """evaluate() -> expression value"""
         pass
 
     # unary mathematical operators:
@@ -41,16 +46,6 @@ class Expression(metaclass=abc.ABCMeta):
 
     def __neg__(self):
         return Neg(self)
-
-    # other unary operators:
-#    def __len__(self):
-#        return Len(self)
-#
-#    def __str__(self):
-#        return Str(self)
-#
-#    def __repr__(self):
-#        return Repr(self)
 
     # binary mathematical operators:
     def __add__(self, other):
@@ -138,21 +133,41 @@ class Expression(metaclass=abc.ABCMeta):
     def __rge__(self, other):
         return Lt(self, other)
 
+    # Call:
+    def __call__(self, *p_args, **n_args):
+        return Call(self, p_args, n_args)
+
+    # Get attribute:
+    def __getattr__(self, attr_name):
+        return Getattr(self, attr_name)
+
     # utilities:
-    def evaluate_operand(self, operand):
+    @classmethod
+    def evaluate_operand(cls, operand):
+        """evaluate_operand() -> operand value"""
         if isinstance(operand, Expression):
             return operand.evaluate()
         else:
             return operand
 
+
 class Value(Expression):
+    """Value(value)
+       Const value expression.
+    """
+
     def __init__(self, value):
         self.value = value
 
     def evaluate(self):
         return self.evaluate_operand(self.value)
 
+
 class UnaryOperator(Expression):
+    """UnaryOperator(operand)
+       Abstract base class for unary operators.
+    """
+
     def __init__(self, operand):
         self.operand = operand
 
@@ -162,37 +177,87 @@ class UnaryOperator(Expression):
 
     @abc.abstractmethod
     def unary_operation(self, value):
+        """unary_operation(value) -> result"""
+
         pass
 
+
 class Abs(UnaryOperator):
+    """'abs' unary operator."""
+
     def unary_operation(self, value):
         return abs(value)
 
+
 class Pos(UnaryOperator):
+    """'pos' unary operator."""
+
     def unary_operation(self, value):
         return +value
 
+
 class Neg(UnaryOperator):
+    """'neg' unary operator."""
+
     def unary_operation(self, value):
         return -value
 
+
 class Len(UnaryOperator):
+    """'len' unary operator."""
+
     def unary_operation(self, value):
         return len(value)
 
+
 class Str(UnaryOperator):
+    """'str' unary operator."""
+
     def unary_operation(self, value):
-        return Str(value)
+        return str(value)
+
 
 class Repr(UnaryOperator):
+    """'repr' unary operator."""
+
     def unary_operation(self, value):
-        return Repr(value)
+        return repr(value)
+
 
 class Not(UnaryOperator):
+    """'not' unary operator."""
     def unary_operation(self, value):
         return Not(value)
 
+
+class Getattr(UnaryOperator):
+    """'getattr' unary operator."""
+
+    def __init__(self, operand, attr_name):
+        super().__init__(operand=operand)
+        self.attr_name = attr_name
+
+    def unary_operation(self, value):
+        return getattr(value, self.attr_name)
+
+
+class Call(UnaryOperator):
+    """'call' unary operator."""
+
+    def __init__(self, operand, p_args, n_args):
+        super().__init__(operand=operand)
+        self.p_args = p_args
+        self.n_args = n_args
+
+    def unary_operation(self, value):
+        return value(*self.p_args, **self.n_args)
+
+
 class BinaryOperator(Expression):
+    """BinaryOperator(operand)
+       Abstract base class for binary operators.
+    """
+
     def __init__(self, left_operand, right_operand):
         self.left_operand = left_operand
         self.right_operand = right_operand
@@ -204,70 +269,119 @@ class BinaryOperator(Expression):
 
     @abc.abstractmethod
     def binary_operation(self, left_value, right_value):
+        """binary_operation(left_value, right_value) -> result"""
+
         pass
 
+
 class Add(BinaryOperator):
+    """'add' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value + right_value
 
+
 class Mul(BinaryOperator):
+    """'mul' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value * right_value
 
+
 class Sub(BinaryOperator):
+    """'sub' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value - right_value
 
+
 class TrueDiv(BinaryOperator):
+    """'truediv' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value / right_value
 
+
 class FloorDiv(BinaryOperator):
+    """'floordiv' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value // right_value
 
+
 class Mod(BinaryOperator):
+    """'mod' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value % right_value
 
+
 class DivMod(BinaryOperator):
+    """'divmod' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
 
+
 class Pow(BinaryOperator):
+    """'pow' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value ** right_value
 
+
 class Eq(BinaryOperator):
+    """'eq' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value == right_value
 
+
 class Ne(BinaryOperator):
+    """'ne' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value != right_value
 
+
 class Lt(BinaryOperator):
+    """'lt' binary operator."""
+
     def binary_operation(self, left_value, right_value):
-        return left_value <  right_value
+        return left_value < right_value
+
 
 class Le(BinaryOperator):
+    """'le' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value <= right_value
 
+
 class Gt(BinaryOperator):
+    """'gt' binary operator."""
+
     def binary_operation(self, left_value, right_value):
-        return left_value >  right_value
+        return left_value > right_value
+
 
 class Ge(BinaryOperator):
+    """'ge' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value >= right_value
 
+
 class And(BinaryOperator):
+    """'and' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value and right_value
 
 
 class Or(BinaryOperator):
+    """'or' binary operator."""
+
     def binary_operation(self, left_value, right_value):
         return left_value or right_value
 

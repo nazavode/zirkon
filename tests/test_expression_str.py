@@ -11,7 +11,7 @@ from daikon.deferred.expression import \
 
 
 ## unary
-_unary_str_operands = ["alpha", "", " a bc d "]
+_unary_str_operands = ["alpha", "", " a BC d "]
 @pytest.fixture(params=_unary_str_operands, ids=[str(o) for o in _unary_str_operands])
 def sval1(request):
     return request.param
@@ -46,6 +46,17 @@ _binary_str_operator['ge'] = lambda l, r: l >= r
 def sop2(request):
     return request.param
 
+_binary_str_method0 = [
+    'lower',
+    'upper',
+    'title',
+    'split',
+    'strip',
+]
+@pytest.fixture(params=_binary_str_method0)
+def smethod0(request):
+    return request.param
+
 ###############################
 ## str unary:
 def test_str_unary(sop1, sval1):
@@ -68,3 +79,19 @@ def test_str_binary_vlr(sop2, sval2):
     l, r = sval2
     e = sop2(Value(l), Value(r))
     assert e.evaluate() == sop2(l, r)
+
+###############################
+def test_str_method0(smethod0, sval1):
+    vm = getattr(sval1, smethod0)
+    e = Value(sval1)
+    em = getattr(e, smethod0)
+    assert vm is not em
+    emv = em().evaluate()
+    assert vm() == emv
+    
+def test_str_method_join():
+    s = ', '
+    l = ['a', ' b ', 'cde', '12']
+    e = Value(s)
+    em = e.join(l)
+    assert s.join(l) == em.evaluate()
