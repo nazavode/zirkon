@@ -30,6 +30,8 @@ __all__ = [
 
 import collections
 
+from .subclass import subclasses
+
 
 class ClassRegistry(object):
     """ClassRegistry(default_factory=lambda : None)
@@ -87,8 +89,10 @@ class ClassRegistry(object):
         else:
             if class_name in self._name_cache:
                 class_ = self._name_cache[class_name]
+                print("::: @1", class_name, class_, self._name_cache)
             else:
                 class_ = self._get_subclass_by_name(class_name)
+                print("::: @2", class_name, class_, self._name_cache)
                 self._name_cache[class_name] = class_
             if class_ is None:
                 return self.default_factory()
@@ -102,11 +106,12 @@ class ClassRegistry(object):
            If not found, it returns None.
         """
         for class_ in self.class_info.keys():
-            for subclass in class_.__subclasses__():
+            for subclass in subclasses(class_, include_self=False):
+                if class_name == 'FloatTuple':
+                    print("::: @3 {!r} {!r} {!r}".format(class_name, class_.__name__, subclass.__name__))
                 if subclass.__name__ == class_name:
                     return subclass
-        else:
-            return None
+        return None
              
     def _get_best_match(self, class_):
         """_get_best_match(class_) -> best_distance, best_match_class

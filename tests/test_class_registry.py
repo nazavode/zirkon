@@ -47,7 +47,16 @@ class D(B):
     pass
 
 
-class E(object):
+class E0(object):
+    pass
+
+class E1(E0):
+    pass
+
+class E2(E1):
+    pass
+
+class E3(E2):
     pass
 
 
@@ -58,6 +67,7 @@ def class_registry():
     cr.register(A1, 'a1')
     cr.register(A2, 'a2')
     cr.register(C, 'c')
+    cr.register(E0, 'e0')
     return cr
 
 Parameters = collections.namedtuple('Parameters', ('class_', 'exact', 'expected'))
@@ -78,6 +88,7 @@ _data = [
     Parameters(class_=DC,  exact=False, expected='c'),
     Parameters(class_=D,   exact=True,  expected=_default),
     Parameters(class_=D,   exact=False, expected=_default),
+    Parameters(class_=E3,  exact=False, expected='e0'),
 ]
 
 @pytest.fixture(params=_data, ids=["{}-{}".format(p.class_.__name__, p.exact) for p in _data])
