@@ -50,17 +50,17 @@ class ClassRegistry(object):
         self.class_info[class_] = info
 
     def get(self, class_or_name, exact=False):
-        """get_by_type(class_, exact=False) -> info
-           Get info for a type 'class_'. If 'exact' returns only exact matches.
+        """get_by_class(class_, exact=False) -> info
+           Get info for a class 'class_'. If 'exact' returns only exact matches.
         """
         if isinstance(class_or_name, str):
             return self.get_by_name(class_or_name, exact=exact)
         else:
-            return self.get_by_type(class_or_name, exact=exact)
+            return self.get_by_class(class_or_name, exact=exact)
 
-    def get_by_type(self, class_, exact=False):
-        """get_by_type(class_, exact=False) -> info
-           Get info for a type 'class_'. If 'exact' returns only exact matches.
+    def get_by_class(self, class_, exact=False):
+        """get_by_class(class_, exact=False) -> info
+           Get info for a class 'class_'. If 'exact' returns only exact matches.
         """
         if class_ in self.class_info:
             return self.class_info[class_]
@@ -80,7 +80,6 @@ class ClassRegistry(object):
            Get info for a class named 'class_name'. If 'exact' returns only exact matches.
         """
         for class_, info in self.class_info.items():
-            print("@@@  {!r} {!r}".format(class_.__name__, class_name))
             if class_.__name__ == class_name:
                 return info
         if exact:
@@ -94,7 +93,7 @@ class ClassRegistry(object):
             if class_ is None:
                 return self.default_factory()
             else:
-                return self.get_by_type(class_, exact=exact)
+                return self.get_by_class(class_, exact=exact)
                         
         
     def _get_subclass_by_name(self, class_name):

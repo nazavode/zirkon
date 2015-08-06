@@ -90,8 +90,8 @@ def test_ClassRegistry_get_t(class_registry, param):
 def test_ClassRegistry_get_n(class_registry, param):
     assert class_registry.get(param.class_.__name__, exact=param.exact) == param.expected
 
-def test_ClassRegistry_get_by_type(class_registry, param):
-    assert class_registry.get_by_type(param.class_, exact=param.exact) == param.expected
+def test_ClassRegistry_get_by_class(class_registry, param):
+    assert class_registry.get_by_class(param.class_, exact=param.exact) == param.expected
 
 def test_ClassRegistry_get_by_name(class_registry, param):
     assert class_registry.get_by_name(param.class_.__name__, exact=param.exact) == param.expected
