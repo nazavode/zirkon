@@ -39,6 +39,7 @@ class ClassRegistry(object):
     def __init__(self, default_factory=lambda : None):
         self.class_info = collections.OrderedDict()
         self._cache = {}
+        self._name_cache = {}
         self.default_factory = default_factory
 
 
@@ -48,13 +49,19 @@ class ClassRegistry(object):
         """
         self.class_info[class_] = info
 
-    def get(self, class_, exact=False):
-        """get(class_, info)
-           Get info for a class or instance. If 'exact' returns only exact matches.
+    def get(self, class_or_name, exact=False):
+        """get_by_type(class_, exact=False) -> info
+           Get info for a type 'class_'. If 'exact' returns only exact matches.
         """
-        if not isinstance(class_, type):
-            class_ = type(class_)
-        
+        if isinstance(class_or_name, str):
+            return self.get_by_name(class_or_name, exact=exact)
+        else:
+            return self.get_by_type(class_or_name, exact=exact)
+
+    def get_by_type(self, class_, exact=False):
+        """get_by_type(class_, exact=False) -> info
+           Get info for a type 'class_'. If 'exact' returns only exact matches.
+        """
         if class_ in self.class_info:
             return self.class_info[class_]
         else:
@@ -62,14 +69,48 @@ class ClassRegistry(object):
                 if class_ in self._cache:
                     best_distance, best_match = self._cache[class_]
                 else:
-                    best_distance, best_match = self.get_best_match(class_)
+                    best_distance, best_match = self._get_best_match(class_)
                     self._cache[class_] = best_distance, best_match
                 if best_distance is not None:
                     return self.class_info[best_match]
             return self.default_factory()
             
-    def get_best_match(self, class_):
-        """get_best_match(class_) -> best_distance, best_match_class
+    def get_by_name(self, class_name, exact=False):
+        """get_by_name(class_name, exact=False) -> info
+           Get info for a class named 'class_name'. If 'exact' returns only exact matches.
+        """
+        for class_, info in self.class_info.items():
+            print("@@@  {!r} {!r}".format(class_.__name__, class_name))
+            if class_.__name__ == class_name:
+                return info
+        if exact:
+            return self.default_factory()
+        else:
+            if class_name in self._name_cache:
+                class_ = self._name_cache[class_name]
+            else:
+                class_ = self._get_subclass_by_name(class_name)
+                self._name_cache[class_name] = class_
+            if class_ is None:
+                return self.default_factory()
+            else:
+                return self.get_by_type(class_, exact=exact)
+                        
+        
+    def _get_subclass_by_name(self, class_name):
+        """_get_subclass_by_name(class_name) -> subclass or None
+           Finds a subclass of any registered whose name is 'class_name'.
+           If not found, it returns None.
+        """
+        for class_ in self.class_info.keys():
+            for subclass in class_.__subclasses__():
+                if subclass.__name__ == class_name:
+                    return subclass
+        else:
+            return None
+             
+    def _get_best_match(self, class_):
+        """_get_best_match(class_) -> best_distance, best_match_class
            Returns the best match for a given class, based on __mro__ of registered
            classes. If a match cannot be found, 'distance' is None.
         """

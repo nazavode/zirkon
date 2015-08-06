@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import collections
+
 import pytest
 
 from daikon.utils.class_registry import ClassRegistry
@@ -49,39 +51,48 @@ class E(object):
     pass
 
 
+_default = 123
 @pytest.fixture
 def class_registry():
-    cr = ClassRegistry(default_factory=lambda : 123)
+    cr = ClassRegistry(default_factory=lambda : _default)
     cr.register(A1, 'a1')
     cr.register(A2, 'a2')
     cr.register(C, 'c')
     return cr
 
-def test_ClassRegistry_A2(class_registry):
-    assert class_registry.get(A2) == 'a2'
+Parameters = collections.namedtuple('Parameters', ('class_', 'exact', 'expected'))
+_data = [
+    Parameters(class_=A2,  exact=True,  expected='a2'),
+    Parameters(class_=A2,  exact=False, expected='a2'),
+    Parameters(class_=DA2, exact=True,  expected=_default),
+    Parameters(class_=DA2, exact=False, expected='a2'),
+    Parameters(class_=A1,  exact=True,  expected='a1'),
+    Parameters(class_=A1,  exact=False, expected='a1'),
+    Parameters(class_=DA1, exact=True,  expected=_default),
+    Parameters(class_=DA1, exact=False, expected='a1'),
+    Parameters(class_=A0,  exact=True,  expected=_default),
+    Parameters(class_=A0,  exact=False, expected=_default),
+    Parameters(class_=DA0, exact=True,  expected=_default),
+    Parameters(class_=DA0, exact=False, expected='c'),
+    Parameters(class_=DC,  exact=True,  expected=_default),
+    Parameters(class_=DC,  exact=False, expected='c'),
+    Parameters(class_=D,   exact=True,  expected=_default),
+    Parameters(class_=D,   exact=False, expected=_default),
+]
 
-def test_ClassRegistry_A2_exact(class_registry):
-    assert class_registry.get(A2, exact=True) == 'a2'
+@pytest.fixture(params=_data, ids=["{}-{}".format(p.class_.__name__, p.exact) for p in _data])
+def param(request):
+    return request.param
 
-def test_ClassRegistry_DA2(class_registry):
-    assert class_registry.get(DA2) == 'a2'
+def test_ClassRegistry_get_t(class_registry, param):
+    assert class_registry.get(param.class_, exact=param.exact) == param.expected
 
-def test_ClassRegistry_DA2_exact(class_registry):
-    assert class_registry.get(DA2, exact=True) == 123
+def test_ClassRegistry_get_n(class_registry, param):
+    assert class_registry.get(param.class_.__name__, exact=param.exact) == param.expected
 
-def test_ClassRegistry_A1(class_registry):
-    assert class_registry.get(A1) == 'a1'
+def test_ClassRegistry_get_by_type(class_registry, param):
+    assert class_registry.get_by_type(param.class_, exact=param.exact) == param.expected
 
-def test_ClassRegistry_DA1(class_registry):
-    assert class_registry.get(DA1) == 'a1'
-
-def test_ClassRegistry_DA0(class_registry):
-    assert class_registry.get(DC) == 'c'
-
-def test_ClassRegistry_DC(class_registry):
-    assert class_registry.get(DC) == 'c'
-
-def test_ClassRegistry_D(class_registry):
-    assert class_registry.get(D) == 123
-
+def test_ClassRegistry_get_by_name(class_registry, param):
+    assert class_registry.get_by_name(param.class_.__name__, exact=param.exact) == param.expected
 
