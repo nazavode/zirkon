@@ -16,8 +16,8 @@
 #
 
 """\
-config.serializer.class_archive
-===============================
+config.utils.class_registry
+===========================
 Implementation of the ClassRegistry registry. This class registers 
 classes and related information. It implements methods to find the
 best match for any class.
