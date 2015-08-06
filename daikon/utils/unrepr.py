@@ -29,7 +29,12 @@ __all__ = [
 
 import ast
 
-def unrepr(string):
+def unrepr(string, globals=None):
+    if globals is None:
+        globals = {
+            'list': list,
+            'tuple': tuple,
+        }
     def py_ast_unrepr(ast_body):
         if isinstance(ast_body, ast.Str):
             return ast_body.s
@@ -57,6 +62,37 @@ def unrepr(string):
                     ast_body.col_offset,
                     type(ast_body).__name__,
                     operand))
+        elif isinstance(ast_body, ast.Name):
+            if ast_body.id in globals:
+                return globals[ast_body.id]
+        elif isinstance(ast_body, ast.Call):
+            ast_func = ast_body.func
+            if ast_func.id in globals:
+                p_args = [py_ast_unrepr(arg) for arg in ast_body.args]
+                n_args = {py_ast_unrepr(key): py_ast_unrepr(val) for key, val in ast_body.keywords}
+                if ast_body.starargs is not None:
+                    starargs = py_ast_unrepr(ast_body.starargs)
+                    p_args.extend(starargs)
+                if ast_body.kwargs is not None:
+                    kwargs = py_ast_unrepr(ast_body.kwargs)
+                    n_args.update(kwargs)
+                func = globals[ast_func.id]
+                try:
+                    print(":::", p_args, n_args)
+                    return func(*p_args, **n_args)
+                except Exception as err:
+                    raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call to function {}: {}: {}".format(
+                        string,
+                        ast_body.col_offset,
+                        ast_func.id,
+                        type(err).__name__,
+                        err))
+            else:
+                raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call to undefined function {}".format(
+                    string,
+                    ast_body.col_offset,
+                    type(ast_body).__name__,
+                    ast_func.id))
         raise SyntaxError("cannot unrepr string {!r}: col {}: invalid ast {}".format(
             string,
             ast_body.col_offset,
