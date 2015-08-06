@@ -71,7 +71,7 @@ from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
 
-json_serializer.add_coder(
+json_serializer.JSONSerializer.codec_registry().add_codec(
     class_=Validator,
     encode=(lambda obj: collections.OrderedDict([('__repr__', obj.repr())])),
     decode=(lambda dct: Validator.unrepr(dct['__repr__'])),

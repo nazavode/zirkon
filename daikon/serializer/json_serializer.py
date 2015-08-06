@@ -27,23 +27,11 @@ import collections
 import json
 
 from .serializer import Serializer
+from .codec_registry import CodecRegistry
 
 
-_JSON_CODERS = {}
-_CLASS_NAME_KEY = '__class_name__'
-
-Coder = collections.namedtuple('Coder', ('class_', 'encode', 'decode'))
-
-
-def add_coder(class_, encode, decode, *, class_name=None):
-    """add_coder(class_, encode, decode, *, class_name=None)
-       Add a Coder for instances of class_ (and its' subclasses).
-    """
-
-    if class_name is None:
-        class_name = class_.__name__
-    _JSON_CODERS[class_name] = Coder(class_=class_, encode=encode, decode=decode)
-
+_CODEC_REGISTRY = CodecRegistry()
+_CLASS_NAME_KEY = "__class_name__"
 
 class JSONPluggableEncoder(json.JSONEncoder):
     """JSONPluggableEncoder()
@@ -51,13 +39,16 @@ class JSONPluggableEncoder(json.JSONEncoder):
     """
 
     def default(self, obj):  # pylint: disable=E0202
-        for class_name, coder in _JSON_CODERS.items():
-            if isinstance(obj, coder.class_):
-                dct = collections.OrderedDict()
-                dct[_CLASS_NAME_KEY] = class_name
-                dct.update(coder.encode(obj))
-                return dct
-        super().default(obj)
+        class_ = type(obj)
+        codec = _CODEC_REGISTRY.get_by_class(class_)
+        print("::: >", class_.__name__, codec)
+        if codec is None:
+            return super().default(obj)
+        else:
+            dct = collections.OrderedDict()
+            dct[_CLASS_NAME_KEY] = codec.class_.__name__
+            dct.update(codec.encode(obj))
+            return dct
 
 
 def _object_pairs_hook(pairs):
@@ -68,9 +59,10 @@ def _object_pairs_hook(pairs):
     dct = collections.OrderedDict(pairs)
     if _CLASS_NAME_KEY in dct:
         class_name = dct[_CLASS_NAME_KEY]
-        coder = _JSON_CODERS[class_name]
+        codec = _CODEC_REGISTRY.get_by_name(class_name)
+        print("::: <", class_name, codec)
         del dct[_CLASS_NAME_KEY]
-        return coder.decode(dct)
+        return codec.decode(dct)
     else:
         return dct
 
@@ -79,6 +71,7 @@ class JSONSerializer(Serializer):
     """JSONSerializer()
        Implementation of JSON serializer.
     """
+    CODEC_REGISTRY = _CODEC_REGISTRY
 
     @classmethod
     def plugin_name(cls):
