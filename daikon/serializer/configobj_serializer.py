@@ -113,7 +113,7 @@ class ConfigObjSerializer(Serializer):
                     value = codec.decode(type_name, val)
                 else:
                     try:
-                        value = unrepr(val)  # pylint: disable=W0123
+                        value = unrepr(val)
                     except Exception as err:
                         raise ValueError("invalid value at line {}@{}: {!r}: {}: {}".format(
                             line_no, filename, val, type(err).__name__, err))
