@@ -81,7 +81,7 @@ def _validator_json_decode(validator_name, arguments):
     #print("::: (((", validator_name, validator_class, arguments)
     return validator_class(**arguments)
 
-json_serializer.JSONSerializer.codec_registry().add_codec(
+json_serializer.JSONSerializer.codec_catalog().add_codec(
     class_=Validator,
     encode=_validator_json_encode,
     decode=_validator_json_decode,
@@ -93,7 +93,7 @@ def _validator_configobj_encode(validator):
 def _validator_configobj_decode(type_name, repr_data):
     return unrepr(repr_data, Validator.subclasses_dict())
 
-configobj_serializer.ConfigObjSerializer.codec_registry().add_codec(
+configobj_serializer.ConfigObjSerializer.codec_catalog().add_codec(
     class_=Validator,
     encode=_validator_configobj_encode,
     decode=_validator_configobj_decode,

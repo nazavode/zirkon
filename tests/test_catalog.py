@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.utils.class_registry import ClassRegistry
+from daikon.utils.catalog import Catalog
 
 
 class A0(object):
@@ -63,7 +63,7 @@ class E3(E2):
 _default = 123
 @pytest.fixture
 def class_registry():
-    cr = ClassRegistry(default_factory=lambda : _default)
+    cr = Catalog(default_factory=lambda : _default)
     cr.register(A1, 'a1')
     cr.register(A2, 'a2')
     cr.register(C, 'c')
@@ -95,15 +95,15 @@ _data = [
 def param(request):
     return request.param
 
-def test_ClassRegistry_get_t(class_registry, param):
+def test_Catalog_get_t(class_registry, param):
     assert class_registry.get(param.class_, exact=param.exact) == param.expected
 
-def test_ClassRegistry_get_n(class_registry, param):
+def test_Catalog_get_n(class_registry, param):
     assert class_registry.get(param.class_.__name__, exact=param.exact) == param.expected
 
-def test_ClassRegistry_get_by_class(class_registry, param):
+def test_Catalog_get_by_class(class_registry, param):
     assert class_registry.get_by_class(param.class_, exact=param.exact) == param.expected
 
-def test_ClassRegistry_get_by_name(class_registry, param):
+def test_Catalog_get_by_name(class_registry, param):
     assert class_registry.get_by_name(param.class_.__name__, exact=param.exact) == param.expected
 

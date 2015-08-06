@@ -16,24 +16,24 @@
 #
 
 """\
-config.serializer.codec_registry
-================================
-Registry for class encoders/decoders.
+config.serializer.codec_catalog
+===============================
+Catalog for class encoders/decoders.
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CodecRegistry',
+    'CodecCatalog',
 ]
 
 import collections
 
-from ..utils.class_registry import ClassRegistry
+from ..utils.catalog import Catalog
 
 
-class CodecRegistry(ClassRegistry):
-    """CodecRegistry(default)
-       ClassRegistry for codecs.
+class CodecCatalog(Catalog):
+    """CodecCatalog(default)
+       Catalog for codecs.
     """
     Codec = collections.namedtuple('Codec', ('class_', 'encode', 'decode'))
 

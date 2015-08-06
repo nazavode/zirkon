@@ -51,15 +51,6 @@ class E(object):
     pass
 
 
-_default = 123
-@pytest.fixture
-def class_registry():
-    cr = ClassRegistry(default_factory=lambda : _default)
-    cr.register(A1, 'a1')
-    cr.register(A2, 'a2')
-    cr.register(C, 'c')
-    return cr
-
 Parameters = collections.namedtuple('Parameters', ('class_', 'include_self', 'filter', 'expected'))
 _data = collections.OrderedDict()
 _data['A2-isT-fN'] = Parameters(class_=A2,  include_self=True, filter=None, expected=[A2, DA2])

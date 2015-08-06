@@ -16,16 +16,15 @@
 #
 
 """\
-config.utils.class_registry
+config.utils.catalog
 ===========================
-Implementation of the ClassRegistry registry. This class registers 
-classes and related information. It implements methods to find the
-best match for any class.
+Implementation of the Catalog class. This class registers information
+about classes. It provides methods to find the best match for any class.
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ClassRegistry',
+    'Catalog',
 ]
 
 import collections
@@ -33,9 +32,9 @@ import collections
 from .subclass import subclasses
 
 
-class ClassRegistry(object):
-    """ClassRegistry(default_factory=lambda : None)
-       Registry for classes.
+class Catalog(object):
+    """Catalog(default_factory=lambda : None)
+       Classes information catalog.
     """
 
     def __init__(self, default_factory=lambda : None):

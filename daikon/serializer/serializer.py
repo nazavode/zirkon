@@ -28,7 +28,7 @@ import abc
 from ..utils.files import createdir
 from ..utils.plugin import Plugin
 
-from .codec_registry import CodecRegistry
+from .codec_catalog import CodecCatalog
 
 
 class Serializer(Plugin, metaclass=abc.ABCMeta):
@@ -36,11 +36,11 @@ class Serializer(Plugin, metaclass=abc.ABCMeta):
        Abstract base class for serializer plugins. Serializers must implement
        to_string(config) and from_string(config_class, serialization, container).
     """
-    CODEC_REGISTRY = CodecRegistry()
+    CODEC_CATALOG = CodecCatalog()
 
     @classmethod
-    def codec_registry(cls):
-        return cls.CODEC_REGISTRY
+    def codec_catalog(cls):
+        return cls.CODEC_CATALOG
 
     @classmethod
     def is_binary(cls):

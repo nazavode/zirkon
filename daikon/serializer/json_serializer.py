@@ -27,10 +27,10 @@ import collections
 import json
 
 from .serializer import Serializer
-from .codec_registry import CodecRegistry
+from .codec_catalog import CodecCatalog
 
 
-_CODEC_REGISTRY = CodecRegistry()
+_CODEC_CATALOG = CodecCatalog()
 _CLASS_NAME_KEY = "__class_name__"
 
 class JSONPluggableEncoder(json.JSONEncoder):
@@ -40,7 +40,7 @@ class JSONPluggableEncoder(json.JSONEncoder):
 
     def default(self, obj):  # pylint: disable=E0202
         class_ = type(obj)
-        codec = _CODEC_REGISTRY.get_by_class(class_)
+        codec = _CODEC_CATALOG.get_by_class(class_)
         #print("::: >", class_.__name__, codec)
         if codec is None:
             return super().default(obj)
@@ -59,7 +59,7 @@ def _object_pairs_hook(pairs):
     dct = collections.OrderedDict(pairs)
     if _CLASS_NAME_KEY in dct:
         class_name = dct[_CLASS_NAME_KEY]
-        codec = _CODEC_REGISTRY.get_by_name(class_name)
+        codec = _CODEC_CATALOG.get_by_name(class_name)
         #print("::: <", class_name, codec)
         del dct[_CLASS_NAME_KEY]
         return codec.decode(class_name, dct)
@@ -71,7 +71,7 @@ class JSONSerializer(Serializer):
     """JSONSerializer()
        Implementation of JSON serializer.
     """
-    CODEC_REGISTRY = _CODEC_REGISTRY
+    CODEC_CATALOG = _CODEC_CATALOG
 
     @classmethod
     def plugin_name(cls):
