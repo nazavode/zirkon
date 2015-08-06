@@ -26,6 +26,8 @@ __author__ = "Simone Campagna"
 import collections
 import inspect
 
+from . import subclass
+
 
 class Plugin(object):
     """Plugin
@@ -64,11 +66,11 @@ class Plugin(object):
            Iterator over subclasses; cls is included only if 'include_self' is True.
            Abstract plugin classes are included only if 'include_abstract' is True.
         """
-        if include_self:
-            if include_abstract or not cls.is_abstract():
-                yield cls
-        for plugin_class in cls.__subclasses__():  # pylint: disable=E1101
-            yield from plugin_class.subclasses(include_self=True, include_abstract=include_abstract)
+        if include_abstract:
+            filter = None
+        else:
+            filter = lambda x: not x.is_abstract()
+        return subclass.subclasses(cls, include_self=include_self, filter=filter)
 
     @classmethod
     def subclasses_dict(cls, *, include_self=False, include_abstract=False):
