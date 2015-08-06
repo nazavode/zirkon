@@ -47,7 +47,7 @@ import pytest
 from daikon.section import Section
 from daikon.config import Config
 from daikon.schema import Schema
-from daikon.validator import Int, Str, StrOption
+from daikon.validator import Int, Str, StrOption, Float, FloatTuple
 
 @pytest.fixture
 def string_io():
@@ -177,14 +177,14 @@ z_value = 30.3
 @pytest.fixture
 def simple_schema_content():
     return collections.OrderedDict((
-        ('a', 'Int(min=1)'),
+        ('a', Int(min=1)),
         ('sub', collections.OrderedDict((
-            ('sa', 'Float(max=10)'),
+            ('sa', Float(max=10)),
             ('sb', Int(default=3)),
             ('sc', Str()),
             ('subsub', collections.OrderedDict((
                            ('ssx', StrOption(values=["alpha", "beta", "gamma"])),    # list, non tuple: JSON does not preserve tuples!
-                           ('ssy', 'FloatTuple(item_max=5.5)'),
+                           ('ssy', FloatTuple(item_max=5.5)),
             ))),
         ))),
     ))
@@ -257,13 +257,13 @@ SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 """
 
 SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION = """\
-a = Int(min=1)
+a = <Int>Int(min=1)
 [sub]
-    sa = Float(max=10)
-    sb = Int(default=3)
-    sc = Str()
+    sa = <Float>Float(max=10)
+    sb = <Int>Int(default=3)
+    sc = <Str>Str()
     [[subsub]]
-        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
-        ssy = FloatTuple(item_max=5.5)
+        ssx = <StrOption>StrOption(values=['alpha', 'beta', 'gamma'])
+        ssy = <FloatTuple>FloatTuple(item_max=5.5)
 """     
 

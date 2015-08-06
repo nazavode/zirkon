@@ -62,13 +62,6 @@ def test_SectionSchema_err(generic_container, string_io, simple_schema_content):
     with pytest.raises(TypeError) as exc_info:
         section_schema = SectionSchema(container=generic_container, init=init)
 
-def test_SectionSchema_err(generic_container, string_io, simple_schema_content):
-    init = simple_schema_content
-    init['a'] = 'Int('
-    with pytest.raises(TypeValidationError) as exc_info:
-        section_schema = SectionSchema(container=generic_container, init=init)
-    assert str(exc_info.value) == """a='Int(': cannot create a validator from string 'Int(': SyntaxError: unexpected EOF while parsing (<string>, line 1)"""
-
 def test_SectionSchema_validate_0(container, generic_container, string_io, simple_schema_content, simple_section_content):
     section_schema = SectionSchema(container=generic_container, init=simple_schema_content)
     section = Section(container=container, init=simple_section_content)

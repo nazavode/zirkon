@@ -61,7 +61,7 @@ class SectionSchema(Section):
                      unexpected_parameter_validator=UnexpectedParameter(),
                      auto_validate=True)
        A Section class to perform validation. All values must be Validator
-       instances (strings are converted through Validator.unrepr()).
+       instances.
 
        The 'unexpected_parameter_validator' is used to validate unexpected
        parameters (parameters found in the section to be validated, but not

@@ -85,5 +85,18 @@ json_serializer.JSONSerializer.codec_registry().add_codec(
     decode=_validator_json_decode,
 )
 
-configobj_serializer.update_globals(Validator.subclasses_dict())
+def _validator_configobj_encode(validator):
+    return repr(validator)
+
+def _validator_configobj_decode(validator_name, repr_data):
+    validator_class = Validator.get_plugin(validator_name)
+    value = eval(repr_data, {validator_name: validator_class}, {})
+    return value
+
+configobj_serializer.ConfigObjSerializer.codec_registry().add_codec(
+    class_=Validator,
+    encode=_validator_configobj_encode,
+    decode=_validator_configobj_decode,
+)
+
 

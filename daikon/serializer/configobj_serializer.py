@@ -27,27 +27,18 @@ __all__ = [
     'ConfigObjSerializer',
 ]
 
+import re
+
 from .serializer import Serializer
-
-_EVAL_GLOBALS = {}
-
-
-def update_globals(dct):
-    """update_globals()
-       Update globals to be used when evaluating config values.
-    """
-    _EVAL_GLOBALS.update(dct)
+from .codec_registry import CodecRegistry
 
 
 class ConfigObjSerializer(Serializer):
     """JSONSerializer()
        Implementation of the ConfigObj serializer.
     """
-
-    CONFIGOBJ_OPTIONS = dict(
-        interpolation=False,
-        unrepr=True,
-    )
+    CODEC_REGISTRY = CodecRegistry()
+    RE_TYPE = re.compile(r'\s*\<(?P<type>\w+)\>(?P<repr_data>.*)')
 
     @classmethod
     def plugin_name(cls):
@@ -59,7 +50,13 @@ class ConfigObjSerializer(Serializer):
         """
         ind = indentation * indentation_level
         for key, value in section.parameters():
-            lines.append("{}{} = {!r}".format(ind, key, value))
+            value_type = type(value)
+            codec = self.CODEC_REGISTRY.get_by_class(value_type)
+            if codec is None:
+                value = repr(value)
+            else:
+                value = "<{type}>{repr_data}".format(type=value_type.__name__, repr_data=codec.encode(value))
+            lines.append("{}{} = {}".format(ind, key, value))
         for key, value in section.sections():
             left = "[" * (indentation_level + 1)
             right = "]" * (indentation_level + 1)
@@ -105,10 +102,19 @@ class ConfigObjSerializer(Serializer):
             else:
                 # key:
                 key, val = line.split('=', 1)
-                try:
-                    current_section[key.strip()] = eval(val, _EVAL_GLOBALS)  # pylint: disable=W0123
-                except Exception as err:
-                    raise ValueError("invalid value at line {}@{}: {}: {}".format(
-                        line_no, filename, type(err).__name__, err))
+                val = val.strip()
+                match = self.RE_TYPE.match(val)
+                if match:
+                    match_d = match.groupdict()
+                    type_name = match_d['type']
+                    codec = self.CODEC_REGISTRY.get_by_name(type_name)
+                    value = codec.decode(type_name, match_d['repr_data'])
+                else:
+                    try:
+                        value = eval(val)  # pylint: disable=W0123
+                    except Exception as err:
+                        raise ValueError("invalid value at line {}@{}: {}: {}".format(
+                            line_no, filename, type(err).__name__, err))
+                current_section[key.strip()] = value
         return config
 

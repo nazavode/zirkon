@@ -61,20 +61,6 @@ class Validator(Plugin):
         args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.__class__.__name__, args)
 
-    @classmethod
-    def unrepr(cls, vstring):
-        """unrepr(vstring) -> validator
-           Return a Validator from a validator's repr string.
-        """
-        return eval(vstring, cls.subclasses_dict())  # pylint: disable=W0123
-
-    def repr(self):
-        """repr() -> validator repr
-           Return the validator's repr string.
-        """
-        args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
-        return "{}({})".format(self.plugin_name(), args)
-
     def validate(self, key, value, defined):
         """validate(key, value, defined) -> validator repr
            Validate a key/value.
