@@ -16,8 +16,8 @@
 #
 
 """\
-config.utils.unrepr
-===================
+config.toolbox.unrepr
+=====================
 Implementation of the 'py_unrepr' function, which does unrepr of
 python builtin types (int, str, float, bool, list, tuple).
 """

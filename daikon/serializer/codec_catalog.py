@@ -28,7 +28,7 @@ __all__ = [
 
 import collections
 
-from ..utils.catalog import Catalog
+from ..toolbox.catalog import Catalog
 
 
 class CodecCatalog(Catalog):

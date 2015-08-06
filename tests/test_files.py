@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from daikon.utils import files
+from daikon.toolbox import files
 
 
 def test_createdir(tmpdir):

@@ -16,8 +16,8 @@
 #
 
 """\
-config.utils.catalog
-===========================
+config.toolbox.catalog
+======================
 Implementation of the Catalog class. This class registers information
 about classes. It provides methods to find the best match for any class.
 """

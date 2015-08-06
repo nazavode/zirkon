@@ -28,7 +28,7 @@ __all__ = [
 
 import copy
 
-from ..utils.undefined import UNDEFINED
+from ..toolbox.undefined import UNDEFINED
 from .check_required import CheckRequired
 from .key_value import KeyValue
 

@@ -30,7 +30,7 @@ import re
 
 from .serializer import Serializer
 from .codec_catalog import CodecCatalog
-from ..utils.unrepr import unrepr
+from ..toolbox.unrepr import unrepr
 
 
 def _parse_section(line, line_number, filename):

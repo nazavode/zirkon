@@ -15,25 +15,22 @@
 # limitations under the License.
 #
 
-"""
-config.utils.subclass
-=====================
+"""\
+config.toolbox.files
+====================
+File-related utility functions
 """
 
 __author__ = "Simone Campagna"
-__all__ = [
-    'subclasses',
-]
 
-import inspect
+import os
 
-def subclasses(class_, *, include_self=False, filter=None):
-    """subclasses(class_, *, include_self=False, filter=lambda : True) -> iterator
-       Iterator over subclasses; class_ is included only if 'include_self' is True.
-       Filter can be used, for instance, to exclude abstract classes.
+
+def createdir(filename):
+    """create_dir(filename)
+       Create the filename directory if it does not exist
     """
-    if include_self:
-        if filter is None or filter(class_):
-            yield class_
-    for subclass in class_.__subclasses__():  # pylint: disable=E1101
-        yield from subclasses(subclass, include_self=True, filter=filter)
+    dirname, filename = os.path.split(filename)
+    if dirname and not os.path.exists(dirname):
+        os.makedirs(dirname)
+

@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.utils import subclass
+from daikon.toolbox import subclass
 
 
 class A0(object):

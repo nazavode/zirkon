@@ -15,25 +15,10 @@
 # limitations under the License.
 #
 
-"""\
-config.utils.undefined
-======================
-Implementation of the UNDEFINED singleton
+"""
+config.toolbox
+==============
+Utilities
 """
 
 __author__ = "Simone Campagna"
-__all__ = [
-    'UNDEFINED',
-]
-
-from .singleton import Singleton
-
-
-class UndefinedType(metaclass=Singleton):  # pylint: disable=R0903
-    """UndefinedType()
-    """
-
-    def __repr__(self):
-        return "UNDEFINED"
-
-UNDEFINED = UndefinedType()

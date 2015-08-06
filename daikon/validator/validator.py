@@ -26,8 +26,8 @@ __all__ = [
     'Validator',
 ]
 
-from ..utils.plugin import Plugin
-from ..utils.compose import Composer, ArgumentStore
+from ..toolbox.plugin import Plugin
+from ..toolbox.compose import Composer, ArgumentStore
 from .key_value import KeyValue
 
 

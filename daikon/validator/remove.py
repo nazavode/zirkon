@@ -26,7 +26,7 @@ __all__ = [
     'Remove',
 ]
 
-from ..utils.compose import Composer
+from ..toolbox.compose import Composer
 
 from .check_remove import CheckRemove
 from .validator import Validator

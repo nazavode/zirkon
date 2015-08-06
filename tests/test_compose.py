@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.utils.compose import ArgumentStore, Composer
+from daikon.toolbox.compose import ArgumentStore, Composer
 
 class Alpha(object):
     def __init__(self, x, y=10):

@@ -16,8 +16,8 @@
 #
 
 """
-config.utils.compose
-====================
+config.toolbox.compose
+======================
 Compose multiple function calls in a single function.
 """
 

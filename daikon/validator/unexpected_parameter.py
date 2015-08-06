@@ -26,7 +26,7 @@ __all__ = [
     'UnexpectedParameter',
 ]
 
-from ..utils.compose import Composer
+from ..toolbox.compose import Composer
 
 from .validator import Validator
 from .check_unexpected_parameter import CheckUnexpectedParameter

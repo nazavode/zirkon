@@ -26,7 +26,7 @@ __all__ = [
     'ValidatorInstance',
 ]
 
-from ..utils.compose import Composer
+from ..toolbox.compose import Composer
 
 from .validator import Validator
 from .check_validator_instance import CheckValidatorInstance

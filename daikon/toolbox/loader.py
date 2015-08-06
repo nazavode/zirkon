@@ -20,7 +20,7 @@ Load objects from modules.
 The 'load' function can be used to load generic modules or objects.
 For instance, this loads the 'load' function itself:
 
->>> l = load('daikon.utils.loader:load')
+>>> l = load('daikon.toolbox.loader:load')
 >>> print(l.__name__)
 load
 >>>
@@ -84,9 +84,9 @@ def load_module(name, path=None):
 
        Loading a module/package:
 
-       >>> m = load_module('daikon.utils.loader')
+       >>> m = load_module('daikon.toolbox.loader')
        >>> print(m.__name__)
-       daikon.utils.loader
+       daikon.toolbox.loader
        >>> import inspect
        >>> print(inspect.ismodule(m))
        True
@@ -94,14 +94,14 @@ def load_module(name, path=None):
 
        Loading a module/package with directory information:
 
-       >>> m = load_module('./daikon.utils.loader')
+       >>> m = load_module('./daikon.toolbox.loader')
        >>> print(m.__name__)
-       daikon.utils.loader
+       daikon.toolbox.loader
        >>>
 
        Loading a module/package from a directory by specifying 'path':
 
-       >>> m = load_module('daikon.utils.loader', path=['.'])
+       >>> m = load_module('daikon.toolbox.loader', path=['.'])
 
 """
 
@@ -153,15 +153,15 @@ def load(name, path=None):
        If 'object_name' is not provided, this function behaves exactly as
        'load_module'.
 
-       >>> mod = load('daikon.utils.loader')
+       >>> mod = load('daikon.toolbox.loader')
        >>> print(mod.__name__)
-       daikon.utils.loader
+       daikon.toolbox.loader
        >>>
 
        Otherwise, the module 'absolute_module_name' is loaded,
        and then the object named 'object_name' in it is returned.
 
-       >>> obj = load('daikon.utils.loader:load')
+       >>> obj = load('daikon.toolbox.loader:load')
        >>> print(obj.__name__)
        load
        >>>

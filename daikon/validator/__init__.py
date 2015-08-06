@@ -71,7 +71,7 @@ from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
 
-from ..utils.unrepr import unrepr
+from ..toolbox.unrepr import unrepr
 
 def _validator_json_encode(validator):
     return validator.actual_arguments.copy()

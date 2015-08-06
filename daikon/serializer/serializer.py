@@ -25,8 +25,8 @@ __author__ = "Simone Campagna"
 
 import abc
 
-from ..utils.files import createdir
-from ..utils.plugin import Plugin
+from ..toolbox.files import createdir
+from ..toolbox.plugin import Plugin
 
 from .codec_catalog import CodecCatalog
 

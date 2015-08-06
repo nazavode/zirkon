@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.utils.plugin import Plugin
+from daikon.toolbox.plugin import Plugin
 
 
 @pytest.fixture

@@ -16,8 +16,8 @@
 #
 
 """
-config.utils.plugin
-===================
+config.toolbox.plugin
+=====================
 Implementation of a Plugin base class
 """
 

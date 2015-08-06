@@ -29,7 +29,7 @@ __all__ = [
     'BoolTuple',
 ]
 
-from ..utils.compose import Composer
+from ..toolbox.compose import Composer
 
 from .validator import Validator
 from .sequence import Sequence
