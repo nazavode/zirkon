@@ -145,7 +145,10 @@ class Composer(object):
        >>> def f_bxd(b, x, d):
        ...     return [b, x, d]
        >>> composer = Composer(Alpha, f_abc, f_bxd)
-       >>> composer(x=1, y=2, b=10, c=20, d=30)
+       >>> actual_arguments, objects = composer(b=10, y=2, d=30, x=1, c=20)
+       >>> actual_arguments
+       OrderedDict([('x', 1), ('y', 2), ('b', 10), ('c', 20), ('d', 30)])
+       >>> objects
        [Alpha(x=1, y=2), 130, [10, 1, 30]]
        >>>
     """
@@ -165,9 +168,9 @@ class Composer(object):
 
     def __call__(self, **args):
         argument_store = ArgumentStore(args)
-        objects = self.partial(argument_store)
+        actual_arguments, objects = self.partial(argument_store)
         self.verify_argument_store(argument_store)
-        return objects
+        return actual_arguments, objects
 
     @classmethod
     def verify_argument_store(cls, argument_store):
@@ -186,6 +189,7 @@ class Composer(object):
            If prefix is given, only arguments starting with prefix are selected,
            and copied to the functions' arguments without prefix.
         """
+        actual_arguments = collections.OrderedDict()
         objects = []
         for function, parameters_info in self._function_info:
             parameters = collections.OrderedDict()
@@ -194,12 +198,12 @@ class Composer(object):
                 if argument_name in argument_store:
                     parameter_value = argument_store.get(argument_name)
                     parameters[parameter_name] = parameter_value
+                    actual_arguments[argument_name] = parameter_value
                 else:
                     if not parameter_info.has_default:
                         raise TypeError("{}: missing required argument {}".format(function.__name__, parameter_name))
             objects.append(function(**parameters))
-        return objects
-
+        return actual_arguments, objects
 
 def compose(*functions):
     """compose(*functions)

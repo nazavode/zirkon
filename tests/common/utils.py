@@ -46,6 +46,7 @@ def standard_dict(dct):
     return dct
   
 def compare_dicts(dct0, dct1):
+    assert standard_dict(dct0) == standard_dict(dct1)
     return standard_dict(dct0) == standard_dict(dct1)
 
 

@@ -43,7 +43,7 @@ class Validator(Plugin):
         argument_store.update(arguments)
         self.argument_store = argument_store
 
-        self.checks = self.bind_arguments(self.argument_store, prefix='')
+        self.actual_arguments, self.checks = self.bind_arguments(self.argument_store, prefix='')
 
         Composer.verify_argument_store(self.argument_store)
 

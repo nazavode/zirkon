@@ -41,12 +41,12 @@ class JSONPluggableEncoder(json.JSONEncoder):
     def default(self, obj):  # pylint: disable=E0202
         class_ = type(obj)
         codec = _CODEC_REGISTRY.get_by_class(class_)
-        print("::: >", class_.__name__, codec)
+        #print("::: >", class_.__name__, codec)
         if codec is None:
             return super().default(obj)
         else:
             dct = collections.OrderedDict()
-            dct[_CLASS_NAME_KEY] = codec.class_.__name__
+            dct[_CLASS_NAME_KEY] = class_.__name__
             dct.update(codec.encode(obj))
             return dct
 
@@ -60,9 +60,9 @@ def _object_pairs_hook(pairs):
     if _CLASS_NAME_KEY in dct:
         class_name = dct[_CLASS_NAME_KEY]
         codec = _CODEC_REGISTRY.get_by_name(class_name)
-        print("::: <", class_name, codec)
+        #print("::: <", class_name, codec)
         del dct[_CLASS_NAME_KEY]
-        return codec.decode(dct)
+        return codec.decode(class_name, dct)
     else:
         return dct
 

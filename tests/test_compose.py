@@ -50,64 +50,116 @@ def _check_objects(objects):
     assert isinstance(objects[3], list)
     assert objects[3] == [100, 200, 300]
 
-def test_Composer_simple_ok():
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
-    objects = composer(x=11, xy=(13, 14), xx=23, yy=24, a=100, b=200, c=300)
+def _check_actual_arguments(actual_arguments):
+    kwlist = list(actual_arguments.items())
+    assert kwlist[0] == ('x', 11)
+    assert kwlist[1] == ('xy', (13, 14))
+    assert kwlist[2] == ('xx', 23)
+    assert kwlist[3] == ('yy', 24)
+    assert kwlist[4] == ('a', 100)
+    assert kwlist[5] == ('b', 200)
+    assert kwlist[6] == ('c', 300)
+
+def _check_actual_arguments_y(actual_arguments):
+    kwlist = list(actual_arguments.items())
+    assert kwlist[0] == ('x', 11)
+    assert kwlist[1] == ('y', 10)
+    assert kwlist[2] == ('xy', (13, 14))
+    assert kwlist[3] == ('xx', 23)
+    assert kwlist[4] == ('yy', 24)
+    assert kwlist[5] == ('a', 100)
+    assert kwlist[6] == ('b', 200)
+    assert kwlist[7] == ('c', 300)
+
+@pytest.fixture()
+def composer():
+    return Composer(Alpha, Beta, Beta.build, gamma)
+
+def fsub(item_min, item_max, item_type):
+    return [item_type, item_min, item_max]
+
+@pytest.fixture()
+def subcomposer():
+    return Composer(fsub)
+
+def _check_sub_objects(objects):
+    assert isinstance(objects[0], list)
+    assert objects[0][0] == 'int'
+    assert objects[0][1] == 5
+    assert objects[0][2] == 10
+
+def _check_actual_sub_arguments(actual_arguments):
+    kwlist = list(actual_arguments.items())
+    assert kwlist[0] == ('item_min', 5)
+    assert kwlist[1] == ('item_max', 10)
+    assert kwlist[2] == ('item_type', 'int')
+
+def test_Composer_simple_ok(composer):
+    actual_arguments, objects = composer(a=100, x=11, c=300, xy=(13, 14), yy=24, b=200, xx=23)
+    _check_actual_arguments(actual_arguments)
     _check_objects(objects)
 
-def test_Composer_simple_missing():
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
+def test_Composer_simple_missing(composer):
     with pytest.raises(TypeError) as exc_info:
-        objects = composer(x=11, xy=(13, 14), yy=24, a=100, b=200, c=300)
+        actual_arguments, objects = composer(x=11, xy=(13, 14), yy=24, a=100, b=200, c=300, y=10)
     assert str(exc_info.value) == "build: missing required argument xx"
 
-def test_Composer_simple_unexpected():
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
+def test_Composer_simple_unexpected(composer):
     with pytest.raises(TypeError) as exc_info:
-        objects = composer(x=11, xy=(13, 14), xx=23, zz=45, yy=24, a=100, b=200, c=300)
+        actual_arguments, objects = composer(x=11, xy=(13, 14), xx=23, zz=45, yy=24, a=100, b=200, c=300)
     assert str(exc_info.value) == "unexpected arguments: zz=45"
 
-def test_Composer_partial():
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
+def test_Composer_partial(composer):
     arguments = dict(x=11, xy=(13, 14), xx=23, zz=45, yy=24, a=100, b=200, c=300)
     argument_store = ArgumentStore(arguments)
-    objects = composer.partial(argument_store)
+    actual_arguments, objects = composer.partial(argument_store)
+    _check_actual_arguments(actual_arguments)
     _check_objects(objects)
     with pytest.raises(TypeError) as exc_info:
         composer.verify_argument_store(argument_store)
     assert str(exc_info.value) == "unexpected arguments: zz=45"
 
-def test_Composer_sub():
+def test_Composer_partial(composer, subcomposer):
+    arguments = dict(x=11, xy=(13, 14), xx=23, item_max=10, item_min=5, zz=45, item_type='int', yy=24, a=100, b=200, c=300)
+    argument_store = ArgumentStore(arguments)
+    actual_arguments, objects = composer.partial(argument_store)
+    _check_actual_arguments(actual_arguments)
+    _check_objects(objects)
+    sub_actual_arguments, sub_objects = subcomposer.partial(argument_store)
+    _check_actual_sub_arguments(sub_actual_arguments)
+    _check_sub_objects(sub_objects)
+    with pytest.raises(TypeError) as exc_info:
+        composer.verify_argument_store(argument_store)
+    assert str(exc_info.value) == "unexpected arguments: zz=45"
+
+def test_Composer_sub(composer):
     arguments = dict(x=11, xy=(13, 14), xx=23, yy=24, a=100, b=200, c=300, sub_a=111, sub_b=222, sub_c=333)
     argument_store = ArgumentStore(arguments)
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
-    objects = composer.partial(argument_store)
+    actual_arguments, objects = composer.partial(argument_store)
     _check_objects(objects)
     sub_composer = Composer(fab, fbc)
-    sub_objects = sub_composer.partial(argument_store, prefix='sub_')
+    sub_actual_arguments, sub_objects = sub_composer.partial(argument_store, prefix='sub_')
     assert sub_objects[0] == [111, 222]
     assert sub_objects[1] == [222, 333]
     composer.verify_argument_store(argument_store)
 
-def test_Composer_sub_missing():
+def test_Composer_sub_missing(composer):
     arguments = dict(x=11, xy=(13, 14), xx=23, yy=24, a=100, b=200, c=300, sub_a=111, sub_c=333)
     argument_store = ArgumentStore(arguments)
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
-    objects = composer.partial(argument_store)
+    actual_arguments, objects = composer.partial(argument_store)
     _check_objects(objects)
     sub_composer = Composer(fab, fbc)
     with pytest.raises(TypeError) as exc_info:
-        sub_objects = sub_composer.partial(argument_store, prefix='sub_')
+        sub_actual_arguments, sub_objects = sub_composer.partial(argument_store, prefix='sub_')
     assert str(exc_info.value) == "fab: missing required argument b"
 
-def test_Composer_sub_unexpected():
+def test_Composer_sub_unexpected(composer):
     arguments = dict(x=11, xy=(13, 14), xx=23, yy=24, zz=45, a=100, b=200, c=300, sub_a=111, sub_b=222, sub_c=333, sub_d=444)
     argument_store = ArgumentStore(arguments)
-    composer = Composer(Alpha, Beta, Beta.build, gamma)
-    objects = composer.partial(argument_store)
+    actual_arguments, objects = composer.partial(argument_store)
     _check_objects(objects)
     sub_composer = Composer(fab, fbc)
-    sub_objects = sub_composer.partial(argument_store, prefix='sub_')
+    sub_actual_arguments, sub_objects = sub_composer.partial(argument_store, prefix='sub_')
     assert sub_objects[0] == [111, 222]
     assert sub_objects[1] == [222, 333]
     with pytest.raises(TypeError) as exc_info:

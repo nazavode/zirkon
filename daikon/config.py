@@ -87,12 +87,26 @@ class Config(Section):
             ))
         return serializer_class()
 
+    def to_string(self, protocol):
+        """to_string(protocol)
+           Serialize to stream 'stream' according to 'protocol'.
+        """
+        serializer = self.get_serializer(protocol)
+        return serializer.to_string(self)
+
+    def to_stream(self, stream, protocol):
+        """to_stream(stream, protocol)
+           Serialize to stream 'stream' according to 'protocol'.
+        """
+        serializer = self.get_serializer(protocol)
+        return serializer.to_stream(self, stream)
+
     def to_file(self, filename, protocol):
         """to_file(filename, protocol)
            Serialize to file 'filename' according to 'protocol'.
         """
         serializer = self.get_serializer(protocol)
-        serializer.to_file(self, filename)
+        return serializer.to_file(self, filename)
 
     @classmethod
     def from_file(cls, filename, protocol, *, container=None, prefix=''):

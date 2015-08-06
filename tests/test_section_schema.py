@@ -52,7 +52,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [subsub]
-        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """
 

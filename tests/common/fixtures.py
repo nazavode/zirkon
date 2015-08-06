@@ -183,7 +183,7 @@ def simple_schema_content():
             ('sb', Int(default=3)),
             ('sc', Str()),
             ('subsub', collections.OrderedDict((
-                           ('ssx', StrOption(values=("alpha", "beta", "gamma"))),
+                           ('ssx', StrOption(values=["alpha", "beta", "gamma"])),    # list, non tuple: JSON does not preserve tuples!
                            ('ssy', 'FloatTuple(item_max=5.5)'),
             ))),
         ))),
@@ -196,7 +196,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [subsub]
-        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """
 
@@ -223,30 +223,33 @@ def simple_schema(container, simple_schema_content):
 SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 {
     "a": {
-        "__class_name__": "Validator",
-        "__repr__": "Int(min=1)"
+        "__class_name__": "Int",
+        "min": 1
     },
     "sub": {
         "sa": {
-            "__class_name__": "Validator",
-            "__repr__": "Float(max=10)"
+            "__class_name__": "Float",
+            "max": 10
         },
         "sb": {
-            "__class_name__": "Validator",
-            "__repr__": "Int(default=3)"
+            "__class_name__": "Int",
+            "default": 3
         },
         "sc": {
-            "__class_name__": "Validator",
-            "__repr__": "Str()"
+            "__class_name__": "Str"
         },
         "subsub": {
             "ssx": {
-                "__class_name__": "Validator",
-                "__repr__": "StrOption(values=('alpha', 'beta', 'gamma'))"
+                "__class_name__": "StrOption",
+                "values": [
+                    "alpha",
+                    "beta",
+                    "gamma"
+                ]
             },
             "ssy": {
-                "__class_name__": "Validator",
-                "__repr__": "FloatTuple(item_max=5.5)"
+                "__class_name__": "FloatTuple",
+                "item_max": 5.5
             }
         }
     }
@@ -260,7 +263,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [[subsub]]
-        ssx = StrOption(values=('alpha', 'beta', 'gamma'))
+        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """     
 

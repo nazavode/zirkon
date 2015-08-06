@@ -71,10 +71,18 @@ from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
 
+def _validator_json_encode(validator):
+    return validator.actual_arguments.copy()
+
+def _validator_json_decode(validator_name, arguments):
+    validator_class = Validator.get_plugin(validator_name)
+    #print("::: (((", validator_name, validator_class, arguments)
+    return validator_class(**arguments)
+
 json_serializer.JSONSerializer.codec_registry().add_codec(
     class_=Validator,
-    encode=(lambda obj: collections.OrderedDict([('__repr__', obj.repr())])),
-    decode=(lambda dct: Validator.unrepr(dct['__repr__'])),
+    encode=_validator_json_encode,
+    decode=_validator_json_decode,
 )
 
 configobj_serializer.update_globals(Validator.subclasses_dict())

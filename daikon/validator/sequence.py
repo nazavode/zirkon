@@ -41,7 +41,10 @@ class Sequence(Validator):
         sub_argument_store = argument_store.split(prefix=sub_prefix)
         self.item_validator = self.ITEM_VALIDATOR_CLASS(argument_store=sub_argument_store)
         argument_store.merge(sub_argument_store, prefix=sub_prefix)
-        return super().bind_arguments(argument_store, prefix=prefix)
+        actual_arguments, objects = super().bind_arguments(argument_store, prefix=prefix)
+        for argument_name, argument_value in self.item_validator.actual_arguments.items():
+            actual_arguments[sub_prefix + argument_name] = argument_value
+        return actual_arguments, objects
 
     def validate_key_value(self, key_value):
         super().validate_key_value(key_value)
