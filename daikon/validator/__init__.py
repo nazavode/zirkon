@@ -71,6 +71,8 @@ from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
 
+from ..utils.unrepr import unrepr
+
 def _validator_json_encode(validator):
     return validator.actual_arguments.copy()
 
@@ -88,10 +90,8 @@ json_serializer.JSONSerializer.codec_registry().add_codec(
 def _validator_configobj_encode(validator):
     return repr(validator)
 
-def _validator_configobj_decode(validator_name, repr_data):
-    validator_class = Validator.get_plugin(validator_name)
-    value = eval(repr_data, {validator_name: validator_class}, {})
-    return value
+def _validator_configobj_decode(type_name, repr_data):
+    return unrepr(repr_data, Validator.subclasses_dict())
 
 configobj_serializer.ConfigObjSerializer.codec_registry().add_codec(
     class_=Validator,

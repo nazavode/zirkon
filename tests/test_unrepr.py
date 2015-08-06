@@ -52,18 +52,31 @@ def test_unrepr_failure(bad_param):
         unrepr(bad_param.string)
     assert str(exc_info.value) == str(bad_param.expected)
 
-def test_unrepr_globals():
-    def myfun(x, y, l, *a, **d):
-        return x + y + len(l) + len(a) + len(d)
+def test_unrepr_globals_0():
+    assert unrepr("a", globals={"a": 102}) == 102
+
+def test_unrepr_globals_1():
+    def myfun(x, y, l):
+        return x + y + len(l)
 
     A_VALUE = 100
     gd = {
         'myfunction': myfun,
         'a': A_VALUE,
-        'l1': (1, 2, 3, 4, 5),
-        'd1': {'a':1, 'b':2},
     }
-    string = "myfunction(10, a, [1, 2, 3], *l1, **d1)"
-    assert unrepr(string, globals=gd) == 10 + A_VALUE + len([1, 2, 3]) + len(gd['l1']) + len(gd['d1'])
-    string = "a"
-    assert unrepr(string, globals=gd) == A_VALUE
+    string = "myfunction(10, y=a, l=[1, 2, 3])"
+    assert unrepr(string, globals=gd) == 10 + A_VALUE + len([1, 2, 3])
+
+def test_unrepr_globals():
+    def myfun(z1, z2, z3, x1, x2, x3):
+        return z1 + z2 + z3 + x1 + x2 + x3
+
+    l1 = [100, 200, 300]
+    d1 = {'x1': 1000, 'x2': 2000, 'x3': 3000}
+    gd = {
+        'myfunction': myfun,
+        'l1': l1,
+        'd1': d1,
+    }
+    string = "myfunction(*l1, **d1)"
+    assert unrepr(string, globals=gd) == sum(l1) + sum(d1.values())

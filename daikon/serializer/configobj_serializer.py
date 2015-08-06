@@ -31,6 +31,7 @@ import re
 
 from .serializer import Serializer
 from .codec_registry import CodecRegistry
+from ..utils.unrepr import unrepr
 
 
 class ConfigObjSerializer(Serializer):
@@ -38,7 +39,7 @@ class ConfigObjSerializer(Serializer):
        Implementation of the ConfigObj serializer.
     """
     CODEC_REGISTRY = CodecRegistry()
-    RE_TYPE = re.compile(r'\s*\<(?P<type>\w+)\>(?P<repr_data>.*)')
+    RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
 
     @classmethod
     def plugin_name(cls):
@@ -55,7 +56,7 @@ class ConfigObjSerializer(Serializer):
             if codec is None:
                 value = repr(value)
             else:
-                value = "<{type}>{repr_data}".format(type=value_type.__name__, repr_data=codec.encode(value))
+                value = codec.encode(value)
             lines.append("{}{} = {}".format(ind, key, value))
         for key, value in section.sections():
             left = "[" * (indentation_level + 1)
@@ -101,20 +102,21 @@ class ConfigObjSerializer(Serializer):
                 current_section, current_level = section_stack[-1], len(section_stack) - 1
             else:
                 # key:
+                
                 key, val = line.split('=', 1)
                 val = val.strip()
-                match = self.RE_TYPE.match(val)
+                match = self.RE_FUNC.match(val)
                 if match:
                     match_d = match.groupdict()
-                    type_name = match_d['type']
+                    type_name = match_d['func_name']
                     codec = self.CODEC_REGISTRY.get_by_name(type_name)
-                    value = codec.decode(type_name, match_d['repr_data'])
+                    value = codec.decode(type_name, val)
                 else:
                     try:
-                        value = eval(val)  # pylint: disable=W0123
+                        value = unrepr(val)  # pylint: disable=W0123
                     except Exception as err:
-                        raise ValueError("invalid value at line {}@{}: {}: {}".format(
-                            line_no, filename, type(err).__name__, err))
+                        raise ValueError("invalid value at line {}@{}: {!r}: {}: {}".format(
+                            line_no, filename, val, type(err).__name__, err))
                 current_section[key.strip()] = value
         return config
 

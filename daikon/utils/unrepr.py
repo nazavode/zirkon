@@ -69,7 +69,7 @@ def unrepr(string, globals=None):
             ast_func = ast_body.func
             if ast_func.id in globals:
                 p_args = [py_ast_unrepr(arg) for arg in ast_body.args]
-                n_args = {py_ast_unrepr(key): py_ast_unrepr(val) for key, val in ast_body.keywords}
+                n_args = {keyword.arg: py_ast_unrepr(keyword.value) for keyword in ast_body.keywords}
                 if ast_body.starargs is not None:
                     starargs = py_ast_unrepr(ast_body.starargs)
                     p_args.extend(starargs)
@@ -78,7 +78,6 @@ def unrepr(string, globals=None):
                     n_args.update(kwargs)
                 func = globals[ast_func.id]
                 try:
-                    print(":::", p_args, n_args)
                     return func(*p_args, **n_args)
                 except Exception as err:
                     raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call to function {}: {}: {}".format(

@@ -257,13 +257,13 @@ SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
 """
 
 SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION = """\
-a = <Int>Int(min=1)
+a = Int(min=1)
 [sub]
-    sa = <Float>Float(max=10)
-    sb = <Int>Int(default=3)
-    sc = <Str>Str()
+    sa = Float(max=10)
+    sb = Int(default=3)
+    sc = Str()
     [[subsub]]
-        ssx = <StrOption>StrOption(values=['alpha', 'beta', 'gamma'])
-        ssy = <FloatTuple>FloatTuple(item_max=5.5)
+        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
+        ssy = FloatTuple(item_max=5.5)
 """     
 
