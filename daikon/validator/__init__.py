@@ -77,7 +77,7 @@ def _validator_json_encode(validator):
     return validator.actual_arguments.copy()
 
 def _validator_json_decode(validator_name, arguments):
-    validator_class = Validator.get_plugin(validator_name)
+    validator_class = Validator.get_class(validator_name)
     #print("::: (((", validator_name, validator_class, arguments)
     return validator_class(**arguments)
 
@@ -91,7 +91,7 @@ def _validator_configobj_encode(validator):
     return repr(validator)
 
 def _validator_configobj_decode(type_name, repr_data):
-    return unrepr(repr_data, Validator.subclasses_dict())
+    return unrepr(repr_data, Validator.class_dict())
 
 configobj_serializer.ConfigObjSerializer.codec_catalog().add_codec(
     class_=Validator,

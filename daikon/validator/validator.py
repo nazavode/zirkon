@@ -26,12 +26,12 @@ __all__ = [
     'Validator',
 ]
 
-from ..toolbox.plugin import Plugin
+from ..toolbox.registry import Registry
 from ..toolbox.compose import Composer, ArgumentStore
 from .key_value import KeyValue
 
 
-class Validator(Plugin):
+class Validator(Registry):
     """Validator(*, argument_store, **arguments)
        Base class for validators.
     """

@@ -57,7 +57,7 @@ class ConfigObjSerializer(Serializer):
     RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
 
     @classmethod
-    def plugin_name(cls):
+    def class_tag(cls):
         return "ConfigObj"
 
     def _dump_section(self, lines, section, indentation_level=0, indentation="    "):

@@ -26,14 +26,14 @@ __author__ = "Simone Campagna"
 import abc
 
 from ..toolbox.files import createdir
-from ..toolbox.plugin import Plugin
+from ..toolbox.registry import Registry
 
 from .codec_catalog import CodecCatalog
 
 
-class Serializer(Plugin, metaclass=abc.ABCMeta):
+class Serializer(Registry, metaclass=abc.ABCMeta):
     """Serializer()
-       Abstract base class for serializer plugins. Serializers must implement
+       Abstract base class for serializers. Serializers must implement
        to_string(config) and from_string(config_class, serialization, container).
     """
     CODEC_CATALOG = CodecCatalog()

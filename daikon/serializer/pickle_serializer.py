@@ -34,7 +34,7 @@ class PickleSerializer(Serializer):
     """
 
     @classmethod
-    def plugin_name(cls):
+    def class_tag(cls):
         return "Pickle"
 
     @classmethod

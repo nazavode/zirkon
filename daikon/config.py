@@ -79,11 +79,11 @@ class Config(Section):
         """get_serializer(protocol)
            Return a serializer for the required protocol.
         """
-        serializer_class = Serializer.get_plugin(protocol)
+        serializer_class = Serializer.get_class(protocol)
         if serializer_class is None:
             raise ValueError("serialization protocol {} not available [{}]".format(
                 protocol,
-                '|'.join(plugin_class.plugin_name() for plugin_class in Serializer.subclasses()),
+                '|'.join(registered_class.class_tag() for registered_class in Serializer.classes()),
             ))
         return serializer_class()
 

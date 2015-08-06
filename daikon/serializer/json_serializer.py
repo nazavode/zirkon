@@ -58,11 +58,10 @@ def _object_pairs_hook(pairs):
 
     dct = collections.OrderedDict(pairs)
     if _CLASS_NAME_KEY in dct:
-        class_name = dct[_CLASS_NAME_KEY]
-        codec = _CODEC_CATALOG.get_by_name(class_name)
-        #print("::: <", class_name, codec)
+        class_tag = dct[_CLASS_NAME_KEY]
+        codec = _CODEC_CATALOG.get_by_name(class_tag)
         del dct[_CLASS_NAME_KEY]
-        return codec.decode(class_name, dct)
+        return codec.decode(class_tag, dct)
     else:
         return dct
 
@@ -74,7 +73,7 @@ class JSONSerializer(Serializer):
     CODEC_CATALOG = _CODEC_CATALOG
 
     @classmethod
-    def plugin_name(cls):
+    def class_tag(cls):
         return "JSON"
 
     def to_string(self, config):
