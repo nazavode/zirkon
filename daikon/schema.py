@@ -29,8 +29,6 @@ from .section_schema import SectionSchema
 
 
 class Schema(Config, SectionSchema):  # pylint: disable=too-many-ancestors,I0011
-    """Schema(container=None)
+    """Schema(init=None, *, dictionary=None)
        Schema config.
     """
-
-    CONTAINER_FACTORY = collections.OrderedDict

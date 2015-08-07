@@ -16,8 +16,8 @@
 #
 
 """\
-config.serializer.configobj_serializer
-======================================
+config.toolbox.serializer.configobj_serializer
+==============================================
 Implementation of the ConfigObj Serializer
 """
 
@@ -30,7 +30,7 @@ import re
 
 from .serializer import Serializer
 from .codec_catalog import CodecCatalog
-from ..toolbox.unrepr import unrepr
+from ..unrepr import unrepr
 
 
 def _parse_section(line, line_number, filename):
@@ -84,10 +84,12 @@ class ConfigObjSerializer(Serializer):
         self._dump_section(lines, config)
         return '\n'.join(lines) + '\n'
 
-    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
             filename = '<string>'
-        config = config_class(container=container, prefix=prefix)
+        config = config_class(dictionary=dictionary)
+        print(type(dictionary))
+        print(type(config))
         section_stack = [config]
         current_section, current_level = section_stack[-1], len(section_stack) - 1
         for line_number, source_line in enumerate(serialization.split('\n')):

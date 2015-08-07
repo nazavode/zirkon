@@ -22,22 +22,18 @@ import io
 
 import pytest
 
-from common.utils import compare_dicts
 from common.fixtures import simple_config_content, \
                             simple_schema_content, \
                             tmp_text_file
 
 from daikon.config import Config
 from daikon.schema import Schema
+from daikon.toolbox.dictutils import compare_dicts
+from daikon.toolbox.serializer import Serializer
 
-@pytest.fixture(params=["JSON", "ConfigObj", "Pickle"])
+@pytest.fixture(params=tuple(Serializer.get_class_tags()))
 def protocol(request):
     return request.param
-
-@pytest.fixture(params=["", "www.", "abc_"])
-def prefix(request):
-    return request.param
-
 
 Parameters = collections.namedtuple('Parameters', ('config_class', 'config_content'))
 
@@ -49,11 +45,11 @@ _config_parameters = [
 def parameters(request):
     return request.param
 
-def test_read_write(protocol, prefix, parameters, tmp_text_file):
+def test_read_write(protocol, parameters, tmp_text_file):
     config_class = parameters.config_class
     config_content = parameters.config_content
-    cs = config_class(config_content, prefix=prefix)
+    cs = config_class(config_content)
     cs.write(tmp_text_file.name, protocol)
-    cs2 = config_class(prefix=prefix)
+    cs2 = config_class()
     cs2.read(tmp_text_file.name, protocol)
     assert compare_dicts(cs, cs2)

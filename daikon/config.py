@@ -26,13 +26,12 @@ import collections
 
 from .section import Section
 
-from .serializer import Serializer
+from .toolbox.serializer import Serializer
 
 
 class Config(Section):
-    """Config(init=None, *, container=None, prefix='')
-       Given a flattened 'container' (by default, OrderedDict()), Config implements
-       a nested subsection view on it.
+    """Config(init=None, *, dictionary=None)
+       Config class.
 
        >>> config = Config()
        >>> config['x_value'] = 10.1
@@ -67,12 +66,9 @@ class Config(Section):
        >>>
     """
 
-    CONTAINER_FACTORY = collections.OrderedDict
 
-    def __init__(self, init=None, *, container=None, prefix=''):
-        if container is None:
-            container = self.CONTAINER_FACTORY()
-        super().__init__(container=container, prefix=prefix, init=init)
+    def __init__(self, init=None, *, dictionary=None):
+        super().__init__(dictionary=dictionary, init=init)
 
     @classmethod
     def get_serializer(cls, protocol):
@@ -109,35 +105,35 @@ class Config(Section):
         return serializer.to_file(self, filename)
 
     @classmethod
-    def from_file(cls, filename, protocol, *, container=None, prefix=''):
-        """from_file(filename, protocol, *, container=None, prefix='')
+    def from_file(cls, filename, protocol, *, dictionary=None):
+        """from_file(filename, protocol, *, dictionary=None)
            Deserialize from file 'filename' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
-        return serializer.from_file(cls, filename, container=container, prefix=prefix)
+        return serializer.from_file(cls, filename, dictionary=dictionary)
 
     @classmethod
-    def from_stream(cls, stream, protocol, *, container=None, prefix='', filename=None):
-        """from_stream(stream, protocol, *, container=None, prefix='', filename=None)
+    def from_stream(cls, stream, protocol, *, dictionary=None, filename=None):
+        """from_stream(stream, protocol, *, dictionary=None, filename=None)
            Deserialize from stream 'stream' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
-        return serializer.from_stream(cls, stream, container=container, prefix=prefix, filename=filename)
+        return serializer.from_stream(cls, stream, dictionary=dictionary, filename=filename)
 
     @classmethod
-    def from_string(cls, string, protocol, *, container=None, prefix='', filename=None):
-        """from_string(string, protocol, *, container=None, prefix='', filename=None)
+    def from_string(cls, string, protocol, *, dictionary=None, filename=None):
+        """from_string(string, protocol, *, dictionary=None, filename=None)
            Deserialize from string 'string' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
-        return serializer.from_string(cls, string, container=container, prefix=prefix, filename=filename)
+        return serializer.from_string(cls, string, dictionary=dictionary, filename=filename)
 
     def read(self, filename, protocol):
         """read(filename, protocol)
            Read from file 'filename' according to 'protocol'.
         """
         self.clear()
-        self.from_file(filename=filename, protocol=protocol, container=self.container, prefix=self.prefix)
+        self.from_file(filename=filename, protocol=protocol, dictionary=self.dictionary)
 
     def write(self, filename, protocol):
         """write(filename, protocol)

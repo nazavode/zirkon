@@ -49,8 +49,8 @@ __all__ = [
 
 import collections
 
-from ..serializer import json_serializer
-from ..serializer import configobj_serializer
+from ..toolbox.serializer import json_serializer
+from ..toolbox.serializer import configobj_serializer
 
 from .validator import Validator
 

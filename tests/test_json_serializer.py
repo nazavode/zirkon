@@ -6,14 +6,14 @@ import os
 import pytest
 
 from common.fixtures import simple_config, \
-                            container, \
+                            dictionary, \
                             simple_config_content, \
                             string_io, \
                             tmp_text_file, \
                             SIMPLE_CONFIG_JSON_SERIALIZATION
 
 from daikon.config import Config
-from daikon.serializer.json_serializer import JSONSerializer
+from daikon.toolbox.serializer.json_serializer import JSONSerializer
 
 @pytest.fixture
 def serializer():

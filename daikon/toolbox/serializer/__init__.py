@@ -16,8 +16,8 @@
 #
 
 """
-config.serializer
-=================
+config.toolbox.serializer
+=========================
 Serializer classes
 """
 

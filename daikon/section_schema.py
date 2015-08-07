@@ -57,7 +57,7 @@ def _validate_parameter(*, validator, section, validation_section,
 
 
 class SectionSchema(Section):
-    """SectionSchema(container, *, prefix='', init=None,
+    """SectionSchema(*, dictionary=None, init=None,
                      unexpected_parameter_validator=UnexpectedParameter(),
                      auto_validate=True)
        A Section class to perform validation. All values must be Validator
@@ -71,16 +71,16 @@ class SectionSchema(Section):
        the validated section), while the 'Remove()' validator can be used
        to remove unexpected parameters from the validated section.
     """
-    SUPPORTED_VALUE_TYPES = (str, Validator)
+    SUPPORTED_DATA_TYPES = (Validator, )
 
-    def __init__(self, container, *, prefix='', init=None,
+    def __init__(self, *, dictionary=None, init=None,
                  unexpected_parameter_validator=UnexpectedParameter(),
                  auto_validate=True):
         self._unexpected_parameter_validator = None
         self.unexpected_parameter_validator = unexpected_parameter_validator
-        super().__init__(container=container, prefix=prefix, init=init)
+        super().__init__(dictionary=dictionary, init=init)
         if auto_validate:
-            schema_validator = self.subsection_class()(container=collections.OrderedDict(),
+            schema_validator = self.subsection_class()(dictionary=None,
                                                        unexpected_parameter_validator=ValidatorInstance(),
                                                        auto_validate=False)
             schema_validator.impl_validate(self, raise_on_error=True)
@@ -89,10 +89,9 @@ class SectionSchema(Section):
     def subsection_class(cls):
         return SectionSchema
 
-    def subsection(self, prefix):
-        return self.subsection_class()(container=self.container,
-                                       unexpected_parameter_validator=self.unexpected_parameter_validator,
-                                       prefix=prefix)
+    def subsection(self, dictionary):
+        return self.subsection_class()(dictionary=dictionary,
+                                       unexpected_parameter_validator=self.unexpected_parameter_validator)
 
     @property
     def unexpected_parameter_validator(self):
@@ -123,7 +122,7 @@ class SectionSchema(Section):
                validation section
            Implementation of the validate method.
         """
-        validation_section = ValidationSection(container=collections.OrderedDict())
+        validation_section = ValidationSection()
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
         self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
         self.impl_validate_parameters(section=section, validation_section=validation_section, **args)
@@ -145,7 +144,7 @@ class SectionSchema(Section):
                     subsection = section.get_section(subsection_name)
                 else:
                     subsection = section.add_section(subsection_name)
-                subsection_fqname = parent_fqname + subsection_name + self.DOT
+                subsection_fqname = parent_fqname + subsection_name + '.'
                 sub_validation_section = subsection_schema.impl_validate(
                     subsection,
                     raise_on_error=raise_on_error,
@@ -155,10 +154,8 @@ class SectionSchema(Section):
         # unexpected subsections:
         for subsection_name, subsection in section.sections():
             if subsection_name not in expected_subsection_names:
-                subsection_fqname = parent_fqname + subsection_name + self.DOT
+                subsection_fqname = parent_fqname + subsection_name + '.'
                 subsection_schema = self.subsection_class()(
-                    container=collections.OrderedDict(),
-                    prefix=self.prefix,
                     unexpected_parameter_validator=self.unexpected_parameter_validator)
                 sub_validation_section = subsection_schema.impl_validate(
                     section[subsection_name],
@@ -173,7 +170,7 @@ class SectionSchema(Section):
         """
         # expected parameters:
         expected_parameter_names = set()
-        for parameter_name, validator in self.parameters():
+        for parameter_name, validator in list(self.parameters()):
             expected_parameter_names.add(parameter_name)
             key = parent_fqname + parameter_name
             if section.has_section(parameter_name):
@@ -195,7 +192,7 @@ class SectionSchema(Section):
                     key_value=key_value,
                     raise_on_error=raise_on_error)
         # unexpected parameters:
-        for parameter_name, parameter_value in section.parameters():
+        for parameter_name, parameter_value in list(section.parameters()):
             if parameter_name not in expected_parameter_names:
                 validator = self.unexpected_parameter_validator
                 key = parent_fqname + parameter_name

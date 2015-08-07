@@ -22,7 +22,7 @@ import io
 
 import pytest
 
-from common.fixtures import container, \
+from common.fixtures import dictionary, \
     string_io, \
     tmp_text_file, \
     simple_section_content, \
@@ -34,31 +34,30 @@ from common.fixtures import container, \
 from daikon.config import Config
 from daikon.schema import Schema
 
-from daikon.serializer import JSONSerializer, \
-                              ConfigObjSerializer, \
-                              PickleSerializer
+from daikon.toolbox.serializer import JSONSerializer, \
+    ConfigObjSerializer, PickleSerializer
 
 def test_Schema_create_empty(string_io):
     schema = Schema()
     schema.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Schema_create_container(container, string_io):
-    schema = Schema(container=container)
+def test_Schema_create_dictionary(dictionary, string_io):
+    schema = Schema(dictionary=dictionary)
     schema.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Schema_create_init(container, simple_schema_content, string_io):
+def test_Schema_create_init(dictionary, simple_schema_content, string_io):
     schema = Schema(init=simple_schema_content)
     schema.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SCHEMA_DUMP
-    assert len(container) == 0
+    assert len(dictionary) == 0
 
-def test_Schema_create_container_init(container, simple_schema_content, string_io):
-    schema = Schema(container=container, init=simple_schema_content)
+def test_Schema_create_dictionary_init(dictionary, simple_schema_content, string_io):
+    schema = Schema(dictionary=dictionary, init=simple_schema_content)
     schema.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SCHEMA_DUMP
-    assert len(container) > 0
+    assert len(dictionary) > 0
 
 def test_Schema_to_file_JSON(simple_schema, tmp_text_file):
     simple_schema.to_file(filename=tmp_text_file.name, protocol="JSON")

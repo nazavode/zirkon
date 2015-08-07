@@ -16,8 +16,8 @@
 #
 
 """\
-config.serializer.serializer
-============================
+config.toolbox.serializer.serializer
+====================================
 Implementation of the abstract serializer class
 """
 
@@ -25,8 +25,8 @@ __author__ = "Simone Campagna"
 
 import abc
 
-from ..toolbox.files import createdir
-from ..toolbox.registry import Registry
+from ..files import createdir
+from ..registry import Registry
 
 from .codec_catalog import CodecCatalog
 
@@ -34,7 +34,7 @@ from .codec_catalog import CodecCatalog
 class Serializer(Registry, metaclass=abc.ABCMeta):
     """Serializer()
        Abstract base class for serializers. Serializers must implement
-       to_string(config) and from_string(config_class, serialization, container).
+       to_string(config) and from_string(config_class, serialization, dictionary).
     """
     CODEC_CATALOG = CodecCatalog()
 
@@ -74,14 +74,14 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
             return self.to_stream(config, f_stream)
 
     @abc.abstractmethod
-    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
-        """from_string(config_class, serialization, *, container=None, prefix='', filename=None) -> config
+    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
+        """from_string(config_class, serialization, *, dictionary=None, filename=None) -> config
            Load a Config from string 'serialization'.
         """
         pass
 
-    def from_stream(self, config_class, stream, *, container=None, prefix='', filename=None):
-        """from_stream(config_class, stream, *, container=None, prefix='', filename=None) -> config
+    def from_stream(self, config_class, stream, *, dictionary=None, filename=None):
+        """from_stream(config_class, stream, *, dictionary=None, filename=None) -> config
            Load a Config from stream 'stream'.
         """
         if filename is None:
@@ -91,12 +91,11 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
                 filename = repr(stream)
         return self.from_string(config_class=config_class,
                                 serialization=stream.read(),
-                                container=container,
-                                prefix=prefix,
+                                dictionary=dictionary,
                                 filename=filename)
 
-    def from_file(self, config_class, filename, *, container=None, prefix=''):
-        """from_file(config_class, filename, *, container=None, prefix='') -> config
+    def from_file(self, config_class, filename, *, dictionary=None):
+        """from_file(config_class, filename, *, dictionary=None) -> config
            Load a Config from file 'filename'.
         """
         createdir(filename)
@@ -105,4 +104,4 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
             mode += 'b'
         with open(filename, mode) as f_stream:
             return self.from_stream(config_class=config_class, stream=f_stream,
-                                    container=container, prefix=prefix, filename=filename)
+                                    dictionary=dictionary, filename=filename)

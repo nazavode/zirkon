@@ -18,8 +18,8 @@
 __author__ = "Simone Campagna"
 __all__ = [
     'string_io',
-    'generic_container',
-    'container',
+    'generic_dictionary',
+    'dictionary',
     'simple_config_content',
     'simple_section',
     'simple_config',
@@ -44,6 +44,7 @@ import tempfile
 
 import pytest
 
+from daikon.toolbox.flatmap import FlatMap
 from daikon.section import Section
 from daikon.config import Config
 from daikon.schema import Schema
@@ -53,14 +54,14 @@ from daikon.validator import Int, Str, StrOption, Float, FloatTuple
 def string_io():
     return io.StringIO()
 
-_container_classes = [dict, collections.OrderedDict]
-@pytest.fixture(params=_container_classes, ids=[cc.__name__ for cc in _container_classes])
-def generic_container(request):
-    container_class = request.param
-    return container_class()
+_dictionary_classes = [dict, collections.OrderedDict, type(None), FlatMap]
+@pytest.fixture(params=_dictionary_classes, ids=[cc.__name__ for cc in _dictionary_classes])
+def generic_dictionary(request):
+    dictionary_class = request.param
+    return dictionary_class()
 
 @pytest.fixture
-def container():
+def dictionary():
     return collections.OrderedDict()
 
 @pytest.fixture
@@ -91,13 +92,13 @@ def simple_config_content():
     
 
 @pytest.fixture
-def simple_section(container, simple_config_content):
-    section = Section(container=container, init=simple_config_content)
+def simple_section(dictionary, simple_config_content):
+    section = Section(dictionary=dictionary, init=simple_config_content)
     return section
 
 @pytest.fixture
-def simple_config(container, simple_config_content):
-    config = Config(container=container, init=simple_config_content)
+def simple_config(dictionary, simple_config_content):
+    config = Config(dictionary=dictionary, init=simple_config_content)
     return config
 
 @pytest.fixture
@@ -128,7 +129,9 @@ z_value = 30.3
     b = 2
 """
 
-SIMPLE_SECTION_REPR = "Section(container=OrderedDict([('x_value', 10.1), ('y_value', 20.2), ('options.i_alpha', 100), ('options.f_beta', -0.123), ('options.b_gamma', True), ('options.epsilon.epsilon_x', 10), ('options.epsilon.epsilon_y', 20), ('options.epsilon.epsilon_z', 30), ('options.epsilon.', None), ('options.s_delta', 'delta.dat'), ('options.', None), ('z_value', 30.3), ('miscellanea.a', 1), ('miscellanea.b', 2), ('miscellanea.', None)]), prefix='')"
+SIMPLE_SECTION_REPR_FLAT = "Section(dictionary=OrderedDict([('x_value', 10.1), ('y_value', 20.2), ('options.i_alpha', 100), ('options.f_beta', -0.123), ('options.b_gamma', True), ('options.epsilon.epsilon_x', 10), ('options.epsilon.epsilon_y', 20), ('options.epsilon.epsilon_z', 30), ('options.epsilon.', None), ('options.s_delta', 'delta.dat'), ('options.', None), ('z_value', 30.3), ('miscellanea.a', 1), ('miscellanea.b', 2), ('miscellanea.', None)]), prefix='')"
+
+SIMPLE_SECTION_REPR = "Section(dictionary=OrderedDict([('x_value', 10.1), ('y_value', 20.2), ('options', OrderedDict([('i_alpha', 100), ('f_beta', -0.123), ('b_gamma', True), ('epsilon', OrderedDict([('epsilon_x', 10), ('epsilon_y', 20), ('epsilon_z', 30)])), ('s_delta', 'delta.dat')])), ('z_value', 30.3), ('miscellanea', OrderedDict([('a', 1), ('b', 2)]))]))"
 
 SIMPLE_SECTION_STR = "Section(x_value=10.1, y_value=20.2, options=Section(i_alpha=100, f_beta=-0.123, b_gamma=True, epsilon=Section(epsilon_x=10, epsilon_y=20, epsilon_z=30), s_delta='delta.dat'), z_value=30.3, miscellanea=Section(a=1, b=2))"
 
@@ -216,8 +219,8 @@ def simple_section_content():
     ))
 
 @pytest.fixture
-def simple_schema(container, simple_schema_content):
-    schema = Schema(container=container, init=simple_schema_content)
+def simple_schema(dictionary, simple_schema_content):
+    schema = Schema(dictionary=dictionary, init=simple_schema_content)
     return schema
 
 SIMPLE_SCHEMA_JSON_SERIALIZATION = """\

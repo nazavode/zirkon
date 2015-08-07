@@ -6,14 +6,14 @@ import os
 import pytest
 
 from common.fixtures import simple_config_content, \
-                            container, \
+                            dictionary, \
                             simple_config, \
                             string_io, \
                             tmp_text_file, \
                             SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
 from daikon.config import Config
-from daikon.serializer.configobj_serializer import ConfigObjSerializer
+from daikon.toolbox.serializer.configobj_serializer import ConfigObjSerializer
 
 @pytest.fixture
 def serializer():

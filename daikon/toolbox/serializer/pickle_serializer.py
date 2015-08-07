@@ -16,8 +16,8 @@
 #
 
 """\
-config.serializer.pickle_serializer
-===================================
+config.toolbox.serializer.pickle_serializer
+===========================================
 Implementation of the pickle serializer
 """
 
@@ -45,9 +45,9 @@ class PickleSerializer(Serializer):
         content = config.as_dict()
         return pickle.dumps(content)
 
-    def from_string(self, config_class, serialization, *, container=None, prefix='', filename=None):
+    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         dummy = filename
         content = pickle.loads(serialization)
-        config = config_class(init=content, container=container, prefix=prefix)
+        config = config_class(init=content, dictionary=dictionary)
         return config
 

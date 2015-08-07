@@ -22,9 +22,8 @@ import io
 
 import pytest
 
-from common.utils import compare_dicts
-from common.fixtures import container, \
-                            generic_container, \
+from common.fixtures import dictionary, \
+                            generic_dictionary, \
                             simple_config_content, \
                             simple_config, \
                             string_io, \
@@ -33,18 +32,18 @@ from common.fixtures import container, \
                             SIMPLE_CONFIG_JSON_SERIALIZATION, \
                             SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
+from daikon.toolbox.dictutils import compare_dicts
 from daikon.config import Config
-from daikon.serializer import JSONSerializer, \
-                              ConfigObjSerializer, \
-                              PickleSerializer
+from daikon.toolbox.serializer import JSONSerializer, \
+    ConfigObjSerializer, PickleSerializer
 
 def test_Config_create_empty(string_io):
     config = Config()
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_container(generic_container, string_io):
-    config = Config(container=generic_container)
+def test_Config_create_dictionary(generic_dictionary, string_io):
+    config = Config(dictionary=generic_dictionary)
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
@@ -53,11 +52,11 @@ def test_Config_create_init(simple_config_content, string_io):
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
 
-def test_Config_create_container_init(container, simple_config_content, string_io):
-    config = Config(container=container, init=simple_config_content)
+def test_Config_create_dictionary_init(dictionary, simple_config_content, string_io):
+    config = Config(dictionary=dictionary, init=simple_config_content)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
-    assert len(container) > 0
+    assert len(dictionary) > 0
 
 def test_Config_to_file_JSON(simple_config, tmp_text_file):
     simple_config.to_file(filename=tmp_text_file.name, protocol="JSON")

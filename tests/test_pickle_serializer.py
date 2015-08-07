@@ -6,13 +6,13 @@ import os
 import pytest
 
 from common.fixtures import simple_config, \
-                            container, \
+                            dictionary, \
                             simple_config_content, \
                             string_io, \
                             tmp_raw_file
 
 from daikon.config import Config
-from daikon.serializer.pickle_serializer import PickleSerializer
+from daikon.toolbox.serializer.pickle_serializer import PickleSerializer
 
 @pytest.fixture
 def serializer():

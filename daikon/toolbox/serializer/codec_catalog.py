@@ -16,8 +16,8 @@
 #
 
 """\
-config.serializer.codec_catalog
-===============================
+config.toolbox.serializer.codec_catalog
+=======================================
 Catalog for class encoders/decoders.
 """
 
@@ -28,7 +28,7 @@ __all__ = [
 
 import collections
 
-from ..toolbox.catalog import Catalog
+from ..catalog import Catalog
 
 
 class CodecCatalog(Catalog):
