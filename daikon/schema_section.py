@@ -26,8 +26,6 @@ __all__ = [
     'SchemaSection',
 ]
 
-import collections
-
 from .section import Section
 from .validation_section import ValidationSection
 from .validator import Validator, ValidatorInstance

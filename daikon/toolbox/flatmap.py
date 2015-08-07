@@ -25,8 +25,6 @@ __author__ = "Simone Campagna"
 
 import collections
 import collections.abc
-import re
-import sys
 
 from .identifier import is_valid_identifier
 
@@ -66,6 +64,9 @@ class FlatMap(collections.abc.Mapping):
 
     @classmethod
     def dictionary_factory(cls):
+        """dctionary_factory() -> new (empty) dictionary
+           Factory for new dictionaries.
+        """
         return collections.OrderedDict()
 
     def get_abs_key(self, rel_key, check=True):
@@ -196,7 +197,7 @@ class FlatMap(collections.abc.Mapping):
         if submap_prefix in self.dictionary:
             return True
         return False
- 
+
     def clear(self):
         """clear(self)
            Clear all the dictionary content
@@ -249,8 +250,10 @@ class FlatMap(collections.abc.Mapping):
             yield value
 
     def copy(self):
+        """copy() -> dictionary
+           Return a deep copy of the FlatMap instance.
+        """
         if hasattr(self.dictionary, 'copy'):
-            dictionary_copy = self.dictionary.copy()
             return self.__class__(dictionary=self.dictionary.copy())
         else:
             return self.__class__(init=self.dictionary)

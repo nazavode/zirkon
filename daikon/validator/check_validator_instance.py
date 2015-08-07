@@ -27,7 +27,6 @@ __all__ = [
 ]
 
 from .check_type import CheckType
-from .error import TypeValidationError
 from .validator import Validator
 
 
@@ -36,14 +35,3 @@ class CheckValidatorInstance(CheckType):
        Check if key/value is a Validator instance.
     """
     TYPE = Validator
-
-#    def convert(self, key_value):
-#        if not isinstance(key_value.value, Validator):
-#            try:
-#                key_value.value = Validator.unrepr(key_value.value)
-#            except Exception as err:
-#                raise TypeValidationError(key_value, "cannot create a validator from string {!r}: {}: {}".format(
-#                    key_value.value,
-#                    type(err).__name__,
-#                    err,
-#                ))

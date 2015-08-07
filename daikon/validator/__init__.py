@@ -74,9 +74,15 @@ from .remove import Remove
 from ..toolbox.unrepr import unrepr
 
 def _validator_json_encode(validator):
+    """_validator_json_encode(validator)
+       JSON encoder for Validator instances
+    """
     return validator.actual_arguments.copy()
 
 def _validator_json_decode(validator_name, arguments):
+    """_validator_json_decode(validator_name, arguments)
+       JSON decoder for Validator instances
+    """
     validator_class = Validator.get_class(validator_name)
     #print("::: (((", validator_name, validator_class, arguments)
     return validator_class(**arguments)
@@ -88,9 +94,15 @@ json_serializer.JSONSerializer.codec_catalog().add_codec(
 )
 
 def _validator_configobj_encode(validator):
+    """_validator_configobj_encode(validator)
+       ConfigObj encoder for Validator instances
+    """
     return repr(validator)
 
-def _validator_configobj_decode(type_name, repr_data):
+def _validator_configobj_decode(type_name, repr_data):  # pylint: disable=W0613
+    """_validator_configobj_decode(validator_name, arguments)
+       ConfigObj decoder for Validator instances
+    """
     return unrepr(repr_data, Validator.class_dict())
 
 configobj_serializer.ConfigObjSerializer.codec_catalog().add_codec(

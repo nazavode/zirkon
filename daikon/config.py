@@ -25,7 +25,6 @@ __all__ = [
     'Config',
 ]
 
-import collections
 
 from .section import Section
 
@@ -36,6 +35,7 @@ class Config(Section):
     """Config(init=None, *, dictionary=None)
        Config class.
 
+       >>> import collections
        >>> config = Config()
        >>> config['x_value'] = 10.1
        >>> config['y_value'] = 20.2

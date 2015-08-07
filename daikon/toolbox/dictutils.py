@@ -26,7 +26,6 @@ __author__ = "Simone Campagna"
 __author__ = "Simone Campagna"
 __all__ = [
     'as_dict',
-    'standard_dict',
     'compare_dicts',
 ]
 
@@ -34,7 +33,7 @@ import collections
 
 
 def as_dict(dct, *, depth=-1, dict_factory=dict):
-    """to_standard_dict(dct, *, depth=-1, dict_class=dict) -> dict object
+    """as_dict(dct, *, depth=-1, dict_class=dict) -> dict object
     """
     stddct = dict_factory(dct)
     dcts = [stddct]

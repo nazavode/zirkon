@@ -25,9 +25,8 @@ __all__ = [
     'subclasses',
 ]
 
-import inspect
 
-def subclasses(class_, *, include_self=False, filter=None):
+def subclasses(class_, *, include_self=False, filter=None):  # pylint: disable=W0622
     """subclasses(class_, *, include_self=False, filter=lambda : True) -> iterator
        Iterator over subclasses; class_ is included only if 'include_self' is True.
        Filter can be used, for instance, to exclude abstract classes.

@@ -29,9 +29,22 @@ __all__ = [
 
 import ast
 
-def unrepr(string, globals=None):
-    if globals is None:
-        globals = {
+def unrepr(string, globals_d=None):
+    """unrepr(string, globals_d=None) -> object
+       Returns the object whose representation is 'string'.
+       
+       >>> for string in "1.05", "[2, 'a']", "3", "()":
+       ...     obj = unrepr(string)
+       ...     print(obj, type(obj).__name__)
+       1.05 float
+       [2, 'a'] list
+       3 int
+       () tuple
+       >>>
+    """
+
+    if globals_d is None:
+        globals_d = {
             'list': list,
             'tuple': tuple,
         }
@@ -63,11 +76,11 @@ def unrepr(string, globals=None):
                     type(ast_body).__name__,
                     operand))
         elif isinstance(ast_body, ast.Name):
-            if ast_body.id in globals:
-                return globals[ast_body.id]
+            if ast_body.id in globals_d:
+                return globals_d[ast_body.id]
         elif isinstance(ast_body, ast.Call):
             ast_func = ast_body.func
-            if ast_func.id in globals:
+            if ast_func.id in globals_d:
                 p_args = [py_ast_unrepr(arg) for arg in ast_body.args]
                 n_args = {keyword.arg: py_ast_unrepr(keyword.value) for keyword in ast_body.keywords}
                 if ast_body.starargs is not None:
@@ -76,7 +89,7 @@ def unrepr(string, globals=None):
                 if ast_body.kwargs is not None:
                     kwargs = py_ast_unrepr(ast_body.kwargs)
                     n_args.update(kwargs)
-                func = globals[ast_func.id]
+                func = globals_d[ast_func.id]
                 try:
                     return func(*p_args, **n_args)
                 except Exception as err:
@@ -96,7 +109,6 @@ def unrepr(string, globals=None):
             string,
             ast_body.col_offset,
             type(ast_body).__name__))
-    
 
     expr = compile(string, "<string>", "eval", ast.PyCF_ONLY_AST)
     return py_ast_unrepr(expr.body)

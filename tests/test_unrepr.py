@@ -53,7 +53,7 @@ def test_unrepr_failure(bad_param):
     assert str(exc_info.value) == str(bad_param.expected)
 
 def test_unrepr_globals_0():
-    assert unrepr("a", globals={"a": 102}) == 102
+    assert unrepr("a", globals_d={"a": 102}) == 102
 
 def test_unrepr_globals_1():
     def myfun(x, y, l):
@@ -65,7 +65,7 @@ def test_unrepr_globals_1():
         'a': A_VALUE,
     }
     string = "myfunction(10, y=a, l=[1, 2, 3])"
-    assert unrepr(string, globals=gd) == 10 + A_VALUE + len([1, 2, 3])
+    assert unrepr(string, globals_d=gd) == 10 + A_VALUE + len([1, 2, 3])
 
 def test_unrepr_globals():
     def myfun(z1, z2, z3, x1, x2, x3):
@@ -79,4 +79,4 @@ def test_unrepr_globals():
         'd1': d1,
     }
     string = "myfunction(*l1, **d1)"
-    assert unrepr(string, globals=gd) == sum(l1) + sum(d1.values())
+    assert unrepr(string, globals_d=gd) == sum(l1) + sum(d1.values())
