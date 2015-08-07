@@ -16,19 +16,20 @@
 #
 
 """\
-config.schema
-=============
+daikon.config.schema
+====================
 """
 
 __author__ = "Simone Campagna"
-
-import collections
+__all__ = [
+    'Schema',
+]
 
 from .config import Config
-from .section_schema import SectionSchema
+from .schema_section import SchemaSection
 
 
-class Schema(Config, SectionSchema):  # pylint: disable=too-many-ancestors,I0011
+class Schema(Config, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
     """Schema(init=None, *, dictionary=None)
        Schema config.
     """

@@ -16,8 +16,8 @@
 #
 
 """
-section
-=======
+daikon.section
+==============
 Implementation of the Section class
 """
 
@@ -28,7 +28,6 @@ __all__ = [
 
 import collections
 import collections.abc
-import re
 import sys
 
 from .toolbox.identifier import is_valid_identifier
@@ -83,6 +82,9 @@ class Section(collections.abc.Mapping):
 
     @classmethod
     def dictionary_factory(cls):
+        """dctionary_factory() -> new (empty) dictionary
+           Factory for new dictionaries.
+        """
         return collections.OrderedDict()
 
     @classmethod
@@ -138,9 +140,15 @@ class Section(collections.abc.Mapping):
         del self.dictionary[key]
 
     def clear(self):
+        """clear()
+           Clear all the section's content.
+        """
         self.dictionary.clear()
 
     def copy(self):
+        """copy()
+           Returns a deep copy of the section.
+        """
         return self.subsection_class()(dictionary=self.dictionary.copy())
 
     def get(self, key, default=None):
@@ -178,13 +186,15 @@ class Section(collections.abc.Mapping):
         """has_parameter(self, parameter_name) -> bool
            Return True if parameter exists.
         """
-        return parameter_name in self.dictionary and not isinstance(self.dictionary[parameter_name], collections.Mapping)
+        return parameter_name in self.dictionary and \
+            not isinstance(self.dictionary[parameter_name], collections.Mapping)
 
     def has_section(self, section_name):
         """has_section(self, section_name) -> bool
            Return True if section exists.
         """
-        return section_name in self.dictionary and isinstance(self.dictionary[section_name], collections.Mapping)
+        return section_name in self.dictionary and \
+            isinstance(self.dictionary[section_name], collections.Mapping)
 
     def parameters(self):
         """parameters(self) -> parameter items

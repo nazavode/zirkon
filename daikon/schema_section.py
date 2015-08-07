@@ -16,12 +16,15 @@
 #
 
 """
-section_schema
-==============
-Implementation of the SectionSchema class
+daikon.schema_section
+=====================
+Implementation of the SchemaSection class
 """
 
 __author__ = "Simone Campagna"
+__all__ = [
+    'SchemaSection',
+]
 
 import collections
 
@@ -40,7 +43,7 @@ def _validate_parameter(*, validator, section, validation_section,
     """_validate_parameter(*, ...)
        Validates a parameter and uses the validation result to
        eventually change the parameter value.
-       Used to implement SectionSchema.impl_validate() method.
+       Used to implement SchemaSection.impl_validate() method.
     """
     value = key_value.value
     try:
@@ -56,8 +59,8 @@ def _validate_parameter(*, validator, section, validation_section,
             section[parameter_name] = key_value.value
 
 
-class SectionSchema(Section):
-    """SectionSchema(*, dictionary=None, init=None,
+class SchemaSection(Section):
+    """SchemaSection(*, dictionary=None, init=None,
                      unexpected_parameter_validator=UnexpectedParameter(),
                      auto_validate=True)
        A Section class to perform validation. All values must be Validator
@@ -87,7 +90,7 @@ class SectionSchema(Section):
 
     @classmethod
     def subsection_class(cls):
-        return SectionSchema
+        return SchemaSection
 
     def subsection(self, dictionary):
         return self.subsection_class()(dictionary=dictionary,
@@ -134,7 +137,7 @@ class SectionSchema(Section):
         """
         # expected subsections:
         expected_subsection_names = set()
-        for subsection_name, subsection_schema in self.sections():
+        for subsection_name, schema_subsection in self.sections():
             expected_subsection_names.add(subsection_name)
             if section.has_parameter(subsection_name):
                 validation_section[subsection_name] = UnexpectedParameterValidationError(
@@ -145,7 +148,7 @@ class SectionSchema(Section):
                 else:
                     subsection = section.add_section(subsection_name)
                 subsection_fqname = parent_fqname + subsection_name + '.'
-                sub_validation_section = subsection_schema.impl_validate(
+                sub_validation_section = schema_subsection.impl_validate(
                     subsection,
                     raise_on_error=raise_on_error,
                     parent_fqname=subsection_fqname)
@@ -155,9 +158,9 @@ class SectionSchema(Section):
         for subsection_name, subsection in section.sections():
             if subsection_name not in expected_subsection_names:
                 subsection_fqname = parent_fqname + subsection_name + '.'
-                subsection_schema = self.subsection_class()(
+                schema_subsection = self.subsection_class()(
                     unexpected_parameter_validator=self.unexpected_parameter_validator)
-                sub_validation_section = subsection_schema.impl_validate(
+                sub_validation_section = schema_subsection.impl_validate(
                     section[subsection_name],
                     raise_on_error=raise_on_error,
                     parent_fqname=subsection_fqname)

@@ -16,11 +16,14 @@
 #
 
 """\
-config.config
-=============
+daikon.config.config
+====================
 """
 
 __author__ = "Simone Campagna"
+__all__ = [
+    'Config',
+]
 
 import collections
 

@@ -16,12 +16,15 @@
 #
 
 """
-validation_section
-==================
-Implementation of the SectionSchema class
+daikon.validation_section
+=========================
+Implementation of the ValidationSection class
 """
 
 __author__ = "Simone Campagna"
+__all__ = [
+    'ValidationSection',
+]
 
 from .section import Section
 from .validator.error import ValidationError
