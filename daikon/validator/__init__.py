@@ -50,7 +50,7 @@ __all__ = [
 import collections
 
 from ..toolbox.serializer import json_serializer
-from ..toolbox.serializer import configobj_serializer
+from ..toolbox.serializer import text_serializer
 
 from .validator import Validator
 
@@ -93,22 +93,22 @@ json_serializer.JSONSerializer.codec_catalog().add_codec(
     decode=_validator_json_decode,
 )
 
-def _validator_configobj_encode(validator):
-    """_validator_configobj_encode(validator)
-       ConfigObj encoder for Validator instances
+def _validator_text_encode(validator):
+    """_validator_text_encode(validator)
+       ConfigObj/Daikon encoder for Validator instances
     """
     return repr(validator)
 
-def _validator_configobj_decode(type_name, repr_data):  # pylint: disable=W0613
-    """_validator_configobj_decode(validator_name, arguments)
-       ConfigObj decoder for Validator instances
+def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
+    """_validator_text_decode(validator_name, arguments)
+       ConfigObj/Daikon decoder for Validator instances
     """
     return unrepr(repr_data, Validator.class_dict())
 
-configobj_serializer.ConfigObjSerializer.codec_catalog().add_codec(
+text_serializer.TextSerializer.codec_catalog().add_codec(
     class_=Validator,
-    encode=_validator_configobj_encode,
-    decode=_validator_configobj_decode,
+    encode=_validator_text_encode,
+    decode=_validator_text_decode,
 )
 
 

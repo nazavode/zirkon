@@ -176,6 +176,8 @@ z_value = 30.3
     b = 2
 """
 
+SIMPLE_CONFIG_DAIKON_SERIALIZATION = SIMPLE_SECTION_DUMP
+
 ##################
 @pytest.fixture
 def simple_schema_content():
@@ -269,4 +271,6 @@ a = Int(min=1)
         ssx = StrOption(values=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """     
+
+SIMPLE_SCHEMA_DAIKON_SERIALIZATION = SIMPLE_SCHEMA_DUMP
 

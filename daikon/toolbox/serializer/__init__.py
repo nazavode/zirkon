@@ -40,6 +40,12 @@ except ImportError:  # pragma: no cover
     pass
 
 try:
+    from .daikon_serializer import DaikonSerializer
+    __all__.append(DaikonSerializer.__name__)
+except ImportError:  # pragma: no cover
+    pass
+
+try:
     from .pickle_serializer import PickleSerializer
     __all__.append(PickleSerializer.__name__)
 except ImportError:  # pragma: no cover

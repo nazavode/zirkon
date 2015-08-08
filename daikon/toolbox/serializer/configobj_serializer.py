@@ -29,7 +29,6 @@ __all__ = [
 import re
 
 from .text_serializer import TextSerializer
-from .codec_catalog import CodecCatalog
 from ..unrepr import unrepr
 
 
@@ -53,7 +52,6 @@ class ConfigObjSerializer(TextSerializer):
     """ConfigObjSerializer()
        Implementation of the ConfigObj serializer.
     """
-    CODEC_CATALOG = CodecCatalog()
     RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
     INDENTATION = '    '
 
@@ -84,8 +82,6 @@ class ConfigObjSerializer(TextSerializer):
         if filename is None:
             filename = '<string>'
         config = config_class(dictionary=dictionary)
-        print(type(dictionary))
-        print(type(config))
         section_stack = [config]
         current_section, current_level = section_stack[-1], len(section_stack) - 1
         for line_number, source_line in enumerate(serialization.split('\n')):
@@ -107,25 +103,19 @@ class ConfigObjSerializer(TextSerializer):
                 current_section, current_level = section_stack[-1], len(section_stack) - 1
             else:
                 # key:
-                print("::: {!r}".format(line))
                 l_kv = line.split('=', 1)
                 if len(l_kv) < 2:
                     raise ValueError("unparsable line {}@{}: {!r}".format(
                         line_number, filename, line))
        
-                key, val = line.split('=', 1)
-                val = val.strip()
-                match = self.RE_FUNC.match(val)
+                key, value = line.split('=', 1)
+                value = value.strip()
+                match = self.RE_FUNC.match(value)
+                value_type_names = []
                 if match:
-                    type_name = match.groupdict()['func_name']
-                    codec = self.CODEC_CATALOG.get_by_name(type_name)
-                    value = codec.decode(type_name, val)
-                else:
-                    try:
-                        value = unrepr(val)
-                    except Exception as err:
-                        raise ValueError("invalid value at line {}@{}: {!r}: {}: {}".format(
-                            line_number, filename, val, type(err).__name__, err))
+                    value_type_name = match.groupdict()['func_name']
+                    value_type_names.append(value_type_name)
+                value = self.decode_value(line_number, filename, key, value, *value_type_names)
                 current_section[key.strip()] = value
         return config
 

@@ -23,14 +23,15 @@ import io
 import pytest
 
 from common.fixtures import dictionary, \
-                            generic_dictionary, \
-                            simple_config_content, \
-                            simple_config, \
-                            string_io, \
-                            tmp_text_file, \
-                            SIMPLE_SECTION_DUMP, \
-                            SIMPLE_CONFIG_JSON_SERIALIZATION, \
-                            SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
+    generic_dictionary, \
+    simple_config_content, \
+    simple_config, \
+    string_io, \
+    tmp_text_file, \
+    SIMPLE_SECTION_DUMP, \
+    SIMPLE_CONFIG_JSON_SERIALIZATION, \
+    SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION, \
+    SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
 from daikon.toolbox.dictutils import compare_dicts
 from daikon.config import Config
@@ -84,6 +85,20 @@ def test_Config_from_file_ConfigObj(simple_config, tmp_text_file):
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     config = Config.from_file(filename=tmp_text_file.name, protocol="ConfigObj")
+    assert config == simple_config
+
+def test_Config_to_file_Daikon(simple_config, tmp_text_file):
+    simple_config.to_file(filename=tmp_text_file.name, protocol="Daikon")
+    tmp_text_file.flush()
+    tmp_text_file.seek(0)
+    serialization = tmp_text_file.read()
+    assert serialization == SIMPLE_CONFIG_DAIKON_SERIALIZATION
+
+def test_Config_from_file_Daikon(simple_config, tmp_text_file):
+    tmp_text_file.write(SIMPLE_CONFIG_DAIKON_SERIALIZATION)
+    tmp_text_file.flush()
+    tmp_text_file.seek(0)
+    config = Config.from_file(filename=tmp_text_file.name, protocol="Daikon")
     assert config == simple_config
 
 def test_Config_get_serializer_JSON():

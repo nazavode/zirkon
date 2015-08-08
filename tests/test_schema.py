@@ -29,13 +29,14 @@ from common.fixtures import dictionary, \
     simple_schema_content, simple_schema, \
     SIMPLE_SCHEMA_DUMP, \
     SIMPLE_SCHEMA_JSON_SERIALIZATION, \
-    SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION
+    SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION, \
+    SIMPLE_SCHEMA_DAIKON_SERIALIZATION
 
 from daikon.config import Config
 from daikon.schema import Schema
 
 from daikon.toolbox.serializer import JSONSerializer, \
-    ConfigObjSerializer, PickleSerializer
+    ConfigObjSerializer, DaikonSerializer, PickleSerializer
 
 def test_Schema_create_empty(string_io):
     schema = Schema()
@@ -85,6 +86,20 @@ def test_Schema_from_file_ConfigObj(simple_schema, tmp_text_file):
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     schema = Schema.from_file(filename=tmp_text_file.name, protocol="ConfigObj")
+    assert schema == simple_schema
+
+def test_Schema_to_file_Daikon(simple_schema, tmp_text_file):
+    simple_schema.to_file(filename=tmp_text_file.name, protocol="Daikon")
+    tmp_text_file.flush()
+    tmp_text_file.seek(0)
+    serialization = tmp_text_file.read()
+    assert serialization == SIMPLE_SCHEMA_DAIKON_SERIALIZATION
+
+def test_Schema_from_file_Daikon(simple_schema, tmp_text_file):
+    tmp_text_file.write(SIMPLE_SCHEMA_DAIKON_SERIALIZATION)
+    tmp_text_file.flush()
+    tmp_text_file.seek(0)
+    schema = Schema.from_file(filename=tmp_text_file.name, protocol="Daikon")
     assert schema == simple_schema
 
 def test_Schema_get_serializer_JSON():
