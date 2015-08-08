@@ -28,6 +28,7 @@ import collections.abc
 
 from .identifier import is_valid_identifier
 
+
 class FlatMap(collections.abc.Mapping):
     """FlatMap(init=None, *, dictionary=None, prefix='')
        FlatMap implements a standard mapping using a flattened internal
@@ -231,7 +232,6 @@ class FlatMap(collections.abc.Mapping):
         for abs_key, rel_key in self._iter_keys():
             if self.nesting_level(rel_key) == 0:
                 submap_name = self.get_submap_name(rel_key)
-                #print("--- abs:{!r}, rel:{!r}, submap_name:{!r}".format(abs_key, rel_key, submap_name))
                 if submap_name is not None:
                     yield submap_name, self.submap(prefix=abs_key)
                 else:

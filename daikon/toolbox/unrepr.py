@@ -29,6 +29,7 @@ __all__ = [
 
 import ast
 
+
 def unrepr(string, globals_d=None):
     """unrepr(string, globals_d=None) -> object
        Returns the object whose representation is 'string'.
@@ -47,6 +48,7 @@ def unrepr(string, globals_d=None):
             'list': list,
             'tuple': tuple,
         }
+
     def py_ast_unrepr(ast_body):  # pylint: disable=R0911,R0912
         """py_ast_unrepr(ast_body) -> value"""
         if isinstance(ast_body, ast.Str):

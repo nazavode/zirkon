@@ -43,7 +43,6 @@ class Catalog(object):
         self._name_cache = {}
         self.default_factory = default_factory
 
-
     def register(self, class_, info):
         """register(class_, info)
            Register a new class.

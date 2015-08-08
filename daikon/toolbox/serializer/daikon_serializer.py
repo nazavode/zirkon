@@ -41,7 +41,9 @@ def _parse_mapping(line, line_number, filename):
         raise ValueError("invalid line {}@{}: unbalanced []".format(line_number, filename))
     return line.strip()
 
+
 _FrameInfo = collections.namedtuple("_FrameInfo", ("indentation", "mapping"))
+
 
 class _Stack(object):
     """Indentation/mapping stack management"""
@@ -106,10 +108,7 @@ class DaikonSerializer(TextSerializer):
         # interspersed keys and mappings
         yield from mapping.items()
 
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
-        if filename is None:
-            filename = '<string>'
-        config = config_class(dictionary=dictionary)
+    def impl_from_string(self, config, serialization, *, filename=None):
         stack = _Stack()
         current_indentation, current_mapping, current_level = stack.push(config)
         for line_number, source_line in enumerate(serialization.split('\n')):

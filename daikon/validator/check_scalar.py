@@ -17,7 +17,7 @@
 
 """\
 config.validator.check_scalar
-===========================
+=============================
 Implementation of the CheckScalarType classes
 """
 

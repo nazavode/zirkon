@@ -69,7 +69,6 @@ class Config(Section):
        >>>
     """
 
-
     def __init__(self, init=None, *, dictionary=None):
         super().__init__(dictionary=dictionary, init=init)
 

@@ -205,6 +205,7 @@ class Composer(object):
             objects.append(function(**parameters))
         return actual_arguments, objects
 
+
 def compose(*functions):
     """compose(*functions)
        Returns a Composer for the given functions.

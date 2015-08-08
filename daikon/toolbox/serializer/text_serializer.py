@@ -50,8 +50,10 @@ class TextSerializer(Serializer):
     @classmethod
     def is_section(cls, mapping):
         """is_section(mapping) -> True is mapping is a Section"""
-        from ...section import Section
-        return isinstance(mapping, Section)
+        if hasattr(mapping, 'parameters') and hasattr(mapping, 'sections'):
+            return True
+        else:
+            return False
 
     def indentation(self, level):
         """indentation(level) -> indentation string"""
@@ -85,7 +87,6 @@ class TextSerializer(Serializer):
             except Exception as err:
                 raise ValueError("line {}@{}: invalid value {!r}: {}: {}".format(
                     line_number, filename, value, type(err).__name__, err))
-
 
     def impl_dump_key_value(self, level, key, value):
         """impl_dump_key_value(level, key, value) -> line"""
@@ -146,3 +147,14 @@ class TextSerializer(Serializer):
         value = self.decode_value(line_number, filename, key, value, *value_type_names)
         return key.strip(), value
 
+    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
+        if filename is None:
+            filename = '<string>'
+        # configobj deserialization
+        config = config_class(dictionary=dictionary)
+        return self.impl_from_string(config, serialization, filename=filename)
+
+    @abc.abstractmethod
+    def impl_from_string(self, config, serialization, *, filename=None):
+        """impl_from_string(...)"""
+        pass

@@ -47,8 +47,6 @@ __all__ = [
     'UnexpectedParameter',
 ]
 
-import collections
-
 from ..toolbox.serializer import json_serializer
 from ..toolbox.serializer import text_serializer
 
@@ -73,19 +71,21 @@ from .remove import Remove
 
 from ..toolbox.unrepr import unrepr
 
+
 def _validator_json_encode(validator):
     """_validator_json_encode(validator)
        JSON encoder for Validator instances
     """
     return validator.actual_arguments.copy()
 
+
 def _validator_json_decode(validator_name, arguments):
     """_validator_json_decode(validator_name, arguments)
        JSON decoder for Validator instances
     """
     validator_class = Validator.get_class(validator_name)
-    #print("::: (((", validator_name, validator_class, arguments)
     return validator_class(**arguments)
+
 
 json_serializer.JSONSerializer.codec_catalog().add_codec(
     class_=Validator,
@@ -93,17 +93,20 @@ json_serializer.JSONSerializer.codec_catalog().add_codec(
     decode=_validator_json_decode,
 )
 
+
 def _validator_text_encode(validator):
     """_validator_text_encode(validator)
        ConfigObj/Daikon encoder for Validator instances
     """
     return repr(validator)
 
+
 def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
     """_validator_text_decode(validator_name, arguments)
        ConfigObj/Daikon decoder for Validator instances
     """
     return unrepr(repr_data, Validator.class_dict())
+
 
 text_serializer.TextSerializer.codec_catalog().add_codec(
     class_=Validator,

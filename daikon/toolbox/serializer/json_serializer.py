@@ -33,6 +33,7 @@ from .codec_catalog import CodecCatalog
 _CODEC_CATALOG = CodecCatalog()
 _CLASS_NAME_KEY = "__class_name__"
 
+
 class JSONPluggableEncoder(json.JSONEncoder):
     """JSONPluggableEncoder()
        Implementation of JSON Pluggable encoder.
@@ -41,7 +42,6 @@ class JSONPluggableEncoder(json.JSONEncoder):
     def default(self, obj):  # pylint: disable=E0202
         class_ = type(obj)
         codec = _CODEC_CATALOG.get_by_class(class_)
-        #print("::: >", class_.__name__, codec)
         if codec is None:
             return super().default(obj)
         else:

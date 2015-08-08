@@ -17,7 +17,7 @@
 
 """
 config.toolbox.singleton
-=======================
+========================
 Singleton metaclass.
 
 >>> class Alpha(metaclass=Singleton):

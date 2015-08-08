@@ -34,6 +34,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
 from .toolbox.serializer import Serializer
 
+
 class Section(collections.abc.Mapping):
     """Section(*, dictionary=None, init=None)
        Dictionary-like object implementing storage of parameters/sections. The
@@ -162,7 +163,7 @@ class Section(collections.abc.Mapping):
         """get_parameter(self, parameter_name, default=None) -> value
            Get a parameter (raises KeyError if a section is found)
         """
-        if not parameter_name in self.dictionary:
+        if parameter_name not in self.dictionary:
             return default
         else:
             value = self.dictionary[parameter_name]
@@ -174,7 +175,7 @@ class Section(collections.abc.Mapping):
         """get_section(self, section_name, default=None) -> value
            Get a section (raises KeyError if a parameter is found)
         """
-        if not section_name in self.dictionary:
+        if section_name not in self.dictionary:
             return default
         else:
             value = self.dictionary[section_name]

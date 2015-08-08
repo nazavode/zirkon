@@ -71,10 +71,7 @@ class ConfigObjSerializer(TextSerializer):
         else:
             yield from mapping.items()
 
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
-        if filename is None:
-            filename = '<string>'
-        config = config_class(dictionary=dictionary)
+    def impl_from_string(self, config, serialization, *, filename=None):
         mapping_stack = [config]
         current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
         for line_number, source_line in enumerate(serialization.split('\n')):
