@@ -105,5 +105,8 @@ class TextSerializer(Serializer):
     def to_string(self, config):
         lines = []
         self.impl_dump_section_lines(level=0, lines=lines, section=config)
-        return '\n'.join(lines) + '\n'
+        if lines:
+            return '\n'.join(lines) + '\n'
+        else:
+            return ''
 

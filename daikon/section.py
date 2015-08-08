@@ -32,6 +32,7 @@ import sys
 
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
+from .toolbox.serializer import Serializer
 
 class Section(collections.abc.Mapping):
     """Section(*, dictionary=None, init=None)
@@ -294,16 +295,11 @@ class Section(collections.abc.Mapping):
             return True
         return False
 
-    def dump(self, stream=None, *, indentation=""):
-        """dump(self, stream=None, *, indentation="")
+    def dump(self, stream=None, protocol="Daikon"):
+        """dump(self, stream=None, protocol="Daikon")
            Dump the content to a stream.
         """
         if stream is None:
             stream = sys.stdout
-        subsection_class = self.subsection_class()
-        for key, value in self.items():
-            if isinstance(value, subsection_class):
-                stream.write("{}[{}]\n".format(indentation, key))
-                value.dump(stream=stream, indentation=indentation + "    ")
-            else:
-                stream.write("{}{} = {!r}\n".format(indentation, key, value))
+        serializer = Serializer.get_class(protocol)()
+        serializer.to_stream(stream=stream, config=self)
