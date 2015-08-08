@@ -47,6 +47,12 @@ class TextSerializer(Serializer):
     def class_tag(cls):
         return "ConfigObj"
 
+    @classmethod
+    def is_section(cls, mapping):
+        """is_section(mapping) -> True is mapping is a Section"""
+        from ...section import Section
+        return isinstance(mapping, Section)
+
     def indentation(self, level):
         """indentation(level) -> indentation string"""
         return self.INDENTATION * level
@@ -90,34 +96,34 @@ class TextSerializer(Serializer):
         )
 
     @abc.abstractmethod
-    def impl_dump_section_name(self, level, section_name):
-        """impl_dump_section_name(level, section_name) -> line"""
+    def impl_dump_mapping_name(self, level, mapping_name):
+        """impl_dump_mapping_name(level, mapping_name) -> line"""
         pass
 
-    def impl_dump_section(self, level, lines, section_name, section):
-        """impl_dump_section(...) -> section lines"""
-        lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
-        self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
+    def impl_dump_mapping(self, level, lines, mapping_name, mapping):
+        """impl_dump_mapping(...) -> mapping lines"""
+        lines.append(self.impl_dump_mapping_name(level=level, mapping_name=mapping_name))
+        self.impl_dump_mapping_lines(level=level + 1, lines=lines, mapping=mapping)
 
     @abc.abstractmethod
-    def impl_iter_section_items(self, section):
+    def impl_iter_mapping_items(self, mapping):
         """impl_iter()"""
         pass
 
-    def impl_dump_section_lines(self, level, lines, section):
-        """impl_dump_section(level, lines, section)
-           Writes lines for the 'section' serialization'
+    def impl_dump_mapping_lines(self, level, lines, mapping):
+        """impl_dump_mapping(level, lines, mapping)
+           Writes lines for the 'mapping' serialization'
         """
-        for key, value in self.impl_iter_section_items(section):
+        for key, value in self.impl_iter_mapping_items(mapping):
             if isinstance(value, collections.Mapping):
-                self.impl_dump_section(level=level, lines=lines, section_name=key, section=value)
+                self.impl_dump_mapping(level=level, lines=lines, mapping_name=key, mapping=value)
             else:
                 encoded_value = self.encode_value(value)
                 lines.append(self.impl_dump_key_value(level=level, key=key, value=encoded_value))
 
     def to_string(self, config):
         lines = []
-        self.impl_dump_section_lines(level=0, lines=lines, section=config)
+        self.impl_dump_mapping_lines(level=0, lines=lines, mapping=config)
         if lines:
             return '\n'.join(lines) + '\n'
         else:

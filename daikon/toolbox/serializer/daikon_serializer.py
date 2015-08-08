@@ -32,8 +32,8 @@ import re
 from .text_serializer import TextSerializer
 
 
-def _parse_section(line, line_number, filename):
-    """_parse_section(line, line_number, filename) -> section_name"""
+def _parse_mapping(line, line_number, filename):
+    """_parse_mapping(line, line_number, filename) -> mapping_name"""
 
     if line[0] == '[' and line[-1] == ']':
         line = line[1:-1]
@@ -41,10 +41,10 @@ def _parse_section(line, line_number, filename):
         raise ValueError("invalid line {}@{}: unbalanced []".format(line_number, filename))
     return line.strip()
 
-_FrameInfo = collections.namedtuple("_FrameInfo", ("indentation", "section"))
+_FrameInfo = collections.namedtuple("_FrameInfo", ("indentation", "mapping"))
 
 class _Stack(object):
-    """Indentation/section stack management"""
+    """Indentation/mapping stack management"""
     def __init__(self):
         self._stack = []
 
@@ -55,7 +55,7 @@ class _Stack(object):
         del self._stack[index]
 
     def get_frame_level(self, indentation, line_number, filename):
-        """get_frame_level(indentation, line_number, filename) -> indentation, section, level"""
+        """get_frame_level(indentation, line_number, filename) -> indentation, mapping, level"""
         for level, frame_info in enumerate(self._stack):
             if frame_info.indentation == indentation:
                 del self[level + 1:]
@@ -68,11 +68,11 @@ class _Stack(object):
         assert frame_info.indentation is None
         self._stack[index] = frame_info._replace(indentation=indentation)
 
-    def push(self, section):
-        """push(section)"""
+    def push(self, mapping):
+        """push(mapping)"""
         frame_info = _FrameInfo(
             indentation=None,
-            section=section)
+            mapping=mapping)
         self._stack.append(frame_info)
         return tuple(frame_info) + (self.level(),)
 
@@ -94,52 +94,52 @@ class DaikonSerializer(TextSerializer):
     def class_tag(cls):
         return "Daikon"
 
-    def impl_dump_section_name(self, level, section_name):
+    def impl_dump_mapping_name(self, level, mapping_name):
         return "{i}{b}{s}{k}".format(
             i=self.indentation(level),
             b='[',
-            s=section_name,
+            s=mapping_name,
             k=']',
         )
 
-    def impl_iter_section_items(self, section):
+    def impl_iter_mapping_items(self, mapping):
         # interspersed keys and mappings
-        yield from section.items()
+        yield from mapping.items()
 
     def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
             filename = '<string>'
         config = config_class(dictionary=dictionary)
         stack = _Stack()
-        current_indentation, current_section, current_level = stack.push(config)
+        current_indentation, current_mapping, current_level = stack.push(config)
         for line_number, source_line in enumerate(serialization.split('\n')):
             indentation, line = self.RE_INDENTATION_LINE.match(source_line).groups()
             if not line or line[0] == '#':
                 # empty line or comment
                 continue
             if current_indentation is None:
-                # brand new section
+                # brand new mapping
                 current_indentation = indentation
                 stack.set_indentation(index=current_level, indentation=current_indentation)
             else:
-                # old section
+                # old mapping
                 if indentation != current_indentation:
                     if indentation.startswith(current_indentation):
                         raise IndentationError("line {}@{}: unexpected indentation".format(line_number, filename))
                     else:
-                        current_indentation, current_section, current_level = stack.get_frame_level(
+                        current_indentation, current_mapping, current_level = stack.get_frame_level(
                             indentation=indentation,
                             line_number=line_number,
                             filename=filename)
             if line[0] == '[':
-                # section
-                section_name = _parse_section(line, line_number, filename)
-                current_section[section_name] = {}
-                current_indentation, current_section, current_level = stack.push(current_section[section_name])
+                # mapping
+                mapping_name = _parse_mapping(line, line_number, filename)
+                current_mapping[mapping_name] = {}
+                current_indentation, current_mapping, current_level = stack.push(current_mapping[mapping_name])
                 current_level = len(stack) - 1
             else:
                 # key:
                 key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
-                current_section[key] = value
+                current_mapping[key] = value
         return config
 

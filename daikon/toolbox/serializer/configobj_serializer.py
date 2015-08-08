@@ -30,8 +30,8 @@ __all__ = [
 from .text_serializer import TextSerializer
 
 
-def _parse_section(line, line_number, filename):
-    """_parse_section(line, line_number, filename) -> section level, name"""
+def _parse_mapping(line, line_number, filename):
+    """_parse_mapping(line, line_number, filename) -> mapping level, name"""
 
     level = 0
     while line:
@@ -55,45 +55,48 @@ class ConfigObjSerializer(TextSerializer):
     def class_tag(cls):
         return "ConfigObj"
 
-    def impl_dump_section_name(self, level, section_name):
+    def impl_dump_mapping_name(self, level, mapping_name):
         return "{i}{b}{s}{k}".format(
             i=self.indentation(level),
             b='[' * (level + 1),
-            s=section_name,
+            s=mapping_name,
             k=']' * (level + 1),
         )
 
-    def impl_iter_section_items(self, section):
+    def impl_iter_mapping_items(self, mapping):
         # keys before, mappings after
-        yield from section.parameters()
-        yield from section.sections()
+        if self.is_section(mapping):
+            yield from mapping.parameters()
+            yield from mapping.sections()
+        else:
+            yield from mapping.items()
 
     def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
             filename = '<string>'
         config = config_class(dictionary=dictionary)
-        section_stack = [config]
-        current_section, current_level = section_stack[-1], len(section_stack) - 1
+        mapping_stack = [config]
+        current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
         for line_number, source_line in enumerate(serialization.split('\n')):
             line = source_line.strip()
             if not line or line[0] == '#':
                 # empty line or comment
                 continue
             if line[0] == '[':
-                # section
-                level, section_name = _parse_section(line, line_number, filename)
+                # mapping
+                level, mapping_name = _parse_mapping(line, line_number, filename)
                 if level <= current_level + 1:
-                    del section_stack[level:]
-                    current_section, current_level = section_stack[-1], len(section_stack) - 1
+                    del mapping_stack[level:]
+                    current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
                 else:
-                    raise ValueError("invalid value at line {}@{}: invalid section level {}".format(
+                    raise ValueError("invalid value at line {}@{}: invalid mapping level {}".format(
                         line_number, filename, level))
-                current_section[section_name] = {}
-                section_stack.append(current_section[section_name])
-                current_section, current_level = section_stack[-1], len(section_stack) - 1
+                current_mapping[mapping_name] = {}
+                mapping_stack.append(current_mapping[mapping_name])
+                current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
             else:
                 # key:
                 key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
-                current_section[key] = value
+                current_mapping[key] = value
         return config
 
