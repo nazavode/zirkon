@@ -28,6 +28,7 @@ __all__ = [
 
 import abc
 import collections
+import re
 
 from .codec_catalog import CodecCatalog
 from .serializer import Serializer
@@ -39,10 +40,16 @@ class TextSerializer(Serializer):
        Implementation of the ConfigObj serializer.
     """
     CODEC_CATALOG = CodecCatalog()
+    RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
+    INDENTATION = "    "
 
     @classmethod
     def class_tag(cls):
         return "ConfigObj"
+
+    def indentation(self, level):
+        """indentation(level) -> indentation string"""
+        return self.INDENTATION * level
 
     def encode_value(self, value):
         """encode_value(key, value) -> encoded value"""
@@ -54,7 +61,7 @@ class TextSerializer(Serializer):
             value = codec.encode(value)
         return value
 
-    def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable:W0613
+    def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable=W0613
         """decode_value(line_number, filename, key, value) -> decoded value"""
         if value_type_names:
             for value_type_name in value_type_names:
@@ -74,33 +81,39 @@ class TextSerializer(Serializer):
                     line_number, filename, value, type(err).__name__, err))
 
 
-    @abc.abstractmethod
     def impl_dump_key_value(self, level, key, value):
         """impl_dump_key_value(level, key, value) -> line"""
-        pass
+        return "{i}{k} = {v}".format(
+            i=self.indentation(level),
+            k=key,
+            v=value,
+        )
 
     @abc.abstractmethod
     def impl_dump_section_name(self, level, section_name):
         """impl_dump_section_name(level, section_name) -> line"""
         pass
 
+    def impl_dump_section(self, level, lines, section_name, section):
+        """impl_dump_section(...) -> section lines"""
+        lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
+        self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
+
+    @abc.abstractmethod
+    def impl_iter_section_items(self, section):
+        """impl_iter()"""
+        pass
+
     def impl_dump_section_lines(self, level, lines, section):
         """impl_dump_section(level, lines, section)
            Writes lines for the 'section' serialization'
         """
-        def dump_section(level, lines, section_name, section):
-            """dump_section(...) -> section lines"""
-            lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
-            self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
-
-        for key, value in section.parameters():
+        for key, value in self.impl_iter_section_items(section):
             if isinstance(value, collections.Mapping):
-                dump_section(level=level, lines=lines, section_name=key, section=value)
+                self.impl_dump_section(level=level, lines=lines, section_name=key, section=value)
             else:
                 encoded_value = self.encode_value(value)
                 lines.append(self.impl_dump_key_value(level=level, key=key, value=encoded_value))
-        for key, value in section.sections():
-            dump_section(level=level, lines=lines, section_name=key, section=value)
 
     def to_string(self, config):
         lines = []
@@ -109,4 +122,21 @@ class TextSerializer(Serializer):
             return '\n'.join(lines) + '\n'
         else:
             return ''
+
+    def impl_parse_key_value(self, line, line_number, filename):
+        """impl_parse_key_value(line, line_number, filename) -> key, value"""
+        # key:
+        l_kv = line.split('=', 1)
+        if len(l_kv) < 2:
+            raise ValueError("unparsable line {}@{}: {!r}".format(
+                line_number, filename, line))
+        key, value = line.split('=', 1)
+        value = value.strip()
+        match = self.RE_FUNC.match(value)
+        value_type_names = []
+        if match:
+            value_type_name = match.groupdict()['func_name']
+            value_type_names.append(value_type_name)
+        value = self.decode_value(line_number, filename, key, value, *value_type_names)
+        return key.strip(), value
 

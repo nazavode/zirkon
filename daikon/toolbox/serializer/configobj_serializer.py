@@ -26,7 +26,6 @@ __all__ = [
     'ConfigObjSerializer',
 ]
 
-import re
 
 from .text_serializer import TextSerializer
 
@@ -51,23 +50,10 @@ class ConfigObjSerializer(TextSerializer):
     """ConfigObjSerializer()
        Implementation of the ConfigObj serializer.
     """
-    RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
-    INDENTATION = '    '
 
     @classmethod
     def class_tag(cls):
         return "ConfigObj"
-
-    def indentation(self, level):
-        """indentation(level) -> indentation string"""
-        return self.INDENTATION * level
-
-    def impl_dump_key_value(self, level, key, value):
-        return "{i}{k} = {v}".format(
-            i=self.indentation(level),
-            k=key,
-            v=value,
-        )
 
     def impl_dump_section_name(self, level, section_name):
         return "{i}{b}{s}{k}".format(
@@ -76,6 +62,11 @@ class ConfigObjSerializer(TextSerializer):
             s=section_name,
             k=']' * (level + 1),
         )
+
+    def impl_iter_section_items(self, section):
+        # keys before, mappings after
+        yield from section.parameters()
+        yield from section.sections()
 
     def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
@@ -102,18 +93,7 @@ class ConfigObjSerializer(TextSerializer):
                 current_section, current_level = section_stack[-1], len(section_stack) - 1
             else:
                 # key:
-                l_kv = line.split('=', 1)
-                if len(l_kv) < 2:
-                    raise ValueError("unparsable line {}@{}: {!r}".format(
-                        line_number, filename, line))
-                key, value = line.split('=', 1)
-                value = value.strip()
-                match = self.RE_FUNC.match(value)
-                value_type_names = []
-                if match:
-                    value_type_name = match.groupdict()['func_name']
-                    value_type_names.append(value_type_name)
-                value = self.decode_value(line_number, filename, key, value, *value_type_names)
-                current_section[key.strip()] = value
+                key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
+                current_section[key] = value
         return config
 

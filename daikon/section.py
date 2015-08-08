@@ -82,13 +82,6 @@ class Section(collections.abc.Mapping):
             self.update(init)
 
     @classmethod
-    def dictionary_factory(cls):
-        """dctionary_factory() -> new (empty) dictionary
-           Factory for new dictionaries.
-        """
-        return collections.OrderedDict()
-
-    @classmethod
     def subsection_class(cls):
         """subsection_class(cls)
            Return the class to be used for subsections (it must be derived from Section)
@@ -100,6 +93,13 @@ class Section(collections.abc.Mapping):
            Return a subsection with the given name
         """
         return self.subsection_class()(dictionary=dictionary)
+
+    @classmethod
+    def dictionary_factory(cls):
+        """dictionary_factory() -> new (empty) dictionary
+           Factory for new dictionaries.
+        """
+        return collections.OrderedDict()
 
     def __getitem__(self, key):
         value = self.dictionary[key]
@@ -260,14 +260,14 @@ class Section(collections.abc.Mapping):
         return "{}(dictionary={!r})".format(self.__class__.__name__, self.dictionary)
 
     def __str__(self):
-        data = []
+        section_data = []
         subsection_class = self.subsection_class()
         for key, value in self.items():
             if isinstance(value, subsection_class):
-                data.append((key, str(value)))
+                section_data.append((key, str(value)))
             else:
-                data.append((key, repr(value)))
-        content = ', '.join("{}={}".format(k, v) for k, v in data)
+                section_data.append((key, repr(value)))
+        content = ', '.join("{}={}".format(k, v) for k, v in section_data)
         return "{}({})".format(self.__class__.__name__, content)
 
     def __eq__(self, section):

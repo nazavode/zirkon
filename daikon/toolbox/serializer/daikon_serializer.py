@@ -41,28 +41,58 @@ def _parse_section(line, line_number, filename):
         raise ValueError("invalid line {}@{}: unbalanced []".format(line_number, filename))
     return line.strip()
 
+_FrameInfo = collections.namedtuple("_FrameInfo", ("indentation", "section"))
+
+class _Stack(object):
+    """Indentation/section stack management"""
+    def __init__(self):
+        self._stack = []
+
+    def __getitem__(self, index):
+        return self._stack[index]
+
+    def __delitem__(self, index):
+        del self._stack[index]
+
+    def get_frame_level(self, indentation, line_number, filename):
+        """get_frame_level(indentation, line_number, filename) -> indentation, section, level"""
+        for level, frame_info in enumerate(self._stack):
+            if frame_info.indentation == indentation:
+                del self[level + 1:]
+                return tuple(self._stack[-1]) + (self.level(),)
+        raise IndentationError("line {}@{}: unmatching indentation".format(line_number, filename))
+
+    def set_indentation(self, index, indentation):
+        """set_indentation(index, indentation)"""
+        frame_info = self._stack[index]
+        assert frame_info.indentation is None
+        self._stack[index] = frame_info._replace(indentation=indentation)
+
+    def push(self, section):
+        """push(section)"""
+        frame_info = _FrameInfo(
+            indentation=None,
+            section=section)
+        self._stack.append(frame_info)
+        return tuple(frame_info) + (self.level(),)
+
+    def level(self):
+        """level() -> stack level"""
+        return len(self._stack) - 1
+
+    def __len__(self):
+        return len(self._stack)
+
 
 class DaikonSerializer(TextSerializer):
     """DaikonSerializer()
        Implementation of the Daikon serializer.
     """
-    RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
-    INDENTATION = '    '
+    RE_INDENTATION_LINE = re.compile(r"(\s*)(.*)")
 
     @classmethod
     def class_tag(cls):
         return "Daikon"
-
-    def indentation(self, level):
-        """indentation(level) -> indentation string"""
-        return self.INDENTATION * level
-
-    def impl_dump_key_value(self, level, key, value):
-        return "{i}{k} = {v}".format(
-            i=self.indentation(level),
-            k=key,
-            v=value,
-        )
 
     def impl_dump_section_name(self, level, section_name):
         return "{i}{b}{s}{k}".format(
@@ -72,71 +102,44 @@ class DaikonSerializer(TextSerializer):
             k=']',
         )
 
-    def impl_dump_section_lines(self, level, lines, section):
-        def dump_section(level, lines, section_name, section):
-            """dump_section(...) -> section lines"""
-            lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
-            self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
-
-        for key, value in section.items():
-            if isinstance(value, collections.Mapping):
-                dump_section(level=level, lines=lines, section_name=key, section=value)
-            else:
-                encoded_value = self.encode_value(value)
-                lines.append(self.impl_dump_key_value(level=level, key=key, value=encoded_value))
+    def impl_iter_section_items(self, section):
+        # interspersed keys and mappings
+        yield from section.items()
 
     def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
             filename = '<string>'
         config = config_class(dictionary=dictionary)
-        indentation_section_stack = [(None, config)]
-        (current_indentation, current_section) = indentation_section_stack[-1]
-        current_level = len(indentation_section_stack) - 1
-        re_indent = re.compile(r"(\s*)(.*)")
+        stack = _Stack()
+        current_indentation, current_section, current_level = stack.push(config)
         for line_number, source_line in enumerate(serialization.split('\n')):
-            indentation, line = re_indent.match(source_line).groups()
+            indentation, line = self.RE_INDENTATION_LINE.match(source_line).groups()
             if not line or line[0] == '#':
                 # empty line or comment
                 continue
             if current_indentation is None:
                 # brand new section
                 current_indentation = indentation
-                indentation_section_stack[current_level] = (current_indentation, current_section)
+                stack.set_indentation(index=current_level, indentation=current_indentation)
             else:
                 # old section
                 if indentation != current_indentation:
                     if indentation.startswith(current_indentation):
                         raise IndentationError("line {}@{}: unexpected indentation".format(line_number, filename))
                     else:
-                        for o_level, (o_indentation, _) in enumerate(indentation_section_stack):
-                            if o_indentation == indentation:
-                                level = o_level
-                                del indentation_section_stack[level + 1:]
-                                (current_indentation, current_section) = indentation_section_stack[-1]
-                                break
-                        else:
-                            raise IndentationError("line {}@{}: unmatching indentation".format(line_number, filename))
+                        current_indentation, current_section, current_level = stack.get_frame_level(
+                            indentation=indentation,
+                            line_number=line_number,
+                            filename=filename)
             if line[0] == '[':
                 # section
                 section_name = _parse_section(line, line_number, filename)
                 current_section[section_name] = {}
-                indentation_section_stack.append((None, current_section[section_name]))
-                current_indentation, current_section = indentation_section_stack[-1]
-                current_level = len(indentation_section_stack) - 1
+                current_indentation, current_section, current_level = stack.push(current_section[section_name])
+                current_level = len(stack) - 1
             else:
                 # key:
-                l_kv = line.split('=', 1)
-                if len(l_kv) < 2:
-                    raise ValueError("unparsable line {}@{}: {!r}".format(
-                        line_number, filename, line))
-                key, value = line.split('=', 1)
-                value = value.strip()
-                match = self.RE_FUNC.match(value)
-                value_type_names = []
-                if match:
-                    value_type_name = match.groupdict()['func_name']
-                    value_type_names.append(value_type_name)
-                value = self.decode_value(line_number, filename, key, value, *value_type_names)
-                current_section[key.strip()] = value
+                key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
+                current_section[key] = value
         return config
 

@@ -64,7 +64,7 @@ class FlatMap(collections.abc.Mapping):
 
     @classmethod
     def dictionary_factory(cls):
-        """dctionary_factory() -> new (empty) dictionary
+        """dictionary_factory() -> new (empty) dictionary
            Factory for new dictionaries.
         """
         return collections.OrderedDict()
@@ -282,14 +282,14 @@ class FlatMap(collections.abc.Mapping):
         return "{}(dictionary={!r}, prefix={!r})".format(self.__class__.__name__, self.dictionary, self.prefix)
 
     def __str__(self):
-        data = []
+        map_data = []
         submap_class = self.submap_class()
         for key, value in self.items():
             if isinstance(value, submap_class):
-                data.append((key, str(value)))
+                map_data.append((key, str(value)))
             else:
-                data.append((key, repr(value)))
-        content = ', '.join("{}={}".format(k, v) for k, v in data)
+                map_data.append((key, repr(value)))
+        content = ', '.join("{}={}".format(k, v) for k, v in map_data)
         return "{}({})".format(self.__class__.__name__, content)
 
     def __eq__(self, dictionary):
