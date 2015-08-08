@@ -38,4 +38,7 @@ class CodecCatalog(Catalog):
     Codec = collections.namedtuple('Codec', ('class_', 'encode', 'decode'))
 
     def add_codec(self, class_, encode, decode):
+        """add_codec(class_, encode, decode)
+           Add encode/decode information for class_.
+        """
         self.register(class_, self.Codec(class_=class_, encode=encode, decode=decode))

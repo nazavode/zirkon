@@ -37,7 +37,7 @@ class Catalog(object):
        Classes information catalog.
     """
 
-    def __init__(self, default_factory=lambda : None):
+    def __init__(self, default_factory=lambda: None):
         self.class_info = collections.OrderedDict()
         self._cache = {}
         self._name_cache = {}
@@ -75,7 +75,7 @@ class Catalog(object):
                 if best_distance is not None:
                     return self.class_info[best_match]
             return self.default_factory()
-            
+
     def get_by_name(self, class_name, exact=False):
         """get_by_name(class_name, exact=False) -> info
            Get info for a class named 'class_name'. If 'exact' returns only exact matches.
@@ -95,8 +95,7 @@ class Catalog(object):
                 return self.default_factory()
             else:
                 return self.get_by_class(class_, exact=exact)
-                        
-        
+
     def _get_subclass_by_name(self, class_name):
         """_get_subclass_by_name(class_name) -> subclass or None
            Finds a subclass of any registered whose name is 'class_name'.
@@ -107,7 +106,7 @@ class Catalog(object):
                 if subclass.__name__ == class_name:
                     return subclass
         return None
-             
+
     def _get_best_match(self, class_):
         """_get_best_match(class_) -> best_distance, best_match_class
            Returns the best match for a given class, based on __mro__ of registered

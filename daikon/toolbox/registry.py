@@ -67,9 +67,9 @@ class Registry(object):
            Abstract classes are included only if 'include_abstract' is True.
         """
         if include_abstract:
-            filter = None
+            filter = None  # pylint: disable=W0622
         else:
-            filter = lambda x: not x.is_abstract()
+            filter = lambda x: not x.is_abstract()  # pylint: disable=W0622
         return subclass.subclasses(cls, include_self=include_self, filter=filter)
 
     @classmethod
@@ -88,7 +88,7 @@ class Registry(object):
            Return the registered class whose tag is 'class_tag', or 'default'.
         """
         return cls.class_dict(include_self=include_self,
-                                   include_abstract=include_abstract).get(class_tag, default)
+                              include_abstract=include_abstract).get(class_tag, default)
 
     @classmethod
     def get_class_tags(cls, *, include_self=False, include_abstract=False):
@@ -96,5 +96,5 @@ class Registry(object):
            Iterator over class tags.
         """
         for class_tag in cls.class_dict(include_self=include_self,
-                                               include_abstract=include_abstract):
+                                        include_abstract=include_abstract):
             yield class_tag

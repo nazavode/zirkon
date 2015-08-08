@@ -40,6 +40,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
     @classmethod
     def codec_catalog(cls):
+        """codec_catalog() -> class' codec catalog"""
         return cls.CODEC_CATALOG
 
     @classmethod

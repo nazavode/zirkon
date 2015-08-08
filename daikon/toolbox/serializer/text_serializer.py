@@ -28,7 +28,6 @@ __all__ = [
 
 import abc
 import collections
-import re
 
 from .codec_catalog import CodecCatalog
 from .serializer import Serializer
@@ -55,7 +54,7 @@ class TextSerializer(Serializer):
             value = codec.encode(value)
         return value
 
-    def decode_value(self, line_number, filename, key, value, *value_type_names):
+    def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable:W0613
         """decode_value(line_number, filename, key, value) -> decoded value"""
         if value_type_names:
             for value_type_name in value_type_names:
@@ -90,6 +89,7 @@ class TextSerializer(Serializer):
            Writes lines for the 'section' serialization'
         """
         def dump_section(level, lines, section_name, section):
+            """dump_section(...) -> section lines"""
             lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
             self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
 

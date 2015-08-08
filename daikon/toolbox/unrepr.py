@@ -32,7 +32,6 @@ import ast
 def unrepr(string, globals_d=None):
     """unrepr(string, globals_d=None) -> object
        Returns the object whose representation is 'string'.
-       
        >>> for string in "1.05", "[2, 'a']", "3", "()":
        ...     obj = unrepr(string)
        ...     print(obj, type(obj).__name__)
@@ -48,7 +47,8 @@ def unrepr(string, globals_d=None):
             'list': list,
             'tuple': tuple,
         }
-    def py_ast_unrepr(ast_body):
+    def py_ast_unrepr(ast_body):  # pylint: disable=R0911,R0912
+        """py_ast_unrepr(ast_body) -> value"""
         if isinstance(ast_body, ast.Str):
             return ast_body.s
         elif isinstance(ast_body, ast.Num):
@@ -103,8 +103,7 @@ def unrepr(string, globals_d=None):
                 raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call to undefined function {}".format(
                     string,
                     ast_body.col_offset,
-                    type(ast_body).__name__,
-                    ast_func.id))
+                    type(ast_body).__name__))
         raise SyntaxError("cannot unrepr string {!r}: col {}: invalid ast {}".format(
             string,
             ast_body.col_offset,

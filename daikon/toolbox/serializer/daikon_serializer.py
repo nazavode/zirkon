@@ -30,7 +30,6 @@ import collections
 import re
 
 from .text_serializer import TextSerializer
-from ..unrepr import unrepr
 
 
 def _parse_section(line, line_number, filename):
@@ -75,6 +74,7 @@ class DaikonSerializer(TextSerializer):
 
     def impl_dump_section_lines(self, level, lines, section):
         def dump_section(level, lines, section_name, section):
+            """dump_section(...) -> section lines"""
             lines.append(self.impl_dump_section_name(level=level, section_name=section_name))
             self.impl_dump_section_lines(level=level + 1, lines=lines, section=section)
 
@@ -108,7 +108,7 @@ class DaikonSerializer(TextSerializer):
                     if indentation.startswith(current_indentation):
                         raise IndentationError("line {}@{}: unexpected indentation".format(line_number, filename))
                     else:
-                        for o_level, (o_indentation, o_section) in enumerate(indentation_section_stack):
+                        for o_level, (o_indentation, _) in enumerate(indentation_section_stack):
                             if o_indentation == indentation:
                                 level = o_level
                                 del indentation_section_stack[level + 1:]
@@ -129,7 +129,6 @@ class DaikonSerializer(TextSerializer):
                 if len(l_kv) < 2:
                     raise ValueError("unparsable line {}@{}: {!r}".format(
                         line_number, filename, line))
-       
                 key, value = line.split('=', 1)
                 value = value.strip()
                 match = self.RE_FUNC.match(value)

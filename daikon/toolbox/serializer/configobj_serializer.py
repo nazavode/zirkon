@@ -29,7 +29,6 @@ __all__ = [
 import re
 
 from .text_serializer import TextSerializer
-from ..unrepr import unrepr
 
 
 def _parse_section(line, line_number, filename):
@@ -107,7 +106,6 @@ class ConfigObjSerializer(TextSerializer):
                 if len(l_kv) < 2:
                     raise ValueError("unparsable line {}@{}: {!r}".format(
                         line_number, filename, line))
-       
                 key, value = line.split('=', 1)
                 value = value.strip()
                 match = self.RE_FUNC.match(value)
