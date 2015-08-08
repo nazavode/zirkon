@@ -4,10 +4,10 @@ import collections
 
 import pytest
 
-from daikon.deferred.expression import \
-    Expression, \
+from daikon.deferred import \
+    Deferred, \
     Repr, Str, And, Or, Not, \
-    Value
+    Const
 
 
 ## unary
@@ -49,22 +49,22 @@ def bop2(request):
 ###############################
 ## bool unary:
 def test_bool_unary(bop1, bval1):
-    e = bop1(Value(bval1))
-    assert isinstance(e, Expression)
+    e = bop1(Const(bval1))
+    assert isinstance(e, Deferred)
     assert e.evaluate() == bop1(bval1)
     
 ## bool binary:
 def test_bool_binary_vl(bop2, bval2):
     l, r = bval2
-    e = bop2(Value(l), r)
+    e = bop2(Const(l), r)
     assert e.evaluate() == bop2(l, r)
     
 def test_bool_binary_vr(bop2, bval2):
     l, r = bval2
-    e = bop2(l, Value(r))
+    e = bop2(l, Const(r))
     assert e.evaluate() == bop2(l, r)
     
 def test_bool_binary_vlr(bop2, bval2):
     l, r = bval2
-    e = bop2(Value(l), Value(r))
+    e = bop2(Const(l), Const(r))
     assert e.evaluate() == bop2(l, r)

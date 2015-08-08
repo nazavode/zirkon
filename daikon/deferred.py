@@ -16,9 +16,9 @@
 #
 
 """\
-config.expression.expression
-============================
-Implementation of the Expression class
+config.deferred
+===============
+Implementation of the Deferred class for deferred evaluation of expressions.
 """
 
 __author__ = "Simone Campagna"
@@ -26,8 +26,8 @@ __author__ = "Simone Campagna"
 import abc
 
 
-class Expression(metaclass=abc.ABCMeta):
-    """Expression()
+class Deferred(metaclass=abc.ABCMeta):
+    """Deferred()
        Abstract base class to compose generic expressions.
        Concrete classes must implement the evaluate() method.
     """
@@ -145,14 +145,14 @@ class Expression(metaclass=abc.ABCMeta):
     @classmethod
     def evaluate_operand(cls, operand):
         """evaluate_operand() -> operand value"""
-        if isinstance(operand, Expression):
+        if isinstance(operand, Deferred):
             return operand.evaluate()
         else:
             return operand
 
 
-class Value(Expression):
-    """Value(value)
+class Const(Deferred):
+    """Const(value)
        Const value expression.
     """
 
@@ -163,7 +163,7 @@ class Value(Expression):
         return self.evaluate_operand(self.value)
 
 
-class UnaryOperator(Expression):
+class UnaryOperator(Deferred):
     """UnaryOperator(operand)
        Abstract base class for unary operators.
     """
@@ -253,7 +253,7 @@ class Call(UnaryOperator):
         return value(*self.p_args, **self.n_args)
 
 
-class BinaryOperator(Expression):
+class BinaryOperator(Deferred):
     """BinaryOperator(operand)
        Abstract base class for binary operators.
     """

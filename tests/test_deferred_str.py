@@ -4,10 +4,10 @@ import collections
 
 import pytest
 
-from daikon.deferred.expression import \
-    Expression, \
+from daikon.deferred import \
+    Deferred, \
     Len, Str, Repr, Not, \
-    Value
+    Const
 
 
 ## unary
@@ -60,30 +60,30 @@ def smethod0(request):
 ###############################
 ## str unary:
 def test_str_unary(sop1, sval1):
-    e = sop1(Value(sval1))
-    assert isinstance(e, Expression)
+    e = sop1(Const(sval1))
+    assert isinstance(e, Deferred)
     assert e.evaluate() == sop1(sval1)
     
 ## str binary:
 def test_str_binary_vl(sop2, sval2):
     l, r = sval2
-    e = sop2(Value(l), r)
+    e = sop2(Const(l), r)
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vr(sop2, sval2):
     l, r = sval2
-    e = sop2(l, Value(r))
+    e = sop2(l, Const(r))
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vlr(sop2, sval2):
     l, r = sval2
-    e = sop2(Value(l), Value(r))
+    e = sop2(Const(l), Const(r))
     assert e.evaluate() == sop2(l, r)
 
 ###############################
 def test_str_method0(smethod0, sval1):
     vm = getattr(sval1, smethod0)
-    e = Value(sval1)
+    e = Const(sval1)
     em = getattr(e, smethod0)
     assert vm is not em
     emv = em().evaluate()
@@ -92,6 +92,6 @@ def test_str_method0(smethod0, sval1):
 def test_str_method_join():
     s = ', '
     l = ['a', ' b ', 'cde', '12']
-    e = Value(s)
+    e = Const(s)
     em = e.join(l)
     assert s.join(l) == em.evaluate()
