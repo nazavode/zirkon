@@ -28,7 +28,7 @@ __all__ = [
 
 import re
 
-from .serializer import Serializer
+from .text_serializer import TextSerializer
 from .codec_catalog import CodecCatalog
 from ..unrepr import unrepr
 
@@ -49,40 +49,36 @@ def _parse_section(line, line_number, filename):
     return level, line.strip()
 
 
-class ConfigObjSerializer(Serializer):
-    """JSONSerializer()
+class ConfigObjSerializer(TextSerializer):
+    """ConfigObjSerializer()
        Implementation of the ConfigObj serializer.
     """
     CODEC_CATALOG = CodecCatalog()
     RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
+    INDENTATION = '    '
 
     @classmethod
     def class_tag(cls):
         return "ConfigObj"
 
-    def _dump_section(self, lines, section, indentation_level=0, indentation="    "):
-        """_dump_section(lines, section, indentation_level=0, indentation="    ")
-           Writes lines for the 'section' serialization'
-        """
-        ind = indentation * indentation_level
-        for key, value in section.parameters():
-            value_type = type(value)
-            codec = self.CODEC_CATALOG.get_by_class(value_type)
-            if codec is None:
-                value = repr(value)
-            else:
-                value = codec.encode(value)
-            lines.append("{}{} = {}".format(ind, key, value))
-        for key, value in section.sections():
-            left = "[" * (indentation_level + 1)
-            right = "]" * (indentation_level + 1)
-            lines.append(ind + left + key + right)
-            self._dump_section(lines, value, indentation_level=indentation_level + 1, indentation=indentation)
+    def indentation(self, level):
+        """indentation(level) -> indentation string"""
+        return self.INDENTATION * level
 
-    def to_string(self, config):
-        lines = []
-        self._dump_section(lines, config)
-        return '\n'.join(lines) + '\n'
+    def impl_dump_key_value(self, level, key, value):
+        return "{i}{k} = {v}".format(
+            i=self.indentation(level),
+            k=key,
+            v=value,
+        )
+
+    def impl_dump_section_name(self, level, section_name):
+        return "{i}{b}{s}{k}".format(
+            i=self.indentation(level),
+            b='[' * (level + 1),
+            s=section_name,
+            k=']' * (level + 1),
+        )
 
     def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
         if filename is None:
@@ -111,6 +107,12 @@ class ConfigObjSerializer(Serializer):
                 current_section, current_level = section_stack[-1], len(section_stack) - 1
             else:
                 # key:
+                print("::: {!r}".format(line))
+                l_kv = line.split('=', 1)
+                if len(l_kv) < 2:
+                    raise ValueError("unparsable line {}@{}: {!r}".format(
+                        line_number, filename, line))
+       
                 key, val = line.split('=', 1)
                 val = val.strip()
                 match = self.RE_FUNC.match(val)
