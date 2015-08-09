@@ -198,6 +198,13 @@ class Section(collections.abc.Mapping):
         return section_name in self.dictionary and \
             isinstance(self.dictionary[section_name], collections.Mapping)
 
+    def add_section(self, section_name):
+        """add_section(self, section_name) -> new section
+           Add a new section and return it.
+        """
+        self[section_name] = {}
+        return self[section_name]
+    
     def parameters(self):
         """parameters(self) -> parameter items
            Iterator over parameter items

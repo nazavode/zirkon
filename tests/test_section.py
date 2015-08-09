@@ -250,3 +250,14 @@ def test_Section_len_empty(generic_dictionary):
 
 def test_Section_len_simple_section(simple_section):
     assert len(simple_section) == 2 + 1 + 1 + 1
+
+def test_Section_add_section(simple_section):
+    assert not 'xyz' in simple_section
+    assert not simple_section.has_section('xyz')
+    section = simple_section.add_section('xyz')
+    assert 'xyz' in simple_section
+    assert section == simple_section['xyz']
+    assert len(simple_section['xyz']) == 0
+    section['a'] = 10
+    assert len(simple_section['xyz']) == 1
+    assert section == simple_section['xyz']

@@ -60,7 +60,7 @@ def _validate_parameter(*, validator, section, validation_section,
 class SchemaSection(Section):
     """SchemaSection(*, dictionary=None, init=None,
                      unexpected_parameter_validator=UnexpectedParameter(),
-                     auto_validate=True)
+                     self_validate=True)
        A Section class to perform validation. All values must be Validator
        instances.
 
@@ -76,14 +76,14 @@ class SchemaSection(Section):
 
     def __init__(self, *, dictionary=None, init=None,
                  unexpected_parameter_validator=UnexpectedParameter(),
-                 auto_validate=True):
+                 self_validate=True):
         self._unexpected_parameter_validator = None
         self.unexpected_parameter_validator = unexpected_parameter_validator
         super().__init__(dictionary=dictionary, init=init)
-        if auto_validate:
+        if self_validate:
             schema_validator = self.subsection_class()(dictionary=None,
                                                        unexpected_parameter_validator=ValidatorInstance(),
-                                                       auto_validate=False)
+                                                       self_validate=False)
             schema_validator.impl_validate(self, raise_on_error=True)
 
     @classmethod
@@ -110,7 +110,7 @@ class SchemaSection(Section):
             raise TypeError("{!r} is not a Validator".format(validator))
         self._unexpected_parameter_validator = validator
 
-    def validate(self, section, *, raise_on_error=False):
+    def validate_section(self, section, *, raise_on_error=False):
         """validate(section, *, raise_on_error=False) -> validation section
            Validates 'section' and returns a ValidationSection with the found
            validation errors.
