@@ -33,7 +33,12 @@ from .toolbox.serializer import Serializer
 
 
 class ConfigValidationError(Exception):
-    def __init__(self, message, validation_section):
+    """ConfigValidationError()
+       Error in Config validation; the validation_section attribute contains the validation result.
+    """
+    def __init__(self, validation_section, message=None):
+        if message is None:
+            message = "validation error: {}".format(validation_section)
         super().__init__(message)
         self.validation_section = validation_section
 
@@ -82,18 +87,24 @@ class Config(Section):
         self.validate()
 
     def set_schema(self, schema, *, validate=True):
+        """set_schema(self, schema, *, validate)
+           Set the validation schema (None to disable validation).
+        """
         self.schema = schema
         if validate:
             self.validate()
 
     def validate(self, raise_on_error=True):
+        """validate(self, raise_on_error=True)
+           Validate the config using the 'schema' attribute.
+        """
         if self.schema is not None:
             validation_section = self.schema.validate_section(self, raise_on_error=False)
             if raise_on_error and validation_section:
-                raise ConfigValidationError("validation error: {}".format(validation_section), validation_section)
+                raise ConfigValidationError(validation_section)
             else:
                 return validation_section
-        
+
     @classmethod
     def get_serializer(cls, protocol):
         """get_serializer(protocol)

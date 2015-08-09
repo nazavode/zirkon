@@ -204,7 +204,7 @@ class Section(collections.abc.Mapping):
         """
         self[section_name] = {}
         return self[section_name]
-    
+
     def parameters(self):
         """parameters(self) -> parameter items
            Iterator over parameter items
