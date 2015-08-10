@@ -25,7 +25,19 @@ for string in [
 def param(request):
     return request.param
 
-def test_unrepr(param):
+def test_deferred(param):
     d = deferred(param.string, globals_d=param.globals_d)
     assert d() == param.expected
 
+def test_deferred_late_evaluation():
+    xlist = []
+    d = deferred("len(x)", {'x': xlist, 'len': len})
+    assert d() == 0
+    xlist.append(10)
+    assert d() == 1
+    xlist.append(20)
+    xlist.append(30)
+    xlist.append(40)
+    assert d() == 4
+    del xlist[1:-1]
+    assert d() == 2

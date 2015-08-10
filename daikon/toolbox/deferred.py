@@ -35,7 +35,7 @@ from . import serializer
 
 
 class Deferred(object):
-    """Deferred(expression, *, globals_d=None)
+    """Deferred(expression, globals_d=None)
        Deferred evaluation of expression. For instance:
        >>> lst = []
        >>> d = Deferred("10 + len(x)", globals_d={'x': lst, 'len': len})
@@ -48,7 +48,7 @@ class Deferred(object):
        >>>
     """
 
-    def __init__(self, expression, *, globals_d=None):
+    def __init__(self, expression, globals_d=None):
         self.expression = expression
         if globals_d is None:
             globals_d = {}
@@ -73,8 +73,8 @@ class Deferred(object):
         return "{}({!r})".format(self.__class__.__name__, self.expression)
 
 
-def deferred(expression, *, globals_d=None):
-    """deferred(expression, *, globals_d=None) -> Deferred instance"""
+def deferred(expression, globals_d=None):
+    """deferred(expression, globals_d=None) -> Deferred instance"""
     return Deferred(expression=expression, globals_d=globals_d)
 
 
