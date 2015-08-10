@@ -29,6 +29,7 @@ __all__ = [
 import copy
 
 from ..toolbox.undefined import UNDEFINED
+from ..toolbox.unrepr import Deferred
 from .check_required import CheckRequired
 from .key_value import KeyValue
 
@@ -44,15 +45,15 @@ class CheckDefault(CheckRequired):
         self.default = default
         super().__init__()
 
-    def check(self, key_value):
+    def check(self, key_value, section):
         if not key_value.defined:
             if self.default is UNDEFINED:
-                super().check(key_value)
+                super().check(key_value, section)
             else:
-                key_value.value = copy.copy(self.default)
+                key_value.value = copy.copy(self.get_value(self.default, section))
                 key_value.defined = True
 
-    def auto_validate(self, validator):
-        if self.default is not UNDEFINED:
+    def self_validate(self, validator):
+        if self.default is not UNDEFINED and not isinstance(self.default, Deferred):
             key_value = KeyValue(key='<default>', value=self.default, defined=True)
-            validator.validate_key_value(key_value)
+            validator.validate_key_value(key_value, section=None)

@@ -38,7 +38,7 @@ class CheckType(Check):
     TYPE = type(None)
     SECONDARY_TYPES = None
 
-    def check(self, key_value):
+    def check(self, key_value, section):
         value = key_value.value
         if not isinstance(value, self.TYPE):
             if self.SECONDARY_TYPES and isinstance(value, self.SECONDARY_TYPES):

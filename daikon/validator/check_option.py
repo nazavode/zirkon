@@ -26,6 +26,7 @@ __all__ = [
     'CheckOption',
 ]
 
+from ..toolbox.unrepr import Deferred
 from .check_type import CheckType
 from .key_value import KeyValue
 from .error import OptionValidationError
@@ -39,14 +40,16 @@ class CheckOption(CheckType):
         self.values = values
         super().__init__()
 
-    def check(self, key_value):
+    def check(self, key_value, section):
+        values = [self.get_value(value, section) for value in self.values]
         if key_value.defined:
-            if key_value.value not in self.values:
+            if key_value.value not in values:
                 raise OptionValidationError(
                     key_value,
                     "{!r} is not a valid option value".format(key_value.value))
 
-    def auto_validate(self, validator):
+    def self_validate(self, validator):
         for value in self.values:
-            key_value = KeyValue(key='<option>', value=value, defined=True)
-            validator.validate_key_value(key_value)
+            if not isinstance(value, Deferred):
+                key_value = KeyValue(key='<option>', value=value, defined=True)
+                validator.validate_key_value(key_value, section=None)

@@ -18,13 +18,20 @@
 """\
 config.toolbox.unrepr
 =====================
-Implementation of the 'py_unrepr' function, which does unrepr of
+Implementation of the 'unrepr' function, which does unrepr of
 python builtin types (int, str, float, bool, list, tuple).
+
+The Deferred class implements a deferred evaluation of string
+expressions.
+
+The deferred function builds a Deferred instance.
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
     'unrepr',
+    'Deferred',
+    'deferred',
 ]
 
 import ast
@@ -49,6 +56,20 @@ def unrepr(string, globals_d=None):
             'tuple': tuple,
         }
 
+    unary_op_d = {
+        ast.UAdd: lambda x: +x,
+        ast.USub: lambda x: -x,
+    }
+    binary_op_d = {
+        ast.Add: lambda x, y: x + y,
+        ast.Sub: lambda x, y: x - y,
+        ast.Mult: lambda x, y: x * y,
+        ast.Div: lambda x, y: x / y,
+        ast.FloorDiv: lambda x, y: x // y,
+        ast.Mod: lambda x, y: x // y,
+        ast.Pow: lambda x, y: x ** y,
+    }
+
     def py_ast_unrepr(ast_body):  # pylint: disable=R0911,R0912
         """py_ast_unrepr(ast_body) -> value"""
         if isinstance(ast_body, ast.Str):
@@ -64,6 +85,13 @@ def unrepr(string, globals_d=None):
             if isinstance(ast_body, ast.Tuple):
                 elements = tuple(elements)
             return elements
+        elif isinstance(ast_body, ast.Dict):
+            dct = {}
+            for ast_key, ast_value in zip(ast_body.keys, ast_body.values):
+                key = py_ast_unrepr(ast_key)
+                value = py_ast_unrepr(ast_value)
+                dct[key] = value
+            return dct
         elif isinstance(ast_body, ast.UnaryOp):
             try:
                 operand = py_ast_unrepr(ast_body.operand)
@@ -80,6 +108,47 @@ def unrepr(string, globals_d=None):
         elif isinstance(ast_body, ast.Name):
             if ast_body.id in globals_d:
                 return globals_d[ast_body.id]
+            else:
+                raise SyntaxError("cannot unrepr string {!r}: col {}: undefined symbol {}".format(
+                    string,
+                    ast_body.col_offset,
+                    ast_body.id))
+        elif isinstance(ast_body, ast.Index):
+            return py_ast_unrepr(ast_body.value)
+        elif isinstance(ast_body, ast.Slice):
+            slist = []
+            for k in 'lower', 'upper', 'step':
+                v = getattr(ast.body, k)
+                if v is not None:
+                    v = py_ast_body(v)
+            slist.append(v)
+            return slice(*slist)
+        elif isinstance(ast_body, ast.Subscript):
+            v_element = py_ast_unrepr(ast_body.value)
+            v_slice = py_ast_unrepr(ast_body.slice)
+            return v_element[v_slice]
+        elif isinstance(ast_body, ast.UnaryOp):
+            op = ast_body.op
+            for op_class, op_function in unary_op_d.items():
+                if isinstance(op, op_class):
+                    return op_function(py_ast_unrepr(ast_body.operand))
+            else:
+                raise SyntaxError("cannot unrepr string {!r}: col {}: unsupported unary operator {}".format(
+                    string,
+                    ast_body.col_offset,
+                    type(ast_body).__name__,
+                    op.__class__.__name__))
+        elif isinstance(ast_body, ast.BinOp):
+            op = ast_body.op
+            for op_class, op_function in binary_op_d.items():
+                if isinstance(op, op_class):
+                    return op_function(py_ast_unrepr(ast_body.left), py_ast_unrepr(ast_body.right))
+            else:
+                raise SyntaxError("cannot unrepr string {!r}: col {}: unsupported binary operator {}".format(
+                    string,
+                    ast_body.col_offset,
+                    type(ast_body).__name__,
+                    op.__class__.__name__))
         elif isinstance(ast_body, ast.Call):
             ast_func = ast_body.func
             if ast_func.id in globals_d:
@@ -105,7 +174,7 @@ def unrepr(string, globals_d=None):
                 raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call to undefined function {}".format(
                     string,
                     ast_body.col_offset,
-                    type(ast_body).__name__))
+                    ast_func.id))
         raise SyntaxError("cannot unrepr string {!r}: col {}: invalid ast {}".format(
             string,
             ast_body.col_offset,
@@ -113,3 +182,45 @@ def unrepr(string, globals_d=None):
 
     expr = compile(string, "<string>", "eval", ast.PyCF_ONLY_AST)
     return py_ast_unrepr(expr.body)
+
+
+class Deferred(object):
+    """Deferred(expression, *, globals_d=None)
+       Deferred evaluation of expression. For instance:
+       >>> lst = []
+       >>> d = Deferred("10 + len(x)", globals_d={'x': lst, 'len': len})
+       >>> lst.extend((1, 2, 3))
+       >>> d()
+       13
+       >>> lst.append(10)
+       >>> d()
+       14
+       >>>
+    """
+
+    def __init__(self, expression, *, globals_d=None):
+        self.expression = expression
+        if globals_d is None:
+            globals_d = {}
+        else:
+            globals_d = globals_d.copy()
+        self.globals_d = globals_d
+
+    def __call__(self, globals_d=None):
+        gd = self.globals_d.copy()
+        if globals_d:
+            gd.update(globals_d)
+        return unrepr(self.expression, globals_d=gd)
+
+    def __repr__(self):
+        if self.globals_d is None:
+            g = ""
+        else:
+            g = ", globals_d={!r}".format(self.globals_d)
+        return "{}({!r}{})".format(self.__class__.__name__, self.expression, g)
+
+    def __str__(self):
+        return "{}({!r})".format(self.__class__.__name__, self.expression)
+def deferred(expression, *, globals_d=None):
+    """deferred(expression, *, globals_d=None) -> Deferred instance"""
+    return Deferred(expression=expression, globals_d=globals_d)

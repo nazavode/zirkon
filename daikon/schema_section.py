@@ -45,7 +45,7 @@ def _validate_parameter(*, validator, section, validation_section,
     """
     value = key_value.value
     try:
-        validator.validate_key_value(key_value)
+        validator.validate_key_value(key_value, section)
     except ValidationError as err:
         validation_section[parameter_name] = err
         if raise_on_error:
@@ -74,12 +74,12 @@ class SchemaSection(Section):
     """
     SUPPORTED_DATA_TYPES = (Validator, )
 
-    def __init__(self, *, dictionary=None, init=None,
+    def __init__(self, *, dictionary=None, init=None, parent=None,
                  unexpected_parameter_validator=UnexpectedParameter(),
                  self_validate=True):
         self._unexpected_parameter_validator = None
         self.unexpected_parameter_validator = unexpected_parameter_validator
-        super().__init__(dictionary=dictionary, init=init)
+        super().__init__(dictionary=dictionary, init=init, parent=parent)
         if self_validate:
             schema_validator = self.subsection_class()(dictionary=None,
                                                        unexpected_parameter_validator=ValidatorInstance(),

@@ -35,6 +35,6 @@ class CheckRequired(Check):
        Check if a required key/value is available (no default).
     """
 
-    def check(self, key_value):
+    def check(self, key_value, section):
         if not key_value.defined:
             raise UndefinedKeyValidationError(key_value, "required value is missing")

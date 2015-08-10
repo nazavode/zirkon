@@ -34,7 +34,7 @@ class CheckRemove(Check):
        Remove key/value.
     """
 
-    def check(self, key_value):
+    def check(self, key_value, section):
         key_value.defined = False
         key_value.value = None
 

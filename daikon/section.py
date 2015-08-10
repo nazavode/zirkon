@@ -32,7 +32,9 @@ import sys
 
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
+from .toolbox.flatmap import FlatMap
 from .toolbox.serializer import Serializer
+from .toolbox.unrepr import Deferred
 
 
 class Section(collections.abc.Mapping):
@@ -75,10 +77,16 @@ class Section(collections.abc.Mapping):
     """
     SUPPORTED_DATA_TYPES = (int, float, bool, str, type(None), list, tuple)
 
-    def __init__(self, *, dictionary=None, init=None):
+    def __init__(self, *, dictionary=None, init=None, parent=None):
         if dictionary is None:
             dictionary = self.dictionary_factory()
         self.dictionary = dictionary
+        if parent is None:
+            self.parent = self
+            self.root = self
+        else:
+            self.parent = parent
+            self.root = self.parent.root
         if init:
             self.update(init)
 
@@ -93,7 +101,7 @@ class Section(collections.abc.Mapping):
         """subsection(self, *p_args, **n_args)
            Return a subsection with the given name
         """
-        return self.subsection_class()(dictionary=dictionary)
+        return self.subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
     def dictionary_factory(cls):
@@ -124,10 +132,17 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             if self.has_parameter(key):
                 raise TypeError("parameter {} cannot be replaced with a section".format(key))
-            dictionary = self.dictionary_factory()
-            dictionary.update(value)
-            value = dictionary
+            if isinstance(self.dictionary, FlatMap):
+                self.dictionary[key] = {}
+                dictionary = self.dictionary[key]
+            else:
+                dictionary = self.dictionary_factory()
+                self.dictionary[key] = dictionary
+            section = self.subsection(dictionary)
+            section.update(value)
         else:
+            if isinstance(value, Deferred):
+                value = value({'SECTION': self, 'ROOT': self.root})
             if not isinstance(value, self.SUPPORTED_DATA_TYPES):
                 raise TypeError("parameter {}: invalid value {!r} of type {}".format(
                     key,
@@ -136,7 +151,7 @@ class Section(collections.abc.Mapping):
                 ))
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with a parameter".format(key))
-        self.dictionary[key] = value
+            self.dictionary[key] = value
 
     def __delitem__(self, key):
         del self.dictionary[key]
@@ -284,17 +299,13 @@ class Section(collections.abc.Mapping):
         else:
             for key, value in self.items():
                 if key not in section:
-                    print("A {!r}={!r}".format(key, value))
                     return False
                 if value != section[key]:
-                    print("B {!r}={!r}".format(key, value))
                     return False
             for key, value in section.items():
                 if key not in self:
-                    print("C {!r}={!r}".format(key, value))
                     return False
                 if self[key] != value:
-                    print("D {!r}={!r}".format(key, value))
                     return False
             return True
 

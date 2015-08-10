@@ -29,6 +29,7 @@ __all__ = [
     'CheckMaxLen',
 ]
 
+from ..toolbox.unrepr import Deferred
 from .check import Check
 from .error import MinValidationError, \
     MaxValidationError, \
@@ -45,12 +46,12 @@ class CheckRange(Check):  # pylint: disable=W0223
 
     ATTRIBUTE_NAME = None
 
-    def auto_validate(self, validator):
+    def self_validate(self, validator):
         value = getattr(self, self.ATTRIBUTE_NAME)
-        if value is not None:
+        if value is not None and not isinstance(value, Deferred):
             key = "<{}>".format(self.ATTRIBUTE_NAME)
             key_value = KeyValue(key=key, value=value, defined=True)
-            validator.validate_key_value(key_value)
+            validator.validate_key_value(key_value, section=None)
 
 
 class CheckMin(CheckRange):
@@ -63,12 +64,13 @@ class CheckMin(CheckRange):
         self.min = min
         super().__init__()
 
-    def check(self, key_value):
-        if self.min is not None:
+    def check(self, key_value, section):
+        min_value = self.get_value(self.min, section)
+        if min_value is not None:
             value = key_value.value
-            if value < self.min:
+            if value < min_value:
                 raise MinValidationError(key_value,
-                                         "value {!r} is lower than min {!r}".format(value, self.min))
+                                         "value {!r} is lower than min {!r}".format(value, min_value))
 
 
 class CheckMax(CheckRange):
@@ -81,12 +83,13 @@ class CheckMax(CheckRange):
         self.max = max
         super().__init__()
 
-    def check(self, key_value):
-        if self.max is not None:
+    def check(self, key_value, section):
+        max_value = self.get_value(self.max, section)
+        if max_value is not None:
             value = key_value.value
-            if value > self.max:
+            if value > max_value:
                 raise MaxValidationError(key_value,
-                                         "value {!r} is greater than max {!r}".format(value, self.max))
+                                         "value {!r} is greater than max {!r}".format(value, max_value))
 
 
 class CheckMinLen(Check):
@@ -98,15 +101,16 @@ class CheckMinLen(Check):
         self.min_len = min_len
         super().__init__()
 
-    def check(self, key_value):
-        if self.min_len is not None:
+    def check(self, key_value, section):
+        min_len_value = self.get_value(self.min_len, section)
+        if min_len_value is not None:
             value = key_value.value
-            if len(value) < self.min_len:
+            if len(value) < min_len_value:
                 raise MinLenValidationError(key_value,
                                             "value {!r} has length {} than is lower than min_len {!r}".format(
                                                 value,
                                                 len(value),
-                                                self.min_len))
+                                                min_len_value))
 
 
 class CheckMaxLen(Check):
@@ -118,12 +122,13 @@ class CheckMaxLen(Check):
         self.max_len = max_len
         super().__init__()
 
-    def check(self, key_value):
-        if self.max_len is not None:
+    def check(self, key_value, section):
+        max_len_value = self.get_value(self.max_len, section)
+        if max_len_value is not None:
             value = key_value.value
-            if len(value) > self.max_len:
+            if len(value) > max_len_value:
                 raise MaxLenValidationError(key_value,
                                             "value {!r} has length {} that is greater than max_len {!r}".format(
                                                 value,
                                                 len(value),
-                                                self.max_len))
+                                                max_len_value))

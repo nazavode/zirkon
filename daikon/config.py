@@ -130,9 +130,7 @@ class Config(Section):
         """to_stream(stream, protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
-        print("AAA")
         self.validate()
-        print("BBB")
         serializer = self.get_serializer(protocol)
         return serializer.to_stream(self, stream)
 

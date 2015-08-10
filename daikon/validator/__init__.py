@@ -69,8 +69,31 @@ from .unexpected_parameter import UnexpectedParameter
 from .ignore import Ignore
 from .remove import Remove
 
-from ..toolbox.unrepr import unrepr
+from ..toolbox.unrepr import unrepr, Deferred
 
+
+### Validator codecs:
+def _validator_text_encode(validator):
+    """_validator_text_encode(validator)
+       ConfigObj/Daikon encoder for Validator instances
+    """
+    return repr(validator)
+
+
+def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
+    """_validator_text_decode(validator_name, arguments)
+       ConfigObj/Daikon decoder for Validator instances
+    """
+    gd = Validator.class_dict()
+    gd['Deferred'] = Deferred
+    return unrepr(repr_data, gd)
+
+
+text_serializer.TextSerializer.codec_catalog().add_codec(
+    class_=Validator,
+    encode=_validator_text_encode,
+    decode=_validator_text_decode,
+)
 
 def _validator_json_encode(validator):
     """_validator_json_encode(validator)
@@ -94,24 +117,46 @@ json_serializer.JSONSerializer.codec_catalog().add_codec(
 )
 
 
-def _validator_text_encode(validator):
-    """_validator_text_encode(validator)
-       ConfigObj/Daikon encoder for Validator instances
+### Deferred codecs:
+def _deferred_json_encode(deferred_object):
+    """_deferred_json_encode(deferred)
+       JSON encoder for Validator instances
     """
-    return repr(validator)
+    return {'expression': deferred_object.expression,
+            'globals_d': deferred_object.globals_d}
 
 
-def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
-    """_validator_text_decode(validator_name, arguments)
-       ConfigObj/Daikon decoder for Validator instances
+def _deferred_json_decode(deferred_class_name, arguments):
+    """_deferred_json_decode(deferred_class_name, arguments)
+       JSON decoder for Deferred instances
     """
-    return unrepr(repr_data, Validator.class_dict())
+    assert deferred_class_name == Deferred.__name__
+    return Deferred(**arguments)
 
 
-text_serializer.TextSerializer.codec_catalog().add_codec(
-    class_=Validator,
-    encode=_validator_text_encode,
-    decode=_validator_text_decode,
+json_serializer.JSONSerializer.codec_catalog().add_codec(
+    class_=Deferred,
+    encode=_deferred_json_encode,
+    decode=_deferred_json_decode,
 )
 
 
+def _deferred_text_encode(deferred):
+    """_deferred_text_encode(deferred)
+       ConfigObj/Daikon encoder for Validator instances
+    """
+    return repr(deferred)
+
+
+def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
+    """_deferred_text_decode(deferred_name, arguments)
+       ConfigObj/Daikon decoder for Validator instances
+    """
+    return unrepr(repr_data, {'Deferred': Deferred})
+
+
+text_serializer.TextSerializer.codec_catalog().add_codec(
+    class_=Deferred,
+    encode=_deferred_text_encode,
+    decode=_deferred_text_decode,
+)

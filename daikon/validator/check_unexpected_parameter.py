@@ -35,5 +35,5 @@ class CheckUnexpectedParameter(Check):
        Check if a required key/value is available (no default).
     """
 
-    def check(self, key_value):
+    def check(self, key_value, section):
         raise UnexpectedParameterValidationError(key_value, "unexpected parameter {!r}".format(key_value.key))
