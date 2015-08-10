@@ -29,7 +29,7 @@ __all__ = [
 import copy
 
 from ..toolbox.undefined import UNDEFINED
-from ..toolbox.unrepr import Deferred
+from ..toolbox.deferred import Deferred
 from .check_required import CheckRequired
 from .key_value import KeyValue
 

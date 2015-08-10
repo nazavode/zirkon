@@ -20,18 +20,11 @@ config.toolbox.unrepr
 =====================
 Implementation of the 'unrepr' function, which does unrepr of
 python builtin types (int, str, float, bool, list, tuple).
-
-The Deferred class implements a deferred evaluation of string
-expressions.
-
-The deferred function builds a Deferred instance.
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
     'unrepr',
-    'Deferred',
-    'deferred',
 ]
 
 import ast
@@ -182,45 +175,3 @@ def unrepr(string, globals_d=None):
 
     expr = compile(string, "<string>", "eval", ast.PyCF_ONLY_AST)
     return py_ast_unrepr(expr.body)
-
-
-class Deferred(object):
-    """Deferred(expression, *, globals_d=None)
-       Deferred evaluation of expression. For instance:
-       >>> lst = []
-       >>> d = Deferred("10 + len(x)", globals_d={'x': lst, 'len': len})
-       >>> lst.extend((1, 2, 3))
-       >>> d()
-       13
-       >>> lst.append(10)
-       >>> d()
-       14
-       >>>
-    """
-
-    def __init__(self, expression, *, globals_d=None):
-        self.expression = expression
-        if globals_d is None:
-            globals_d = {}
-        else:
-            globals_d = globals_d.copy()
-        self.globals_d = globals_d
-
-    def __call__(self, globals_d=None):
-        gd = self.globals_d.copy()
-        if globals_d:
-            gd.update(globals_d)
-        return unrepr(self.expression, globals_d=gd)
-
-    def __repr__(self):
-        if self.globals_d is None:
-            g = ""
-        else:
-            g = ", globals_d={!r}".format(self.globals_d)
-        return "{}({!r}{})".format(self.__class__.__name__, self.expression, g)
-
-    def __str__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.expression)
-def deferred(expression, *, globals_d=None):
-    """deferred(expression, *, globals_d=None) -> Deferred instance"""
-    return Deferred(expression=expression, globals_d=globals_d)

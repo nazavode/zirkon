@@ -29,7 +29,7 @@ __all__ = [
     'CheckMaxLen',
 ]
 
-from ..toolbox.unrepr import Deferred
+from ..toolbox.deferred import Deferred
 from .check import Check
 from .error import MinValidationError, \
     MaxValidationError, \

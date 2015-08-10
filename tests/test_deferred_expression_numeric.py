@@ -4,10 +4,10 @@ import collections
 
 import pytest
 
-from daikon.deferred import \
-    Deferred, \
-    Const, \
-    Repr, Str, Not
+from daikon.toolbox.deferred_expression import \
+    DE_Base, \
+    DE_Repr, DE_Str, DE_And, DE_Or, DE_Not, \
+    DE_Const
 
 
 ## unary
@@ -25,9 +25,9 @@ _unary_int_operator = collections.OrderedDict()
 _unary_int_operator['abs'] = abs
 _unary_int_operator['pos'] = lambda x: +x
 _unary_int_operator['neg'] = lambda x: -x
-_unary_int_operator['Str'] = Str
-_unary_int_operator['Repr'] = Repr
-_unary_int_operator['Not'] = Not
+_unary_int_operator['Str'] = DE_Str
+_unary_int_operator['Repr'] = DE_Repr
+_unary_int_operator['Not'] = DE_Not
 @pytest.fixture(ids=tuple(_unary_int_operator.keys()), params=tuple(_unary_int_operator.values()))
 def iop1(request):
     return request.param
@@ -80,45 +80,45 @@ def fop2(request):
 ###############################
 ## int unary:
 def test_int_unary(iop1, ival1):
-    e = iop1(Const(ival1))
-    assert isinstance(e, Deferred)
+    e = iop1(DE_Const(ival1))
+    assert isinstance(e, DE_Base)
     assert e.evaluate() == iop1(ival1)
     
 ## float unary:
 def test_float_unary(fop1, fval1):
-    e = fop1(Const(fval1))
-    assert isinstance(e, Deferred)
+    e = fop1(DE_Const(fval1))
+    assert isinstance(e, DE_Base)
     assert e.evaluate() == fop1(fval1)
   
 ## int binary:
 def test_int_binary_vl(iop2, ival2):
     l, r = ival2
-    e = iop2(Const(l), r)
+    e = iop2(DE_Const(l), r)
     assert e.evaluate() == iop2(l, r)
     
 def test_int_binary_vr(iop2, ival2):
     l, r = ival2
-    e = iop2(l, Const(r))
+    e = iop2(l, DE_Const(r))
     assert e.evaluate() == iop2(l, r)
     
 def test_int_binary_vlr(iop2, ival2):
     l, r = ival2
-    e = iop2(Const(l), Const(r))
+    e = iop2(DE_Const(l), DE_Const(r))
     assert e.evaluate() == iop2(l, r)
     
 ## float binary:
 def test_float_binary_vl(fop2, fval2):
     l, r = fval2
-    e = fop2(Const(l), r)
+    e = fop2(DE_Const(l), r)
     assert e.evaluate() == fop2(l, r)
     
 def test_float_binary_vr(fop2, fval2):
     l, r = fval2
-    e = fop2(l, Const(r))
+    e = fop2(l, DE_Const(r))
     assert e.evaluate() == fop2(l, r)
     
 def test_float_binary_vlr(fop2, fval2):
     l, r = fval2
-    e = fop2(Const(l), Const(r))
+    e = fop2(DE_Const(l), DE_Const(r))
     assert e.evaluate() == fop2(l, r)
     

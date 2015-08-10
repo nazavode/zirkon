@@ -34,7 +34,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
 from .toolbox.flatmap import FlatMap
 from .toolbox.serializer import Serializer
-from .toolbox.unrepr import Deferred
+from .toolbox.deferred import Deferred
 
 
 class Section(collections.abc.Mapping):

@@ -28,7 +28,7 @@ __all__ = [
 
 import abc
 
-from ..toolbox.unrepr import Deferred
+from ..toolbox.deferred import Deferred
 
 
 class Check(metaclass=abc.ABCMeta):

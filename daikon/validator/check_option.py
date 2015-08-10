@@ -26,7 +26,7 @@ __all__ = [
     'CheckOption',
 ]
 
-from ..toolbox.unrepr import Deferred
+from ..toolbox.deferred import Deferred
 from .check_type import CheckType
 from .key_value import KeyValue
 from .error import OptionValidationError
