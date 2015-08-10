@@ -69,6 +69,10 @@ class DE_Base(metaclass=abc.ABCMeta):
         """evaluate() -> expression value"""
         pass
 
+    @abc.abstractmethod
+    def canonical(self):
+        """canonical() -> canonical representation"""
+        pass
     # unary mathematical operators:
     def __abs__(self):
         return DE_Abs(self)
@@ -186,6 +190,13 @@ class DE_Base(metaclass=abc.ABCMeta):
         else:
             return operand
 
+    @classmethod
+    def canonical_operand(cls, operand):
+        """canonical_operand() -> operand value"""
+        if isinstance(operand, DE_Base):
+            return operand.canonical()
+        else:
+            return repr(operand)
 
 class DE_Const(DE_Base):
     """DE_Const(value)
@@ -198,6 +209,8 @@ class DE_Const(DE_Base):
     def evaluate(self):
         return self.evaluate_operand(self.value)
 
+    def canonical(self):
+        return self.canonical_operand(self.value)
 
 class DE_UnaryOperator(DE_Base):
     """DE_UnaryOperator(operand)
@@ -224,12 +237,18 @@ class DE_Abs(DE_UnaryOperator):
     def unary_operation(self, value):
         return abs(value)
 
+    def canonical(self):
+        return "abs({})".format(self.canonical_operand(self.operand))
+
 
 class DE_Pos(DE_UnaryOperator):
     """'pos' unary operator."""
 
     def unary_operation(self, value):
         return +value
+
+    def canonical(self):
+        return "(+{})".format(self.canonical_operand(self.operand))
 
 
 class DE_Neg(DE_UnaryOperator):
@@ -238,12 +257,18 @@ class DE_Neg(DE_UnaryOperator):
     def unary_operation(self, value):
         return -value
 
+    def canonical(self):
+        return "(-{})".format(self.canonical_operand(self.operand))
+
 
 class DE_Len(DE_UnaryOperator):
     """'len' unary operator."""
 
     def unary_operation(self, value):
         return len(value)
+
+    def canonical(self):
+        return "len({})".format(self.canonical_operand(self.operand))
 
 
 class DE_Str(DE_UnaryOperator):
@@ -252,6 +277,9 @@ class DE_Str(DE_UnaryOperator):
     def unary_operation(self, value):
         return str(value)
 
+    def canonical(self):
+        return "str({})".format(self.canonical_operand(self.operand))
+
 
 class DE_Repr(DE_UnaryOperator):
     """'repr' unary operator."""
@@ -259,11 +287,17 @@ class DE_Repr(DE_UnaryOperator):
     def unary_operation(self, value):
         return repr(value)
 
+    def canonical(self):
+        return "repr({})".format(self.canonical_operand(self.operand))
+
 
 class DE_Not(DE_UnaryOperator):
     """'not' unary operator."""
     def unary_operation(self, value):
         return not value
+
+    def canonical(self):
+        return "(not {})".format(self.canonical_operand(self.operand))
 
 
 class DE_Call(DE_UnaryOperator):
@@ -277,11 +311,20 @@ class DE_Call(DE_UnaryOperator):
     def unary_operation(self, value):
         return value(*self.p_args, **self.n_args)
 
+    def canonical(self):
+        l_args = []
+        if self.p_args:
+            l_args.extend(repr(a) for a in self.p_args)
+        if self.n_args:
+            l_args.extend("{}={!r}".format(k, v) for k, v in self.n_args)
+        return "{}({})".format(self.canonical_operand(self.operand), ', '.join(l_args))
+
 
 class DE_BinaryOperator(DE_Base):
     """DE_BinaryOperator(operand)
        Abstract base class for binary operators.
     """
+    BINOP_SYMBOL = None
 
     def __init__(self, left_operand, right_operand):
         self.left_operand = left_operand
@@ -298,9 +341,20 @@ class DE_BinaryOperator(DE_Base):
 
         pass
 
+    def __repr__(self):
+        return "{}(left_operand={!r}, right_operand={!r})".format(
+            self.__class__.__name__, self.left_operand, self.right_operand)
+
+    def canonical(self):
+        return "({} {} {})".format(
+            self.canonical_operand(self.left_operand),
+            self.BINOP_SYMBOL,
+            self.canonical_operand(self.right_operand))
+       
 
 class DE_Add(DE_BinaryOperator):
     """'add' binary operator."""
+    BINOP_SYMBOL = '+'
 
     def binary_operation(self, left_value, right_value):
         return left_value + right_value
@@ -308,6 +362,7 @@ class DE_Add(DE_BinaryOperator):
 
 class DE_Mul(DE_BinaryOperator):
     """'mul' binary operator."""
+    BINOP_SYMBOL = '*'
 
     def binary_operation(self, left_value, right_value):
         return left_value * right_value
@@ -315,6 +370,7 @@ class DE_Mul(DE_BinaryOperator):
 
 class DE_Sub(DE_BinaryOperator):
     """'sub' binary operator."""
+    BINOP_SYMBOL = '-'
 
     def binary_operation(self, left_value, right_value):
         return left_value - right_value
@@ -322,6 +378,7 @@ class DE_Sub(DE_BinaryOperator):
 
 class DE_TrueDiv(DE_BinaryOperator):
     """'truediv' binary operator."""
+    BINOP_SYMBOL = '/'
 
     def binary_operation(self, left_value, right_value):
         return left_value / right_value
@@ -329,6 +386,8 @@ class DE_TrueDiv(DE_BinaryOperator):
 
 class DE_FloorDiv(DE_BinaryOperator):
     """'floordiv' binary operator."""
+    BINOP_SYMBOL = '//'
+
 
     def binary_operation(self, left_value, right_value):
         return left_value // right_value
@@ -336,6 +395,7 @@ class DE_FloorDiv(DE_BinaryOperator):
 
 class DE_Mod(DE_BinaryOperator):
     """'mod' binary operator."""
+    BINOP_SYMBOL = '%'
 
     def binary_operation(self, left_value, right_value):
         return left_value % right_value
@@ -347,9 +407,15 @@ class DE_DivMod(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
 
+    def canonical(self):
+        return "divmod({}, {})".format(
+            self.canonical_operand(self.left_operand),
+            self.canonical_operand(self.right_operand))
+       
 
 class DE_Pow(DE_BinaryOperator):
     """'pow' binary operator."""
+    BINOP_SYMBOL = '**'
 
     def binary_operation(self, left_value, right_value):
         return left_value ** right_value
@@ -357,6 +423,7 @@ class DE_Pow(DE_BinaryOperator):
 
 class DE_Eq(DE_BinaryOperator):
     """'eq' binary operator."""
+    BINOP_SYMBOL = '=='
 
     def binary_operation(self, left_value, right_value):
         return left_value == right_value
@@ -364,6 +431,7 @@ class DE_Eq(DE_BinaryOperator):
 
 class DE_Ne(DE_BinaryOperator):
     """'ne' binary operator."""
+    BINOP_SYMBOL = '!='
 
     def binary_operation(self, left_value, right_value):
         return left_value != right_value
@@ -371,6 +439,7 @@ class DE_Ne(DE_BinaryOperator):
 
 class DE_Lt(DE_BinaryOperator):
     """'lt' binary operator."""
+    BINOP_SYMBOL = '<'
 
     def binary_operation(self, left_value, right_value):
         return left_value < right_value
@@ -378,6 +447,7 @@ class DE_Lt(DE_BinaryOperator):
 
 class DE_Le(DE_BinaryOperator):
     """'le' binary operator."""
+    BINOP_SYMBOL = '<='
 
     def binary_operation(self, left_value, right_value):
         return left_value <= right_value
@@ -385,6 +455,7 @@ class DE_Le(DE_BinaryOperator):
 
 class DE_Gt(DE_BinaryOperator):
     """'gt' binary operator."""
+    BINOP_SYMBOL = '>'
 
     def binary_operation(self, left_value, right_value):
         return left_value > right_value
@@ -392,6 +463,7 @@ class DE_Gt(DE_BinaryOperator):
 
 class DE_Ge(DE_BinaryOperator):
     """'ge' binary operator."""
+    BINOP_SYMBOL = '>='
 
     def binary_operation(self, left_value, right_value):
         return left_value >= right_value
@@ -403,6 +475,11 @@ class DE_And(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return left_value and right_value
 
+    def canonical(self):
+        return "And({}, {})".format(
+            self.canonical_operand(self.left_operand),
+            self.canonical_operand(self.right_operand))
+       
 
 class DE_Or(DE_BinaryOperator):
     """'or' binary operator."""
@@ -410,6 +487,11 @@ class DE_Or(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return left_value or right_value
 
+    def canonical(self):
+        return "Or({}, {})".format(
+            self.canonical_operand(self.left_operand),
+            self.canonical_operand(self.right_operand))
+       
 
 class DE_Getattr(DE_BinaryOperator):
     """'getattr' binary operator."""
@@ -417,6 +499,12 @@ class DE_Getattr(DE_BinaryOperator):
     def binary_operation(self, left, right):
         return getattr(left, right)
 
+    def canonical(self):
+        left = self.canonical_operand(self.left_operand)
+        right = self.canonical_operand(self.right_operand)
+        fmt = "({}.{})"
+        return fmt.format(left, right)
+       
 
 class DE_Getitem(DE_BinaryOperator):
     """'getitem' binary operator."""
@@ -424,3 +512,9 @@ class DE_Getitem(DE_BinaryOperator):
     def binary_operation(self, left, right):
         return left[right]
 
+    def canonical(self):
+        left = self.canonical_operand(self.left_operand)
+        right = self.canonical_operand(self.right_operand)
+        fmt = "{}[{}])"
+        return fmt.format(left, right)
+       
