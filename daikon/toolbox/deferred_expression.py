@@ -59,30 +59,30 @@ __all__ = [
 
 import abc
 
-#lambda	Lambda Expression
-#or	Boolean OR
-#and	Boolean AND
-#not x	Boolean NOT
-#in, not in	Membership tests
-#is, is not	Identity tests
-#<, <=, >, >=, !=, ==	Comparisons
-#|	Bitwise OR
-#^	Bitwise XOR
-#&	Bitwise AND
-#<<, >>	Shifts
-#+, -	Addition and subtraction
-#*, /, %	Multiplication, Division and Remainder
-#+x, -x	Positive, Negative
-#~x	Bitwise NOT
-#**	Exponentiation
-#x.attribute	Attribute reference
-#x[index]	Subscription
-#x[index:index]	Slicing
-#f(arguments ...)	Function call
-#(expressions, ...)	Binding or tuple display
-#[expressions, ...]	List display
-#{key:datum, ...}	Dictionary display
-#`expressions, ...`	String conversion
+# lambda	Lambda Expression
+# or	Boolean OR
+# and	Boolean AND
+# not x	Boolean NOT
+# in, not in	Membership tests
+# is, is not	Identity tests
+# <, <=, >, >=, !=, ==	Comparisons
+# |	Bitwise OR
+# ^	Bitwise XOR
+# &	Bitwise AND
+# <<, >>	Shifts
+# +, -	Addition and subtraction
+# *, /, %	Multiplication, Division and Remainder
+# +x, -x	Positive, Negative
+# ~x	Bitwise NOT
+# **	Exponentiation
+# x.attribute	Attribute reference
+# x[index]	Subscription
+# x[index:index]	Slicing
+# f(arguments ...)	Function call
+# (expressions, ...)	Binding or tuple display
+# [expressions, ...]	List display
+# {key:datum, ...}	Dictionary display
+# `expressions, ...`	String conversion
 
 
 class DE_Base(metaclass=abc.ABCMeta):
@@ -645,4 +645,34 @@ class DE_Or(DE_BinaryOperator):
 
     def binary_operation(self, left_value, right_value):
         return left_value or right_value
+
+# from . import serializer
+# from .subclasses import subclasses
+# text_serializer_module = getattr(serializer, 'text_serializer', None)
+# if text_serializer_module is not None:
+#     def _deferred_expression_text_encode(deferred_expression):
+#         """_deferred_expression_text_encode(deferred_expression)
+#            ConfigObj/Daikon encoder for Validator instances
+#         """
+#         return repr(deferred_expression)
+# 
+# 
+#     def _deferred_expression_text_decode(type_name, repr_data):  # pylint: disable=W0613
+#         """_deferred_expression_text_decode(deferred_expression_name, arguments)
+#            ConfigObj/Daikon decoder for Validator instances
+#         """
+#         gd = {}
+#         for subclass in subclasses(DE_Base, include_self=False):
+#             gd[subclass.__name__] = subclass
+#         gd['len'] = len
+#         gd['str'] = str
+#         gd['repr'] = repr
+#         return unrepr(repr_data, gd)
+# 
+# 
+#     text_serializer_module.TextSerializer.codec_catalog().add_codec(
+#         class_=DE_Base,
+#         encode=_deferred_expression_text_encode,
+#         decode=_deferred_expression_text_decode,
+#     )
 
