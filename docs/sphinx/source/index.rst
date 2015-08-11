@@ -8,6 +8,12 @@ Contents:
 
     modules
 
+.. toctree::
+    :maxdepth: 2
+
+    getting-started/index
+    userguide/index
+
 Indices and tables
 ==================
 

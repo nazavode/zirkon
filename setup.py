@@ -70,7 +70,8 @@ if __name__ == "__main__":
     data_files = []
     for data_dirname, patterns in [('requirements', ('*.txt', )),
                                    ('docs/sphinx/source', ('conf.py', '*.rst')),
-                                   ('docs/sphinx/source/img', ('*.jpg', )),
+                                   ('docs/sphinx/source/getting-started', ('*.rst',)),
+                                   ('docs/sphinx/source/img', ('*.jpg',)),
                                   ]:
         files = []
         for pattern in patterns:
