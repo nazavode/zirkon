@@ -32,7 +32,6 @@ import sys
 
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
-from .toolbox.flatmap import FlatMap
 from .toolbox.serializer import Serializer
 from .toolbox.deferred import Deferred
 
@@ -132,13 +131,8 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             if self.has_parameter(key):
                 raise TypeError("parameter {} cannot be replaced with a section".format(key))
-            if isinstance(self.dictionary, FlatMap):
-                self.dictionary[key] = {}
-                dictionary = self.dictionary[key]
-            else:
-                dictionary = self.dictionary_factory()
-                self.dictionary[key] = dictionary
-            section = self.subsection(dictionary)
+            self.dictionary[key] = self.dictionary_factory()
+            section = self.subsection(self.dictionary[key])
             section.update(value)
         else:
             if isinstance(value, Deferred):
