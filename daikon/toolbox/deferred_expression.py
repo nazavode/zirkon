@@ -26,6 +26,7 @@ __all__ = [
     'DE_Base',
     'DE_BinaryOperator',
     'DE_UnaryOperator',
+    'DE_Name',
     'DE_Const',
     'DE_Abs',
     'DE_Pos',
@@ -50,6 +51,7 @@ __all__ = [
     'DE_Len',
     'DE_Str',
     'DE_Repr',
+    'DE_Contains',
     'DE_Getattr',
     'DE_Getitem',
     'DE_Call',
@@ -57,22 +59,100 @@ __all__ = [
 
 import abc
 
+#lambda	Lambda Expression
+#or	Boolean OR
+#and	Boolean AND
+#not x	Boolean NOT
+#in, not in	Membership tests
+#is, is not	Identity tests
+#<, <=, >, >=, !=, ==	Comparisons
+#|	Bitwise OR
+#^	Bitwise XOR
+#&	Bitwise AND
+#<<, >>	Shifts
+#+, -	Addition and subtraction
+#*, /, %	Multiplication, Division and Remainder
+#+x, -x	Positive, Negative
+#~x	Bitwise NOT
+#**	Exponentiation
+#x.attribute	Attribute reference
+#x[index]	Subscription
+#x[index:index]	Slicing
+#f(arguments ...)	Function call
+#(expressions, ...)	Binding or tuple display
+#[expressions, ...]	List display
+#{key:datum, ...}	Dictionary display
+#`expressions, ...`	String conversion
+
 
 class DE_Base(metaclass=abc.ABCMeta):
     """DE_Base()
        Abstract base class to compose generic expressions.
        Concrete classes must implement the evaluate() method.
     """
+    PRIORITY = {
+        'DE_Const': 100000,
+        'DE_Name': 100000,
+        'DE_Or': 1,
+        'DE_And': 2,
+        'DE_Not': 3,
+        'DE_Contains': 4,
+        #'DE_Is': 5,
+        'DE_Lt': 6,
+        'DE_Le': 6,
+        'DE_Gt': 6,
+        'DE_Ge': 6,
+        'DE_Eq': 6,
+        'DE_Ne': 6,
+        'DE_Ne': 6,
+        #'DE_BitwiseOr': 7,
+        #'DE_BitwiseXOr': 8,
+        #'DE_BitwiseAnd': 9,
+        #'DE_LeftShift': 10,
+        #'DE_RightShift': 10,
+        'DE_Add': 11,
+        'DE_Sub': 11,
+        'DE_Mul': 12,
+        'DE_TrueDiv': 12,
+        'DE_FloorDiv': 12,
+        'DE_Mod': 12,
+        'DE_DivMod': 12,
+        'DE_Pos': 13,
+        'DE_Neg': 13,
+        #'DE_BitwiseNot': 14,
+        'DE_Pow': 15,
+        'DE_Call': 16,
+        'DE_Getitem': 17,
+        'DE_Getattr': 18,
+    }
 
     @abc.abstractmethod
     def evaluate(self):
         """evaluate() -> expression value"""
         pass
 
+    def expression(self):
+        """expression() -> python expression representation"""
+        return self.impl_expression_wrap(wrap=False)
+
+    def impl_expression_wrap(self, wrap):
+        """impl_expression_wrap(wrap) -> expression representation
+           If 'wrap' puts output in parenthesis.
+        """
+        return self.wrap(expression=self.impl_expression(), wrap=wrap)
+
     @abc.abstractmethod
-    def canonical(self):
-        """canonical() -> canonical representation"""
+    def impl_expression(self):
+        """impl_expression() -> expression representation."""
         pass
+
+    def wrap(self, expression, wrap):
+        """wrap(expression, wrap) -> [wrapped] expression"""
+        if wrap:
+            return '(' + expression + ')'
+        else:
+            return expression
+
     # unary mathematical operators:
     def __abs__(self):
         return DE_Abs(self)
@@ -169,6 +249,9 @@ class DE_Base(metaclass=abc.ABCMeta):
     def __rge__(self, other):
         return DE_Lt(self, other)
 
+    def __contains__(self, other):
+        return DE_Contains(self, other)
+
     # Call:
     def __call__(self, *p_args, **n_args):
         return DE_Call(self, p_args, n_args)
@@ -191,12 +274,18 @@ class DE_Base(metaclass=abc.ABCMeta):
             return operand
 
     @classmethod
-    def canonical_operand(cls, operand):
-        """canonical_operand() -> operand value"""
+    def impl_expression_operand(cls, operand, wrap=None):
+        """impl_expression_operand(operand, wrap=None) -> operand value"""
         if isinstance(operand, DE_Base):
-            return operand.canonical()
+            if wrap is None:
+                wrap = operand.priority() < cls.priority()
+            return operand.impl_expression_wrap(wrap=wrap)
         else:
             return repr(operand)
+
+    @classmethod
+    def priority(cls):
+        return cls.PRIORITY.get(cls.__name__, 1000)
 
 class DE_Const(DE_Base):
     """DE_Const(value)
@@ -209,8 +298,26 @@ class DE_Const(DE_Base):
     def evaluate(self):
         return self.evaluate_operand(self.value)
 
-    def canonical(self):
-        return self.canonical_operand(self.value)
+    def impl_expression(self):
+        return self.impl_expression_operand(self.value)
+
+class DE_Name(DE_Base):
+    """DE_Name(name)
+       DE_Name name expression.
+    """
+
+    def __init__(self, name, globals_d=None):
+        self.name = name
+        self.globals_d = globals_d
+
+    def evaluate(self):
+        globals_d = self.globals_d
+        if globals_d is None:
+            globals_d = globals()
+        return globals_d[self.name]
+
+    def impl_expression(self):
+        return self.name
 
 class DE_UnaryOperator(DE_Base):
     """DE_UnaryOperator(operand)
@@ -237,8 +344,8 @@ class DE_Abs(DE_UnaryOperator):
     def unary_operation(self, value):
         return abs(value)
 
-    def canonical(self):
-        return "abs({})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "abs({})".format(self.impl_expression_operand(self.operand, wrap=False))
 
 
 class DE_Pos(DE_UnaryOperator):
@@ -247,8 +354,8 @@ class DE_Pos(DE_UnaryOperator):
     def unary_operation(self, value):
         return +value
 
-    def canonical(self):
-        return "(+{})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "+{}".format(self.impl_expression_operand(self.operand))
 
 
 class DE_Neg(DE_UnaryOperator):
@@ -257,8 +364,8 @@ class DE_Neg(DE_UnaryOperator):
     def unary_operation(self, value):
         return -value
 
-    def canonical(self):
-        return "(-{})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "-{}".format(self.impl_expression_operand(self.operand))
 
 
 class DE_Len(DE_UnaryOperator):
@@ -267,8 +374,8 @@ class DE_Len(DE_UnaryOperator):
     def unary_operation(self, value):
         return len(value)
 
-    def canonical(self):
-        return "len({})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "len({})".format(self.impl_expression_operand(self.operand, wrap=False))
 
 
 class DE_Str(DE_UnaryOperator):
@@ -277,8 +384,8 @@ class DE_Str(DE_UnaryOperator):
     def unary_operation(self, value):
         return str(value)
 
-    def canonical(self):
-        return "str({})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "str({})".format(self.impl_expression_operand(self.operand, wrap=False))
 
 
 class DE_Repr(DE_UnaryOperator):
@@ -287,17 +394,18 @@ class DE_Repr(DE_UnaryOperator):
     def unary_operation(self, value):
         return repr(value)
 
-    def canonical(self):
-        return "repr({})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "repr({})".format(self.impl_expression_operand(self.operand, wrap=False))
 
 
 class DE_Not(DE_UnaryOperator):
     """'not' unary operator."""
+
     def unary_operation(self, value):
         return not value
 
-    def canonical(self):
-        return "(not {})".format(self.canonical_operand(self.operand))
+    def impl_expression(self):
+        return "not {}".format(self.impl_expression_operand(self.operand))
 
 
 class DE_Call(DE_UnaryOperator):
@@ -311,13 +419,13 @@ class DE_Call(DE_UnaryOperator):
     def unary_operation(self, value):
         return value(*self.p_args, **self.n_args)
 
-    def canonical(self):
+    def impl_expression(self):
         l_args = []
         if self.p_args:
             l_args.extend(repr(a) for a in self.p_args)
         if self.n_args:
             l_args.extend("{}={!r}".format(k, v) for k, v in self.n_args)
-        return "{}({})".format(self.canonical_operand(self.operand), ', '.join(l_args))
+        return "{}({})".format(self.impl_expression_operand(self.operand), ', '.join(l_args))
 
 
 class DE_BinaryOperator(DE_Base):
@@ -345,11 +453,11 @@ class DE_BinaryOperator(DE_Base):
         return "{}(left_operand={!r}, right_operand={!r})".format(
             self.__class__.__name__, self.left_operand, self.right_operand)
 
-    def canonical(self):
-        return "({} {} {})".format(
-            self.canonical_operand(self.left_operand),
+    def impl_expression(self):
+        return "{} {} {}".format(
+            self.impl_expression_operand(self.left_operand),
             self.BINOP_SYMBOL,
-            self.canonical_operand(self.right_operand))
+            self.impl_expression_operand(self.right_operand))
        
 
 class DE_Add(DE_BinaryOperator):
@@ -407,10 +515,10 @@ class DE_DivMod(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
 
-    def canonical(self):
+    def impl_expression(self):
         return "divmod({}, {})".format(
-            self.canonical_operand(self.left_operand),
-            self.canonical_operand(self.right_operand))
+            self.impl_expression_operand(self.left_operand, wrap=False),
+            self.impl_expression_operand(self.right_operand, wrap=False))
        
 
 class DE_Pow(DE_BinaryOperator):
@@ -475,10 +583,10 @@ class DE_And(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return left_value and right_value
 
-    def canonical(self):
-        return "And({}, {})".format(
-            self.canonical_operand(self.left_operand),
-            self.canonical_operand(self.right_operand))
+    def expression(self):
+        return "{} and {}".format(
+            self.impl_expression_operand(self.left_operand),
+            self.impl_expression_operand(self.right_operand))
        
 
 class DE_Or(DE_BinaryOperator):
@@ -487,23 +595,25 @@ class DE_Or(DE_BinaryOperator):
     def binary_operation(self, left_value, right_value):
         return left_value or right_value
 
-    def canonical(self):
-        return "Or({}, {})".format(
-            self.canonical_operand(self.left_operand),
-            self.canonical_operand(self.right_operand))
+    def expression(self):
+        return "{} or {}".format(
+            self.impl_expression_operand(self.left_operand),
+            self.impl_expression_operand(self.right_operand))
        
 
-class DE_Getattr(DE_BinaryOperator):
+class DE_Getattr(DE_UnaryOperator):
     """'getattr' binary operator."""
+    def __init__(self, operand, attr_name):
+        super().__init__(operand)
+        self.attr_name = attr_name
 
-    def binary_operation(self, left, right):
-        return getattr(left, right)
+    def unary_operation(self, operand):
+        return getattr(operand, self.attr_name)
 
-    def canonical(self):
-        left = self.canonical_operand(self.left_operand)
-        right = self.canonical_operand(self.right_operand)
-        fmt = "({}.{})"
-        return fmt.format(left, right)
+    def impl_expression(self):
+        operand = self.impl_expression_operand(self.operand)
+        fmt = "{}.{}"
+        return fmt.format(operand, self.attr_name)
        
 
 class DE_Getitem(DE_BinaryOperator):
@@ -512,9 +622,27 @@ class DE_Getitem(DE_BinaryOperator):
     def binary_operation(self, left, right):
         return left[right]
 
-    def canonical(self):
-        left = self.canonical_operand(self.left_operand)
-        right = self.canonical_operand(self.right_operand)
-        fmt = "{}[{}])"
+    def impl_expression(self):
+        left = self.impl_expression_operand(self.left_operand)
+        right = self.impl_expression_operand(self.right_operand, wrap=False)
+        fmt = "{}[{}]"
         return fmt.format(left, right)
        
+class DE_Contains(DE_BinaryOperator):
+    """'in' binary operator."""
+
+    def binary_operation(self, left_value, right_value):
+        return left_value in right_value
+
+    def impl_expression(self):
+        return "{} in {}".format(
+            self.impl_expression_operand(self.left_operand),
+            self.impl_expression_operand(self.right_operand))
+       
+
+class DE_Or(DE_BinaryOperator):
+    """'or' binary operator."""
+
+    def binary_operation(self, left_value, right_value):
+        return left_value or right_value
+

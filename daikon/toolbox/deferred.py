@@ -31,6 +31,7 @@ __all__ = [
 ]
 
 from .unrepr import unrepr
+from .deferred_expression import DE_Base
 from . import serializer
 
 
@@ -49,6 +50,8 @@ class Deferred(object):
     """
 
     def __init__(self, expression, globals_d=None):
+        if isinstance(expression, DE_Base):
+            expression = expression.expression()
         self.expression = expression
         if globals_d is None:
             globals_d = {}
