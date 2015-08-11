@@ -34,6 +34,10 @@ from common.fixtures import dictionary, \
 
 from daikon.config import Config
 from daikon.schema import Schema
+from daikon.validator import Int, IntOption
+from daikon.validator.error import OptionValidationError, \
+    MinValidationError, MaxValidationError
+from daikon.toolbox.deferred import Deferred
 
 from daikon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, DaikonSerializer, PickleSerializer
@@ -110,3 +114,60 @@ def test_Schema_get_serializer_ConfigObj():
 
 def test_Schema_get_serializer_Pickle():
     assert isinstance(Schema.get_serializer("Pickle"), PickleSerializer)
+
+@pytest.fixture
+def deferred_schema():
+    schema = Schema()
+    schema['a'] = Int()
+    schema['b'] = Int()
+    schema['c'] = IntOption(values=(Deferred("SECTION['a']"), Deferred("SECTION['b']")))
+    schema['sub'] = {}
+    schema['sub']['d'] = Int(min=Deferred("ROOT['a']"), max=Deferred("ROOT['b']"))
+    schema['sub']['e'] = Int(default=Deferred("ROOT['a'] + ROOT['b'] + SECTION['d']"))
+    return schema
+
+@pytest.fixture
+def deferred_config():
+    config = Config()
+    config['a'] = 10
+    config['b'] = 20
+    config['c'] = 10
+    config['sub'] = {}
+    config['sub']['d'] = 18
+    config['sub']['e'] = -100
+    return config
+
+def test_Schema_deferred_pass(deferred_schema, deferred_config):
+    deferred_schema.validate_section(deferred_config)
+    assert deferred_config['c'] == 10
+    assert deferred_config['sub']['e'] == -100
+
+def test_Schema_deferred_default(deferred_schema, deferred_config):
+    del deferred_config['sub']['e']
+    deferred_schema.validate_section(deferred_config)
+    assert deferred_config['c'] == 10
+    assert deferred_config['sub']['e'] == 48
+    deferred_config['b'] = -10
+    del deferred_config['sub']['e']
+    deferred_schema.validate_section(deferred_config)
+    assert deferred_config['sub']['e'] == 18
+
+def test_Schema_deferred_err_option(deferred_schema, deferred_config):
+    deferred_config['c'] = 15
+    with pytest.raises(OptionValidationError) as exc_info:
+        deferred_schema.validate_section(deferred_config, raise_on_error=True)
+    assert str(exc_info.value) == "c=15: 15 is not a valid option value; valid values are: (10, 20)"
+
+def test_Schema_deferred_err_min(deferred_schema, deferred_config):
+    deferred_config['a'] = 19
+    deferred_config['c'] = deferred_config['b']
+    with pytest.raises(MinValidationError) as exc_info:
+        deferred_schema.validate_section(deferred_config, raise_on_error=True)
+    assert str(exc_info.value) == "sub.d=18: value 18 is lower than min 19"
+
+def test_Schema_deferred_err_max(deferred_schema, deferred_config):
+    deferred_config['b'] = 13
+    deferred_config['c'] = deferred_config['a']
+    with pytest.raises(MaxValidationError) as exc_info:
+        deferred_schema.validate_section(deferred_config, raise_on_error=True)
+    assert str(exc_info.value) == "sub.d=18: value 18 is greater than max 13"

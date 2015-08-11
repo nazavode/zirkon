@@ -46,7 +46,7 @@ class CheckOption(CheckType):
             if key_value.value not in values:
                 raise OptionValidationError(
                     key_value,
-                    "{!r} is not a valid option value".format(key_value.value))
+                    "{!r} is not a valid option value; valid values are: ({})".format(key_value.value, ', '.join(repr(v) for v in values)))
 
     def self_validate(self, validator):
         for value in self.values:
