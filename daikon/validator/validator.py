@@ -73,7 +73,7 @@ class Validator(Registry):
            Validate a KeyValue object.
         """
         for check in self.checks:
-            check.do_check(key_value, section)
+            check.check(key_value, section)
         return key_value.value
 
     def __eq__(self, validator):

@@ -40,25 +40,10 @@ class Check(metaclass=abc.ABCMeta):
     def __init__(self):
         pass
 
-    def do_check(self, key_value, section):
-        """do_check(key_value, section)
-           Execute
-           * convert(key_value);
-           * check(key_value, section);
-        """
-        self.convert(key_value)
-        self.check(key_value, section)
-
     @abc.abstractmethod
     def check(self, key_value, section):
         """check(key_value, section)
            Run key/value check (can change key_value.value)
-        """
-        pass
-
-    def convert(self, key_value):
-        """convert(key_value)
-           Convert key/value (can change key_value.value)
         """
         pass
 
