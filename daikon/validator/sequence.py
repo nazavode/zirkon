@@ -46,7 +46,7 @@ class Sequence(Validator):
             actual_arguments[sub_prefix + argument_name] = argument_value
         return actual_arguments, objects
 
-    def validate_key_value(self, key_value, section):
+    def validate_key_value(self, key_value, section=None):
         super().validate_key_value(key_value, section)
         if key_value.defined and key_value.value:
             validated_item_values = []

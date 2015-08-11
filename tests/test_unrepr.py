@@ -36,8 +36,8 @@ def param(request):
     return request.param
 
 _bad_data = [
-    Parameters(string="-[3, 2]", expected=SyntaxError("cannot unrepr string '-[3, 2]': col 0: invalid operator UnaryOp followed by [3, 2]")),
-    Parameters(string="[3, -2, -()]", expected=SyntaxError("cannot unrepr string '[3, -2, -()]': col 8: invalid operator UnaryOp followed by ()")),
+    Parameters(string="-[3, 2]", expected=TypeError("bad operand type for unary -: 'list'")),
+    Parameters(string="[3, -2, -()]", expected=TypeError("bad operand type for unary -: 'tuple'")),
 ]
 
 @pytest.fixture(ids=[p.string for p in _bad_data], params=_bad_data)

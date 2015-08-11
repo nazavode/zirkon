@@ -297,15 +297,17 @@ class FlatMap(collections.abc.Mapping):
         if isinstance(dictionary, submap_class) and dictionary.dictionary is self.dictionary:
             return dictionary.prefix == self.prefix
         else:
-            for key, value in self.items():
-                if key not in dictionary:
+            # compare self vs dictionary
+            for s_key, s_value in self.items():
+                if s_key not in dictionary:
                     return False
-                if value != dictionary[key]:
+                if s_value != dictionary[s_key]:
                     return False
-            for key, value in dictionary.items():
-                if key not in self:
+            # compare dictionary vs self
+            for d_key, d_value in dictionary.items():
+                if d_key not in self:
                     return False
-                if self[key] != value:
+                if self[d_key] != d_value:
                     return False
             return True
 

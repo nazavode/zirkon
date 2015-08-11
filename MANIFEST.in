@@ -1,5 +1,5 @@
 include requirements/*.txt
-include docs/sphinx/source/conf.py
-include docs/sphinx/source/*.rst
-include docs/sphinx/source/getting-started/*.rst
-include docs/sphinx/source/img/*.jpg
+include docs/source/conf.py
+include docs/source/*.rst
+include docs/source/getting-started/*.rst
+include docs/source/img/*.jpg

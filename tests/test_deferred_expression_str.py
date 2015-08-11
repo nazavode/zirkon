@@ -5,9 +5,9 @@ import collections
 import pytest
 
 from daikon.toolbox.deferred_expression import \
-    DE_Base, \
-    DE_Repr, DE_Str, DE_And, DE_Or, DE_Not, \
-    DE_Const, DE_Len
+    DEBase, \
+    DERepr, DEStr, DEAnd, DEOr, DENot, \
+    DEConst, DELen
 
 
 
@@ -18,10 +18,10 @@ def sval1(request):
     return request.param
 
 _unary_str_operator = collections.OrderedDict()
-_unary_str_operator['Len'] = DE_Len
-_unary_str_operator['Str'] = DE_Str
-_unary_str_operator['Repr'] = DE_Repr
-_unary_str_operator['Not'] = DE_Not
+_unary_str_operator['Len'] = DELen
+_unary_str_operator['Str'] = DEStr
+_unary_str_operator['Repr'] = DERepr
+_unary_str_operator['Not'] = DENot
 @pytest.fixture(ids=tuple(_unary_str_operator.keys()), params=tuple(_unary_str_operator.values()))
 def sop1(request):
     return request.param
@@ -61,30 +61,30 @@ def smethod0(request):
 ###############################
 ## str unary:
 def test_str_unary(sop1, sval1):
-    e = sop1(DE_Const(sval1))
-    assert isinstance(e, DE_Base)
+    e = sop1(DEConst(sval1))
+    assert isinstance(e, DEBase)
     assert e.evaluate() == sop1(sval1)
     
 ## str binary:
 def test_str_binary_vl(sop2, sval2):
     l, r = sval2
-    e = sop2(DE_Const(l), r)
+    e = sop2(DEConst(l), r)
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vr(sop2, sval2):
     l, r = sval2
-    e = sop2(l, DE_Const(r))
+    e = sop2(l, DEConst(r))
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vlr(sop2, sval2):
     l, r = sval2
-    e = sop2(DE_Const(l), DE_Const(r))
+    e = sop2(DEConst(l), DEConst(r))
     assert e.evaluate() == sop2(l, r)
 
 ###############################
 def test_str_method0(smethod0, sval1):
     vm = getattr(sval1, smethod0)
-    e = DE_Const(sval1)
+    e = DEConst(sval1)
     em = getattr(e, smethod0)
     assert vm is not em
     emv = em().evaluate()
@@ -93,6 +93,6 @@ def test_str_method0(smethod0, sval1):
 def test_str_method_join():
     s = ', '
     l = ['a', ' b ', 'cde', '12']
-    e = DE_Const(s)
+    e = DEConst(s)
     em = e.join(l)
     assert s.join(l) == em.evaluate()

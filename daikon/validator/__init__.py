@@ -72,51 +72,52 @@ from ..toolbox.unrepr import unrepr
 from ..toolbox.deferred import Deferred
 
 
-### Validator codecs:
-text_serializer_module = getattr(serializer, 'text_serializer', None)
-if text_serializer_module is not None:
-    def _validator_text_encode(validator):
-        """_validator_text_encode(validator)
-           ConfigObj/Daikon encoder for Validator instances
-        """
-        return repr(validator)
+# Validator codecs:
+def _setup_codecs():
+    """_setup_codecs()
+       Setup codecs for validators.
+    """
+    _text_serializer_module = getattr(serializer, 'text_serializer', None)
+    if _text_serializer_module is not None:
+        def _validator_text_encode(validator):
+            """_validator_text_encode(validator)
+               ConfigObj/Daikon encoder for Validator instances
+            """
+            return repr(validator)
 
+        def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
+            """_validator_text_decode(validator_name, arguments)
+               ConfigObj/Daikon decoder for Validator instances
+            """
+            globals_d = Validator.class_dict()
+            globals_d['Deferred'] = Deferred
+            return unrepr(repr_data, globals_d)
 
-    def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
-        """_validator_text_decode(validator_name, arguments)
-           ConfigObj/Daikon decoder for Validator instances
-        """
-        gd = Validator.class_dict()
-        gd['Deferred'] = Deferred
-        return unrepr(repr_data, gd)
+        _text_serializer_module.TextSerializer.codec_catalog().add_codec(
+            class_=Validator,
+            encode=_validator_text_encode,
+            decode=_validator_text_decode,
+        )
 
+    _json_serializer_module = getattr(serializer, 'json_serializer', None)
+    if _json_serializer_module is not None:
+        def _validator_json_encode(validator):
+            """_validator_json_encode(validator)
+               JSON encoder for Validator instances
+            """
+            return validator.actual_arguments.copy()
 
-    text_serializer_module.TextSerializer.codec_catalog().add_codec(
-        class_=Validator,
-        encode=_validator_text_encode,
-        decode=_validator_text_decode,
-    )
+        def _validator_json_decode(validator_name, arguments):
+            """_validator_json_decode(validator_name, arguments)
+               JSON decoder for Validator instances
+            """
+            validator_class = Validator.get_class(validator_name)
+            return validator_class(**arguments)
 
-json_serializer_module = getattr(serializer, 'json_serializer', None)
-if json_serializer_module is not None:
-    def _validator_json_encode(validator):
-        """_validator_json_encode(validator)
-           JSON encoder for Validator instances
-        """
-        return validator.actual_arguments.copy()
+        _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
+            class_=Validator,
+            encode=_validator_json_encode,
+            decode=_validator_json_decode,
+        )
 
-
-    def _validator_json_decode(validator_name, arguments):
-        """_validator_json_decode(validator_name, arguments)
-           JSON decoder for Validator instances
-        """
-        validator_class = Validator.get_class(validator_name)
-        return validator_class(**arguments)
-
-
-    json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-        class_=Validator,
-        encode=_validator_json_encode,
-        decode=_validator_json_decode,
-    )
-
+_setup_codecs()

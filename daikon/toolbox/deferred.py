@@ -31,11 +31,11 @@ __all__ = [
 ]
 
 from .unrepr import unrepr
-from .deferred_expression import DE_Base
+from .deferred_expression import DEBase
 from . import serializer
 
 
-class Deferred(object):
+class Deferred(object):  # pylint: disable=R0903
     """Deferred(expression, globals_d=None)
        Deferred evaluation of expression. For instance:
        >>> lst = []
@@ -50,7 +50,7 @@ class Deferred(object):
     """
 
     def __init__(self, expression, globals_d=None):
-        if isinstance(expression, DE_Base):
+        if isinstance(expression, DEBase):
             expression = expression.expression()
         self.expression = expression
         if globals_d is None:
@@ -60,17 +60,17 @@ class Deferred(object):
         self.globals_d = globals_d
 
     def __call__(self, globals_d=None):
-        gd = self.globals_d.copy()
+        gdct = self.globals_d.copy()
         if globals_d:
-            gd.update(globals_d)
-        return unrepr(self.expression, globals_d=gd)
+            gdct.update(globals_d)
+        return unrepr(self.expression, globals_d=gdct)
 
     def __repr__(self):
         if self.globals_d is None:
-            g = ""
+            gtext = ""
         else:
-            g = ", globals_d={!r}".format(self.globals_d)
-        return "{}({!r}{})".format(self.__class__.__name__, self.expression, g)
+            gtext = ", globals_d={!r}".format(self.globals_d)
+        return "{}({!r}{})".format(self.__class__.__name__, self.expression, gtext)
 
     def __str__(self):
         return "{}({!r})".format(self.__class__.__name__, self.expression)
@@ -81,51 +81,51 @@ def deferred(expression, globals_d=None):
     return Deferred(expression=expression, globals_d=globals_d)
 
 
-### Deferred codecs:
-json_serializer_module = getattr(serializer, 'json_serializer', None)
-if json_serializer_module is not None:
-    def _deferred_json_encode(deferred_object):
-        """_deferred_json_encode(deferred)
-           JSON encoder for Validator instances
-        """
-        return {'expression': deferred_object.expression,
-                'globals_d': deferred_object.globals_d}
+# Deferred codecs:
+def _setup_codecs():
+    """_setup_codecs()
+       Setup codecs for validators.
+    """
+    _json_serializer_module = getattr(serializer, 'json_serializer', None)
+    if _json_serializer_module is not None:
+        def _deferred_json_encode(deferred_object):
+            """_deferred_json_encode(deferred)
+               JSON encoder for Validator instances
+            """
+            return {'expression': deferred_object.expression,
+                    'globals_d': deferred_object.globals_d}
 
+        def _deferred_json_decode(deferred_class_name, arguments):
+            """_deferred_json_decode(deferred_class_name, arguments)
+               JSON decoder for Deferred instances
+            """
+            assert deferred_class_name == Deferred.__name__
+            return Deferred(**arguments)
 
-    def _deferred_json_decode(deferred_class_name, arguments):
-        """_deferred_json_decode(deferred_class_name, arguments)
-           JSON decoder for Deferred instances
-        """
-        assert deferred_class_name == Deferred.__name__
-        return Deferred(**arguments)
+        _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
+            class_=Deferred,
+            encode=_deferred_json_encode,
+            decode=_deferred_json_decode,
+        )
 
+    _text_serializer_module = getattr(serializer, 'text_serializer', None)
+    if _text_serializer_module is not None:
+        def _deferred_text_encode(deferred_object):
+            """_deferred_text_encode(deferred)
+               ConfigObj/Daikon encoder for Validator instances
+            """
+            return repr(deferred_object)
 
-    json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-        class_=Deferred,
-        encode=_deferred_json_encode,
-        decode=_deferred_json_decode,
-    )
+        def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
+            """_deferred_text_decode(deferred_name, arguments)
+               ConfigObj/Daikon decoder for Validator instances
+            """
+            return unrepr(repr_data, {'Deferred': Deferred})
 
+        _text_serializer_module.TextSerializer.codec_catalog().add_codec(
+            class_=Deferred,
+            encode=_deferred_text_encode,
+            decode=_deferred_text_decode,
+        )
 
-text_serializer_module = getattr(serializer, 'text_serializer', None)
-if text_serializer_module is not None:
-    def _deferred_text_encode(deferred):
-        """_deferred_text_encode(deferred)
-           ConfigObj/Daikon encoder for Validator instances
-        """
-        return repr(deferred)
-
-
-    def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
-        """_deferred_text_decode(deferred_name, arguments)
-           ConfigObj/Daikon decoder for Validator instances
-        """
-        return unrepr(repr_data, {'Deferred': Deferred})
-
-
-    text_serializer_module.TextSerializer.codec_catalog().add_codec(
-        class_=Deferred,
-        encode=_deferred_text_encode,
-        decode=_deferred_text_decode,
-    )
-
+_setup_codecs()

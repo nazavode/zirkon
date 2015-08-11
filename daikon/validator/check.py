@@ -68,7 +68,7 @@ class Check(metaclass=abc.ABCMeta):
         """
         pass
 
-    def get_value(self, value, section):
+    def get_value(self, value, section):  # pylint: disable=R0201
         """get_value(value, section) -> value"""
         if section is not None and isinstance(value, Deferred):
             if section is not None:
@@ -77,4 +77,3 @@ class Check(metaclass=abc.ABCMeta):
                 globals_d = {}
             value = value(globals_d=globals_d)
         return value
-  

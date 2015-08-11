@@ -297,11 +297,13 @@ class Section(collections.abc.Mapping):
         if isinstance(section, Section):
             return compare_dicts(section.dictionary, self.dictionary)
         else:
+            # coompare self vs section
             for key, value in self.items():
                 if key not in section:
                     return False
                 if value != section[key]:
                     return False
+            # coompare section vs self
             for key, value in section.items():
                 if key not in self:
                     return False
