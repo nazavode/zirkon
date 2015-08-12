@@ -82,37 +82,42 @@ def test_Config(string_io, config, config_content):
     config.dump(stream=string_io)
     assert string_io.getvalue() == CONFIG_DUMP
 
-def test_Config_validate(string_io, config):
-    config.validate()
+def test_Config_self_validate(string_io, config):
+    config.self_validate()
 
-def test_Config_validate_default(string_io, config):
+def test_Config_self_validate_default(string_io, config):
     assert 'max_iterations' in config['parameters']
     assert config['parameters']['max_iterations'] == 80
     del config['parameters']['max_iterations']
     assert not 'max_iterations' in config['parameters']
-    config.validate()
+    config.self_validate()
     assert 'max_iterations' in config['parameters']
     assert config['parameters']['max_iterations'] == 100
 
-def test_Config_validate_error(string_io, config):
+def test_Config_self_validate_error(string_io, config):
+    print(config.schema)
     del config['parameters']['frequencies'][1:]
+    print(config.schema)
     assert len(config['parameters']['frequencies'])
     with pytest.raises(ConfigValidationError) as exc_info:
-        config.validate()
-    assert str(exc_info.value) == "validation error: ValidationSection(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
-    exc_info.value.validation_section.dump(string_io)
+        print(config.schema)
+        x = config.self_validate()
+        print(config.schema)
+        x.dump()
+    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
+    exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
     frequencies = MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)
 """
 
-def test_Config_validate_error_dump(string_io, config):
+def test_Config_self_validate_error_dump(string_io, config):
     del config['parameters']['frequencies'][1:]
     assert len(config['parameters']['frequencies'])
     with pytest.raises(ConfigValidationError) as exc_info:
         config.dump()
-    assert str(exc_info.value) == "validation error: ValidationSection(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
-    exc_info.value.validation_section.dump(string_io)
+    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
+    exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
     frequencies = MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)

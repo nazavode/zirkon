@@ -127,7 +127,7 @@ Additional validators can be used to manage keys unexpected keys found in valida
 - ``Ignore()``
   unexpected keys are silently ignored.
 
-Validation is performed by the Schema ``validation_section`` method; unless ``rase_on_error`` argument is set to True, it does not raise errors, that are instead stored on a ValidationSection object and then returned to the caller. 
+Validation is performed by the Schema ``validate`` method; unless ``rase_on_error`` argument is set to True, it does not raise errors, that are instead stored on a Validation object and then returned to the caller. 
 
 Validation changes the validated config; it can:
 - add keys (for missing keys with a default in the Schema)
@@ -149,8 +149,8 @@ By default the
 >>> config['a'] = 9
 >>> config['w'] = 1.1
 >>> config['sub'] = {'c': 'x'}
->>> validation_section = schema.validate_section(config)
->>> validation_section.dump()
+>>> validation = schema.validate(config)
+>>> validation.dump()
 [sub]
     c = MinLenValidationError("sub.c='x': value 'x' has length 1 than is lower than min_len 2",)
 d = UndefinedKeyValidationError('d=<undefined>: required value is missing',)
@@ -160,12 +160,12 @@ w = UnexpectedParameterValidationError("w=1.1: unexpected parameter 'w'",)
 >>> config['sub']['c'] = 'xxx'
 >>> config['d'] = 1.18
 >>> del config['w']
->>> validation_section = schema.validate_section(config)
->>> validation_section.dump()
+>>> validation = schema.validate(config)
+>>> validation.dump()
 >>>
 
-A schema can be added to the Config object; in this case it is automatically called on load/write, and it can be done by calling the ``Config.validate`` method:
+A schema can be added to the Config object; in this case it is automatically called on load/write, and it can be done by calling the ``Config.self_validate`` method:
 
 >>> config2 = Config(schema=schema, init=config) # automatic validation
->>> validation_section = config2.validate(raise_on_error=True)
->>> assert not validation_section
+>>> validation = config2.self_validate(raise_on_error=True)
+>>> assert not validation

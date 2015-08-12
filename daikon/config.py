@@ -34,13 +34,13 @@ from .toolbox.serializer import Serializer
 
 class ConfigValidationError(Exception):
     """ConfigValidationError()
-       Error in Config validation; the validation_section attribute contains the validation result.
+       Error in Config validation; the validation attribute contains the validation result.
     """
-    def __init__(self, validation_section, message=None):
+    def __init__(self, validation, message=None):
         if message is None:
-            message = "validation error: {}".format(validation_section)
+            message = "validation error: {}".format(validation)
         super().__init__(message)
-        self.validation_section = validation_section
+        self.validation = validation
 
 
 class Config(Section):
@@ -81,10 +81,9 @@ class Config(Section):
        >>>
     """
 
-    def __init__(self, init=None, *, dictionary=None, schema=None):
+    def __init__(self, init=None, *, dictionary=None, schema=None, validate=True):
         super().__init__(dictionary=dictionary, init=init)
-        self.schema = schema
-        self.validate()
+        self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):
         """set_schema(self, schema, *, validate)
@@ -92,18 +91,18 @@ class Config(Section):
         """
         self.schema = schema
         if validate:
-            self.validate()
+            self.self_validate()
 
-    def validate(self, raise_on_error=True):
-        """validate(self, raise_on_error=True)
-           Validate the config using the 'schema' attribute.
+    def self_validate(self, raise_on_error=True):
+        """self_validate(self, raise_on_error=True)
+           Validate the config itself using the 'schema' attribute.
         """
         if self.schema is not None:
-            validation_section = self.schema.validate_section(self, raise_on_error=False)
-            if raise_on_error and validation_section:
-                raise ConfigValidationError(validation_section)
+            validation = self.schema.validate(self, raise_on_error=False)
+            if raise_on_error and validation:
+                raise ConfigValidationError(validation=validation)
             else:
-                return validation_section
+                return validation
 
     @classmethod
     def get_serializer(cls, protocol):
@@ -122,7 +121,7 @@ class Config(Section):
         """to_string(protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
-        self.validate()
+        self.self_validate()
         serializer = self.get_serializer(protocol)
         return serializer.to_string(self)
 
@@ -130,7 +129,7 @@ class Config(Section):
         """to_stream(stream, protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
-        self.validate()
+        self.self_validate()
         serializer = self.get_serializer(protocol)
         return serializer.to_stream(self, stream)
 
@@ -138,12 +137,12 @@ class Config(Section):
         """to_file(filename, protocol)
            Serialize to file 'filename' according to 'protocol'.
         """
-        self.validate()
+        self.self_validate()
         serializer = self.get_serializer(protocol)
         return serializer.to_file(self, filename)
 
     def dump(self, stream=None, protocol="Daikon"):
-        self.validate()
+        self.self_validate()
         return super().dump(stream, protocol)
 
     @classmethod
@@ -182,7 +181,7 @@ class Config(Section):
         """
         self.clear()
         self.from_file(filename=filename, protocol=protocol, dictionary=self.dictionary)
-        self.validate()
+        self.self_validate()
 
     def write(self, filename, protocol):
         """write(filename, protocol)

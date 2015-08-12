@@ -28,6 +28,7 @@ __all__ = [
 
 from .section import Section
 from .validation_section import ValidationSection
+from .validation import Validation
 from .validator import Validator, ValidatorInstance
 from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
@@ -41,7 +42,7 @@ def _validate_parameter(*, validator, section, validation_section,
     """_validate_parameter(*, ...)
        Validates a parameter and uses the validation result to
        eventually change the parameter value.
-       Used to implement SchemaSection.impl_validate() method.
+       Used to implement SchemaSection.impl_validate(...) method.
     """
     value = key_value.value
     try:
@@ -84,7 +85,7 @@ class SchemaSection(Section):
             schema_validator = self.subsection_class()(dictionary=None,
                                                        unexpected_parameter_validator=ValidatorInstance(),
                                                        self_validate=False)
-            schema_validator.impl_validate(self, raise_on_error=True)
+            schema_validator.validate(section=self, raise_on_error=True)
 
     @classmethod
     def subsection_class(cls):
@@ -110,24 +111,27 @@ class SchemaSection(Section):
             raise TypeError("{!r} is not a Validator".format(validator))
         self._unexpected_parameter_validator = validator
 
-    def validate_section(self, section, *, raise_on_error=False):
-        """validate(section, *, raise_on_error=False) -> validation section
+    def validate(self, section, *, validation=None, raise_on_error=False):
+        """validate(section, *, validation=None, raise_on_error=False) -> validation object
            Validates 'section' and returns a ValidationSection with the found
            validation errors.
            If 'raise_on_error', the first validation error is fatal.
         """
-        return self.impl_validate(section, raise_on_error=raise_on_error)
+        if validation is None:
+            validation = Validation()
+        self.impl_validate(
+            section=section,
+            validation_section=validation,
+            raise_on_error=raise_on_error)
+        return validation
 
-    def impl_validate(self, section, *, raise_on_error=False, parent_fqname=''):
-        """impl_validate(section, *, raise_on_error=False, parent_fqname='') ->
-               validation section
+    def impl_validate(self, section, validation_section, *, raise_on_error=False, parent_fqname=''):
+        """impl_validate(section, validation_section, *, raise_on_error=False, parent_fqname='')
            Implementation of the validate method.
         """
-        validation_section = ValidationSection()
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
         self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
         self.impl_validate_parameters(section=section, validation_section=validation_section, **args)
-        return validation_section
 
     def impl_validate_subsections(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
         """impl_validate_subsections(...)
@@ -146,8 +150,10 @@ class SchemaSection(Section):
                 else:
                     subsection = section.add_section(subsection_name)
                 subsection_fqname = parent_fqname + subsection_name + '.'
-                sub_validation_section = schema_subsection.impl_validate(
+                sub_validation_section = ValidationSection()
+                schema_subsection.impl_validate(
                     subsection,
+                    validation_section=sub_validation_section,
                     raise_on_error=raise_on_error,
                     parent_fqname=subsection_fqname)
                 if sub_validation_section:
@@ -158,8 +164,10 @@ class SchemaSection(Section):
                 subsection_fqname = parent_fqname + subsection_name + '.'
                 schema_subsection = self.subsection_class()(
                     unexpected_parameter_validator=self.unexpected_parameter_validator)
-                sub_validation_section = schema_subsection.impl_validate(
+                sub_validation_section = ValidationSection()
+                schema_subsection.impl_validate(
                     section[subsection_name],
+                    validation_section=sub_validation_section,
                     raise_on_error=raise_on_error,
                     parent_fqname=subsection_fqname)
                 if sub_validation_section:

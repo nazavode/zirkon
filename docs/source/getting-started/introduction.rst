@@ -82,7 +82,7 @@ is simply a special Config having Validators as values:
 The validation result itself is a Config object having ValidationErrors
 as values.
 
- >>> validation = schema.validate_section(config)
+ >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
      y = MinLenValidationError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 6",)
@@ -112,7 +112,7 @@ Moreover, this can be used in validators:
 
 The ``min_len`` value of the ``Str`` validator depends on the value found for ``x`` (10 in this case):
 
- >>> validation = schema.validate_section(config)
+ >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
      y = MinLenValidationError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 8",)
