@@ -85,8 +85,8 @@ as values.
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 6",)
-     w = MissingRequiredParameterError('subsection.w=<undefined>: required value is missing',)
+     y = MinLengthError(key_value=KeyValue(key='subsection.y', value='alpha', defined=True), message="value 'alpha' has length 5 than is lower than min_len 6")
+     w = MissingRequiredParameterError(key_value=KeyValue(key='subsection.w', value=None, defined=False), message='required value is missing')
  >>>
 
 There list of available Validators can be easily extended.
@@ -115,6 +115,6 @@ The ``min_len`` value of the ``Str`` validator depends on the value found for ``
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 8",)
-     w = MissingRequiredParameterError('subsection.w=<undefined>: required value is missing',)
+     y = MinLengthError(key_value=KeyValue(key='subsection.y', value='alpha', defined=True), message="value 'alpha' has length 5 than is lower than min_len 8")
+     w = MissingRequiredParameterError(key_value=KeyValue(key='subsection.w', value=None, defined=False), message='required value is missing')
  >>>

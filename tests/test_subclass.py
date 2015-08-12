@@ -68,3 +68,13 @@ def _sorted_classes(classes):
 
 def test_subclasses(param):
     assert _sorted_classes(subclass.subclasses(param.class_, include_self=param.include_self, filter=param.filter)) == _sorted_classes(param.expected)
+
+def test_find_subclass_found():
+    assert subclass.find_subclass(A1, DA1.__name__) is DA1
+    assert subclass.find_subclass(A1, DA2.__name__) is DA2
+
+def test_find_subclass_not_found():
+    assert subclass.find_subclass(A1, 'DC1') is None
+
+def test_find_subclass_not_found():
+    assert subclass.find_subclass(A1, A0.__name__) is None

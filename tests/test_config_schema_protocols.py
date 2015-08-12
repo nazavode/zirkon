@@ -22,24 +22,27 @@ import io
 
 import pytest
 
-from common.fixtures import simple_config_content, \
-                            simple_schema_content, \
-                            tmp_text_file
+from common.fixtures import protocol, \
+    simple_config_content, simple_schema_content, \
+    simple_section_content, simple_validation, tmp_text_file
 
 from daikon.config import Config
 from daikon.schema import Schema
-from daikon.toolbox.dictutils import compare_dicts
+from daikon.validation import Validation
+from daikon.toolbox.dictutils import compare_dicts, transform
 from daikon.toolbox.serializer import Serializer
 
-@pytest.fixture(params=tuple(Serializer.get_class_tags()))
-def protocol(request):
-    return request.param
-
 Parameters = collections.namedtuple('Parameters', ('config_class', 'config_content'))
+
+validation = simple_validation(
+    simple_schema_content=simple_schema_content(),
+    simple_section_content=simple_section_content(),
+)
 
 _config_parameters = [
     Parameters(config_class=Config, config_content=simple_config_content()),
     Parameters(config_class=Schema, config_content=simple_schema_content()),
+    Parameters(config_class=Validation, config_content=validation),
 ]
 @pytest.fixture(params=_config_parameters, ids=[c.config_class.__name__ for c in _config_parameters])
 def parameters(request):
@@ -49,7 +52,21 @@ def test_read_write(protocol, parameters, tmp_text_file):
     config_class = parameters.config_class
     config_content = parameters.config_content
     cs = config_class(config_content)
+
+    print(":::", config_class)
+    cs.dump()
+
     cs.write(tmp_text_file.name, protocol)
     cs2 = config_class()
     cs2.read(tmp_text_file.name, protocol)
-    assert compare_dicts(cs, cs2)
+
+    print("::: reloaded:")
+    cs2.dump()
+
+    if config_class == Validation:
+        tcs = transform(cs, value_transform=str, dict_factory=dict)
+        tcs2 = transform(cs2, value_transform=str, dict_factory=dict)
+        print("===", type(tcs), type(tcs2))
+        assert tcs == tcs2
+    else:
+        assert compare_dicts(cs, cs2)

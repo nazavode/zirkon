@@ -23,6 +23,7 @@ config.toolbox.subclass
 __author__ = "Simone Campagna"
 __all__ = [
     'subclasses',
+    'find_subclass',
 ]
 
 
@@ -36,3 +37,13 @@ def subclasses(class_, *, include_self=False, filter=None):  # pylint: disable=W
             yield class_
     for subclass in class_.__subclasses__():  # pylint: disable=E1101
         yield from subclasses(subclass, include_self=True, filter=filter)
+
+
+def find_subclass(class_, class_name, *, include_self=False, filter=None):  # pylint: disable=W0622
+    """find_subclass(class_, class_name, *, include_self=False, filter=lambda : True) -> iterator
+       Find a subclass of 'class_' whose name is 'class_name'. Return the found class, or None.
+    """
+    for subclass in subclasses(class_=class_, include_self=include_self, filter=filter):  # pylint: disable=W0622
+        if subclass.__name__ == class_name:
+            return subclass
+    return None

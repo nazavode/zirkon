@@ -10,4 +10,5 @@
 
     introduction
     first-steps
+    miscellanea
 

@@ -45,7 +45,11 @@ class KeyValidationError(Exception):
 
     def __init__(self, key_value, message):
         self.key_value = key_value
+        self.message = message
         super().__init__("{}: {}".format(key_value, message))
+
+    def __reduce__(self):
+        return (type(self), (self.key_value, self.message))
 
 
 class InvalidContentError(KeyValidationError):

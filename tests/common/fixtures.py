@@ -20,12 +20,14 @@ __all__ = [
     'string_io',
     'generic_dictionary',
     'dictionary',
+    'protocol',
     'simple_config_content',
     'simple_section',
     'simple_config',
     'simple_schema',
     'simple_schema_content',
     'simple_section_content',
+    'simple_validation',
     'tmp_text_file',
     'tmp_raw_file',
     'SIMPLE_SECTION_DUMP',
@@ -49,6 +51,11 @@ from daikon.section import Section
 from daikon.config import Config
 from daikon.schema import Schema
 from daikon.validator import Int, Str, StrOption, Float, FloatTuple
+from daikon.toolbox.serializer import Serializer
+
+@pytest.fixture(params=tuple(Serializer.get_class_tags()))
+def protocol(request):
+    return request.param
 
 @pytest.fixture
 def string_io():
@@ -274,3 +281,15 @@ a = Int(min=1)
 
 SIMPLE_SCHEMA_DAIKON_SERIALIZATION = SIMPLE_SCHEMA_DUMP
 
+###
+@pytest.fixture
+def simple_validation(simple_schema_content, simple_section_content):
+    schema = Schema(simple_schema_content)
+    simple_section_content['a'] = -10
+    simple_section_content['sub']['sa'] = 100.3
+    simple_section_content['sub']['sb'] = "abc"
+    simple_section_content['sub']['sc'] = True
+    simple_section_content['sub']['subsub']['ssx'] = "omega"
+    simple_section_content['sub']['subsub']['ssy'] = []
+    config = Config(simple_section_content)
+    return schema.validate(config)

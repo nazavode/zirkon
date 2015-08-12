@@ -59,3 +59,11 @@ def test_compare_dicts_no_1():
     dct1 = {'a': 10, 'b': {'x': 1, 'y': {'r': 222}, 'z': 3}, 'c': 3}
     assert not dictutils.compare_dicts(dct0, dct1)
     assert not dictutils.compare_dicts(dct1, dct0)
+
+def test_transform_0():
+    dct0 = {'a': 10, 'b': collections.OrderedDict([('x', 1), ('z', 3)]), 'c': 3}
+    dctr = dictutils.transform(dct0, value_transform=str, key_transform=lambda x: '_' + x)
+    assert type(dct0) is type(dctr)
+    assert type(dct0['b']) is type(dctr['_b'])
+    assert str(dct0['a']) == dctr['_a']
+    assert str(dct0['b']['x']) == dctr['_b']['_x']

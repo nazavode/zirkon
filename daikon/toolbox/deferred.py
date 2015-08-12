@@ -33,6 +33,7 @@ __all__ = [
 from .unrepr import unrepr
 from .deferred_expression import DEBase
 from . import serializer
+from .subclass import find_subclass
 
 
 class Deferred(object):  # pylint: disable=R0903
@@ -99,8 +100,10 @@ def _setup_codecs():
             """_deferred_json_decode(deferred_class_name, arguments)
                JSON decoder for Deferred instances
             """
-            assert deferred_class_name == Deferred.__name__
-            return Deferred(**arguments)
+            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
+            if deferred_class is None:
+                raise NameError("undefined Deferred class {}".format(deferred_class_name))
+            return deferred_class(**arguments)
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
             class_=Deferred,

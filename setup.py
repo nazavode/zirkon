@@ -64,7 +64,6 @@ if __name__ == "__main__":
             if '__init__.py' in filenames:
                 rdirpath = os.path.relpath(dirpath, DIRNAME)
                 packages.append(os.path.normpath(rdirpath).replace(os.sep, '.'))
-    print(packages)
     
     # search requirement files
     data_files = []
@@ -78,7 +77,6 @@ if __name__ == "__main__":
             for fpath in glob.glob(os.path.join(DIRNAME, data_dirname, pattern)):
                 files.append(os.path.relpath(fpath, DIRNAME))
         data_files.append((data_dirname, files))
-    print(data_files)
     
     setup(
         name="daikon",

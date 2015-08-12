@@ -59,3 +59,27 @@ def compare_dicts(dct0, dct1):
     return stddct0 == stddct1
 
 
+def transform(dct, *, key_transform=None, value_transform=None, dict_factory=None):
+    """transform(dct, key_transform=None, value_transform=None, dict_factory=None) -> transformed dict"""
+
+    if key_transform is None:
+        key_transform = lambda key: key
+    if value_transform is None:
+        value_transform = lambda value: value
+    if dict_factory is None:
+        use_dict_factory = type(dct)
+    else:
+        use_dict_factory = dict_factory
+    resdct = use_dict_factory()
+    for key, value in dct.items():
+        key = key_transform(key)
+        if isinstance(value, collections.Mapping):
+            resdct[key] = transform(
+                value,
+                key_transform=key_transform,
+                value_transform=value_transform,
+                dict_factory=dict_factory)
+        else:
+            resdct[key] = value_transform(value)
+    return resdct
+
