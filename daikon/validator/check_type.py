@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 from .check import Check
-from .error import TypeValidationError
+from .error import InvalidTypeError
 
 
 class CheckType(Check):
@@ -44,7 +44,7 @@ class CheckType(Check):
             if self.SECONDARY_TYPES and isinstance(value, self.SECONDARY_TYPES):
                 key_value.value = self.TYPE(value)
             else:
-                raise TypeValidationError(key_value, "invalid type {} - expected type is {}".format(
+                raise InvalidTypeError(key_value, "invalid type {} - expected type is {}".format(
                     type(value).__name__,
                     self.TYPE.__name__,
                 ))

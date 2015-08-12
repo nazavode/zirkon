@@ -11,7 +11,7 @@ from daikon.validator.error import OptionValidationError, \
                                    MaxValidationError, \
                                    MinLenValidationError, \
                                    MaxLenValidationError, \
-                                   TypeValidationError, \
+                                   InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.int_validators import IntList, IntTuple
 from daikon.validator.float_validators import FloatList, FloatTuple
@@ -95,11 +95,11 @@ def test_basic(parameters):
     assert len(seq) == 0
     v = iv.validate(key='alpha', defined=True, value=seq)
     assert v is seq
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         v = iv.validate(key='alpha', defined=True, value=parameters.vscalar)
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         v = iv.validate(key='alpha', defined=True, value=parameters.oseq(m=3))
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         v = iv.validate(key='alpha', defined=True, value=parameters.bseq(m=3))
     with pytest.raises(MissingRequiredParameterError):
         v = iv.validate(key='alpha', defined=False, value=None)
@@ -122,15 +122,15 @@ def test_default(parameters):
         assert v2 == dseq
 
 def test_bad_default_type_scalar(parameters):
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = parameters.vclass(default='ten')
 
 def test_bad_default_type_sequence(parameters):
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = parameters.vclass(default=parameters.oseq(m=3))
 
 def test_bad_default_item_type(parameters):
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = parameters.vclass(default=parameters.bseq(m=3))
 
 def test_default_min_len(parameters):

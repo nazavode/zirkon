@@ -7,7 +7,7 @@ import pytest
 
 from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
-                                   TypeValidationError, \
+                                   InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.float_validators import Float
 
@@ -20,7 +20,7 @@ def test_basic():
     v = fv.validate(key='alpha', defined=True, value=2)
     assert isinstance(v, float)
     assert v == 2.0
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         v = fv.validate(key='alpha', defined=True, value='2.0')
     with pytest.raises(MissingRequiredParameterError):
         v = fv.validate(key='alpha', defined=False, value=None)
@@ -36,15 +36,15 @@ def test_default():
     assert v == 3.2
 
 def test_bad_default_type():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         fv = Float(default='ten')
 
 def test_bad_min_type():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = Float(min="abc")
 
 def test_bad_max_type():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = Float(max="abc")
 
 def test_default_min():

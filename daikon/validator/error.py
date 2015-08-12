@@ -25,7 +25,7 @@ __author__ = "Simone Campagna"
 __all__ = [
     'ValidationError',
     'MissingRequiredParameterError',
-    'TypeValidationError',
+    'InvalidTypeError',
     'MinValidationError',
     'MaxValidationError',
     'MinLenValidationError',
@@ -51,8 +51,8 @@ class MissingRequiredParameterError(ValidationError):
     pass
 
 
-class TypeValidationError(ValidationError):
-    """RangeValidationError()
+class InvalidTypeError(ValidationError):
+    """InvalidTypeError()
     """
     pass
 

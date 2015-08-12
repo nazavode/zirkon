@@ -7,7 +7,7 @@ import pytest
 
 from daikon.validator.error import MinValidationError, \
                                    MaxValidationError, \
-                                   TypeValidationError, \
+                                   InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.int_validators import Int
 
@@ -17,7 +17,7 @@ def test_basic():
     assert v == 2
     v = iv.validate(key='alpha', defined=True, value=-2000)
     assert v == -2000
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         v = iv.validate(key='alpha', defined=True, value=2.0)
     with pytest.raises(MissingRequiredParameterError):
         v = iv.validate(key='alpha', defined=False, value=None)
@@ -32,15 +32,15 @@ def test_default():
     assert v == 3
 
 def test_bad_default_type():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = Int(default='ten')
 
 def test_bad_default_min():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = Int(min=4.5)
 
 def test_bad_default_max():
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = Int(max=4.5)
 
 def test_default_min():

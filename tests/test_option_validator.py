@@ -7,7 +7,7 @@ import os
 import pytest
 
 from daikon.validator.error import OptionValidationError, \
-                                   TypeValidationError
+                                   InvalidTypeError
 from daikon.validator.int_validators import IntOption
 from daikon.validator.float_validators import FloatOption
 from daikon.validator.str_validators import StrOption
@@ -59,5 +59,5 @@ def test_basic(parameters):
 
 def test_bad_option_value(parameters):
     invalid_values = parameters.values + (parameters.invalid_option, )
-    with pytest.raises(TypeValidationError):
+    with pytest.raises(InvalidTypeError):
         iv = parameters.validator_class(values=invalid_values)

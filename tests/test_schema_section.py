@@ -32,7 +32,7 @@ from daikon.validator import Int, Str, \
     FloatTuple, StrOption
 from daikon.validator.ignore import Ignore
 from daikon.validator.remove import Remove
-from daikon.validator.error import TypeValidationError, \
+from daikon.validator.error import \
     OptionValidationError, UnexpectedParameterValidationError
 
 
