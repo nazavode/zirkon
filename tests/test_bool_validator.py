@@ -6,7 +6,7 @@ import os
 import pytest
 
 from daikon.validator.error import TypeValidationError, \
-                                   UndefinedKeyValidationError
+                                   MissingRequiredParameterError
 from daikon.validator.bool_validators import Bool
 
 def test_basic():
@@ -23,7 +23,7 @@ def test_basic():
        v = bv.validate(key='alpha', defined=True, value=1.0)
     with pytest.raises(TypeValidationError):
        v = bv.validate(key='alpha', defined=True, value='True')
-    with pytest.raises(UndefinedKeyValidationError):
+    with pytest.raises(MissingRequiredParameterError):
         v = bv.validate(key='alpha', defined=False, value=None)
 
 def test_default():

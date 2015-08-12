@@ -24,7 +24,7 @@ ValidationError classes
 __author__ = "Simone Campagna"
 __all__ = [
     'ValidationError',
-    'UndefinedKeyValidationError',
+    'MissingRequiredParameterError',
     'TypeValidationError',
     'MinValidationError',
     'MaxValidationError',
@@ -45,8 +45,8 @@ class ValidationError(Exception):
         super().__init__("{}: {}".format(key_value, message))
 
 
-class UndefinedKeyValidationError(ValidationError):
-    """UndefinedValidationError()
+class MissingRequiredParameterError(ValidationError):
+    """MissingRequiredParameterError()
     """
     pass
 

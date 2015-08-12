@@ -12,7 +12,7 @@ from daikon.validator.error import OptionValidationError, \
                                    MinLenValidationError, \
                                    MaxLenValidationError, \
                                    TypeValidationError, \
-                                   UndefinedKeyValidationError
+                                   MissingRequiredParameterError
 from daikon.validator.int_validators import IntList, IntTuple
 from daikon.validator.float_validators import FloatList, FloatTuple
 from daikon.validator.str_validators import StrList, StrTuple
@@ -101,7 +101,7 @@ def test_basic(parameters):
         v = iv.validate(key='alpha', defined=True, value=parameters.oseq(m=3))
     with pytest.raises(TypeValidationError):
         v = iv.validate(key='alpha', defined=True, value=parameters.bseq(m=3))
-    with pytest.raises(UndefinedKeyValidationError):
+    with pytest.raises(MissingRequiredParameterError):
         v = iv.validate(key='alpha', defined=False, value=None)
 
 def test_default(parameters):
