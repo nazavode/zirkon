@@ -24,15 +24,18 @@ ValidationError classes
 __author__ = "Simone Campagna"
 __all__ = [
     'ValidationError',
+    'InvalidContentError',
     'MissingRequiredParameterError',
+    'UnexpectedSectionError',
+    'UnexpectedParameterError',
     'InvalidTypeError',
-    'MinValidationError',
-    'MaxValidationError',
-    'MinLenValidationError',
-    'MaxLenValidationError',
-    'OptionValidationError',
-    'UnexpectedSectionValidationError',
-    'UnexpectedParameterValidationError',
+    'InvalidValueError',
+    'MinValueError',
+    'MaxValueError',
+    'OptionValueError',
+    'InvalidLengthError',
+    'MinLengthError',
+    'MaxLengthError',
 ]
 
 
@@ -45,8 +48,8 @@ class ValidationError(Exception):
         super().__init__("{}: {}".format(key_value, message))
 
 
-class MissingRequiredParameterError(ValidationError):
-    """MissingRequiredParameterError()
+class InvalidContentError(ValidationError):
+    """InvalidContentError()
     """
     pass
 
@@ -57,44 +60,62 @@ class InvalidTypeError(ValidationError):
     pass
 
 
-class MinValidationError(ValidationError):
-    """MinValidationError()
+class InvalidValueError(ValidationError):
+    """InvalidValueError()
     """
     pass
 
 
-class MaxValidationError(ValidationError):
-    """MaxValidationError()
+class MissingRequiredParameterError(InvalidContentError):
+    """MissingRequiredParameterError()
     """
     pass
 
 
-class MinLenValidationError(ValidationError):
-    """MinLenValidationError()
+class UnexpectedSectionError(InvalidContentError):
+    """UnexpectedSectionError()
     """
     pass
 
 
-class MaxLenValidationError(ValidationError):
-    """MaxLenValidationError()
+class UnexpectedParameterError(InvalidContentError):
+    """UnexpectedParameterError()
     """
     pass
 
 
-class OptionValidationError(ValidationError):
-    """OptionValidationError()
+class MinValueError(InvalidValueError):
+    """MinValueError()
     """
     pass
 
 
-class UnexpectedSectionValidationError(ValidationError):
-    """UnexpectedSectionValidationError()
+class MaxValueError(InvalidValueError):
+    """MaxValueError()
     """
     pass
 
 
-class UnexpectedParameterValidationError(ValidationError):
-    """UnexpectedParameterValidationError()
+class OptionValueError(InvalidValueError):
+    """OptionValueError()
+    """
+    pass
+
+
+class InvalidLengthError(ValidationError):
+    """InvalidLengthError()
+    """
+    pass
+
+
+class MinLengthError(InvalidLengthError):
+    """MinLengthError()
+    """
+    pass
+
+
+class MaxLengthError(InvalidLengthError):
+    """MaxLengthError()
     """
     pass
 

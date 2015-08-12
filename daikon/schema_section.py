@@ -33,8 +33,8 @@ from .validator import Validator, ValidatorInstance
 from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
 from .validator.error import ValidationError, \
-    UnexpectedSectionValidationError, \
-    UnexpectedParameterValidationError
+    UnexpectedSectionError, \
+    UnexpectedParameterError
 
 
 def _validate_parameter(*, validator, section, validation_section,
@@ -68,7 +68,7 @@ class SchemaSection(Section):
        The 'unexpected_parameter_validator' is used to validate unexpected
        parameters (parameters found in the section to be validated, but not
        in the schema). By default it is 'UnexpectedParameter()', which
-       raises an UnexpectedParameterValidationError. The 'Ignore()' validator
+       raises an UnexpectedParameterError. The 'Ignore()' validator
        can be used to ignore unexpected parameters (they will be kept in
        the validated section), while the 'Remove()' validator can be used
        to remove unexpected parameters from the validated section.
@@ -142,7 +142,7 @@ class SchemaSection(Section):
         for subsection_name, schema_subsection in self.sections():
             expected_subsection_names.add(subsection_name)
             if section.has_parameter(subsection_name):
-                validation_section[subsection_name] = UnexpectedParameterValidationError(
+                validation_section[subsection_name] = UnexpectedParameterError(
                     "unexpected parameter {} (expecting section)".format(subsection_name))
             else:
                 if section.has_section(subsection_name):
@@ -183,7 +183,7 @@ class SchemaSection(Section):
             expected_parameter_names.add(parameter_name)
             key = parent_fqname + parameter_name
             if section.has_section(parameter_name):
-                validation_section[parameter_name] = UnexpectedSectionValidationError(
+                validation_section[parameter_name] = UnexpectedSectionError(
                     "unexpected section {} (expecting parameter)".format(key))
             else:
                 if section.has_parameter(parameter_name):

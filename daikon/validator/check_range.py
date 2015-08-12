@@ -31,10 +31,10 @@ __all__ = [
 
 from ..toolbox.deferred import Deferred
 from .check import Check
-from .error import MinValidationError, \
-    MaxValidationError, \
-    MinLenValidationError, \
-    MaxLenValidationError
+from .error import MinValueError, \
+    MaxValueError, \
+    MinLengthError, \
+    MaxLengthError
 
 from .key_value import KeyValue
 
@@ -69,8 +69,8 @@ class CheckMin(CheckRange):
         if min_value is not None:
             value = key_value.value
             if value < min_value:
-                raise MinValidationError(key_value,
-                                         "value {!r} is lower than min {!r}".format(value, min_value))
+                raise MinValueError(key_value,
+                                    "value {!r} is lower than min {!r}".format(value, min_value))
 
 
 class CheckMax(CheckRange):
@@ -88,8 +88,8 @@ class CheckMax(CheckRange):
         if max_value is not None:
             value = key_value.value
             if value > max_value:
-                raise MaxValidationError(key_value,
-                                         "value {!r} is greater than max {!r}".format(value, max_value))
+                raise MaxValueError(key_value,
+                                    "value {!r} is greater than max {!r}".format(value, max_value))
 
 
 class CheckMinLen(Check):
@@ -106,11 +106,11 @@ class CheckMinLen(Check):
         if min_len_value is not None:
             value = key_value.value
             if len(value) < min_len_value:
-                raise MinLenValidationError(key_value,
-                                            "value {!r} has length {} than is lower than min_len {!r}".format(
-                                                value,
-                                                len(value),
-                                                min_len_value))
+                raise MinLengthError(key_value,
+                                     "value {!r} has length {} than is lower than min_len {!r}".format(
+                                         value,
+                                         len(value),
+                                         min_len_value))
 
 
 class CheckMaxLen(Check):
@@ -127,8 +127,8 @@ class CheckMaxLen(Check):
         if max_len_value is not None:
             value = key_value.value
             if len(value) > max_len_value:
-                raise MaxLenValidationError(key_value,
-                                            "value {!r} has length {} that is greater than max_len {!r}".format(
-                                                value,
-                                                len(value),
-                                                max_len_value))
+                raise MaxLengthError(key_value,
+                                     "value {!r} has length {} that is greater than max_len {!r}".format(
+                                         value,
+                                         len(value),
+                                         max_len_value))

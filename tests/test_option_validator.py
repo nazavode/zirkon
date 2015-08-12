@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from daikon.validator.error import OptionValidationError, \
+from daikon.validator.error import OptionValueError, \
                                    InvalidTypeError
 from daikon.validator.int_validators import IntOption
 from daikon.validator.float_validators import FloatOption
@@ -54,7 +54,7 @@ def test_basic(parameters):
     for value in parameters.values:
         v = iv.validate(key='alpha', defined=True, value=value)
         assert v == value
-    with pytest.raises(OptionValidationError):
+    with pytest.raises(OptionValueError):
         v = iv.validate(key='alpha', defined=True, value=parameters.invalid_value)
 
 def test_bad_option_value(parameters):

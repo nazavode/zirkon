@@ -104,11 +104,11 @@ def test_Config_self_validate_error(string_io, config):
         x = config.self_validate()
         print(config.schema)
         x.dump()
-    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
+    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLengthError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
     exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
-    frequencies = MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)
+    frequencies = MinLengthError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)
 """
 
 def test_Config_self_validate_error_dump(string_io, config):
@@ -116,9 +116,9 @@ def test_Config_self_validate_error_dump(string_io, config):
     assert len(config['parameters']['frequencies'])
     with pytest.raises(ConfigValidationError) as exc_info:
         config.dump()
-    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
+    assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLengthError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
     exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
-    frequencies = MinLenValidationError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)
+    frequencies = MinLengthError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)
 """

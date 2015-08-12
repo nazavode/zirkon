@@ -152,9 +152,9 @@ By default the
 >>> validation = schema.validate(config)
 >>> validation.dump()
 [sub]
-    c = MinLenValidationError("sub.c='x': value 'x' has length 1 than is lower than min_len 2",)
+    c = MinLengthError("sub.c='x': value 'x' has length 1 than is lower than min_len 2",)
 d = MissingRequiredParameterError('d=<undefined>: required value is missing',)
-w = UnexpectedParameterValidationError("w=1.1: unexpected parameter 'w'",)
+w = UnexpectedParameterError("w=1.1: unexpected parameter 'w'",)
 >>> print(config['b'])
 1.02
 >>> config['sub']['c'] = 'xxx'

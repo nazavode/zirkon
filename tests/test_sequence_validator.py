@@ -6,11 +6,11 @@ import os
 
 import pytest
 
-from daikon.validator.error import OptionValidationError, \
-                                   MinValidationError, \
-                                   MaxValidationError, \
-                                   MinLenValidationError, \
-                                   MaxLenValidationError, \
+from daikon.validator.error import OptionValueError, \
+                                   MinValueError, \
+                                   MaxValueError, \
+                                   MinLengthError, \
+                                   MaxLengthError, \
                                    InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.int_validators import IntList, IntTuple
@@ -136,7 +136,7 @@ def test_bad_default_item_type(parameters):
 def test_default_min_len(parameters):
     dseq = parameters.vseq(m=4)
     iv = parameters.vclass(default=dseq, min_len=3)
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=2))
     seq = parameters.vseq(m=3)
     v = iv.validate(key='alpha', defined=True, value=seq)
@@ -145,19 +145,19 @@ def test_default_min_len(parameters):
     assert v == dseq
 
 def test_bad_default_min(parameters):
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         iv = parameters.vclass(default=parameters.vseq(m=2), min_len=3)
 
 def test_bad_default_max(parameters):
-    with pytest.raises(MaxLenValidationError):
+    with pytest.raises(MaxLengthError):
         iv = parameters.vclass(default=parameters.vseq(m=4), max_len=3)
 
 def test_default_max(parameters):
     dseq = parameters.vseq(m=4)
     iv = parameters.vclass(default=dseq, min_len=3, max_len=5)
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=2))
-    with pytest.raises(MaxLenValidationError):
+    with pytest.raises(MaxLengthError):
         v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=6))
     seq = parameters.vseq(m=3)
     v = iv.validate(key='alpha', defined=True, value=seq)
@@ -174,12 +174,12 @@ def test_item_options(parameters):
         imin = parameters.vseq(m=4)[0]
         imax = parameters.vseq(m=5)[0]
         iv = parameters.vclass(default=dseq, min_len=3, max_len=10, item_min=imin, item_max=imax)
-        with pytest.raises(MinValidationError):
+        with pytest.raises(MinValueError):
             v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=3))
         for m in 4, 5:
             seq = parameters.vseq(m=m)
             v = iv.validate(key='alpha', defined=True, value=seq)
             v is seq
-        with pytest.raises(MaxValidationError):
+        with pytest.raises(MaxValueError):
             v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=6))
 

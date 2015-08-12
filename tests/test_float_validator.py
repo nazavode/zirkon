@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinValidationError, \
-                                   MaxValidationError, \
+from daikon.validator.error import MinValueError, \
+                                   MaxValueError, \
                                    InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.float_validators import Float
@@ -49,7 +49,7 @@ def test_bad_max_type():
 
 def test_default_min():
     fv = Float(default=10.01, min=3.3)
-    with pytest.raises(MinValidationError):
+    with pytest.raises(MinValueError):
         v = fv.validate(key='alpha', defined=True, value=3.2)
     v = fv.validate(key='alpha', defined=True, value=3.3)
     assert v == 3.3
@@ -59,18 +59,18 @@ def test_default_min():
     assert v == 10.01
 
 def test_bad_default_min():
-    with pytest.raises(MinValidationError):
+    with pytest.raises(MinValueError):
         fv = Float(default=2.9, min=3.0)
 
 def test_bad_default_max():
-    with pytest.raises(MaxValidationError):
+    with pytest.raises(MaxValueError):
         fv = Float(default=3.1, max=3.0)
 
 def test_default_max():
     fv = Float(default=10.01, min=3.2, max=100.1)
-    with pytest.raises(MinValidationError):
+    with pytest.raises(MinValueError):
         v = fv.validate(key='alpha', defined=True, value=3.199)
-    with pytest.raises(MaxValidationError):
+    with pytest.raises(MaxValueError):
         v = fv.validate(key='alpha', defined=True, value=100.101)
     v = fv.validate(key='alpha', defined=True, value=3.2)
     assert v == 3.2

@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinLenValidationError, \
-                                   MaxLenValidationError, \
+from daikon.validator.error import MinLengthError, \
+                                   MaxLengthError, \
                                    InvalidTypeError, \
                                    MissingRequiredParameterError
 from daikon.validator.str_validators import Str
@@ -37,7 +37,7 @@ def test_bad_default_type():
 
 def test_default_min_len():
     iv = Str(default="abcd", min_len=3)
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         v = iv.validate(key='alpha', defined=True, value="x")
     v = iv.validate(key='alpha', defined=True, value="xxx")
     assert v == "xxx"
@@ -45,18 +45,18 @@ def test_default_min_len():
     assert v == "abcd"
 
 def test_bad_default_min_len():
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         iv = Str(default="ab", min_len=3)
 
 def test_bad_default_max_len():
-    with pytest.raises(MaxLenValidationError):
+    with pytest.raises(MaxLengthError):
         iv = Str(default="abcd", max_len=3)
 
 def test_default_max_len():
     iv = Str(default="abcd", min_len=3, max_len=10)
-    with pytest.raises(MinLenValidationError):
+    with pytest.raises(MinLengthError):
         v = iv.validate(key='alpha', defined=True, value="ab")
-    with pytest.raises(MaxLenValidationError):
+    with pytest.raises(MaxLengthError):
         v = iv.validate(key='alpha', defined=True, value="abcdefghijk")
     v = iv.validate(key='alpha', defined=True, value="xxx")
     assert v == "xxx"

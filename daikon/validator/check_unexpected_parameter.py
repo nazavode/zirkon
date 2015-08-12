@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 from .check import Check
-from .error import UnexpectedParameterValidationError
+from .error import UnexpectedParameterError
 
 
 class CheckUnexpectedParameter(Check):
@@ -36,4 +36,4 @@ class CheckUnexpectedParameter(Check):
     """
 
     def check(self, key_value, section):
-        raise UnexpectedParameterValidationError(key_value, "unexpected parameter {!r}".format(key_value.key))
+        raise UnexpectedParameterError(key_value, "unexpected parameter {!r}".format(key_value.key))

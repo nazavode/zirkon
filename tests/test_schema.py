@@ -35,8 +35,8 @@ from common.fixtures import dictionary, \
 from daikon.config import Config
 from daikon.schema import Schema
 from daikon.validator import Int, IntOption
-from daikon.validator.error import OptionValidationError, \
-    MinValidationError, MaxValidationError
+from daikon.validator.error import OptionValueError, \
+    MinValueError, MaxValueError
 from daikon.toolbox.deferred import Deferred
 
 from daikon.toolbox.serializer import JSONSerializer, \
@@ -154,20 +154,20 @@ def test_Schema_deferred_default(deferred_schema, deferred_config):
 
 def test_Schema_deferred_err_option(deferred_schema, deferred_config):
     deferred_config['c'] = 15
-    with pytest.raises(OptionValidationError) as exc_info:
+    with pytest.raises(OptionValueError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
     assert str(exc_info.value) == "c=15: 15 is not a valid option value; valid values are: (10, 20)"
 
 def test_Schema_deferred_err_min(deferred_schema, deferred_config):
     deferred_config['a'] = 19
     deferred_config['c'] = deferred_config['b']
-    with pytest.raises(MinValidationError) as exc_info:
+    with pytest.raises(MinValueError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
     assert str(exc_info.value) == "sub.d=18: value 18 is lower than min 19"
 
 def test_Schema_deferred_err_max(deferred_schema, deferred_config):
     deferred_config['b'] = 13
     deferred_config['c'] = deferred_config['a']
-    with pytest.raises(MaxValidationError) as exc_info:
+    with pytest.raises(MaxValueError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
     assert str(exc_info.value) == "sub.d=18: value 18 is greater than max 13"

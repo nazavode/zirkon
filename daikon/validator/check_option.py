@@ -29,7 +29,7 @@ __all__ = [
 from ..toolbox.deferred import Deferred
 from .check_type import CheckType
 from .key_value import KeyValue
-from .error import OptionValidationError
+from .error import OptionValueError
 
 
 class CheckOption(CheckType):
@@ -44,7 +44,7 @@ class CheckOption(CheckType):
         values = [self.get_value(value, section) for value in self.values]
         if key_value.defined:
             if key_value.value not in values:
-                raise OptionValidationError(
+                raise OptionValueError(
                     key_value,
                     "{!r} is not a valid option value; valid values are: ({})".format(
                         key_value.value, ', '.join(repr(v) for v in values)))

@@ -85,7 +85,7 @@ as values.
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLenValidationError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 6",)
+     y = MinLengthError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 6",)
      w = MissingRequiredParameterError('subsection.w=<undefined>: required value is missing',)
  >>>
 
@@ -115,6 +115,6 @@ The ``min_len`` value of the ``Str`` validator depends on the value found for ``
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLenValidationError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 8",)
+     y = MinLengthError("subsection.y='alpha': value 'alpha' has length 5 than is lower than min_len 8",)
      w = MissingRequiredParameterError('subsection.w=<undefined>: required value is missing',)
  >>>

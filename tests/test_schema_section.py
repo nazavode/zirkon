@@ -33,7 +33,7 @@ from daikon.validator import Int, Str, \
 from daikon.validator.ignore import Ignore
 from daikon.validator.remove import Remove
 from daikon.validator.error import \
-    OptionValidationError, UnexpectedParameterValidationError
+    OptionValueError, UnexpectedParameterError
 
 
 def test_SchemaSection_create(generic_dictionary, string_io):
@@ -79,7 +79,7 @@ def test_SchemaSection_validate_invalid_option(dictionary, generic_dictionary, s
     assert len(validation) == 1
     assert len(validation['sub']) == 1
     assert len(validation['sub']['subsub']) == 1
-    assert isinstance(validation['sub']['subsub']['ssx'], OptionValidationError)
+    assert isinstance(validation['sub']['subsub']['ssx'], OptionValueError)
 
 def test_SchemaSection_validate_unexpected(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
@@ -90,7 +90,7 @@ def test_SchemaSection_validate_unexpected(dictionary, generic_dictionary, strin
     assert validation
     assert len(validation) == 1
     assert len(validation['sub']) == 1
-    assert isinstance(validation['sub']['abc'], UnexpectedParameterValidationError)
+    assert isinstance(validation['sub']['abc'], UnexpectedParameterError)
 
 def test_SchemaSection_validate_unexpected_ignored(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
