@@ -27,14 +27,14 @@ __all__ = [
 ]
 
 from .section import Section
-from .validator.error import ValidationError
+from .validator.error import KeyValidationError
 
 
 class ValidationSection(Section):
     """ValidationSection(container, *, prefix='', init=None, unexpected_key_validator=None)
        A Section to store ValidationResult values.
     """
-    SUPPORTED_DATA_TYPES = (ValidationError, )
+    SUPPORTED_DATA_TYPES = (KeyValidationError, )
 
     @classmethod
     def subsection_class(cls):

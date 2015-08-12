@@ -79,7 +79,7 @@ is simply a special Config having Validators as values:
      w = Float()
  >>>
 
-The validation result itself is a Config object having ValidationErrors
+The validation result itself is a Config object having KeyValidationErrors
 as values.
 
  >>> validation = schema.validate(config)

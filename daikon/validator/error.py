@@ -18,12 +18,12 @@
 """\
 config.validator.error
 ======================
-ValidationError classes
+KeyValidationError classes
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'ValidationError',
+    'KeyValidationError',
     'InvalidContentError',
     'MissingRequiredParameterError',
     'UnexpectedSectionError',
@@ -39,8 +39,8 @@ __all__ = [
 ]
 
 
-class ValidationError(Exception):
-    """ValidationError()
+class KeyValidationError(Exception):
+    """KeyValidationError()
     """
 
     def __init__(self, key_value, message):
@@ -48,19 +48,19 @@ class ValidationError(Exception):
         super().__init__("{}: {}".format(key_value, message))
 
 
-class InvalidContentError(ValidationError):
+class InvalidContentError(KeyValidationError):
     """InvalidContentError()
     """
     pass
 
 
-class InvalidTypeError(ValidationError):
+class InvalidTypeError(KeyValidationError):
     """InvalidTypeError()
     """
     pass
 
 
-class InvalidValueError(ValidationError):
+class InvalidValueError(KeyValidationError):
     """InvalidValueError()
     """
     pass
@@ -102,7 +102,7 @@ class OptionValueError(InvalidValueError):
     pass
 
 
-class InvalidLengthError(ValidationError):
+class InvalidLengthError(KeyValidationError):
     """InvalidLengthError()
     """
     pass

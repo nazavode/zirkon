@@ -32,7 +32,7 @@ from .validation import Validation
 from .validator import Validator, ValidatorInstance
 from .validator.unexpected_parameter import UnexpectedParameter
 from .validator.key_value import KeyValue
-from .validator.error import ValidationError, \
+from .validator.error import KeyValidationError, \
     UnexpectedSectionError, \
     UnexpectedParameterError
 
@@ -47,7 +47,7 @@ def _validate_parameter(*, validator, section, validation_section,
     value = key_value.value
     try:
         validator.validate_key_value(key_value, section)
-    except ValidationError as err:
+    except KeyValidationError as err:
         validation_section[parameter_name] = err
         if raise_on_error:
             raise
