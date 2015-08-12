@@ -44,10 +44,6 @@ class TextSerializer(Serializer):
     INDENTATION = "    "
 
     @classmethod
-    def class_tag(cls):
-        return "ConfigObj"
-
-    @classmethod
     def is_section(cls, mapping):
         """is_section(mapping) -> True is mapping is a Section"""
         if hasattr(mapping, 'parameters') and hasattr(mapping, 'sections'):

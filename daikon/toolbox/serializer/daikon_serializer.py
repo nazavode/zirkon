@@ -94,7 +94,7 @@ class DaikonSerializer(TextSerializer):
 
     @classmethod
     def class_tag(cls):
-        return "Daikon"
+        return "daikon"
 
     def impl_dump_mapping_name(self, level, mapping_name):
         return "{i}{b}{s}{k}".format(

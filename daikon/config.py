@@ -141,7 +141,7 @@ class Config(Section):
         serializer = self.get_serializer(protocol)
         return serializer.to_file(self, filename)
 
-    def dump(self, stream=None, protocol="Daikon"):
+    def dump(self, stream=None, protocol="daikon"):
         self.self_validate(raise_on_error=True)
         return super().dump(stream, protocol)
 

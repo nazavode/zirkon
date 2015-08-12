@@ -27,8 +27,6 @@ from common.fixtures import string_io
 from daikon.toolbox.dictutils import compare_dicts
 from daikon.config import Config, ConfigValidationError
 from daikon.schema import Schema
-from daikon.toolbox.serializer import JSONSerializer, \
-    ConfigObjSerializer, PickleSerializer
 from daikon.validator import Str, StrOption, Float, Int, FloatList
 
 @pytest.fixture

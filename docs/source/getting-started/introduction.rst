@@ -56,14 +56,14 @@ available:
  +---------+--------+-----------------------------------------------------+
  |Protocol |text/raw|description                                          |
  +=========+========+=====================================================+
- |Daikon   |text    |the native protocol; it implements a nested INI file |
+ |daikon   |text    |the native protocol; it implements a nested INI file |
  +---------+--------+-----------------------------------------------------+
- |ConfigObj|raw     |compatible with ConfigObj using the ``unrepr`` option|
+ |configobj|raw     |compatible with ConfigObj using the ``unrepr`` option|
  |         |        |see http://www.voidspace.org.uk/python/configobj.html|
  +---------+--------+-----------------------------------------------------+
- |JSON     |text    |JSON serialization                                   |
+ |json     |text    |JSON serialization                                   |
  +---------+--------+-----------------------------------------------------+
- |Pickle   |text    |pickle serialization                                 |
+ |pickle   |text    |pickle serialization                                 |
  +---------+--------+-----------------------------------------------------+
 
 Validation

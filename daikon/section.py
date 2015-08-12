@@ -324,8 +324,8 @@ class Section(collections.abc.Mapping):
             return True
         return False
 
-    def dump(self, stream=None, protocol="Daikon"):
-        """dump(self, stream=None, protocol="Daikon")
+    def dump(self, stream=None, protocol="daikon"):
+        """dump(self, stream=None, protocol="daikon")
            Dump the content to a stream.
         """
         if stream is None:

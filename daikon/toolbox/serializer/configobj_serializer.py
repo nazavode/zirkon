@@ -53,7 +53,7 @@ class ConfigObjSerializer(TextSerializer):
 
     @classmethod
     def class_tag(cls):
-        return "ConfigObj"
+        return "configobj"
 
     def impl_dump_mapping_name(self, level, mapping_name):
         return "{i}{b}{s}{k}".format(

@@ -71,56 +71,56 @@ def test_Config_create_dictionary_init_overlap(string_io):
     assert config['y'] == 30
     assert config['a'] == 20
 
-def test_Config_to_file_JSON(simple_config, tmp_text_file):
-    simple_config.to_file(filename=tmp_text_file.name, protocol="JSON")
+def test_Config_to_file_json(simple_config, tmp_text_file):
+    simple_config.to_file(filename=tmp_text_file.name, protocol="json")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_CONFIG_JSON_SERIALIZATION
 
-def test_Config_from_file_JSON(simple_config, tmp_text_file):
+def test_Config_from_file_json(simple_config, tmp_text_file):
     tmp_text_file.write(SIMPLE_CONFIG_JSON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    config = Config.from_file(filename=tmp_text_file.name, protocol="JSON")
+    config = Config.from_file(filename=tmp_text_file.name, protocol="json")
     assert config == simple_config
 
-def test_Config_to_file_ConfigObj(simple_config, tmp_text_file):
-    simple_config.to_file(filename=tmp_text_file.name, protocol="ConfigObj")
+def test_Config_to_file_configobj(simple_config, tmp_text_file):
+    simple_config.to_file(filename=tmp_text_file.name, protocol="configobj")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
-def test_Config_from_file_ConfigObj(simple_config, tmp_text_file):
+def test_Config_from_file_configobj(simple_config, tmp_text_file):
     tmp_text_file.write(SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    config = Config.from_file(filename=tmp_text_file.name, protocol="ConfigObj")
+    config = Config.from_file(filename=tmp_text_file.name, protocol="configobj")
     assert config == simple_config
 
-def test_Config_to_file_Daikon(simple_config, tmp_text_file):
-    simple_config.to_file(filename=tmp_text_file.name, protocol="Daikon")
+def test_Config_to_file_daikon(simple_config, tmp_text_file):
+    simple_config.to_file(filename=tmp_text_file.name, protocol="daikon")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
-def test_Config_from_file_Daikon(simple_config, tmp_text_file):
+def test_Config_from_file_daikon(simple_config, tmp_text_file):
     tmp_text_file.write(SIMPLE_CONFIG_DAIKON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    config = Config.from_file(filename=tmp_text_file.name, protocol="Daikon")
+    config = Config.from_file(filename=tmp_text_file.name, protocol="daikon")
     assert config == simple_config
 
-def test_Config_get_serializer_JSON():
-    assert isinstance(Config.get_serializer("JSON"), JSONSerializer)
+def test_Config_get_serializer_json():
+    assert isinstance(Config.get_serializer("json"), JSONSerializer)
 
-def test_Config_get_serializer_ConfigObj():
-    assert isinstance(Config.get_serializer("ConfigObj"), ConfigObjSerializer)
+def test_Config_get_serializer_configobj():
+    assert isinstance(Config.get_serializer("configobj"), ConfigObjSerializer)
 
-def test_Config_get_serializer_Pickle():
-    assert isinstance(Config.get_serializer("Pickle"), PickleSerializer)
+def test_Config_get_serializer_pickle():
+    assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
 def test_Config_deferred():
     config = Config()

@@ -64,20 +64,20 @@ Storing/loading the Config
 
 It is possible to store/load the *Config* object to/from strings, streams or files. All the store/load functions accept a ``protocol`` argument, which is the name of an available serialization protocol:
 
- >>> s_config = config.to_string(protocol="ConfigObj")
+ >>> s_config = config.to_string(protocol="configobj")
  >>> print(s_config)
  a = 10
  l = [1, 2, 'x']
  [sub]
     [[subsub]]
         a = 1
- >>> config2 = config.from_string(s_config, protocol="ConfigObj")
+ >>> config2 = config.from_string(s_config, protocol="configobj")
  >>> print(config2 == config)
  True
  >>>
 
 The ``to_stream``, ``from_stream`` methods allow serialization to/from a stream; the ``to_file``, ``from_file`` methods allow serialization to/from a file. The ``write`` and ``read`` methods behaves like ``to_file``, ``from_file``.
-Finally, the ``dump(stream=None, protocol="Daikon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
+Finally, the ``dump(stream=None, protocol="daikon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
 
  >>> config.dump()
  a = 10
@@ -92,10 +92,10 @@ The list of available serialization protocols is:
  >>> from daikon.toolbox.serializer import Serializer
  >>> for protocol in Serializer.class_dict():
  ...     print(protocol)
- Daikon
- ConfigObj
- JSON
- Pickle
+ daikon
+ configobj
+ json
+ pickle
  >>>
 
 Creating a Schema

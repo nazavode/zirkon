@@ -65,7 +65,7 @@ def test_Schema_create_dictionary_init(dictionary, simple_schema_content, string
     assert len(dictionary) > 0
 
 def test_Schema_to_file_JSON(simple_schema, tmp_text_file):
-    simple_schema.to_file(filename=tmp_text_file.name, protocol="JSON")
+    simple_schema.to_file(filename=tmp_text_file.name, protocol="json")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
@@ -75,11 +75,11 @@ def test_Schema_from_file_JSON(simple_schema, tmp_text_file):
     tmp_text_file.write(SIMPLE_SCHEMA_JSON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    schema = Schema.from_file(filename=tmp_text_file.name, protocol="JSON")
+    schema = Schema.from_file(filename=tmp_text_file.name, protocol="json")
     assert schema == simple_schema
 
 def test_Schema_to_file_ConfigObj(simple_schema, tmp_text_file):
-    simple_schema.to_file(filename=tmp_text_file.name, protocol="ConfigObj")
+    simple_schema.to_file(filename=tmp_text_file.name, protocol="configobj")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
@@ -89,11 +89,11 @@ def test_Schema_from_file_ConfigObj(simple_schema, tmp_text_file):
     tmp_text_file.write(SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    schema = Schema.from_file(filename=tmp_text_file.name, protocol="ConfigObj")
+    schema = Schema.from_file(filename=tmp_text_file.name, protocol="configobj")
     assert schema == simple_schema
 
 def test_Schema_to_file_Daikon(simple_schema, tmp_text_file):
-    simple_schema.to_file(filename=tmp_text_file.name, protocol="Daikon")
+    simple_schema.to_file(filename=tmp_text_file.name, protocol="daikon")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
@@ -103,17 +103,17 @@ def test_Schema_from_file_Daikon(simple_schema, tmp_text_file):
     tmp_text_file.write(SIMPLE_SCHEMA_DAIKON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    schema = Schema.from_file(filename=tmp_text_file.name, protocol="Daikon")
+    schema = Schema.from_file(filename=tmp_text_file.name, protocol="daikon")
     assert schema == simple_schema
 
 def test_Schema_get_serializer_JSON():
-    assert isinstance(Schema.get_serializer("JSON"), JSONSerializer)
+    assert isinstance(Schema.get_serializer("json"), JSONSerializer)
 
 def test_Schema_get_serializer_ConfigObj():
-    assert isinstance(Schema.get_serializer("ConfigObj"), ConfigObjSerializer)
+    assert isinstance(Schema.get_serializer("configobj"), ConfigObjSerializer)
 
 def test_Schema_get_serializer_Pickle():
-    assert isinstance(Schema.get_serializer("Pickle"), PickleSerializer)
+    assert isinstance(Schema.get_serializer("pickle"), PickleSerializer)
 
 @pytest.fixture
 def deferred_schema():

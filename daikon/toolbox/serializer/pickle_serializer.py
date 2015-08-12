@@ -35,7 +35,7 @@ class PickleSerializer(Serializer):
 
     @classmethod
     def class_tag(cls):
-        return "Pickle"
+        return "pickle"
 
     @classmethod
     def is_binary(cls):

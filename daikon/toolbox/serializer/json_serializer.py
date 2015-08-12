@@ -74,7 +74,7 @@ class JSONSerializer(Serializer):
 
     @classmethod
     def class_tag(cls):
-        return "JSON"
+        return "json"
 
     def to_string(self, config):
         content = config.as_dict()

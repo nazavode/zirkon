@@ -65,9 +65,9 @@ Reading/writing configuration files
 
 Daikon config files can be read/written from/to strings, streams or files. There are four available protocols:
 Four serialization methods (protocols) are currently implemented:
-* Daikon: the native serialization
-* ConfigObj: the ConfigObj serialization, see http://www.voidspace.org.uk/python/configobj.html
-* JSON: JSON serialization
+* daikon: the native serialization
+* configobj: the ConfigObj serialization, see http://www.voidspace.org.uk/python/configobj.html
+* json: JSON serialization
 * pickle: pickle-based serialization (not human-readable!)
 
  >>> with tempfile.TemporaryDirectory() as tdir:
@@ -75,9 +75,9 @@ Four serialization methods (protocols) are currently implemented:
  ...     config = Config()
  ...     config['sub'] = {'a': 1}
  ...     config['w'] = 10
- ...     config.write(tfile, protocol="JSON")
+ ...     config.write(tfile, protocol="json")
  ...     config2 = Config()
- ...     config2.read(tfile, protocol="JSON")
+ ...     config2.read(tfile, protocol="json")
  ...     assert config == config2
  >>>
 
