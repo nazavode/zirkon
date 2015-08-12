@@ -34,7 +34,8 @@ class ValidationSection(Section):
     """ValidationSection(container, *, prefix='', init=None, unexpected_key_validator=None)
        A Section to store ValidationResult values.
     """
-    SUPPORTED_DATA_TYPES = (KeyValidationError, )
+    SUPPORTED_LIST_TYPES = ()
+    SUPPORTED_SCALAR_TYPES = (KeyValidationError, )
 
     @classmethod
     def subsection_class(cls):

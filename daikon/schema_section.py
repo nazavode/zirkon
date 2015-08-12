@@ -73,7 +73,8 @@ class SchemaSection(Section):
        the validated section), while the 'Remove()' validator can be used
        to remove unexpected parameters from the validated section.
     """
-    SUPPORTED_DATA_TYPES = (Validator, )
+    SUPPORTED_LIST_TYPES = ()
+    SUPPORTED_SCALAR_TYPES = (Validator, )
 
     def __init__(self, *, dictionary=None, init=None, parent=None,
                  unexpected_parameter_validator=UnexpectedParameter(),

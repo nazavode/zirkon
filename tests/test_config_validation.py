@@ -83,14 +83,14 @@ def test_Config(string_io, config, config_content):
     assert string_io.getvalue() == CONFIG_DUMP
 
 def test_Config_self_validate(string_io, config):
-    config.self_validate()
+    config.self_validate(raise_on_error=True)
 
 def test_Config_self_validate_default(string_io, config):
     assert 'max_iterations' in config['parameters']
     assert config['parameters']['max_iterations'] == 80
     del config['parameters']['max_iterations']
     assert not 'max_iterations' in config['parameters']
-    config.self_validate()
+    config.self_validate(raise_on_error=True)
     assert 'max_iterations' in config['parameters']
     assert config['parameters']['max_iterations'] == 100
 
@@ -100,9 +100,7 @@ def test_Config_self_validate_error(string_io, config):
     print(config.schema)
     assert len(config['parameters']['frequencies'])
     with pytest.raises(ConfigValidationError) as exc_info:
-        print(config.schema)
-        x = config.self_validate()
-        print(config.schema)
+        x = config.self_validate(raise_on_error=True)
         x.dump()
     assert str(exc_info.value) == "validation error: Validation(parameters=ValidationSection(frequencies=MinLengthError('parameters.frequencies=[5.0]: value [5.0] has length 1 than is lower than min_len 2',)))"
     exc_info.value.validation.dump(string_io)

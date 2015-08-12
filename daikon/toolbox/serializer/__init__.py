@@ -28,6 +28,12 @@ __all__ = ['Serializer']
 from .serializer import Serializer
 
 try:
+    from .daikon_serializer import DaikonSerializer
+    __all__.append(DaikonSerializer.__name__)
+except ImportError:  # pragma: no cover
+    pass
+
+try:
     from .json_serializer import JSONSerializer
     __all__.append(JSONSerializer.__name__)
 except ImportError:  # pragma: no cover
@@ -36,12 +42,6 @@ except ImportError:  # pragma: no cover
 try:
     from .configobj_serializer import ConfigObjSerializer
     __all__.append(ConfigObjSerializer.__name__)
-except ImportError:  # pragma: no cover
-    pass
-
-try:
-    from .daikon_serializer import DaikonSerializer
-    __all__.append(DaikonSerializer.__name__)
 except ImportError:  # pragma: no cover
     pass
 

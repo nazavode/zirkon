@@ -261,3 +261,17 @@ def test_Section_add_section(simple_section):
     section['a'] = 10
     assert len(simple_section['xyz']) == 1
     assert section == simple_section['xyz']
+
+def test_Section_invalid_list_content():
+    section = Section()
+    with pytest.raises(TypeError) as exc_info:
+        section['a'] = (1, 23, {})
+    assert str(exc_info.value) == "parameter a: invalid tuple: item #2 {} has invalid type dict"
+
+def test_Section_invalid_dictionary_content():
+    dictionary = {'a': (1, 23, {}), 'b': 8}
+    section = Section(dictionary=dictionary)
+    assert section['b'] == 8
+    with pytest.raises(TypeError) as exc_info:
+        a = section['a']
+    assert str(exc_info.value) == "parameter a: invalid tuple: item #2 {} has invalid type dict"

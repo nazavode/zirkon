@@ -86,15 +86,15 @@ class Config(Section):
         self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):
-        """set_schema(self, schema, *, validate)
+        """set_schema(self, schema, *, validate=True)
            Set the validation schema (None to disable validation).
         """
         self.schema = schema
         if validate:
-            self.self_validate()
+            self.self_validate(raise_on_error=True)
 
-    def self_validate(self, raise_on_error=True):
-        """self_validate(self, raise_on_error=True)
+    def self_validate(self, raise_on_error=False):
+        """self_validate(self, raise_on_error=False)
            Validate the config itself using the 'schema' attribute.
         """
         if self.schema is not None:
@@ -121,7 +121,7 @@ class Config(Section):
         """to_string(protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
-        self.self_validate()
+        self.self_validate(raise_on_error=True)
         serializer = self.get_serializer(protocol)
         return serializer.to_string(self)
 
@@ -129,7 +129,7 @@ class Config(Section):
         """to_stream(stream, protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
-        self.self_validate()
+        self.self_validate(raise_on_error=True)
         serializer = self.get_serializer(protocol)
         return serializer.to_stream(self, stream)
 
@@ -137,42 +137,42 @@ class Config(Section):
         """to_file(filename, protocol)
            Serialize to file 'filename' according to 'protocol'.
         """
-        self.self_validate()
+        self.self_validate(raise_on_error=True)
         serializer = self.get_serializer(protocol)
         return serializer.to_file(self, filename)
 
     def dump(self, stream=None, protocol="Daikon"):
-        self.self_validate()
+        self.self_validate(raise_on_error=True)
         return super().dump(stream, protocol)
 
     @classmethod
-    def from_file(cls, filename, protocol, *, dictionary=None, schema=None):
-        """from_file(filename, protocol, *, dictionary=None)
+    def from_file(cls, filename, protocol, *, dictionary=None, schema=None, validate=True):
+        """from_file(filename, protocol, *, dictionary=None, schema=None, validate=True)
            Deserialize from file 'filename' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
         instance = serializer.from_file(cls, filename, dictionary=dictionary)
-        instance.set_schema(schema, validate=True)
+        instance.set_schema(schema, validate=validate)
         return instance
 
     @classmethod
-    def from_stream(cls, stream, protocol, *, dictionary=None, filename=None, schema=None):
-        """from_stream(stream, protocol, *, dictionary=None, filename=None)
+    def from_stream(cls, stream, protocol, *, dictionary=None, filename=None, schema=None, validate=True):
+        """from_stream(stream, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
            Deserialize from stream 'stream' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
         instance = serializer.from_stream(cls, stream, dictionary=dictionary, filename=filename)
-        instance.set_schema(schema, validate=True)
+        instance.set_schema(schema, validate=validate)
         return instance
 
     @classmethod
-    def from_string(cls, string, protocol, *, dictionary=None, filename=None, schema=None):
-        """from_string(string, protocol, *, dictionary=None, filename=None)
+    def from_string(cls, string, protocol, *, dictionary=None, filename=None, schema=None, validate=True):
+        """from_string(string, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
            Deserialize from string 'string' according to 'protocol'.
         """
         serializer = cls.get_serializer(protocol)
         instance = serializer.from_string(cls, string, dictionary=dictionary, filename=filename)
-        instance.set_schema(schema, validate=True)
+        instance.set_schema(schema, validate=validate)
         return instance
 
     def read(self, filename, protocol):
@@ -181,7 +181,7 @@ class Config(Section):
         """
         self.clear()
         self.from_file(filename=filename, protocol=protocol, dictionary=self.dictionary)
-        self.self_validate()
+        self.self_validate(raise_on_error=True)
 
     def write(self, filename, protocol):
         """write(filename, protocol)

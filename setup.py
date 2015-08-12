@@ -70,6 +70,7 @@ if __name__ == "__main__":
     for data_dirname, patterns in [('requirements', ('*.txt', )),
                                    ('docs/source', ('conf.py', '*.rst')),
                                    ('docs/source/getting-started', ('*.rst',)),
+                                   ('docs/source/userguide', ('*.rst',)),
                                    ('docs/source/img', ('*.jpg',)),
                                   ]:
         files = []

@@ -60,6 +60,17 @@ def test_Config_create_dictionary_init(dictionary, simple_config_content, string
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
     assert len(dictionary) > 0
 
+def test_Config_create_dictionary_init_overlap(string_io):
+    dictionary = collections.OrderedDict()
+    dictionary['x'] = 10
+    dictionary['y'] = 10
+    init = {'a': 20, 'y': 30}
+    config = Config(init, dictionary=dictionary)
+    assert len(config) == 3
+    assert config['x'] == 10
+    assert config['y'] == 30
+    assert config['a'] == 20
+
 def test_Config_to_file_JSON(simple_config, tmp_text_file):
     simple_config.to_file(filename=tmp_text_file.name, protocol="JSON")
     tmp_text_file.flush()

@@ -74,7 +74,8 @@ class Section(collections.abc.Mapping):
            type = 'RAW'
        >>>
     """
-    SUPPORTED_DATA_TYPES = (int, float, bool, str, type(None), list, tuple)
+    SUPPORTED_SEQUENCE_TYPES = (list, tuple)
+    SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
     def __init__(self, *, dictionary=None, init=None, parent=None):
         if dictionary is None:
@@ -109,19 +110,37 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
+    def check_data_type(self, key, value):
+        """check_data_type(key, value)
+        """
+        if isinstance(value, self.SUPPORTED_SCALAR_TYPES):
+            return
+        elif isinstance(value, self.SUPPORTED_SEQUENCE_TYPES):
+            for index, item in enumerate(value):
+                if not isinstance(item, self.SUPPORTED_SCALAR_TYPES):
+                    fmt = "parameter {key}: invalid {value_type}: item #{index} {item!r} has invalid type {item_type}"
+                    raise TypeError(fmt.format(
+                        key=key,
+                        value_type=type(value).__name__,
+                        index=index,
+                        item=item,
+                        item_type=type(item).__name__,
+                    ))
+            return
+        else:
+            raise TypeError("parameter {}: invalid value {!r} of type {}".format(
+                key,
+                value,
+                type(value).__name__,
+            ))
+
     def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
             return self.subsection(dictionary=value)
         else:
-            if isinstance(value, self.SUPPORTED_DATA_TYPES):
-                return value
-            else:
-                raise TypeError("parameter {}: invalid value {!r} of type {}".format(
-                    key,
-                    value,
-                    type(value).__name__,
-                ))
+            self.check_data_type(key=key, value=value)
+            return value
 
     def __setitem__(self, key, value):
         if not isinstance(key, str):
@@ -137,12 +156,7 @@ class Section(collections.abc.Mapping):
         else:
             if isinstance(value, Deferred):
                 value = value({'SECTION': self, 'ROOT': self.root})
-            if not isinstance(value, self.SUPPORTED_DATA_TYPES):
-                raise TypeError("parameter {}: invalid value {!r} of type {}".format(
-                    key,
-                    value,
-                    type(value).__name__,
-                ))
+            self.check_data_type(key=key, value=value)
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with a parameter".format(key))
             self.dictionary[key] = value
