@@ -140,7 +140,7 @@ By default, validation errors are not raised: they are stored on the ``Validatio
  >>> config['a'] = "abc"
  >>> validation = schema.validate(config)
  >>> validation.dump()
- a = InvalidTypeError(key_value=KeyValue(key='a', value='abc', defined=True), message='invalid type str - expected type is int')
+ a = InvalidTypeError(KeyValue('a', 'abc'), 'invalid type str - expected type is int')
  >>> config.dump()
  a = 'abc'
  >>>
@@ -154,7 +154,7 @@ The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, w
  ...     print("type error!")
  type error!
  >>> validation.dump()
- a = InvalidTypeError(key_value=KeyValue(key='a', value='abc', defined=True), message='invalid type str - expected type is int')
+ a = InvalidTypeError(KeyValue('a', 'abc'), 'invalid type str - expected type is int')
  >>> config.dump()
  a = 'abc'
  >>>
@@ -174,7 +174,7 @@ The *unexpected_parameter_validator* *Schema* attribute can be set to specify ho
      u = 0.35
      >>> validation = schema.validate(config)
      >>> validation.dump()
-     u = UnexpectedParameterError(key_value=KeyValue(key='u', value=0.35, defined=True), message="unexpected parameter 'u'")
+     u = UnexpectedParameterError(KeyValue('u', 0.35), "unexpected parameter 'u'")
      >>> config.dump()
      u = 0.35
      a = 10
@@ -223,8 +223,8 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
  >>> config['y'] = 10
  >>> validation = config.self_validate(raise_on_error=False)
  >>> validation.dump()
- x = MinValueError(key_value=KeyValue(key='x', value=10, defined=True), message='value 10 is lower than min 30')
- y = MaxValueError(key_value=KeyValue(key='y', value=10, defined=True), message='value 10 is greater than max 2')
+ x = MinValueError(KeyValue('x', 10), 'value 10 is lower than min 30')
+ y = MaxValueError(KeyValue('y', 10), 'value 10 is greater than max 2')
 
 The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
  
@@ -235,7 +235,7 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  ...     print("config validation error:")
  ...     err.validation.dump()
  config validation error:
- x = MinValueError(key_value=KeyValue(key='x', value=10, defined=True), message='value 10 is lower than min 30')
- y = MaxValueError(key_value=KeyValue(key='y', value=10, defined=True), message='value 10 is greater than max 2')
+ x = MinValueError(KeyValue('x', 10), 'value 10 is lower than min 30')
+ y = MaxValueError(KeyValue('y', 10), 'value 10 is greater than max 2')
  >>>
 

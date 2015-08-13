@@ -104,7 +104,7 @@ def test_Config_self_validate_error(string_io, config):
     exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
-    frequencies = MinLengthError(key_value=KeyValue(key='parameters.frequencies', value=[5.0], defined=True), message='value [5.0] has length 1 than is lower than min_len 2')
+    frequencies = MinLengthError(KeyValue('parameters.frequencies', [5.0]), 'value [5.0] has length 1 than is lower than min_len 2')
 """
 
 def test_Config_self_validate_error_dump(string_io, config):
@@ -116,5 +116,5 @@ def test_Config_self_validate_error_dump(string_io, config):
     exc_info.value.validation.dump(string_io)
     assert string_io.getvalue() == """\
 [parameters]
-    frequencies = MinLengthError(key_value=KeyValue(key='parameters.frequencies', value=[5.0], defined=True), message='value [5.0] has length 1 than is lower than min_len 2')
+    frequencies = MinLengthError(KeyValue('parameters.frequencies', [5.0]), 'value [5.0] has length 1 than is lower than min_len 2')
 """

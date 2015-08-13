@@ -109,7 +109,7 @@ def _setup_codecs():
             """_kv_error_text_encode(validator)
                KeyValidationError encoder.
             """
-            return "{}(key_value={!r}, message={!r})".format(
+            return "{}({!r}, {!r})".format(
                 type(key_validation_error).__name__,
                 key_validation_error.key_value,
                 key_validation_error.message)

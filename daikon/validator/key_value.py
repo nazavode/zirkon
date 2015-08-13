@@ -31,7 +31,7 @@ class KeyValue(object):
     """KeyValue(key, value, *, defined=None)
        Key/value ocject.
     """
-    def __init__(self, key, value, *, defined=None):
+    def __init__(self, key, value, *, defined=True):
         self.key = key
         self.value = value
         self.defined = defined
@@ -49,11 +49,15 @@ class KeyValue(object):
         return self.__class__(key=self.key, value=self.value, defined=self.defined)
 
     def __repr__(self):
-        return "{}(key={!r}, value={!r}, defined={!r})".format(
+        if self.defined:
+            dstring = ""
+        else:
+            dstring = ", defined=False"
+        return "{}({!r}, {!r}{})".format(
             self.__class__.__name__,
             self.key,
             self.value,
-            self.defined)
+            dstring)
 
     def __str__(self):
         if self.defined:

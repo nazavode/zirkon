@@ -21,8 +21,8 @@ def test_key_value_is_defined_False():
 
 def test_key_value_is_defined_default():
     key_value = KeyValue(key='alpha', value=8.3)
-    assert key_value.defined is None
-    assert not key_value.is_defined()
+    assert key_value.defined
+    assert key_value.is_defined()
  
 def test_key_value_copy():
     key_value = KeyValue(key='alpha', value=8.3, defined=True)
