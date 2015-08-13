@@ -159,7 +159,7 @@ def test_validate_config_de_ko_min(config_protocol, schema_de):
     assert len(validation['sub']) == 1
     assert 'x' in validation['sub']
     assert isinstance(validation['sub']['x'], MinValueError)
-    assert str(validation['sub']['x']) == "sub.x=1: value 1 is lower than min 7"
+    assert str(validation['sub']['x']) == "sub.x=1: value is lower than min 7"
     assert config['alpha'] == 10
     assert config['beta'] == 7
     assert config['sub']['x'] == 1

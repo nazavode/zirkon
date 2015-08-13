@@ -162,11 +162,11 @@ def test_Schema_deferred_err_min(deferred_schema, deferred_config):
     deferred_config['c'] = deferred_config['b']
     with pytest.raises(MinValueError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
-    assert str(exc_info.value) == "sub.d=18: value 18 is lower than min 19"
+    assert str(exc_info.value) == "sub.d=18: value is lower than min 19"
 
 def test_Schema_deferred_err_max(deferred_schema, deferred_config):
     deferred_config['b'] = 13
     deferred_config['c'] = deferred_config['a']
     with pytest.raises(MaxValueError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
-    assert str(exc_info.value) == "sub.d=18: value 18 is greater than max 13"
+    assert str(exc_info.value) == "sub.d=18: value is greater than max 13"

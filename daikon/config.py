@@ -207,7 +207,7 @@ def _setup_codecs():
         """_deferred_encode(deferred_object)
            Encoder for Deferred instances
         """
-        return {'expression': deferred_object.expression()}
+        return {'expression': deferred_object.unparse()}
 
     def _deferred_decode(deferred_class_name, arguments):
         """_deferred_decode(deferred_class_name, arguments)

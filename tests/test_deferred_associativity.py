@@ -57,7 +57,7 @@ def expression_no_match(request):
 def test_DName(expression):
     de = eval(expression, de_globals_d)
     value = eval(expression, py_globals_d)
-    de_expression = de.expression()
+    de_expression = de.unparse()
     assert de_expression == expression
     de_value = de.evaluate(de_globals_d)
     assert de_value == value
@@ -65,7 +65,7 @@ def test_DName(expression):
 def test_DName_no_match(expression_no_match):
     de = eval(expression_no_match, de_globals_d)
     value = eval(expression_no_match, py_globals_d)
-    de_expression = de.expression()
+    de_expression = de.unparse()
     assert de_expression != expression_no_match
     de_value = de.evaluate(de_globals_d)
     assert de_value == value

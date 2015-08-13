@@ -42,6 +42,6 @@ def test_DCall(param):
     de = DCall(MYFUN, p_args, n_args)
     expression = param.expression
     globals_d = param.globals_d
-    assert de.expression() == expression
+    assert de.unparse() == expression
     value = eval(expression, globals_d)
     assert de.evaluate(globals_d) == value

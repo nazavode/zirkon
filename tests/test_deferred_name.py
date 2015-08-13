@@ -29,5 +29,5 @@ def test_DName(param):
     de = param.de
     assert isinstance(de, Deferred)
     expression = param.expression
-    assert de.expression() == expression
+    assert de.unparse() == expression
     assert de.evaluate(param.globals_d) == eval(expression, param.globals_d)

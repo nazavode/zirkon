@@ -28,7 +28,7 @@ def param(request):
 
 def test_DeferredExpression_expression(param):
     assert isinstance(param.de, Deferred)
-    expression = param.de.expression()
+    expression = param.de.unparse()
     assert expression == param.expression
     value = eval(expression)
     assert param.de.evaluate() == value

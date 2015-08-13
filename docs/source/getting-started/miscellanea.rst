@@ -154,7 +154,7 @@ By default the
 d = MissingRequiredParameterError(KeyValue('d', None, defined=False), 'required value is missing')
 w = UnexpectedParameterError(KeyValue('w', 1.1), "unexpected parameter 'w'")
 [sub]
-    c = MinLengthError(KeyValue('sub.c', 'x'), "value 'x' has length 1 than is lower than min_len 2")
+    c = MinLengthError(KeyValue('sub.c', 'x'), 'value has length 1 than is lower than min_len 2')
 
 >>> print(config['b'])
 1.02

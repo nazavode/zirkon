@@ -92,7 +92,7 @@ as values.
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError(KeyValue('subsection.y', 'alpha'), "value 'alpha' has length 5 than is lower than min_len 6")
+     y = MinLengthError(KeyValue('subsection.y', 'alpha'), 'value has length 5 than is lower than min_len 6')
      w = MissingRequiredParameterError(KeyValue('subsection.w', None, defined=False), 'required value is missing')
  >>>
 

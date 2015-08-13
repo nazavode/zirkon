@@ -130,43 +130,47 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def evaluate(self, globals_d=None):
-        """evaluate(globals_d=None) -> expression value"""
+        """evaluate(globals_d=None) -> value"""
         pass
 
     @abc.abstractmethod
     def __reduce__(self):
         pass
 
-    def expression(self):
-        """expression() -> python expression representation"""
-        return self._impl_expression_wrap(wrap=False)
+    def unparse(self):
+        """unparse() -> python expression representation"""
+        return self._impl_unparse_wrap(wrap=False)
 
-    def _impl_expression_wrap(self, wrap):
-        """_impl_expression_wrap(wrap) -> expression representation
+    def _impl_unparse_wrap(self, wrap):
+        """_impl_unparse_wrap(wrap) -> python expression representation
            If 'wrap' puts output in parenthesis.
         """
-        expression = self._impl_expression()
+        expression = self._impl_unparse()
         if wrap:
             return '(' + expression + ')'
         else:
             return expression
 
     @abc.abstractmethod
-    def _impl_expression(self):
-        """_impl_expression() -> expression representation."""
+    def _impl_unparse(self):
+        """_impl_unparse() -> python expression representation."""
         pass
 
     def _wrap(self, expression, wrap):  # pylint: disable=R0201
         """wrap(expression, wrap) -> [wrapped] expression"""
 
-    # __str__:
     @abc.abstractmethod
-    def __str__(self):
+    def _impl_tree(self):
+        """_impl_tree() -> show object tree"""
         pass
+
+    # __str__:
+    def __str__(self):
+        return self._impl_tree()
 
     # __repr__:
     def __repr__(self):
-        return self.expression()
+        return self.unparse()
 
     # unary mathematical operators:
     def __abs__(self):
@@ -289,8 +293,8 @@ class Deferred(metaclass=abc.ABCMeta):
             return operand
 
     @classmethod
-    def _impl_expression_lr_operand(cls, operand, wrap=None, right=None):
-        """_impl_expression_operand(operand, wrap=None, right=None) -> operand value"""
+    def _impl_unparse_lr_operand(cls, operand, wrap=None, right=None):
+        """_impl_unparse_operand(operand, wrap=None, right=None) -> operand value"""
         if isinstance(operand, Deferred):
             if wrap is None:
                 p_operand = operand._priority()  # pylint: disable=W0212
@@ -303,24 +307,32 @@ class Deferred(metaclass=abc.ABCMeta):
                         wrap = right
                 else:
                     wrap = (p_operand < p_cls)
-            return operand._impl_expression_wrap(wrap=wrap)  # pylint: disable=W0212
+            return operand._impl_unparse_wrap(wrap=wrap)  # pylint: disable=W0212
         else:
             return repr(operand)
 
     @classmethod
-    def _impl_expression_left_operand(cls, operand, wrap=None):
-        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
-        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=False)
+    def _impl_unparse_left_operand(cls, operand, wrap=None):
+        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=False)
 
     @classmethod
-    def _impl_expression_right_operand(cls, operand, wrap=None):
-        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
-        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=True)
+    def _impl_unparse_right_operand(cls, operand, wrap=None):
+        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=True)
 
     @classmethod
-    def _impl_expression_operand(cls, operand, wrap=None):
-        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
-        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=None)
+    def _impl_unparse_operand(cls, operand, wrap=None):
+        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=None)
+
+    @classmethod
+    def _impl_tree_operand(cls, operand):
+        """_impl_tree_operand(operand) -> operand tree representation"""
+        if isinstance(operand, Deferred):
+            return operand._impl_tree()  # pylint: disable=W0212
+        else:
+            return repr(operand)
 
     @classmethod
     def _priority(cls):
@@ -344,14 +356,14 @@ class DConst(Deferred):
     def __reduce__(self):
         return (self.__class__, (self.value,))
 
-    def __str__(self):
+    def _impl_tree(self):
         return "{}({!r})".format(self.__class__.__name__, self.value)
 
     def evaluate(self, globals_d=None):
         return self._impl_evaluate_operand(operand=self.value, globals_d=globals_d)
 
-    def _impl_expression(self):
-        return self._impl_expression_operand(self.value)
+    def _impl_unparse(self):
+        return self._impl_unparse_operand(self.value)
 
 
 class DName(Deferred):
@@ -366,7 +378,7 @@ class DName(Deferred):
     def __reduce__(self):
         return (self.__class__, (self.name, self.globals_d))
 
-    def __str__(self):
+    def _impl_tree(self):
         if self.globals_d is None:
             gstring = ""
         else:
@@ -384,7 +396,7 @@ class DName(Deferred):
             raise NameError("name {!r} is not defined".format(self.name))
         return globals_d[self.name]
 
-    def _impl_expression(self):
+    def _impl_unparse(self):
         return self.name
 
 
@@ -404,7 +416,7 @@ class DCall(Deferred):
     def __reduce__(self):
         return (self.__class__, (self.functor, self.p_args, self.n_args))
 
-    def __str__(self):
+    def _impl_tree(self):
         return "{}({!r}, {!r}, {!r})".format(
             self.__class__.__name__,
             self.functor,
@@ -418,13 +430,13 @@ class DCall(Deferred):
         n_args = {key: self._impl_evaluate_operand(operand, globals_d) for key, operand in self.n_args.items()}
         return value(*p_args, **n_args)
 
-    def _impl_expression(self):
+    def _impl_unparse(self):
         l_args = []
         if self.p_args:
-            l_args.extend(self._impl_expression_operand(a) for a in self.p_args)
+            l_args.extend(self._impl_unparse_operand(a) for a in self.p_args)
         if self.n_args:
-            l_args.extend("{}={}".format(k, self._impl_expression_operand(v)) for k, v in self.n_args.items())
-        return "{}({})".format(self._impl_expression_operand(self.functor), ', '.join(l_args))
+            l_args.extend("{}={}".format(k, self._impl_unparse_operand(v)) for k, v in self.n_args.items())
+        return "{}({})".format(self._impl_unparse_operand(self.functor), ', '.join(l_args))
 
 
 class DUnaryOperator(Deferred):
@@ -438,8 +450,8 @@ class DUnaryOperator(Deferred):
     def __reduce__(self):
         return (self.__class__, (self.operand,))
 
-    def __str__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.operand)
+    def _impl_tree(self):
+        return "{}({})".format(self.__class__.__name__, self._impl_tree_operand(self.operand))
 
     def evaluate(self, globals_d=None):
         value = self._impl_evaluate_operand(operand=self.operand, globals_d=globals_d)
@@ -458,8 +470,8 @@ class DAbs(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return abs(value)
 
-    def _impl_expression(self):
-        return "abs({})".format(self._impl_expression_operand(self.operand, wrap=False))
+    def _impl_unparse(self):
+        return "abs({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
 class DPos(DUnaryOperator):
@@ -468,8 +480,8 @@ class DPos(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return +value
 
-    def _impl_expression(self):
-        return "+{}".format(self._impl_expression_operand(self.operand))
+    def _impl_unparse(self):
+        return "+{}".format(self._impl_unparse_operand(self.operand))
 
 
 class DNeg(DUnaryOperator):
@@ -478,8 +490,8 @@ class DNeg(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return -value
 
-    def _impl_expression(self):
-        return "-{}".format(self._impl_expression_operand(self.operand))
+    def _impl_unparse(self):
+        return "-{}".format(self._impl_unparse_operand(self.operand))
 
 
 class DLen(DUnaryOperator):
@@ -488,8 +500,8 @@ class DLen(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return len(value)
 
-    def _impl_expression(self):
-        return "len({})".format(self._impl_expression_operand(self.operand, wrap=False))
+    def _impl_unparse(self):
+        return "len({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
 class DStr(DUnaryOperator):
@@ -498,8 +510,8 @@ class DStr(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return str(value)
 
-    def _impl_expression(self):
-        return "str({})".format(self._impl_expression_operand(self.operand, wrap=False))
+    def _impl_unparse(self):
+        return "str({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
 class DRepr(DUnaryOperator):
@@ -508,8 +520,8 @@ class DRepr(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return repr(value)
 
-    def _impl_expression(self):
-        return "repr({})".format(self._impl_expression_operand(self.operand, wrap=False))
+    def _impl_unparse(self):
+        return "repr({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
 class DNot(DUnaryOperator):
@@ -518,8 +530,8 @@ class DNot(DUnaryOperator):
     def _impl_unary_operation(self, value):
         return not value
 
-    def _impl_expression(self):
-        return "not {}".format(self._impl_expression_operand(self.operand))
+    def _impl_unparse(self):
+        return "not {}".format(self._impl_unparse_operand(self.operand))
 
 
 class DBinaryOperator(Deferred):
@@ -546,15 +558,17 @@ class DBinaryOperator(Deferred):
     def __reduce__(self):
         return (self.__class__, (self.left_operand, self.right_operand))
 
-    def __str__(self):
-        return "{}({!r}, {!r})".format(
-            self.__class__.__name__, self.left_operand, self.right_operand)
+    def _impl_tree(self):
+        return "{}({}, {})".format(
+            self.__class__.__name__,
+            self._impl_tree_operand(self.left_operand),
+            self._impl_tree_operand(self.right_operand))
 
-    def _impl_expression(self):
+    def _impl_unparse(self):
         return "{} {} {}".format(
-            self._impl_expression_left_operand(self.left_operand),
+            self._impl_unparse_left_operand(self.left_operand),
             self.BINOP_SYMBOL,
-            self._impl_expression_right_operand(self.right_operand))
+            self._impl_unparse_right_operand(self.right_operand))
 
 
 class DAdd(DBinaryOperator):
@@ -611,10 +625,10 @@ class DDivMod(DBinaryOperator):
     def _impl_binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
 
-    def _impl_expression(self):
+    def _impl_unparse(self):
         return "divmod({}, {})".format(
-            self._impl_expression_left_operand(self.left_operand, wrap=False),
-            self._impl_expression_right_operand(self.right_operand, wrap=False))
+            self._impl_unparse_left_operand(self.left_operand, wrap=False),
+            self._impl_unparse_right_operand(self.right_operand, wrap=False))
 
 
 class DPow(DBinaryOperator):
@@ -679,10 +693,10 @@ class DAnd(DBinaryOperator):
     def _impl_binary_operation(self, left_value, right_value):
         return left_value and right_value
 
-    def expression(self):
+    def unparse(self):
         return "{} and {}".format(
-            self._impl_expression_left_operand(self.left_operand),
-            self._impl_expression_right_operand(self.right_operand))
+            self._impl_unparse_left_operand(self.left_operand),
+            self._impl_unparse_right_operand(self.right_operand))
 
 
 class DGetattr(DUnaryOperator):
@@ -694,8 +708,8 @@ class DGetattr(DUnaryOperator):
     def _impl_unary_operation(self, operand):
         return getattr(operand, self.attr_name)
 
-    def _impl_expression(self):
-        operand = self._impl_expression_operand(self.operand)
+    def _impl_unparse(self):
+        operand = self._impl_unparse_operand(self.operand)
         fmt = "{}.{}"
         return fmt.format(operand, self.attr_name)
 
@@ -706,9 +720,9 @@ class DGetitem(DBinaryOperator):
     def _impl_binary_operation(self, left, right):
         return left[right]
 
-    def _impl_expression(self):
-        left = self._impl_expression_left_operand(self.left_operand)
-        right = self._impl_expression_right_operand(self.right_operand, wrap=False)
+    def _impl_unparse(self):
+        left = self._impl_unparse_left_operand(self.left_operand)
+        right = self._impl_unparse_right_operand(self.right_operand, wrap=False)
         fmt = "{}[{}]"
         return fmt.format(left, right)
 
@@ -719,10 +733,10 @@ class DContains(DBinaryOperator):
     def _impl_binary_operation(self, left_value, right_value):
         return left_value in right_value
 
-    def _impl_expression(self):
+    def _impl_unparse(self):
         return "{} in {}".format(
-            self._impl_expression_left_operand(self.left_operand),
-            self._impl_expression_right_operand(self.right_operand))
+            self._impl_unparse_left_operand(self.left_operand),
+            self._impl_unparse_right_operand(self.right_operand))
 
 
 class DOr(DBinaryOperator):

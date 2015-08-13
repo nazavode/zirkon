@@ -223,8 +223,8 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
  >>> config['y'] = 10
  >>> validation = config.self_validate(raise_on_error=False)
  >>> validation.dump()
- x = MinValueError(KeyValue('x', 10), 'value 10 is lower than min 30')
- y = MaxValueError(KeyValue('y', 10), 'value 10 is greater than max 2')
+ x = MinValueError(KeyValue('x', 10), 'value is lower than min 30')
+ y = MaxValueError(KeyValue('y', 10), 'value is greater than max 2')
 
 The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
  
@@ -235,7 +235,7 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  ...     print("config validation error:")
  ...     err.validation.dump()
  config validation error:
- x = MinValueError(KeyValue('x', 10), 'value 10 is lower than min 30')
- y = MaxValueError(KeyValue('y', 10), 'value 10 is greater than max 2')
+ x = MinValueError(KeyValue('x', 10), 'value is lower than min 30')
+ y = MaxValueError(KeyValue('y', 10), 'value is greater than max 2')
  >>>
 
