@@ -125,24 +125,24 @@ class Config(Section):
            Serialize to stream 'stream' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
-        serializer = self.get_serializer(protocol)
-        return serializer.to_string(self)
+        serializer_instance = self.get_serializer(protocol)
+        return serializer_instance.to_string(self)
 
     def to_stream(self, stream, protocol):
         """to_stream(stream, protocol)
            Serialize to stream 'stream' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
-        serializer = self.get_serializer(protocol)
-        return serializer.to_stream(self, stream)
+        serializer_instance = self.get_serializer(protocol)
+        return serializer_instance.to_stream(self, stream)
 
     def to_file(self, filename, protocol):
         """to_file(filename, protocol)
            Serialize to file 'filename' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
-        serializer = self.get_serializer(protocol)
-        return serializer.to_file(self, filename)
+        serializer_instance = self.get_serializer(protocol)
+        return serializer_instance.to_file(self, filename)
 
     def dump(self, stream=None, protocol="daikon"):
         self.self_validate(raise_on_error=True)
@@ -153,8 +153,8 @@ class Config(Section):
         """from_file(filename, protocol, *, dictionary=None, schema=None, validate=True)
            Deserialize from file 'filename' according to 'protocol'.
         """
-        serializer = cls.get_serializer(protocol)
-        instance = serializer.from_file(cls, filename, dictionary=dictionary)
+        serializer_instance = cls.get_serializer(protocol)
+        instance = serializer_instance.from_file(cls, filename, dictionary=dictionary)
         instance.set_schema(schema, validate=validate)
         return instance
 
@@ -163,8 +163,8 @@ class Config(Section):
         """from_stream(stream, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
            Deserialize from stream 'stream' according to 'protocol'.
         """
-        serializer = cls.get_serializer(protocol)
-        instance = serializer.from_stream(cls, stream, dictionary=dictionary, filename=filename)
+        serializer_instance = cls.get_serializer(protocol)
+        instance = serializer_instance.from_stream(cls, stream, dictionary=dictionary, filename=filename)
         instance.set_schema(schema, validate=validate)
         return instance
 
@@ -173,8 +173,8 @@ class Config(Section):
         """from_string(string, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
            Deserialize from string 'string' according to 'protocol'.
         """
-        serializer = cls.get_serializer(protocol)
-        instance = serializer.from_string(cls, string, dictionary=dictionary, filename=filename)
+        serializer_instance = cls.get_serializer(protocol)
+        instance = serializer_instance.from_string(cls, string, dictionary=dictionary, filename=filename)
         instance.set_schema(schema, validate=validate)
         return instance
 
@@ -203,50 +203,35 @@ def _setup_codecs():
     """_setup_codecs()
        Setup codecs for validators.
     """
+    def _deferred_encode(deferred_object):
+        """_deferred_encode(deferred_object)
+           Encoder for Deferred instances
+        """
+        return {'expression': deferred_object.expression()}
+
+    def _deferred_decode(deferred_class_name, arguments):
+        """_deferred_decode(deferred_class_name, arguments)
+           Decoder for Deferred instances
+        """
+        deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
+        if deferred_class is None:
+            raise NameError("undefined Deferred class {}".format(deferred_class_name))
+        return eval(arguments['expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=W0123
+
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
     if _json_serializer_module is not None:
-        def _deferred_json_encode(deferred_object):
-            """_deferred_json_encode(deferred_object)
-               JSON encoder for Deferred instances
-            """
-            return {'expression': deferred_object.expression()}
-
-        def _deferred_json_decode(deferred_class_name, arguments):
-            """_deferred_json_decode(deferred_class_name, arguments)
-               JSON decoder for Deferred instances
-            """
-            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
-            if deferred_class is None:
-                raise NameError("undefined Deferred class {}".format(deferred_class_name))
-            return eval(arguments['expression'])
-
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
             class_=Deferred,
-            encode=_deferred_json_encode,
-            decode=_deferred_json_decode,
+            encode=_deferred_encode,
+            decode=_deferred_decode,
         )
 
     _text_serializer_module = getattr(serializer, 'text_serializer', None)
     if _text_serializer_module is not None:
-        def _deferred_text_encode(deferred_object):
-            """_deferred_text_encode(deferred_object)
-               ConfigObj/Daikon encoder for Deferred instances
-            """
-            return {'expression': deferred_object.expression()}
-
-        def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
-            """_deferred_text_decode(deferred_name, arguments)
-               ConfigObj/Daikon decoder for Deferred instances
-            """
-            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
-            if deferred_class is None:
-                raise NameError("undefined Deferred class {}".format(deferred_class_name))
-            return eval(arguments['expression'])
-
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
             class_=Deferred,
-            encode=_deferred_text_encode,
-            decode=_deferred_text_decode,
+            encode=_deferred_encode,
+            decode=_deferred_decode,
         )
 
         def _str_text_encode(str_object):

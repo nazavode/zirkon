@@ -28,7 +28,6 @@ __all__ = [
 
 import abc
 
-from ..toolbox.deferred_eval import DeferredEval
 from ..toolbox.deferred import Deferred
 
 
@@ -48,11 +47,11 @@ class Check(metaclass=abc.ABCMeta):
         """
         pass
 
-    def has_actual_value(self, value):
+    def has_actual_value(self, value):  # pylint: disable=R0201
         """has_actual_value(value)
-           Return False if value is a DeferredEval or Deferred instance
+           Return False if value is a Deferred instance
         """
-        return not isinstance(value, (DeferredEval, Deferred))
+        return not isinstance(value, Deferred)
 
     def self_validate(self, validator):
         """self_validate(validator)
@@ -63,9 +62,7 @@ class Check(metaclass=abc.ABCMeta):
     def get_value(self, value, section):  # pylint: disable=R0201
         """get_value(value, section) -> value"""
         if section is not None:
-            globals_d = {'SECTION': section, 'ROOT': section.root}
-            if isinstance(value, DeferredEval):
-                value = value(globals_d=globals_d)
-            elif isinstance(value, Deferred):
+            if isinstance(value, Deferred):
+                globals_d = {'SECTION': section, 'ROOT': section.root}
                 value = value.evaluate(globals_d=globals_d)
         return value

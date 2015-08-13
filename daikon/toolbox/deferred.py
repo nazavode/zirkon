@@ -293,7 +293,7 @@ class Deferred(metaclass=abc.ABCMeta):
         """_impl_expression_operand(operand, wrap=None, right=None) -> operand value"""
         if isinstance(operand, Deferred):
             if wrap is None:
-                p_operand = operand._priority()
+                p_operand = operand._priority()  # pylint: disable=W0212
                 p_cls = cls._priority()
                 if p_operand == p_cls:
                     right_associativity = cls._right_associativity()
@@ -303,7 +303,7 @@ class Deferred(metaclass=abc.ABCMeta):
                         wrap = right
                 else:
                     wrap = (p_operand < p_cls)
-            return operand._impl_expression_wrap(wrap=wrap)
+            return operand._impl_expression_wrap(wrap=wrap)  # pylint: disable=W0212
         else:
             return repr(operand)
 
@@ -391,10 +391,14 @@ class DName(Deferred):
 class DCall(Deferred):
     """'call' operator."""
 
-    def __init__(self, functor, p_args=(), n_args={}):
+    def __init__(self, functor, p_args=None, n_args=None):
         super().__init__()
         self.functor = functor
+        if p_args is None:
+            p_args = ()
         self.p_args = p_args
+        if n_args is None:
+            n_args = {}
         self.n_args = n_args
 
     def __reduce__(self):
@@ -412,7 +416,7 @@ class DCall(Deferred):
         value = self._impl_evaluate_operand(operand=self.functor, globals_d=globals_d)
         p_args = [self._impl_evaluate_operand(operand, globals_d) for operand in self.p_args]
         n_args = {key: self._impl_evaluate_operand(operand, globals_d) for key, operand in self.n_args.items()}
-        return self._impl_unary_operation(value)
+        return value(*p_args, **n_args)
 
     def _impl_expression(self):
         l_args = []

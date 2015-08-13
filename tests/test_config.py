@@ -34,8 +34,7 @@ from common.fixtures import dictionary, \
     SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
 from daikon.toolbox.dictutils import compare_dicts
-from daikon.toolbox.deferred_eval import DeferredEval
-from daikon.config import Config
+from daikon.config import Config, ROOT, SECTION
 from daikon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, PickleSerializer
 
@@ -122,27 +121,27 @@ def test_Config_get_serializer_configobj():
 def test_Config_get_serializer_pickle():
     assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
-def test_Config_deferred_eval():
+def test_Config_deferred():
     config = Config()
     config['a'] = 10
     config['b'] = 20
-    config['c'] = DeferredEval("SECTION['a'] * SECTION['b']")
+    config['c'] = SECTION['a'] * SECTION['b']
     config['sub'] = {}
     config['sub']['x'] = 7
     config['options'] = {}
     config['options']['d'] = 100
-    config['options']['e'] = DeferredEval("ROOT['a'] + ROOT['sub']['x'] + SECTION['d']")
+    config['options']['e'] = ROOT['a'] + ROOT['sub']['x'] + SECTION['d']
 
     assert isinstance(config['c'], int)
     assert config['c'] == 200
     assert isinstance(config['options']['e'], int)
     assert config['options']['e'] == 117
 
-def test_Config_deferred_eval_error():
+def test_Config_deferred_error():
     config = Config()
     config['a'] = 10
     with pytest.raises(KeyError) as exc_info:
-        config['c'] = DeferredEval("SECTION['a'] * SECTION['b']")
+        config['c'] = SECTION['a'] * SECTION['b']
     print(exc_info)
     print(exc_info.value)
     assert str(exc_info.value) == "'b'"

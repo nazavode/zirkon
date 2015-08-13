@@ -70,8 +70,7 @@ from .ignore import Ignore
 from .remove import Remove
 
 from ..toolbox.unrepr import unrepr
-from ..toolbox.deferred_eval import DeferredEval
-from ..toolbox.subclass import subclasses, find_subclass
+from ..toolbox.subclass import find_subclass
 
 from .error import KeyValidationError
 from .key_value import KeyValue
@@ -97,8 +96,6 @@ def _setup_codecs():
             globals_d = {}
             globals_d['ROOT'] = ROOT
             globals_d['SECTION'] = SECTION
-            for deferred_class in subclasses(DeferredEval, include_self=True):
-                globals_d[deferred_class.__name__] = deferred_class
             globals_d[type_name] = Validator.class_dict()[type_name]
             return unrepr(repr_data, globals_d)
 

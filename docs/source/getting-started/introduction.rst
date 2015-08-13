@@ -105,23 +105,28 @@ Daikon supports advanced value interpolation: key/values precedently stored in
 the Config object can be accessed and used in complex expressions to set new values.
 For instance:
 
- >>> from daikon.toolbox.deferred_eval import deferred_eval
- >>> print(config['x'])
- 10
- >>> config['z'] = deferred_eval("ROOT['x'] * 4")
- >>> print(config['z'])
- 40
- >>> del config['z']
+ >>> config_s = """\
+ ... x = 10
+ ... y = ROOT['x'] * 4
+ ... """
+ >>> config = Config.from_string(config_s, protocol="daikon")
+ >>> config.dump()
+ x = 10
+ y = 40
+ >>>
 
 Moreover, this can be used in validators:
 
- >>> schema['subsection']['y'] = Str(min_len=deferred_eval("ROOT['x'] - 2"))
-
-The ``min_len`` value of the ``Str`` validator depends on the value found for ``x`` (10 in this case):
-
+ >>> schema_s = """\
+ ... x = Int()
+ ... y = Int(min=ROOT['x'] // 2)
+ ... z = Int(default=ROOT['x'] * ROOT['y'])
+ ... """
+ >>> schema = Schema.from_string(schema_s, protocol="daikon")
  >>> validation = schema.validate(config)
  >>> validation.dump()
- [subsection]
-     y = MinLengthError(key_value=KeyValue(key='subsection.y', value='alpha', defined=True), message="value 'alpha' has length 5 than is lower than min_len 8")
-     w = MissingRequiredParameterError(key_value=KeyValue(key='subsection.w', value=None, defined=False), message='required value is missing')
+ >>> config.dump()
+ x = 10
+ y = 40
+ z = 400
  >>>
