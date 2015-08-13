@@ -35,6 +35,10 @@ _data = [
     "x * (y / z) * w",
     "x * y / z * w",
     "x * (y * (z * w))",
+    "x + y + z",
+    "x ** y ** z",
+    #"(x ** y) ** z",
+    #"x ** (y ** z)",
 ]
 
 _data_no_match = [

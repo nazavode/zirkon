@@ -124,6 +124,9 @@ class DEBase(metaclass=abc.ABCMeta):
         'DEGetitem': 17,
         'DEGetattr': 18,
     }
+    RIGHT_ASSOCIATIVITY = {
+        'DEPow': True
+    }
 
     @abc.abstractmethod
     def evaluate(self, globals_d=None):
@@ -284,7 +287,14 @@ class DEBase(metaclass=abc.ABCMeta):
             if wrap is None:
                 p_operand = operand._priority()
                 p_cls = cls._priority()
-                wrap = (p_operand < p_cls) or (right and p_operand == p_cls)
+                if p_operand == p_cls:
+                    right_associativity = cls._right_associativity()
+                    if right_associativity:
+                        wrap = not right
+                    else:
+                        wrap = right
+                else:
+                    wrap = (p_operand < p_cls)
             return operand._impl_expression_wrap(wrap=wrap)
         else:
             return repr(operand)
@@ -308,6 +318,11 @@ class DEBase(metaclass=abc.ABCMeta):
     def _priority(cls):
         """_priority() -> priority"""
         return cls.PRIORITY.get(cls.__name__, 1000)
+
+    @classmethod
+    def _right_associativity(cls):
+        """_right_associativity() -> right_associativity"""
+        return cls.RIGHT_ASSOCIATIVITY.get(cls.__name__, False)
 
 
 class DEConst(DEBase):
