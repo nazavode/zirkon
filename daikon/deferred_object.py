@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-from .toolbox.deferred_expression import DEName
+from .toolbox.deferred import DName
 
-SECTION = DEName('SECTION')
-ROOT = DEName('ROOT')
+SECTION = DName('SECTION')
+ROOT = DName('ROOT')

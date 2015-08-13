@@ -16,45 +16,45 @@
 #
 
 """\
-config.deferred_expression
-==========================
-Implementation of the DEBase class for deferred evaluation of expressions.
+config.deferred
+===============
+Implementation of the Deferred abstract base class for deferred evaluation of python expressions.
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'DEBase',
-    'DEBinaryOperator',
-    'DEUnaryOperator',
-    'DEName',
-    'DEConst',
-    'DEAbs',
-    'DEPos',
-    'DENeg',
-    'DEAdd',
-    'DESub',
-    'DEMul',
-    'DETrueDiv',
-    'DEFloorDiv',
-    'DEMod',
-    'DEDivMod',
-    'DEPow',
-    'DEEq',
-    'DENe',
-    'DELt',
-    'DELe',
-    'DEGt',
-    'DEGe',
-    'DEAnd',
-    'DEOr',
-    'DENot',
-    'DELen',
-    'DEStr',
-    'DERepr',
-    'DEContains',
-    'DEGetattr',
-    'DEGetitem',
-    'DECall',
+    'Deferred',
+    'DBinaryOperator',
+    'DUnaryOperator',
+    'DName',
+    'DConst',
+    'DAbs',
+    'DPos',
+    'DNeg',
+    'DAdd',
+    'DSub',
+    'DMul',
+    'DTrueDiv',
+    'DFloorDiv',
+    'DMod',
+    'DDivMod',
+    'DPow',
+    'DEq',
+    'DNe',
+    'DLt',
+    'DLe',
+    'DGt',
+    'DGe',
+    'DAnd',
+    'DOr',
+    'DNot',
+    'DLen',
+    'DStr',
+    'DRepr',
+    'DContains',
+    'DGetattr',
+    'DGetitem',
+    'DCall',
 ]
 
 import abc
@@ -85,47 +85,47 @@ import abc
 # `expressions, ...`	String conversion
 
 
-class DEBase(metaclass=abc.ABCMeta):
-    """DEBase()
+class Deferred(metaclass=abc.ABCMeta):
+    """Deferred()
        Abstract base class to compose generic expressions.
        Concrete classes must implement the evaluate(globals_d=None) method.
     """
     PRIORITY = {
-        'DEConst': 100000,
-        'DEName': 100000,
-        'DEOr': 1,
-        'DEAnd': 2,
-        'DENot': 3,
-        'DEContains': 4,
-        # 'DEIs': 5,
-        'DELt': 6,
-        'DELe': 6,
-        'DEGt': 6,
-        'DEGe': 6,
-        'DEEq': 6,
-        'DENe': 6,
-        # 'DEBitwiseOr': 7,
-        # 'DEBitwiseXOr': 8,
-        # 'DEBitwiseAnd': 9,
-        # 'DELeftShift': 10,
-        # 'DERightShift': 10,
-        'DEAdd': 11,
-        'DESub': 11,
-        'DEMul': 12,
-        'DETrueDiv': 12,
-        'DEFloorDiv': 12,
-        'DEMod': 12,
-        'DEDivMod': 12,
-        'DEPos': 13,
-        'DENeg': 13,
-        # 'DEBitwiseNot': 14,
-        'DEPow': 15,
-        'DECall': 16,
-        'DEGetitem': 17,
-        'DEGetattr': 18,
+        'DConst': 100000,
+        'DName': 100000,
+        'DOr': 1,
+        'DAnd': 2,
+        'DNot': 3,
+        'DContains': 4,
+        # 'DIs': 5,
+        'DLt': 6,
+        'DLe': 6,
+        'DGt': 6,
+        'DGe': 6,
+        'DEq': 6,
+        'DNe': 6,
+        # 'DBitwiseOr': 7,
+        # 'DBitwiseXOr': 8,
+        # 'DBitwiseAnd': 9,
+        # 'DLeftShift': 10,
+        # 'DRightShift': 10,
+        'DAdd': 11,
+        'DSub': 11,
+        'DMul': 12,
+        'DTrueDiv': 12,
+        'DFloorDiv': 12,
+        'DMod': 12,
+        'DDivMod': 12,
+        'DPos': 13,
+        'DNeg': 13,
+        # 'DBitwiseNot': 14,
+        'DPow': 15,
+        'DCall': 16,
+        'DGetitem': 17,
+        'DGetattr': 18,
     }
     RIGHT_ASSOCIATIVITY = {
-        'DEPow': True
+        'DPow': True
     }
 
     @abc.abstractmethod
@@ -170,120 +170,120 @@ class DEBase(metaclass=abc.ABCMeta):
 
     # unary mathematical operators:
     def __abs__(self):
-        return DEAbs(self)
+        return DAbs(self)
 
     def __pos__(self):
-        return DEPos(self)
+        return DPos(self)
 
     def __neg__(self):
-        return DENeg(self)
+        return DNeg(self)
 
     # binary mathematical operators:
     def __add__(self, other):
-        return DEAdd(self, other)
+        return DAdd(self, other)
 
     def __radd__(self, other):
-        return DEAdd(other, self)
+        return DAdd(other, self)
 
     def __sub__(self, other):
-        return DESub(self, other)
+        return DSub(self, other)
 
     def __rsub__(self, other):
-        return DESub(other, self)
+        return DSub(other, self)
 
     def __mul__(self, other):
-        return DEMul(self, other)
+        return DMul(self, other)
 
     def __rmul__(self, other):
-        return DEMul(other, self)
+        return DMul(other, self)
 
     def __truediv__(self, other):
-        return DETrueDiv(self, other)
+        return DTrueDiv(self, other)
 
     def __rtruediv__(self, other):
-        return DETrueDiv(other, self)
+        return DTrueDiv(other, self)
 
     def __floordiv__(self, other):
-        return DEFloorDiv(self, other)
+        return DFloorDiv(self, other)
 
     def __rfloordiv__(self, other):
-        return DEFloorDiv(other, self)
+        return DFloorDiv(other, self)
 
     def __mod__(self, other):
-        return DEMod(self, other)
+        return DMod(self, other)
 
     def __rmod__(self, other):
-        return DEMod(other, self)
+        return DMod(other, self)
 
     def __divmod__(self, other):
-        return DEDivMod(self, other)
+        return DDivMod(self, other)
 
     def __rdivmod__(self, other):
-        return DEDivMod(other, self)
+        return DDivMod(other, self)
 
     def __pow__(self, other):
-        return DEPow(self, other)
+        return DPow(self, other)
 
     def __rpow__(self, other):
-        return DEPow(other, self)
+        return DPow(other, self)
 
     # binary comparison operators:
     def __eq__(self, other):
-        return DEEq(self, other)
+        return DEq(self, other)
 
     def __req__(self, other):
-        return DEEq(other, self)
+        return DEq(other, self)
 
     def __ne__(self, other):
-        return DENe(self, other)
+        return DNe(self, other)
 
     def __rne__(self, other):
-        return DENe(other, self)
+        return DNe(other, self)
 
     def __lt__(self, other):
-        return DELt(self, other)
+        return DLt(self, other)
 
     def __rlt__(self, other):
-        return DEGe(other, self)
+        return DGe(other, self)
 
     def __le__(self, other):
-        return DELe(self, other)
+        return DLe(self, other)
 
     def __rle__(self, other):
-        return DEGt(self, other)
+        return DGt(self, other)
 
     def __gt__(self, other):
-        return DEGt(self, other)
+        return DGt(self, other)
 
     def __rgt__(self, other):
-        return DELe(self, other)
+        return DLe(self, other)
 
     def __ge__(self, other):
-        return DEGe(self, other)
+        return DGe(self, other)
 
     def __rge__(self, other):
-        return DELt(self, other)
+        return DLt(self, other)
 
     def __contains__(self, other):
-        return DEContains(self, other)
+        return DContains(self, other)
 
     # Call:
     def __call__(self, *p_args, **n_args):
-        return DECall(functor=self, p_args=p_args, n_args=n_args)
+        return DCall(functor=self, p_args=p_args, n_args=n_args)
 
     # Get attribute:
     def __getattr__(self, attr_name):
-        return DEGetattr(self, attr_name)
+        return DGetattr(self, attr_name)
 
     # Get item:
     def __getitem__(self, item):
-        return DEGetitem(self, item)
+        return DGetitem(self, item)
 
     # utilities:
     @classmethod
     def _impl_evaluate_operand(cls, operand, globals_d):
         """_impl_evaluate_operand(operand, globals_d) -> operand value"""
-        if isinstance(operand, DEBase):
+        if isinstance(operand, Deferred):
             return operand.evaluate(globals_d=globals_d)
         else:
             return operand
@@ -291,7 +291,7 @@ class DEBase(metaclass=abc.ABCMeta):
     @classmethod
     def _impl_expression_lr_operand(cls, operand, wrap=None, right=None):
         """_impl_expression_operand(operand, wrap=None, right=None) -> operand value"""
-        if isinstance(operand, DEBase):
+        if isinstance(operand, Deferred):
             if wrap is None:
                 p_operand = operand._priority()
                 p_cls = cls._priority()
@@ -333,9 +333,9 @@ class DEBase(metaclass=abc.ABCMeta):
         return cls.RIGHT_ASSOCIATIVITY.get(cls.__name__, False)
 
 
-class DEConst(DEBase):
-    """DEConst(value)
-       DEConst value expression.
+class DConst(Deferred):
+    """DConst(value)
+       DConst value expression.
     """
 
     def __init__(self, value):
@@ -354,9 +354,9 @@ class DEConst(DEBase):
         return self._impl_expression_operand(self.value)
 
 
-class DEName(DEBase):
-    """DEName(name)
-       DEName name expression.
+class DName(Deferred):
+    """DName(name)
+       DName name expression.
     """
 
     def __init__(self, name, globals_d=None):
@@ -388,7 +388,7 @@ class DEName(DEBase):
         return self.name
 
 
-class DECall(DEBase):
+class DCall(Deferred):
     """'call' operator."""
 
     def __init__(self, functor, p_args=(), n_args={}):
@@ -423,8 +423,8 @@ class DECall(DEBase):
         return "{}({})".format(self._impl_expression_operand(self.functor), ', '.join(l_args))
 
 
-class DEUnaryOperator(DEBase):
-    """DEUnaryOperator(operand)
+class DUnaryOperator(Deferred):
+    """DUnaryOperator(operand)
        Abstract base class for unary operators.
     """
 
@@ -448,7 +448,7 @@ class DEUnaryOperator(DEBase):
         pass
 
 
-class DEAbs(DEUnaryOperator):
+class DAbs(DUnaryOperator):
     """'abs' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -458,7 +458,7 @@ class DEAbs(DEUnaryOperator):
         return "abs({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
-class DEPos(DEUnaryOperator):
+class DPos(DUnaryOperator):
     """'pos' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -468,7 +468,7 @@ class DEPos(DEUnaryOperator):
         return "+{}".format(self._impl_expression_operand(self.operand))
 
 
-class DENeg(DEUnaryOperator):
+class DNeg(DUnaryOperator):
     """'neg' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -478,7 +478,7 @@ class DENeg(DEUnaryOperator):
         return "-{}".format(self._impl_expression_operand(self.operand))
 
 
-class DELen(DEUnaryOperator):
+class DLen(DUnaryOperator):
     """'len' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -488,7 +488,7 @@ class DELen(DEUnaryOperator):
         return "len({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
-class DEStr(DEUnaryOperator):
+class DStr(DUnaryOperator):
     """'str' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -498,7 +498,7 @@ class DEStr(DEUnaryOperator):
         return "str({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
-class DERepr(DEUnaryOperator):
+class DRepr(DUnaryOperator):
     """'repr' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -508,7 +508,7 @@ class DERepr(DEUnaryOperator):
         return "repr({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
-class DENot(DEUnaryOperator):
+class DNot(DUnaryOperator):
     """'not' unary operator."""
 
     def _impl_unary_operation(self, value):
@@ -518,8 +518,8 @@ class DENot(DEUnaryOperator):
         return "not {}".format(self._impl_expression_operand(self.operand))
 
 
-class DEBinaryOperator(DEBase):
-    """DEBinaryOperator(operand)
+class DBinaryOperator(Deferred):
+    """DBinaryOperator(operand)
        Abstract base class for binary operators.
     """
     BINOP_SYMBOL = None
@@ -553,7 +553,7 @@ class DEBinaryOperator(DEBase):
             self._impl_expression_right_operand(self.right_operand))
 
 
-class DEAdd(DEBinaryOperator):
+class DAdd(DBinaryOperator):
     """'add' binary operator."""
     BINOP_SYMBOL = '+'
 
@@ -561,7 +561,7 @@ class DEAdd(DEBinaryOperator):
         return left_value + right_value
 
 
-class DEMul(DEBinaryOperator):
+class DMul(DBinaryOperator):
     """'mul' binary operator."""
     BINOP_SYMBOL = '*'
 
@@ -569,7 +569,7 @@ class DEMul(DEBinaryOperator):
         return left_value * right_value
 
 
-class DESub(DEBinaryOperator):
+class DSub(DBinaryOperator):
     """'sub' binary operator."""
     BINOP_SYMBOL = '-'
 
@@ -577,7 +577,7 @@ class DESub(DEBinaryOperator):
         return left_value - right_value
 
 
-class DETrueDiv(DEBinaryOperator):
+class DTrueDiv(DBinaryOperator):
     """'truediv' binary operator."""
     BINOP_SYMBOL = '/'
 
@@ -585,7 +585,7 @@ class DETrueDiv(DEBinaryOperator):
         return left_value / right_value
 
 
-class DEFloorDiv(DEBinaryOperator):
+class DFloorDiv(DBinaryOperator):
     """'floordiv' binary operator."""
     BINOP_SYMBOL = '//'
 
@@ -593,7 +593,7 @@ class DEFloorDiv(DEBinaryOperator):
         return left_value // right_value
 
 
-class DEMod(DEBinaryOperator):
+class DMod(DBinaryOperator):
     """'mod' binary operator."""
     BINOP_SYMBOL = '%'
 
@@ -601,7 +601,7 @@ class DEMod(DEBinaryOperator):
         return left_value % right_value
 
 
-class DEDivMod(DEBinaryOperator):
+class DDivMod(DBinaryOperator):
     """'divmod' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -613,7 +613,7 @@ class DEDivMod(DEBinaryOperator):
             self._impl_expression_right_operand(self.right_operand, wrap=False))
 
 
-class DEPow(DEBinaryOperator):
+class DPow(DBinaryOperator):
     """'pow' binary operator."""
     BINOP_SYMBOL = '**'
 
@@ -621,7 +621,7 @@ class DEPow(DEBinaryOperator):
         return left_value ** right_value
 
 
-class DEEq(DEBinaryOperator):
+class DEq(DBinaryOperator):
     """'eq' binary operator."""
     BINOP_SYMBOL = '=='
 
@@ -629,7 +629,7 @@ class DEEq(DEBinaryOperator):
         return left_value == right_value
 
 
-class DENe(DEBinaryOperator):
+class DNe(DBinaryOperator):
     """'ne' binary operator."""
     BINOP_SYMBOL = '!='
 
@@ -637,7 +637,7 @@ class DENe(DEBinaryOperator):
         return left_value != right_value
 
 
-class DELt(DEBinaryOperator):
+class DLt(DBinaryOperator):
     """'lt' binary operator."""
     BINOP_SYMBOL = '<'
 
@@ -645,7 +645,7 @@ class DELt(DEBinaryOperator):
         return left_value < right_value
 
 
-class DELe(DEBinaryOperator):
+class DLe(DBinaryOperator):
     """'le' binary operator."""
     BINOP_SYMBOL = '<='
 
@@ -653,7 +653,7 @@ class DELe(DEBinaryOperator):
         return left_value <= right_value
 
 
-class DEGt(DEBinaryOperator):
+class DGt(DBinaryOperator):
     """'gt' binary operator."""
     BINOP_SYMBOL = '>'
 
@@ -661,7 +661,7 @@ class DEGt(DEBinaryOperator):
         return left_value > right_value
 
 
-class DEGe(DEBinaryOperator):
+class DGe(DBinaryOperator):
     """'ge' binary operator."""
     BINOP_SYMBOL = '>='
 
@@ -669,7 +669,7 @@ class DEGe(DEBinaryOperator):
         return left_value >= right_value
 
 
-class DEAnd(DEBinaryOperator):
+class DAnd(DBinaryOperator):
     """'and' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -681,7 +681,7 @@ class DEAnd(DEBinaryOperator):
             self._impl_expression_right_operand(self.right_operand))
 
 
-class DEGetattr(DEUnaryOperator):
+class DGetattr(DUnaryOperator):
     """'getattr' binary operator."""
     def __init__(self, operand, attr_name):
         super().__init__(operand)
@@ -696,7 +696,7 @@ class DEGetattr(DEUnaryOperator):
         return fmt.format(operand, self.attr_name)
 
 
-class DEGetitem(DEBinaryOperator):
+class DGetitem(DBinaryOperator):
     """'getitem' binary operator."""
 
     def _impl_binary_operation(self, left, right):
@@ -709,7 +709,7 @@ class DEGetitem(DEBinaryOperator):
         return fmt.format(left, right)
 
 
-class DEContains(DEBinaryOperator):
+class DContains(DBinaryOperator):
     """'in' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -721,38 +721,8 @@ class DEContains(DEBinaryOperator):
             self._impl_expression_right_operand(self.right_operand))
 
 
-class DEOr(DEBinaryOperator):
+class DOr(DBinaryOperator):
     """'or' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value or right_value
-
-# from . import serializer
-# from .subclasses import subclasses
-# text_serializer_module = getattr(serializer, 'text_serializer', None)
-# if text_serializer_module is not None:
-#     def _deferred_expression_text_encode(deferred_expression):
-#         """_deferred_expression_text_encode(deferred_expression)
-#            ConfigObj/Daikon encoder for Validator instances
-#         """
-#         return repr(deferred_expression)
-#
-#
-#     def _deferred_expression_text_decode(type_name, repr_data):  # pylint: disable=W0613
-#         """_deferred_expression_text_decode(deferred_expression_name, arguments)
-#            ConfigObj/Daikon decoder for Validator instances
-#         """
-#         globals_d = {}
-#         for subclass in subclasses(DEBase, include_self=False):
-#             globals_d[subclass.__name__] = subclass
-#         globals_d['len'] = len
-#         globals_d['str'] = str
-#         globals_d['repr'] = repr
-#         return unrepr(repr_data, globals_d)
-#
-#
-#     text_serializer_module.TextSerializer.codec_catalog().add_codec(
-#         class_=DEBase,
-#         encode=_deferred_expression_text_encode,
-#         decode=_deferred_expression_text_decode,
-#     )

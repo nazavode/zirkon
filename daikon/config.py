@@ -194,7 +194,7 @@ class Config(Section):
 
 
 from .toolbox import serializer
-from .toolbox.deferred_expression import DEBase
+from .toolbox.deferred import Deferred
 from .toolbox.subclass import find_subclass
 
 
@@ -205,48 +205,48 @@ def _setup_codecs():
     """
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
     if _json_serializer_module is not None:
-        def _de_json_encode(de_object):
-            """_de_json_encode(de_object)
-               JSON encoder for DE instances
+        def _deferred_json_encode(deferred_object):
+            """_deferred_json_encode(deferred_object)
+               JSON encoder for Deferred instances
             """
-            return {'expression': de_object.expression()}
+            return {'expression': deferred_object.expression()}
 
-        def _de_json_decode(de_class_name, arguments):
-            """_de_json_decode(de_class_name, arguments)
-               JSON decoder for DE instances
+        def _deferred_json_decode(deferred_class_name, arguments):
+            """_deferred_json_decode(deferred_class_name, arguments)
+               JSON decoder for Deferred instances
             """
-            de_class = find_subclass(DEBase, de_class_name, include_self=True)
-            if de_class is None:
-                raise NameError("undefined DE class {}".format(de_class_name))
+            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
+            if deferred_class is None:
+                raise NameError("undefined Deferred class {}".format(deferred_class_name))
             return eval(arguments['expression'])
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=DEBase,
-            encode=_de_json_encode,
-            decode=_de_json_decode,
+            class_=Deferred,
+            encode=_deferred_json_encode,
+            decode=_deferred_json_decode,
         )
 
     _text_serializer_module = getattr(serializer, 'text_serializer', None)
     if _text_serializer_module is not None:
-        def _de_text_encode(de_object):
-            """_de_text_encode(de_object)
-               ConfigObj/Daikon encoder for DE instances
+        def _deferred_text_encode(deferred_object):
+            """_deferred_text_encode(deferred_object)
+               ConfigObj/Daikon encoder for Deferred instances
             """
-            return {'expression': de_object.expression()}
+            return {'expression': deferred_object.expression()}
 
-        def _de_text_decode(type_name, repr_data):  # pylint: disable=W0613
-            """_de_text_decode(de_name, arguments)
-               ConfigObj/Daikon decoder for DE instances
+        def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
+            """_deferred_text_decode(deferred_name, arguments)
+               ConfigObj/Daikon decoder for Deferred instances
             """
-            de_class = find_subclass(DEBase, de_class_name, include_self=True)
-            if de_class is None:
-                raise NameError("undefined DE class {}".format(de_class_name))
+            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
+            if deferred_class is None:
+                raise NameError("undefined Deferred class {}".format(deferred_class_name))
             return eval(arguments['expression'])
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
-            class_=DEBase,
-            encode=_de_text_encode,
-            decode=_de_text_decode,
+            class_=Deferred,
+            encode=_deferred_text_encode,
+            decode=_deferred_text_decode,
         )
 
         def _str_text_encode(str_object):

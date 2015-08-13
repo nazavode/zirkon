@@ -29,7 +29,7 @@ __all__ = [
 import abc
 
 from ..toolbox.deferred_eval import DeferredEval
-from ..toolbox.deferred_expression import DEBase
+from ..toolbox.deferred import Deferred
 
 
 class Check(metaclass=abc.ABCMeta):
@@ -50,9 +50,9 @@ class Check(metaclass=abc.ABCMeta):
 
     def has_actual_value(self, value):
         """has_actual_value(value)
-           Return False if value is a DeferredEval or DEBase instance
+           Return False if value is a DeferredEval or Deferred instance
         """
-        return not isinstance(value, (DeferredEval, DEBase))
+        return not isinstance(value, (DeferredEval, Deferred))
 
     def self_validate(self, validator):
         """self_validate(validator)
@@ -66,6 +66,6 @@ class Check(metaclass=abc.ABCMeta):
             globals_d = {'SECTION': section, 'ROOT': section.root}
             if isinstance(value, DeferredEval):
                 value = value(globals_d=globals_d)
-            elif isinstance(value, DEBase):
+            elif isinstance(value, Deferred):
                 value = value.evaluate(globals_d=globals_d)
         return value

@@ -4,10 +4,10 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred_expression import \
-    DEBase, \
-    DERepr, DEStr, DEAnd, DEOr, DENot, \
-    DEConst
+from daikon.toolbox.deferred import \
+    Deferred, \
+    DRepr, DStr, DAnd, DOr, DNot, \
+    DConst
 
 
 ## unary
@@ -17,9 +17,9 @@ def bval1(request):
     return request.param
 
 _unary_bool_operator = collections.OrderedDict()
-_unary_bool_operator['Not'] = DENot
-_unary_bool_operator['Str'] = DEStr
-_unary_bool_operator['Repr'] = DERepr
+_unary_bool_operator['Not'] = DNot
+_unary_bool_operator['Str'] = DStr
+_unary_bool_operator['Repr'] = DRepr
 @pytest.fixture(ids=tuple(_unary_bool_operator.keys()), params=tuple(_unary_bool_operator.values()))
 def bop1(request):
     return request.param
@@ -38,8 +38,8 @@ _binary_bool_operator['lt'] = lambda l, r: l <  r
 _binary_bool_operator['le'] = lambda l, r: l <= r
 _binary_bool_operator['gt'] = lambda l, r: l >  r
 _binary_bool_operator['ge'] = lambda l, r: l >= r
-_binary_bool_operator['And'] = DEAnd
-_binary_bool_operator['Or'] = DEOr
+_binary_bool_operator['And'] = DAnd
+_binary_bool_operator['Or'] = DOr
 
 
 @pytest.fixture(ids=tuple(_binary_bool_operator.keys()), params=tuple(_binary_bool_operator.values()))
@@ -49,22 +49,22 @@ def bop2(request):
 ###############################
 ## bool unary:
 def test_bool_unary(bop1, bval1):
-    e = bop1(DEConst(bval1))
-    assert isinstance(e, DEBase)
+    e = bop1(DConst(bval1))
+    assert isinstance(e, Deferred)
     assert e.evaluate() == bop1(bval1)
     
 ## bool binary:
 def test_bool_binary_vl(bop2, bval2):
     l, r = bval2
-    e = bop2(DEConst(l), r)
+    e = bop2(DConst(l), r)
     assert e.evaluate() == bop2(l, r)
     
 def test_bool_binary_vr(bop2, bval2):
     l, r = bval2
-    e = bop2(l, DEConst(r))
+    e = bop2(l, DConst(r))
     assert e.evaluate() == bop2(l, r)
     
 def test_bool_binary_vlr(bop2, bval2):
     l, r = bval2
-    e = bop2(DEConst(l), DEConst(r))
+    e = bop2(DConst(l), DConst(r))
     assert e.evaluate() == bop2(l, r)

@@ -4,8 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred_expression import \
-    DEBase, DEName
+from daikon.toolbox.deferred import DName
 
 py_globals_d = {
     't': 10,
@@ -15,13 +14,13 @@ py_globals_d = {
     'w': 7,
 }
 
-t = DEName(10)
-x = DEName(4)
-y = DEName(5)
-z = DEName(6)
-w = DEName(7)
+t = DName(10)
+x = DName(4)
+y = DName(5)
+z = DName(6)
+w = DName(7)
 
-de_globals_d = {k: DEName(k) for k in py_globals_d}
+de_globals_d = {k: DName(k) for k in py_globals_d}
 
 
 _data = [
@@ -55,7 +54,7 @@ def expression(request):
 def expression_no_match(request):
     return request.param
 
-def test_DEName(expression):
+def test_DName(expression):
     de = eval(expression, de_globals_d)
     value = eval(expression, py_globals_d)
     de_expression = de.expression()
@@ -63,7 +62,7 @@ def test_DEName(expression):
     de_value = de.evaluate(de_globals_d)
     assert de_value == value
 
-def test_DEName_no_match(expression_no_match):
+def test_DName_no_match(expression_no_match):
     de = eval(expression_no_match, de_globals_d)
     value = eval(expression_no_match, py_globals_d)
     de_expression = de.expression()

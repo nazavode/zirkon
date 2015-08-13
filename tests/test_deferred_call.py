@@ -4,8 +4,8 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred_expression import \
-    DEBase, DEName, DEConst, DECall
+from daikon.toolbox.deferred import \
+    DName, DConst, DCall
 
 Param = collections.namedtuple('Param', ('de', 'expression', 'globals_d'))
 
@@ -19,10 +19,10 @@ y_20 = 20
 y_10 = 10
 
 
-MYFUN = DEName("myfun")
-X = DEConst(10)
-Y = DEName('y')
-Z = DEConst(4)
+MYFUN = DName("myfun")
+X = DConst(10)
+Y = DName('y')
+Z = DConst(4)
 
 Param = collections.namedtuple('Param', ('globals_d', 'expression'))
 _data = [
@@ -34,12 +34,12 @@ _data = [
 def param(request):
     return request.param
 
-def test_DECall(param):
+def test_DCall(param):
     p_args = (X,)
     n_args = collections.OrderedDict()
     n_args['c'] = Z
     n_args['b'] = Y
-    de = DECall(MYFUN, p_args, n_args)
+    de = DCall(MYFUN, p_args, n_args)
     expression = param.expression
     globals_d = param.globals_d
     assert de.expression() == expression
