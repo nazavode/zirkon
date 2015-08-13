@@ -25,6 +25,7 @@ de_globals_d = {k: DEName(k) for k in py_globals_d}
 
 
 _data = [
+    "x + z // y",
     "x * y + z * w",
     "x * (y + z) * w",
     "x * y * z * w",

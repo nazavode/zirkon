@@ -377,7 +377,7 @@ class DEName(DEBase):
 class DECall(DEBase):
     """'call' operator."""
 
-    def __init__(self, functor, p_args, n_args):
+    def __init__(self, functor, p_args=(), n_args={}):
         super().__init__()
         self.functor = functor
         self.p_args = p_args
