@@ -31,7 +31,7 @@ from .validator.error import KeyValidationError
 
 
 class ValidationSection(Section):
-    """ValidationSection(container, *, prefix='', init=None, unexpected_key_validator=None)
+    """ValidationSection(...)
        A Section to store ValidationResult values.
     """
     SUPPORTED_LIST_TYPES = ()

@@ -8,7 +8,9 @@
 .. toctree::
     :maxdepth: 2
 
-    advanced-value-interpolation
+    Config-class
+    Schema-class
+    value-interpolation
     extending-serializers
     extending-validators
 

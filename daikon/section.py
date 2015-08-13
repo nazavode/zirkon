@@ -37,7 +37,7 @@ from .toolbox.deferred import Deferred
 
 
 class Section(collections.abc.Mapping):
-    """Section(*, dictionary=None, init=None)
+    """Section(init=None, *, dictionary=None, parent=None)
        Dictionary-like object implementing storage of parameters/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -77,7 +77,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, *, dictionary=None, init=None, parent=None):
+    def __init__(self, init=None, *, dictionary=None, parent=None):
         if dictionary is None:
             dictionary = self.dictionary_factory()
         self.dictionary = dictionary

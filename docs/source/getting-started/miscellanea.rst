@@ -120,7 +120,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
   a boolean option.
 
 Additional validators can be used to manage keys unexpected keys found in validated section:
-- ``UnexpectedParameter()``
+- ``Complain()``
   unexpected keys raise an UnexpectedParameterError (the default behaviour);
 - ``Remove()``
   unexpected keys are removed;

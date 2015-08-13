@@ -16,24 +16,24 @@
 #
 
 """\
-config.validator.unexpected_parameter
-=====================================
-Implementation of the UnexpectedParameter class
+config.validator.check_complain
+===============================
+Implementation of the CheckComplain class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'UnexpectedParameter',
+    'CheckComplain',
 ]
 
-from ..toolbox.compose import Composer
-
-from .validator import Validator
-from .check_unexpected_parameter import CheckUnexpectedParameter
+from .check import Check
+from .error import UnexpectedParameterError
 
 
-class UnexpectedParameter(Validator):
-    """UnexpectedParameter()
-       Validator for unexpected parameters
+class CheckComplain(Check):
+    """CheckComplain()
+       Complains about unexpected parameters by raising UnexpectedParameterErrors.
     """
-    CHECK_COMPOSER = Composer(CheckUnexpectedParameter)
+
+    def check(self, key_value, section):
+        raise UnexpectedParameterError(key_value, "unexpected parameter {!r}".format(key_value.key))

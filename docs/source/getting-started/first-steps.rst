@@ -166,7 +166,7 @@ Dealing with unexpected parameters
 
 The *unexpected_parameter_validator* *Schema* attribute can be set to specify how to threat unexpected parameters, i.e. keys found in the *config* and not defined in the *schema*. It is possible to change this validator; interesting alternatives are:
 
-* ``daikon.validator.UnexpectedParameter``: this is the default: an ``UnexpectedParameterError`` validation error is produced:
+* ``daikon.validator.Complain``: this is the default: an ``UnexpectedParameterError`` validation error is produced:
 
      >>> config = Config()
      >>> config['u'] = 0.35

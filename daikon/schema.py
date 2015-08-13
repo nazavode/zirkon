@@ -33,3 +33,7 @@ class Schema(Config, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
     """Schema(init=None, *, dictionary=None)
        Schema config.
     """
+    def __init__(self, init=None, *, dictionary=None, unexpected_parameter_validator=None):
+        super().__init__(dictionary=dictionary, init=init)
+        self.unexpected_parameter_validator = unexpected_parameter_validator
+

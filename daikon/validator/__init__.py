@@ -44,7 +44,7 @@ __all__ = [
     'ValidatorInstance',
     'Ignore',
     'Remove',
-    'UnexpectedParameter',
+    'Complain',
 ]
 
 from ..toolbox import serializer
@@ -65,7 +65,7 @@ from .bool_validators import Bool, \
     BoolList, BoolTuple, BoolOption
 
 from .validator_instance import ValidatorInstance
-from .unexpected_parameter import UnexpectedParameter
+from .complain import Complain
 from .ignore import Ignore
 from .remove import Remove
 

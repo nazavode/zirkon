@@ -30,7 +30,7 @@ from .section import Section
 from .validation_section import ValidationSection
 from .validation import Validation
 from .validator import Validator, ValidatorInstance
-from .validator.unexpected_parameter import UnexpectedParameter
+from .validator.complain import Complain
 from .validator.key_value import KeyValue
 from .validator.error import KeyValidationError, \
     UnexpectedSectionError, \
@@ -59,15 +59,15 @@ def _validate_parameter(*, validator, section, validation_section,
 
 
 class SchemaSection(Section):
-    """SchemaSection(*, dictionary=None, init=None,
-                     unexpected_parameter_validator=UnexpectedParameter(),
+    """SchemaSection(init=None, *, dictionary=None, parent=None,
+                     unexpected_parameter_validator=None,
                      self_validate=True)
        A Section class to perform validation. All values must be Validator
        instances.
 
        The 'unexpected_parameter_validator' is used to validate unexpected
        parameters (parameters found in the section to be validated, but not
-       in the schema). By default it is 'UnexpectedParameter()', which
+       in the schema). By default it is 'Complain()', which
        raises an UnexpectedParameterError. The 'Ignore()' validator
        can be used to ignore unexpected parameters (they will be kept in
        the validated section), while the 'Remove()' validator can be used
@@ -76,8 +76,8 @@ class SchemaSection(Section):
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
-    def __init__(self, *, dictionary=None, init=None, parent=None,
-                 unexpected_parameter_validator=UnexpectedParameter(),
+    def __init__(self, init=None, *, dictionary=None, parent=None,
+                 unexpected_parameter_validator=None,
                  self_validate=True):
         self._unexpected_parameter_validator = None
         self.unexpected_parameter_validator = unexpected_parameter_validator
@@ -108,6 +108,8 @@ class SchemaSection(Section):
         """unexpected_parameter_validator [property setter]
            Sets the validator to be used for unexpected parameters.
         """
+        if validator is None:
+            validator = Complain()
         if not isinstance(validator, Validator):
             raise TypeError("{!r} is not a Validator".format(validator))
         self._unexpected_parameter_validator = validator
