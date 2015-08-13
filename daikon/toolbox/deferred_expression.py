@@ -88,7 +88,7 @@ import abc
 class DEBase(metaclass=abc.ABCMeta):
     """DEBase()
        Abstract base class to compose generic expressions.
-       Concrete classes must implement the evaluate() method.
+       Concrete classes must implement the evaluate(globals_d=None) method.
     """
     PRIORITY = {
         'DEConst': 100000,
@@ -126,31 +126,36 @@ class DEBase(metaclass=abc.ABCMeta):
     }
 
     @abc.abstractmethod
-    def evaluate(self):
-        """evaluate() -> expression value"""
+    def evaluate(self, globals_d=None):
+        """evaluate(globals_d=None) -> expression value"""
         pass
 
     def expression(self):
         """expression() -> python expression representation"""
-        return self.impl_expression_wrap(wrap=False)
+        return self._impl_expression_wrap(wrap=False)
 
-    def impl_expression_wrap(self, wrap):
-        """impl_expression_wrap(wrap) -> expression representation
+    def _impl_expression_wrap(self, wrap):
+        """_impl_expression_wrap(wrap) -> expression representation
            If 'wrap' puts output in parenthesis.
         """
-        return self.wrap(expression=self.impl_expression(), wrap=wrap)
-
-    @abc.abstractmethod
-    def impl_expression(self):
-        """impl_expression() -> expression representation."""
-        pass
-
-    def wrap(self, expression, wrap):  # pylint: disable=R0201
-        """wrap(expression, wrap) -> [wrapped] expression"""
+        expression = self._impl_expression()
         if wrap:
             return '(' + expression + ')'
         else:
             return expression
+
+    @abc.abstractmethod
+    def _impl_expression(self):
+        """_impl_expression() -> expression representation."""
+        pass
+
+    def _wrap(self, expression, wrap):  # pylint: disable=R0201
+        """wrap(expression, wrap) -> [wrapped] expression"""
+
+    #__repr__:
+    @abc.abstractmethod
+    def __repr__(self):
+        pass
 
     # unary mathematical operators:
     def __abs__(self):
@@ -265,26 +270,43 @@ class DEBase(metaclass=abc.ABCMeta):
 
     # utilities:
     @classmethod
-    def evaluate_operand(cls, operand):
-        """evaluate_operand() -> operand value"""
+    def _impl_evaluate_operand(cls, operand, globals_d):
+        """_impl_evaluate_operand(operand, globals_d) -> operand value"""
         if isinstance(operand, DEBase):
-            return operand.evaluate()
+            return operand.evaluate(globals_d=globals_d)
         else:
             return operand
 
     @classmethod
-    def impl_expression_operand(cls, operand, wrap=None):
-        """impl_expression_operand(operand, wrap=None) -> operand value"""
+    def _impl_expression_lr_operand(cls, operand, wrap=None, right=None):
+        """_impl_expression_operand(operand, wrap=None, right=None) -> operand value"""
         if isinstance(operand, DEBase):
             if wrap is None:
-                wrap = operand.priority() < cls.priority()
-            return operand.impl_expression_wrap(wrap=wrap)
+                p_operand = operand._priority()
+                p_cls = cls._priority()
+                wrap = (p_operand < p_cls) or (right and p_operand == p_cls)
+            return operand._impl_expression_wrap(wrap=wrap)
         else:
             return repr(operand)
 
     @classmethod
-    def priority(cls):
-        """priority() -> priority"""
+    def _impl_expression_left_operand(cls, operand, wrap=None):
+        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=False)
+
+    @classmethod
+    def _impl_expression_right_operand(cls, operand, wrap=None):
+        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=True)
+
+    @classmethod
+    def _impl_expression_operand(cls, operand, wrap=None):
+        """_impl_expression_left_operand(operand, wrap=None) -> operand value"""
+        return cls._impl_expression_lr_operand(operand, wrap=wrap, right=None)
+
+    @classmethod
+    def _priority(cls):
+        """_priority() -> priority"""
         return cls.PRIORITY.get(cls.__name__, 1000)
 
 
@@ -296,11 +318,14 @@ class DEConst(DEBase):
     def __init__(self, value):
         self.value = value
 
-    def evaluate(self):
-        return self.evaluate_operand(self.value)
+    def __repr__(self):
+        return "{}({!r})".format(self.__class__.__name__, self.value)
 
-    def impl_expression(self):
-        return self.impl_expression_operand(self.value)
+    def evaluate(self, globals_d=None):
+        return self._impl_evaluate_operand(operand=self.value, globals_d=globals_d)
+
+    def _impl_expression(self):
+        return self._impl_expression_operand(self.value)
 
 
 class DEName(DEBase):
@@ -312,14 +337,58 @@ class DEName(DEBase):
         self.name = name
         self.globals_d = globals_d
 
-    def evaluate(self):
-        globals_d = self.globals_d
+    def __repr__(self):
+        if self.globals_d is None:
+            gstring = ""
+        else:
+            gstring = ", {!r}".format(self.globals_d)
+        return "{}({!r}{})".format(self.__class__.__name__, self.name, gstring)
+
+    def evaluate(self, globals_d=None):
         if globals_d is None:
-            globals_d = globals()
+            globals_d = {}
+        else:
+            globals_d = globals_d.copy()
+        if self.globals_d is not None:
+            globals_d.update(self.globals_d)
+        if self.name not in globals_d:
+            raise NameError("name {!r} is not defined".format(self.name))
         return globals_d[self.name]
 
-    def impl_expression(self):
+    def _impl_expression(self):
         return self.name
+
+
+class DECall(DEBase):
+    """'call' operator."""
+
+    def __init__(self, functor, p_args, n_args):
+        super().__init__()
+        self.functor = functor
+        self.p_args = p_args
+        self.n_args = n_args
+
+    def __repr__(self):
+        return "{}({!r}, {!r}, {!r})".format(
+            self.__class__.__name__,
+            self.functor,
+            self.p_args,
+            self.n_args
+        )
+
+    def evaluate(self, globals_d=None):
+        value = self._impl_evaluate_operand(operand=self.functor, globals_d=globals_d)
+        p_args = [self._impl_evaluate_operand(operand, globals_d) for operand in self.p_args]
+        n_args = {key: self._impl_evaluate_operand(operand, globals_d) for key, operand in self.n_args.items()}
+        return self._impl_unary_operation(value)
+
+    def _impl_expression(self):
+        l_args = []
+        if self.p_args:
+            l_args.extend(self._impl_expression_operand(a) for a in self.p_args)
+        if self.n_args:
+            l_args.extend("{}={}".format(k, self._impl_expression_operand(v)) for k, v in self.n_args.items())
+        return "{}({})".format(self._impl_expression_operand(self.functor), ', '.join(l_args))
 
 
 class DEUnaryOperator(DEBase):
@@ -330,13 +399,16 @@ class DEUnaryOperator(DEBase):
     def __init__(self, operand):
         self.operand = operand
 
-    def evaluate(self):
-        value = self.evaluate_operand(self.operand)
-        return self.unary_operation(value)
+    def __repr__(self):
+        return "{}({!r})".format(self.__class__.__name__, self.operand)
+
+    def evaluate(self, globals_d=None):
+        value = self._impl_evaluate_operand(operand=self.operand, globals_d=globals_d)
+        return self._impl_unary_operation(value)
 
     @abc.abstractmethod
-    def unary_operation(self, value):
-        """unary_operation(value) -> result"""
+    def _impl_unary_operation(self, value):
+        """_impl_unary_operation(value) -> result"""
 
         pass
 
@@ -344,91 +416,71 @@ class DEUnaryOperator(DEBase):
 class DEAbs(DEUnaryOperator):
     """'abs' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return abs(value)
 
-    def impl_expression(self):
-        return "abs({})".format(self.impl_expression_operand(self.operand, wrap=False))
+    def _impl_expression(self):
+        return "abs({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
 class DEPos(DEUnaryOperator):
     """'pos' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return +value
 
-    def impl_expression(self):
-        return "+{}".format(self.impl_expression_operand(self.operand))
+    def _impl_expression(self):
+        return "+{}".format(self._impl_expression_operand(self.operand))
 
 
 class DENeg(DEUnaryOperator):
     """'neg' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return -value
 
-    def impl_expression(self):
-        return "-{}".format(self.impl_expression_operand(self.operand))
+    def _impl_expression(self):
+        return "-{}".format(self._impl_expression_operand(self.operand))
 
 
 class DELen(DEUnaryOperator):
     """'len' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return len(value)
 
-    def impl_expression(self):
-        return "len({})".format(self.impl_expression_operand(self.operand, wrap=False))
+    def _impl_expression(self):
+        return "len({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
 class DEStr(DEUnaryOperator):
     """'str' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return str(value)
 
-    def impl_expression(self):
-        return "str({})".format(self.impl_expression_operand(self.operand, wrap=False))
+    def _impl_expression(self):
+        return "str({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
 class DERepr(DEUnaryOperator):
     """'repr' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return repr(value)
 
-    def impl_expression(self):
-        return "repr({})".format(self.impl_expression_operand(self.operand, wrap=False))
+    def _impl_expression(self):
+        return "repr({})".format(self._impl_expression_operand(self.operand, wrap=False))
 
 
 class DENot(DEUnaryOperator):
     """'not' unary operator."""
 
-    def unary_operation(self, value):
+    def _impl_unary_operation(self, value):
         return not value
 
-    def impl_expression(self):
-        return "not {}".format(self.impl_expression_operand(self.operand))
-
-
-class DECall(DEUnaryOperator):
-    """'call' unary operator."""
-
-    def __init__(self, operand, p_args, n_args):
-        super().__init__(operand=operand)
-        self.p_args = p_args
-        self.n_args = n_args
-
-    def unary_operation(self, value):
-        return value(*self.p_args, **self.n_args)
-
-    def impl_expression(self):
-        l_args = []
-        if self.p_args:
-            l_args.extend(repr(a) for a in self.p_args)
-        if self.n_args:
-            l_args.extend("{}={!r}".format(k, v) for k, v in self.n_args)
-        return "{}({})".format(self.impl_expression_operand(self.operand), ', '.join(l_args))
+    def _impl_expression(self):
+        return "not {}".format(self._impl_expression_operand(self.operand))
 
 
 class DEBinaryOperator(DEBase):
@@ -441,33 +493,33 @@ class DEBinaryOperator(DEBase):
         self.left_operand = left_operand
         self.right_operand = right_operand
 
-    def evaluate(self):
-        left_value = self.evaluate_operand(self.left_operand)
-        right_value = self.evaluate_operand(self.right_operand)
-        return self.binary_operation(left_value, right_value)
+    def evaluate(self, globals_d=None):
+        left_value = self._impl_evaluate_operand(operand=self.left_operand, globals_d=globals_d)
+        right_value = self._impl_evaluate_operand(operand=self.right_operand, globals_d=globals_d)
+        return self._impl_binary_operation(left_value, right_value)
 
     @abc.abstractmethod
-    def binary_operation(self, left_value, right_value):
-        """binary_operation(left_value, right_value) -> result"""
+    def _impl_binary_operation(self, left_value, right_value):
+        """_impl_binary_operation(left_value, right_value) -> result"""
 
         pass
 
     def __repr__(self):
-        return "{}(left_operand={!r}, right_operand={!r})".format(
+        return "{}({!r}, {!r})".format(
             self.__class__.__name__, self.left_operand, self.right_operand)
 
-    def impl_expression(self):
+    def _impl_expression(self):
         return "{} {} {}".format(
-            self.impl_expression_operand(self.left_operand),
+            self._impl_expression_left_operand(self.left_operand),
             self.BINOP_SYMBOL,
-            self.impl_expression_operand(self.right_operand))
+            self._impl_expression_right_operand(self.right_operand))
 
 
 class DEAdd(DEBinaryOperator):
     """'add' binary operator."""
     BINOP_SYMBOL = '+'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value + right_value
 
 
@@ -475,7 +527,7 @@ class DEMul(DEBinaryOperator):
     """'mul' binary operator."""
     BINOP_SYMBOL = '*'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value * right_value
 
 
@@ -483,7 +535,7 @@ class DESub(DEBinaryOperator):
     """'sub' binary operator."""
     BINOP_SYMBOL = '-'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value - right_value
 
 
@@ -491,7 +543,7 @@ class DETrueDiv(DEBinaryOperator):
     """'truediv' binary operator."""
     BINOP_SYMBOL = '/'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value / right_value
 
 
@@ -499,7 +551,7 @@ class DEFloorDiv(DEBinaryOperator):
     """'floordiv' binary operator."""
     BINOP_SYMBOL = '//'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value // right_value
 
 
@@ -507,27 +559,27 @@ class DEMod(DEBinaryOperator):
     """'mod' binary operator."""
     BINOP_SYMBOL = '%'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value % right_value
 
 
 class DEDivMod(DEBinaryOperator):
     """'divmod' binary operator."""
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
 
-    def impl_expression(self):
+    def _impl_expression(self):
         return "divmod({}, {})".format(
-            self.impl_expression_operand(self.left_operand, wrap=False),
-            self.impl_expression_operand(self.right_operand, wrap=False))
+            self._impl_expression_left_operand(self.left_operand, wrap=False),
+            self._impl_expression_right_operand(self.right_operand, wrap=False))
 
 
 class DEPow(DEBinaryOperator):
     """'pow' binary operator."""
     BINOP_SYMBOL = '**'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value ** right_value
 
 
@@ -535,7 +587,7 @@ class DEEq(DEBinaryOperator):
     """'eq' binary operator."""
     BINOP_SYMBOL = '=='
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value == right_value
 
 
@@ -543,7 +595,7 @@ class DENe(DEBinaryOperator):
     """'ne' binary operator."""
     BINOP_SYMBOL = '!='
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value != right_value
 
 
@@ -551,7 +603,7 @@ class DELt(DEBinaryOperator):
     """'lt' binary operator."""
     BINOP_SYMBOL = '<'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value < right_value
 
 
@@ -559,7 +611,7 @@ class DELe(DEBinaryOperator):
     """'le' binary operator."""
     BINOP_SYMBOL = '<='
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value <= right_value
 
 
@@ -567,7 +619,7 @@ class DEGt(DEBinaryOperator):
     """'gt' binary operator."""
     BINOP_SYMBOL = '>'
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value > right_value
 
 
@@ -575,20 +627,20 @@ class DEGe(DEBinaryOperator):
     """'ge' binary operator."""
     BINOP_SYMBOL = '>='
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value >= right_value
 
 
 class DEAnd(DEBinaryOperator):
     """'and' binary operator."""
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value and right_value
 
     def expression(self):
         return "{} and {}".format(
-            self.impl_expression_operand(self.left_operand),
-            self.impl_expression_operand(self.right_operand))
+            self._impl_expression_left_operand(self.left_operand),
+            self._impl_expression_right_operand(self.right_operand))
 
 
 class DEGetattr(DEUnaryOperator):
@@ -597,11 +649,11 @@ class DEGetattr(DEUnaryOperator):
         super().__init__(operand)
         self.attr_name = attr_name
 
-    def unary_operation(self, operand):
+    def _impl_unary_operation(self, operand):
         return getattr(operand, self.attr_name)
 
-    def impl_expression(self):
-        operand = self.impl_expression_operand(self.operand)
+    def _impl_expression(self):
+        operand = self._impl_expression_operand(self.operand)
         fmt = "{}.{}"
         return fmt.format(operand, self.attr_name)
 
@@ -609,12 +661,12 @@ class DEGetattr(DEUnaryOperator):
 class DEGetitem(DEBinaryOperator):
     """'getitem' binary operator."""
 
-    def binary_operation(self, left, right):
+    def _impl_binary_operation(self, left, right):
         return left[right]
 
-    def impl_expression(self):
-        left = self.impl_expression_operand(self.left_operand)
-        right = self.impl_expression_operand(self.right_operand, wrap=False)
+    def _impl_expression(self):
+        left = self._impl_expression_left_operand(self.left_operand)
+        right = self._impl_expression_right_operand(self.right_operand, wrap=False)
         fmt = "{}[{}]"
         return fmt.format(left, right)
 
@@ -622,19 +674,19 @@ class DEGetitem(DEBinaryOperator):
 class DEContains(DEBinaryOperator):
     """'in' binary operator."""
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value in right_value
 
-    def impl_expression(self):
+    def _impl_expression(self):
         return "{} in {}".format(
-            self.impl_expression_operand(self.left_operand),
-            self.impl_expression_operand(self.right_operand))
+            self._impl_expression_left_operand(self.left_operand),
+            self._impl_expression_right_operand(self.right_operand))
 
 
 class DEOr(DEBinaryOperator):
     """'or' binary operator."""
 
-    def binary_operation(self, left_value, right_value):
+    def _impl_binary_operation(self, left_value, right_value):
         return left_value or right_value
 
 # from . import serializer
