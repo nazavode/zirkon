@@ -33,7 +33,8 @@ import sys
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
 from .toolbox.serializer import Serializer
-from .toolbox.deferred import Deferred
+from .toolbox.deferred_eval import DeferredEval
+from .toolbox.deferred_expression import DEBase
 
 
 class Section(collections.abc.Mapping):
@@ -154,8 +155,10 @@ class Section(collections.abc.Mapping):
             section = self.subsection(self.dictionary[key])
             section.update(value)
         else:
-            if isinstance(value, Deferred):
+            if isinstance(value, DeferredEval):
                 value = value({'SECTION': self, 'ROOT': self.root})
+            elif isinstance(value, DEBase):
+                value = value.evaluate({'SECTION': self, 'ROOT': self.root})
             self.check_data_type(key=key, value=value)
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with a parameter".format(key))

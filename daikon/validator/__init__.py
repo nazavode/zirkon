@@ -48,6 +48,7 @@ __all__ = [
 ]
 
 from ..toolbox import serializer
+from ..deferred_object import ROOT, SECTION
 
 from .validator import Validator
 
@@ -69,7 +70,7 @@ from .ignore import Ignore
 from .remove import Remove
 
 from ..toolbox.unrepr import unrepr
-from ..toolbox.deferred import Deferred
+from ..toolbox.deferred_eval import DeferredEval
 from ..toolbox.subclass import subclasses, find_subclass
 
 from .error import KeyValidationError
@@ -94,7 +95,9 @@ def _setup_codecs():
                ConfigObj/Daikon decoder for Validator instances
             """
             globals_d = {}
-            for deferred_class in subclasses(Deferred, include_self=True):
+            globals_d['ROOT'] = ROOT
+            globals_d['SECTION'] = SECTION
+            for deferred_class in subclasses(DeferredEval, include_self=True):
                 globals_d[deferred_class.__name__] = deferred_class
             globals_d[type_name] = Validator.class_dict()[type_name]
             return unrepr(repr_data, globals_d)
@@ -123,6 +126,8 @@ def _setup_codecs():
             if key_validation_error_class is None:
                 raise NameError("undefined KeyValidationError class {}".format(type_name))
             globals_d[type_name] = key_validation_error_class
+            globals_d['ROOT'] = ROOT
+            globals_d['SECTION'] = SECTION
             return unrepr(repr_data, globals_d)
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(

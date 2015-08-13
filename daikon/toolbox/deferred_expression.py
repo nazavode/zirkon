@@ -133,6 +133,10 @@ class DEBase(metaclass=abc.ABCMeta):
         """evaluate(globals_d=None) -> expression value"""
         pass
 
+    @abc.abstractmethod
+    def __reduce__(self):
+        pass
+
     def expression(self):
         """expression() -> python expression representation"""
         return self._impl_expression_wrap(wrap=False)
@@ -155,10 +159,14 @@ class DEBase(metaclass=abc.ABCMeta):
     def _wrap(self, expression, wrap):  # pylint: disable=R0201
         """wrap(expression, wrap) -> [wrapped] expression"""
 
-    #__repr__:
+    # __str__:
     @abc.abstractmethod
-    def __repr__(self):
+    def __str__(self):
         pass
+
+    # __repr__:
+    def __repr__(self):
+        return self.expression()
 
     # unary mathematical operators:
     def __abs__(self):
@@ -261,7 +269,7 @@ class DEBase(metaclass=abc.ABCMeta):
 
     # Call:
     def __call__(self, *p_args, **n_args):
-        return DECall(self, p_args, n_args)
+        return DECall(functor=self, p_args=p_args, n_args=n_args)
 
     # Get attribute:
     def __getattr__(self, attr_name):
@@ -333,7 +341,10 @@ class DEConst(DEBase):
     def __init__(self, value):
         self.value = value
 
-    def __repr__(self):
+    def __reduce__(self):
+        return (self.__class__, (self.value,))
+
+    def __str__(self):
         return "{}({!r})".format(self.__class__.__name__, self.value)
 
     def evaluate(self, globals_d=None):
@@ -352,7 +363,10 @@ class DEName(DEBase):
         self.name = name
         self.globals_d = globals_d
 
-    def __repr__(self):
+    def __reduce__(self):
+        return (self.__class__, (self.name, self.globals_d))
+
+    def __str__(self):
         if self.globals_d is None:
             gstring = ""
         else:
@@ -383,7 +397,10 @@ class DECall(DEBase):
         self.p_args = p_args
         self.n_args = n_args
 
-    def __repr__(self):
+    def __reduce__(self):
+        return (self.__class__, (self.functor, self.p_args, self.n_args))
+
+    def __str__(self):
         return "{}({!r}, {!r}, {!r})".format(
             self.__class__.__name__,
             self.functor,
@@ -414,7 +431,10 @@ class DEUnaryOperator(DEBase):
     def __init__(self, operand):
         self.operand = operand
 
-    def __repr__(self):
+    def __reduce__(self):
+        return (self.__class__, (self.operand,))
+
+    def __str__(self):
         return "{}({!r})".format(self.__class__.__name__, self.operand)
 
     def evaluate(self, globals_d=None):
@@ -519,7 +539,10 @@ class DEBinaryOperator(DEBase):
 
         pass
 
-    def __repr__(self):
+    def __reduce__(self):
+        return (self.__class__, (self.left_operand, self.right_operand))
+
+    def __str__(self):
         return "{}({!r}, {!r})".format(
             self.__class__.__name__, self.left_operand, self.right_operand)
 
@@ -733,4 +756,3 @@ class DEOr(DEBinaryOperator):
 #         encode=_deferred_expression_text_encode,
 #         decode=_deferred_expression_text_decode,
 #     )
-

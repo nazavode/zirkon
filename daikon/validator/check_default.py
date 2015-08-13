@@ -29,7 +29,6 @@ __all__ = [
 import copy
 
 from ..toolbox.undefined import UNDEFINED
-from ..toolbox.deferred import Deferred
 from .check_required import CheckRequired
 from .key_value import KeyValue
 
@@ -54,6 +53,6 @@ class CheckDefault(CheckRequired):
                 key_value.defined = True
 
     def self_validate(self, validator):
-        if self.default is not UNDEFINED and not isinstance(self.default, Deferred):
+        if (self.default is not UNDEFINED) and self.has_actual_value(self.default):
             key_value = KeyValue(key='<default>', value=self.default, defined=True)
             validator.validate_key_value(key_value, section=None)

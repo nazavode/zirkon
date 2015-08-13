@@ -131,8 +131,8 @@ class SchemaSection(Section):
            Implementation of the validate method.
         """
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
-        self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
         self.impl_validate_parameters(section=section, validation_section=validation_section, **args)
+        self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
 
     def impl_validate_subsections(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
         """impl_validate_subsections(...)

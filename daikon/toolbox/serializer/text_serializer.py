@@ -140,6 +140,7 @@ class TextSerializer(Serializer):
         if match:
             value_type_name = match.groupdict()['func_name']
             value_type_names.append(value_type_name)
+        value_type_names.append('str')
         value = self.decode_value(line_number, filename, key, value, *value_type_names)
         return key.strip(), value
 

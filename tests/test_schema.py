@@ -37,7 +37,7 @@ from daikon.schema import Schema
 from daikon.validator import Int, IntOption
 from daikon.validator.error import OptionValueError, \
     MinValueError, MaxValueError
-from daikon.toolbox.deferred import Deferred
+from daikon.toolbox.deferred_eval import DeferredEval
 
 from daikon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, DaikonSerializer, PickleSerializer
@@ -120,10 +120,10 @@ def deferred_schema():
     schema = Schema()
     schema['a'] = Int()
     schema['b'] = Int()
-    schema['c'] = IntOption(values=(Deferred("SECTION['a']"), Deferred("SECTION['b']")))
+    schema['c'] = IntOption(values=(DeferredEval("SECTION['a']"), DeferredEval("SECTION['b']")))
     schema['sub'] = {}
-    schema['sub']['d'] = Int(min=Deferred("ROOT['a']"), max=Deferred("ROOT['b']"))
-    schema['sub']['e'] = Int(default=Deferred("ROOT['a'] + ROOT['b'] + SECTION['d']"))
+    schema['sub']['d'] = Int(min=DeferredEval("ROOT['a']"), max=DeferredEval("ROOT['b']"))
+    schema['sub']['e'] = Int(default=DeferredEval("ROOT['a'] + ROOT['b'] + SECTION['d']"))
     return schema
 
 @pytest.fixture

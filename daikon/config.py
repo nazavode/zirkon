@@ -24,12 +24,15 @@ __author__ = "Simone Campagna"
 __all__ = [
     'Config',
     'ConfigValidationError',
+    'SECTION',
+    'ROOT',
 ]
 
 
 from .section import Section
-
 from .toolbox.serializer import Serializer
+from .toolbox.unrepr import unrepr
+from .deferred_object import ROOT, SECTION
 
 
 class ConfigValidationError(Exception):
@@ -188,3 +191,81 @@ class Config(Section):
            Write to file 'filename' according to 'protocol'.
         """
         self.to_file(filename, protocol)
+
+
+from .toolbox import serializer
+from .toolbox.deferred_expression import DEBase
+from .toolbox.subclass import find_subclass
+
+
+# deferred_expression codecs:
+def _setup_codecs():
+    """_setup_codecs()
+       Setup codecs for validators.
+    """
+    _json_serializer_module = getattr(serializer, 'json_serializer', None)
+    if _json_serializer_module is not None:
+        def _de_json_encode(de_object):
+            """_de_json_encode(de_object)
+               JSON encoder for DE instances
+            """
+            return {'expression': de_object.expression()}
+
+        def _de_json_decode(de_class_name, arguments):
+            """_de_json_decode(de_class_name, arguments)
+               JSON decoder for DE instances
+            """
+            de_class = find_subclass(DEBase, de_class_name, include_self=True)
+            if de_class is None:
+                raise NameError("undefined DE class {}".format(de_class_name))
+            return eval(arguments['expression'])
+
+        _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
+            class_=DEBase,
+            encode=_de_json_encode,
+            decode=_de_json_decode,
+        )
+
+    _text_serializer_module = getattr(serializer, 'text_serializer', None)
+    if _text_serializer_module is not None:
+        def _de_text_encode(de_object):
+            """_de_text_encode(de_object)
+               ConfigObj/Daikon encoder for DE instances
+            """
+            return {'expression': de_object.expression()}
+
+        def _de_text_decode(type_name, repr_data):  # pylint: disable=W0613
+            """_de_text_decode(de_name, arguments)
+               ConfigObj/Daikon decoder for DE instances
+            """
+            de_class = find_subclass(DEBase, de_class_name, include_self=True)
+            if de_class is None:
+                raise NameError("undefined DE class {}".format(de_class_name))
+            return eval(arguments['expression'])
+
+        _text_serializer_module.TextSerializer.codec_catalog().add_codec(
+            class_=DEBase,
+            encode=_de_text_encode,
+            decode=_de_text_decode,
+        )
+
+        def _str_text_encode(str_object):
+            """_str_text_encode(str_object)
+               ConfigObj/Daikon encoder for str instances
+            """
+            return repr(str_object)
+
+        def _str_text_decode(type_name, repr_data):  # pylint: disable=W0613
+            """_str_text_decode(str_name, arguments)
+               ConfigObj/Daikon decoder for str instances
+            """
+            return unrepr(repr_data, {'SECTION': SECTION, 'ROOT': ROOT})
+
+        _text_serializer_module.TextSerializer.codec_catalog().add_codec(
+            class_=str,
+            encode=_str_text_encode,
+            decode=_str_text_decode,
+        )
+
+_setup_codecs()
+

@@ -26,9 +26,11 @@ from common.fixtures import protocol, \
     simple_config_content, simple_schema_content, \
     simple_section_content, simple_validation, tmp_text_file
 
-from daikon.config import Config
+from daikon.config import Config, SECTION, ROOT
 from daikon.schema import Schema
 from daikon.validation import Validation
+from daikon.validator import Int
+from daikon.validator.error import MinValueError
 from daikon.toolbox.dictutils import compare_dicts, transform
 from daikon.toolbox.serializer import Serializer
 
@@ -70,3 +72,96 @@ def test_read_write(protocol, parameters, tmp_text_file):
         assert tcs == tcs2
     else:
         assert compare_dicts(cs, cs2)
+
+@pytest.fixture
+def schema_de():
+    schema = Schema()
+    schema['alpha'] = Int(default=10)
+    schema['beta'] = Int(default=ROOT['alpha'] - 3)
+    schema['sub'] = {}
+    schema['sub']['x'] = Int(min=ROOT['beta'])
+    schema['sub']['y'] = Int(default=ROOT['alpha'] + SECTION['x'])
+    schema['sub']['z'] = Int(default=0)
+    return schema
+
+SCHEMA_DE_STRING = {}
+SCHEMA_DE_STRING['daikon'] = """\
+alpha = Int(default=10)
+beta = Int(default=ROOT['alpha'] - 3)
+[sub]
+    x = Int(min=ROOT['beta'])
+    y = Int(default=ROOT['alpha'] + SECTION['x'])
+    z = Int(default=0)
+"""
+SCHEMA_DE_STRING['configobj'] = SCHEMA_DE_STRING['daikon']
+
+def test_read_write_schema_de(protocol, schema_de):
+    schema_de_string = schema_de.to_string(protocol=protocol)
+    ref_schema_de_string = SCHEMA_DE_STRING.get(protocol, None)
+    if ref_schema_de_string:
+        assert schema_de_string == ref_schema_de_string
+    schema_de_reloaded = Schema.from_string(schema_de_string, protocol=protocol)
+    assert schema_de == schema_de_reloaded
+    schema_de_reloaded_string = schema_de_reloaded.to_string(protocol=protocol)
+    if ref_schema_de_string:
+        assert schema_de_reloaded_string == schema_de_string
+    else:
+        assert schema_de_reloaded.to_string(protocol='daikon') == schema_de.to_string(protocol='daikon')
+
+CONFIG_DE_STRING = {}
+CONFIG_DE_STRING['daikon'] = """\
+[sub]
+    x = 100
+    z = SECTION['x'] + 5
+"""
+CONFIG_DE_STRING['configobj'] = CONFIG_DE_STRING['daikon']
+
+@pytest.fixture
+def config_de():
+    config = Config()
+    config['sub'] = {}
+    config['sub']['x'] = 100
+    config['sub']['z'] = SECTION['x'] + 5
+    return config
+
+@pytest.fixture
+def config_protocol(protocol, config_de):
+    ref_config_de_string = CONFIG_DE_STRING.get(protocol, None)
+    if ref_config_de_string:
+        config = Config.from_string(ref_config_de_string, protocol=protocol)
+    else:
+        config = config_de
+    return config, protocol
+
+def test_read_write_config_de(config_protocol):
+    config, protocol = config_protocol
+    assert config['sub']['z'] == 105
+    config_string = config.to_string(protocol=protocol)
+    config_reloaded = Config.from_string(config_string, protocol=protocol)
+    assert config_reloaded == config
+
+def test_validate_config_de_ok(config_protocol, schema_de):
+    config, protocol = config_protocol
+    validation = schema_de.validate(config)
+    assert not validation
+    assert config['alpha'] == 10
+    assert config['beta'] == 7
+    assert config['sub']['x'] == 100
+    assert config['sub']['y'] == 110
+    assert config['sub']['z'] == 105
+
+def test_validate_config_de_ko_min(config_protocol, schema_de):
+    config, protocol = config_protocol
+    config['sub']['x'] = 1
+    validation = schema_de.validate(config)
+    assert len(validation) == 1
+    assert 'sub' in validation
+    assert len(validation['sub']) == 1
+    assert 'x' in validation['sub']
+    assert isinstance(validation['sub']['x'], MinValueError)
+    assert str(validation['sub']['x']) == "sub.x=1: value 1 is lower than min 7"
+    assert config['alpha'] == 10
+    assert config['beta'] == 7
+    assert config['sub']['x'] == 1
+    assert config['sub']['y'] == 11
+    assert config['sub']['z'] == 105

@@ -4,8 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred import deferred
-from daikon.toolbox.deferred_expression import DEConst
+from daikon.toolbox.deferred_eval import deferred_eval
 
 
 Parameters = collections.namedtuple('Parameters', ('string', 'globals_d', 'expected'))
@@ -26,13 +25,13 @@ for string in [
 def param(request):
     return request.param
 
-def test_deferred(param):
-    d = deferred(param.string, globals_d=param.globals_d)
+def test_deferred_eval(param):
+    d = deferred_eval(param.string, globals_d=param.globals_d)
     assert d() == param.expected
 
-def test_deferred_late_evaluation():
+def test_deferred_eval_late_evaluation():
     xlist = []
-    d = deferred("len(x)", {'x': xlist, 'len': len})
+    d = deferred_eval("len(x)", {'x': xlist, 'len': len})
     assert d() == 0
     xlist.append(10)
     assert d() == 1
@@ -43,8 +42,3 @@ def test_deferred_late_evaluation():
     del xlist[1:-1]
     assert d() == 2
 
-def test_deferred_DeferredExpression():
-    de = (2 + DEConst(4)) * 5
-    defer = deferred(de)
-    assert defer.expression == "(2 + 4) * 5"
-    assert defer() == 30

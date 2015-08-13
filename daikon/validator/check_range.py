@@ -29,7 +29,6 @@ __all__ = [
     'CheckMaxLen',
 ]
 
-from ..toolbox.deferred import Deferred
 from .check import Check
 from .error import MinValueError, \
     MaxValueError, \
@@ -48,7 +47,7 @@ class CheckRange(Check):  # pylint: disable=W0223
 
     def self_validate(self, validator):
         value = getattr(self, self.ATTRIBUTE_NAME)
-        if value is not None and not isinstance(value, Deferred):
+        if (value is not None) and self.has_actual_value(value):
             key = "<{}>".format(self.ATTRIBUTE_NAME)
             key_value = KeyValue(key=key, value=value, defined=True)
             validator.validate_key_value(key_value, section=None)

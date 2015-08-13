@@ -105,17 +105,17 @@ Daikon supports advanced value interpolation: key/values precedently stored in
 the Config object can be accessed and used in complex expressions to set new values.
 For instance:
 
- >>> from daikon.toolbox.deferred import Deferred
+ >>> from daikon.toolbox.deferred_eval import deferred_eval
  >>> print(config['x'])
  10
- >>> config['z'] = Deferred("ROOT['x'] * 4")
+ >>> config['z'] = deferred_eval("ROOT['x'] * 4")
  >>> print(config['z'])
  40
  >>> del config['z']
 
 Moreover, this can be used in validators:
 
- >>> schema['subsection']['y'] = Str(min_len=Deferred("ROOT['x'] - 2"))
+ >>> schema['subsection']['y'] = Str(min_len=deferred_eval("ROOT['x'] - 2"))
 
 The ``min_len`` value of the ``Str`` validator depends on the value found for ``x`` (10 in this case):
 

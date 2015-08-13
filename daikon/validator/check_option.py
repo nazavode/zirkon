@@ -26,7 +26,6 @@ __all__ = [
     'CheckOption',
 ]
 
-from ..toolbox.deferred import Deferred
 from .check_type import CheckType
 from .key_value import KeyValue
 from .error import OptionValueError
@@ -51,6 +50,6 @@ class CheckOption(CheckType):
 
     def self_validate(self, validator):
         for value in self.values:
-            if not isinstance(value, Deferred):
+            if self.has_actual_value(value):
                 key_value = KeyValue(key='<option>', value=value, defined=True)
                 validator.validate_key_value(key_value, section=None)
