@@ -3,22 +3,19 @@ language: python
 python:
   - "3.4"
 
-# env:
-env:
- - TOX_ENV=coverage
-
 # command to install dependencies
 install:
-  - "pip3 install tox"
+  - "pip3 install pytest"
+  - "pip3 install pytest-cov"
   - "pip3 install coveralls"
 
 
 # command to run tests
 script:
-  - tox -e $TOX_ENV
+  - py.test --cov daikon --cov-report=html --cov-config=.coveragerc tests
 
 after_success:
-  - coveralls --rcfile=.tox/coverage/tox.coveragerc
+  - coveralls --rcfile=.coveragerc
 
 # notifications:
 notifications:
