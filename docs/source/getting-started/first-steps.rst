@@ -11,13 +11,23 @@
 Creating a Config
 =================
 
-The *Config* class has the following signature:
+Creating a *Config* object is simple:
 
- .. code-block:: python
-    
-    Config(init=None, *, dictionary=None, schema=None)
+ >>> from daikon.config import Config
+ >>> config = Config()
 
-where *init* is an optional initialization dict-like object. The *dictionary* attribute, if present, is a dict-like object that can be used to load/store all the configuration data; it does not need to be empty, anyway, if it is not empty, the content is loaded as initial configuration (and then updated with *init*). The *schema* attribute, if present, is a *Schema* object used for validation, as explained below.
+An initializer mapping can be passed:
+
+ >>> config = Config({'a': 10})
+ >>> config.dump()
+ a = 10
+
+All the configuration data are kept in a newly created *OrderedDict*:
+
+ >>> config.dictionary
+ OrderedDict([('a', 10)])
+
+This dictionary can be passed during construction; in this case, all the dictionary content is loaded:
 
  >>> import collections
  >>> from daikon.config import Config
@@ -38,7 +48,7 @@ Accessing the Config content
 ============================
 
 The *Config* is a dict-like object, with some restrictions:
-* keys must be strings representing valid python identifiers
+* keys must be strings representing valid python identifiers (for instance, ``10``, ``c.x``, ``9c`` are all invalid keys)
 * values can be
   - scalars of type ``int``, ``float``, ``str``, ``bool`` or ``NoneType``;
   - a ``list`` of scalars;
@@ -52,12 +62,17 @@ The *Config* object can contain subsections; in order to have a subsection, you 
 
  >>> config['sub'] = {}  # empty subsection added
 
-If the dict-like object is not empty, its content is added to the subsection
+If the dict-like object is not empty, its content is added to the subsection:
 
  >>> config['sub']['subsub'] = {'a': 1}
  >>> print(config['sub']['subsub']['a'])
  1
  >>>
+
+Notice that, regardless of the actual type of the inserted dictionary, *Config* will internally use for subsection the same type used for the ``dictionary`` attribute:
+
+ >>> type(config['sub'].dictionary)
+ <class 'collections.OrderedDict'>
 
 Storing/loading the Config
 ==========================
@@ -77,6 +92,18 @@ It is possible to store/load the *Config* object to/from strings, streams or fil
  >>>
 
 The ``to_stream``, ``from_stream`` methods allow serialization to/from a stream; the ``to_file``, ``from_file`` methods allow serialization to/from a file. The ``write`` and ``read`` methods behaves like ``to_file``, ``from_file``.
+
+ >>> import tempfile
+ >>> with tempfile.NamedTemporaryFile() as fstream:
+ ...     _ = config.to_file(fstream.name, "configobj")
+ ...     config2 = Config.from_file(fstream.name, "configobj")
+ ...     config3 = Config()
+ ...     config3.read(fstream.name, protocol="configobj")
+ >>> print(config2 == config)
+ True
+ >>> print(config3 == config)
+ True
+
 Finally, the ``dump(stream=None, protocol="daikon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
 
  >>> config.dump()
@@ -97,6 +124,7 @@ The list of available serialization protocols is:
  json
  pickle
  >>>
+
 
 Creating a Schema
 =================

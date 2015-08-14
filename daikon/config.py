@@ -146,7 +146,7 @@ class Config(Section):
 
     def dump(self, stream=None, protocol="daikon"):
         self.self_validate(raise_on_error=True)
-        return super().dump(stream, protocol)
+        super().dump(stream, protocol)
 
     @classmethod
     def from_file(cls, filename, protocol, *, dictionary=None, schema=None, validate=True):

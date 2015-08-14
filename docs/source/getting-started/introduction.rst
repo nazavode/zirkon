@@ -33,19 +33,16 @@ Daikon Config objects behaves like traditional mappings:
  >>> config['x'] = 10
  >>> config['subsection'] = {}
  >>> config['subsection']['y'] = "alpha"
- >>> config.dump()
- x = 10
- [subsection]
-     y = 'alpha'
- >>>
+ >>> print(config['subsection']['y'])
+ alpha
 
 Flexibility
 -----------
 
 Daikon Config objects internally store information in a dict-like
 object, by default ad OrderedDict. It is possible to change this
-internal dictionary and to use, for instance, a ``shelve`` in order
-to add persistency.
+internal dictionary and to use (for instance a ``shelve``, in order
+to add persistency).
 
 Multiple file serializations
 ----------------------------
@@ -53,23 +50,44 @@ Multiple file serializations
 Daikon supports multiple serialization methods; currently four are
 available:
 
- +---------+--------+-----------------------------------------------------+
- |Protocol |text/raw|description                                          |
- +=========+========+=====================================================+
- |daikon   |text    |the native protocol; it implements a nested INI file |
- +---------+--------+-----------------------------------------------------+
- |configobj|raw     |compatible with ConfigObj using the ``unrepr`` option|
- |         |        |see http://www.voidspace.org.uk/python/configobj.html|
- +---------+--------+-----------------------------------------------------+
- |json     |text    |JSON serialization                                   |
- +---------+--------+-----------------------------------------------------+
- |pickle   |text    |pickle serialization                                 |
- +---------+--------+-----------------------------------------------------+
+ +---------+--------+---------------------------------------------------------------+
+ |Protocol |text/raw|description                                                    |
+ +=========+========+===============================================================+
+ |daikon   |text    |the native protocol; it implements a nested INI file           |
+ +---------+--------+---------------------------------------------------------------+
+ |configobj|raw     |partially compatible with ConfigObj using the ``unrepr`` option|
+ |         |        |see http://www.voidspace.org.uk/python/configobj.html          |
+ +---------+--------+---------------------------------------------------------------+
+ |json     |text    |JSON serialization                                             |
+ +---------+--------+---------------------------------------------------------------+
+ |pickle   |text    |pickle serialization                                           |
+ +---------+--------+---------------------------------------------------------------+
+
+Some examples:
+
+ >>> print(config.to_string(protocol="daikon"))
+ x = 10
+ [subsection]
+     y = 'alpha'
+ >>> print(config.to_string(protocol="json"))
+ {
+     "x": 10,
+     "subsection": {
+         "y": "alpha"
+     }
+ }
+
+The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="daikon")``:
+
+ >>> config.dump()
+ x = 10
+ [subsection]
+     y = 'alpha'
 
 Validation
 ----------
     
-Daikon supports validation of Config objects to a Schema. A Schema
+Daikon allows to define a SChema for the validation of Config objects. A Schema
 is simply a special Config having Validators as values:
 
  >>> from daikon.schema import Schema
@@ -79,12 +97,6 @@ is simply a special Config having Validators as values:
  >>> schema['subsection'] = {}
  >>> schema['subsection']['y'] = Str(min_len=6)
  >>> schema['subsection']['w'] = Float()
- >>> schema.dump()
- x = Int(min=1)
- [subsection]
-     y = Str(min_len=6)
-     w = Float()
- >>>
 
 The validation result itself is a Config object having KeyValidationErrors
 as values.
