@@ -1,12 +1,3 @@
-# flake8:
-flake8
-
-# pylint:
-pylint
-
 # pytest and extensions:
 pytest
 pytest-cov
-
-# Sphinx
-Sphinx
