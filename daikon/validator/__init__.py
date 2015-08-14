@@ -73,7 +73,6 @@ from ..toolbox.unrepr import unrepr
 from ..toolbox.subclass import find_subclass
 
 from .error import OptionValidationError
-from .option import Option
 
 
 # Validator codecs:
@@ -117,7 +116,7 @@ def _setup_codecs():
             """_ov_error_text_encode(type_name, repr_data)
                OptionValidationError decoder.
             """
-            globals_d = {Option.__name__: Option}
+            globals_d = {}
             option_validation_error_class = find_subclass(OptionValidationError, type_name, include_self=False)
             if option_validation_error_class is None:
                 raise NameError("undefined OptionValidationError class {}".format(type_name))
@@ -151,29 +150,6 @@ def _setup_codecs():
             class_=Validator,
             encode=_validator_json_encode,
             decode=_validator_json_decode,
-        )
-
-        def _option_json_encode(option):
-            """_option_json_encode(validator)
-               Option JSON encoder.
-            """
-            return {'name': option.name,
-                    'value': option.value,
-                    'defined': option.defined}
-
-        def _option_json_decode(type_name, args):
-            """_option_json_encode(type_name, repr_data)
-               OptionValalue JSON decoder.
-            """
-            option_class = find_subclass(Option, type_name, include_self=True)
-            if option_class is None:
-                raise NameError("undefined Option class {}".format(type_name))
-            return option_class(**args)
-
-        _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=Option,
-            encode=_option_json_encode,
-            decode=_option_json_decode,
         )
 
         def _ov_error_json_encode(option_validation_error):
