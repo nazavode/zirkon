@@ -3,6 +3,11 @@ Daikon
 A python configuration library. Daikon requires python >= 3.4.
 
 
+.. image:: https://coveralls.io/repos/simone-campagna/daikon/badge.svg?branch=master&service=github
+  :target: https://coveralls.io/github/simone-campagna/daikon?branch=master
+
+
+
 What is daikon
 --------------
 
