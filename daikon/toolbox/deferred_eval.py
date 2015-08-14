@@ -80,7 +80,7 @@ def deferred_eval(expression, globals_d=None):
 
 
 # DeferredEval codecs:
-def _setup_codecs():
+def _setup_codecs():  # pragma: no cover
     """_setup_codecs()
        Setup codecs for validators.
     """
@@ -128,4 +128,4 @@ def _setup_codecs():
             decode=_deferred_text_decode,
         )
 
-_setup_codecs()
+_setup_codecs()  # pragma: no cover

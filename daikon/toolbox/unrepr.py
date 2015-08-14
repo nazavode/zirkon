@@ -98,7 +98,7 @@ def unrepr(string, globals_d=None):
             value = getattr(ast_body, key)
             if value is not None:
                 value = py_ast_unrepr(value)
-        slist.append(value)
+            slist.append(value)
         return slice(*slist)
 
     def py_ast_subscript(ast_body):
@@ -145,6 +145,10 @@ def unrepr(string, globals_d=None):
     def py_ast_call(ast_body):
         """py_ast_call"""
         ast_func = ast_body.func
+        if not hasattr(ast_func, 'id'):
+            raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call: not a function".format(
+                string,
+                ast_body.col_offset))
         if ast_func.id in globals_d:
             p_args = [py_ast_unrepr(arg) for arg in ast_body.args]
             n_args = {keyword.arg: py_ast_unrepr(keyword.value) for keyword in ast_body.keywords}
@@ -190,6 +194,7 @@ def unrepr(string, globals_d=None):
         globals_d = {
             'list': list,
             'tuple': tuple,
+            'dict': dict,
         }
 
     def py_ast_unrepr(ast_body):

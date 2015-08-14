@@ -6,7 +6,6 @@ import pytest
 
 from daikon.toolbox.deferred_eval import deferred_eval
 
-
 Parameters = collections.namedtuple('Parameters', ('string', 'globals_d', 'expected'))
 
 _data = []
@@ -25,9 +24,14 @@ for string in [
 def param(request):
     return request.param
 
+def test_deferred_eval_no_globals():
+    d = deferred_eval("2 * 5")
+    assert d() == 10
+
 def test_deferred_eval(param):
     d = deferred_eval(param.string, globals_d=param.globals_d)
     assert d() == param.expected
+    assert str(d) == "DeferredEval({!r})".format(param.string)
 
 def test_deferred_eval_late_evaluation():
     xlist = []

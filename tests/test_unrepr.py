@@ -26,7 +26,9 @@ for value in [
 for string in [
                "0x19a1", "-0x193A", "+0xabc3de",
                "0o123", "-0o234542", "+0o232",
-               "list()", "tuple()",
+               "list()", "tuple()", "dict()",
+               "[1, 2, 3][-1]", "(1, 2)[-1]", "{'a': 1, 'b': 2}['b']",
+               "[1, 2, 3][1:-1]",
               ]:
     value = eval(string)
     _data.append(Parameters(string=string, expected=value)),
@@ -80,3 +82,27 @@ def test_unrepr_globals():
     }
     string = "myfunction(*l1, **d1)"
     assert unrepr(string, globals_d=gd) == sum(l1) + sum(d1.values())
+
+def test_unrepr_syntax_error_undefined_unop():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("^0")
+
+def test_unrepr_syntax_error_undefined_binop():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("1 << 2")
+
+def test_unrepr_syntax_error_func_call_0():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("1(2, 3)")
+
+def test_unrepr_syntax_error_func_call_1():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("f(2, 3)", {'f': lambda: None})
+
+def test_unrepr_syntax_error_func_call_2():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("f(2, 3)", {})
+
+def test_unrepr_syntax_error_func_call_3():
+    with pytest.raises(SyntaxError) as exc_info:
+        unrepr("import a", {})
