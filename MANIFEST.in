@@ -5,6 +5,5 @@ include docs/source/getting-started/*.rst
 include docs/source/userguide/*.rst
 include docs/source/img/*.jpg
 include tox.ini
-include pytest.ini
 include pylint.ini
 include flake8.ini
