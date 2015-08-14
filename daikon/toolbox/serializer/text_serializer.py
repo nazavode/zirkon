@@ -95,7 +95,7 @@ class TextSerializer(Serializer):
     @abc.abstractmethod
     def impl_dump_mapping_name(self, level, mapping_name):
         """impl_dump_mapping_name(level, mapping_name) -> line"""
-        pass
+        raise NotImplementedError
 
     def impl_dump_mapping(self, level, lines, mapping_name, mapping):
         """impl_dump_mapping(...) -> mapping lines"""
@@ -105,7 +105,7 @@ class TextSerializer(Serializer):
     @abc.abstractmethod
     def impl_iter_mapping_items(self, mapping):
         """impl_iter()"""
-        pass
+        raise NotImplementedError
 
     def impl_dump_mapping_lines(self, level, lines, mapping):
         """impl_dump_mapping(level, lines, mapping)
@@ -154,4 +154,4 @@ class TextSerializer(Serializer):
     @abc.abstractmethod
     def impl_from_string(self, config, serialization, *, filename=None):
         """impl_from_string(...)"""
-        pass
+        raise NotImplementedError

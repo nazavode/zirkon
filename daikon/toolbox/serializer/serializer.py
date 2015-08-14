@@ -55,7 +55,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
         """to_string(config) -> str
            Dump the serialization for 'config'.
         """
-        pass
+        raise NotImplementedError
 
     def to_stream(self, config, stream):
         """to_stream(config, stream)
@@ -79,7 +79,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
         """from_string(config_class, serialization, *, dictionary=None, filename=None) -> config
            Load a Config from string 'serialization'.
         """
-        pass
+        raise NotImplementedError
 
     def from_stream(self, config_class, stream, *, dictionary=None, filename=None):
         """from_stream(config_class, stream, *, dictionary=None, filename=None) -> config

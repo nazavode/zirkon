@@ -45,7 +45,7 @@ class Check(metaclass=abc.ABCMeta):
         """check(option, section)
            Run option check (can change option.value, option.defined)
         """
-        pass
+        raise NotImplementedError
 
     def has_actual_value(self, value):  # pylint: disable=R0201
         """has_actual_value(value)

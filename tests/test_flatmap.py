@@ -71,6 +71,10 @@ _key_errors = [
 def key_error(request):
     return request.param
 
+@pytest.fixture(params=['keys', 'values', 'items'])
+def iterattribute(request):
+    return request.param
+
 def test_FlatMap_create():
     flatmap = FlatMap()
     assert len(flatmap) == 0
@@ -202,3 +206,56 @@ def test_FlatMap_key_type_err(content, key_error):
         flatmap.has_key(key)
     with pytest.raises(error):
         flatmap.update({key: 'anything'})
+
+def test_FlatMap_key_err(content, key_error):
+    flatmap = FlatMap(content)
+    key, error = key_error
+    with pytest.raises(error):
+        a = flatmap[key]
+    with pytest.raises(error):
+        del flatmap[key]
+    with pytest.raises(error):
+        flatmap.has_key(key)
+    with pytest.raises(error):
+        flatmap.update({key: 'anything'})
+
+def test_FlatMap_keys(flat_content, iterattribute):
+    flatmap = FlatMap(flat_content)
+    l0 = list(getattr(flatmap, iterattribute)())
+    l1 = list(getattr(flat_content, iterattribute)())
+    assert l0 == l1
+
+def test_FlatMap_copy(content):
+    flatmap = FlatMap(content)
+    flatmap2 = flatmap.copy()
+    assert flatmap2 == flatmap
+    
+def test_FlatMap_copy(content):
+    flatmap = FlatMap(content)
+    dct = flatmap.as_dict()
+    assert dct == content
+    
+def test_FlatMap_eq_ne(content):
+    flatmap0 = FlatMap(content)
+    flatmape = FlatMap(content.copy())
+    flatmap1 = FlatMap(content.copy())
+    flatmap2 = FlatMap(content.copy())
+    flatmap3 = FlatMap(content.copy())
+    flatmap1['x'] = 10001
+    flatmap2['sub']['x'] = 'alpha'
+    del flatmap3['sub']['x']
+    assert flatmap0 == flatmape
+    assert flatmap0 != flatmap1
+    assert flatmap1 != flatmap0
+    assert flatmap0 != flatmap2
+    assert flatmap2 != flatmap0
+    assert flatmap0 != flatmap3
+    assert flatmap3 != flatmap0
+
+def test_FlatMap_bool(content):
+    flatmap = FlatMap()
+    assert not flatmap
+    flatmap['x'] = 0
+    assert flatmap
+    del flatmap['x']
+    assert not flatmap

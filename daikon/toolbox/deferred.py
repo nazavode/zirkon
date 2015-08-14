@@ -131,11 +131,11 @@ class Deferred(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def evaluate(self, globals_d=None):
         """evaluate(globals_d=None) -> value"""
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def __reduce__(self):
-        pass
+        raise NotImplementedError
 
     def unparse(self):
         """unparse() -> python expression representation"""
@@ -154,7 +154,7 @@ class Deferred(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _impl_unparse(self):
         """_impl_unparse() -> python expression representation."""
-        pass
+        raise NotImplementedError
 
     def _wrap(self, expression, wrap):  # pylint: disable=R0201
         """wrap(expression, wrap) -> [wrapped] expression"""
@@ -162,7 +162,7 @@ class Deferred(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _impl_tree(self):
         """_impl_tree() -> show object tree"""
-        pass
+        raise NotImplementedError
 
     # __str__:
     def __str__(self):
@@ -460,8 +460,7 @@ class DUnaryOperator(Deferred):
     @abc.abstractmethod
     def _impl_unary_operation(self, value):
         """_impl_unary_operation(value) -> result"""
-
-        pass
+        raise NotImplementedError
 
 
 class DAbs(DUnaryOperator):
@@ -552,8 +551,7 @@ class DBinaryOperator(Deferred):
     @abc.abstractmethod
     def _impl_binary_operation(self, left_value, right_value):
         """_impl_binary_operation(left_value, right_value) -> result"""
-
-        pass
+        raise NotImplementedError
 
     def __reduce__(self):
         return (self.__class__, (self.left_operand, self.right_operand))
