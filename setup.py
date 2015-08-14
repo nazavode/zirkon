@@ -72,6 +72,7 @@ if __name__ == "__main__":
                                    ('docs/source/getting-started', ('*.rst',)),
                                    ('docs/source/userguide', ('*.rst',)),
                                    ('docs/source/img', ('*.jpg',)),
+                                   ('.', ('tox.ini', 'pytest.ini', 'pylint.ini', 'flake8.ini',)),
                                   ]:
         files = []
         for pattern in patterns:
