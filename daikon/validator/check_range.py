@@ -109,7 +109,7 @@ class CheckMinLen(Check):
             if len(value) < min_len_value:
                 raise MinLengthError.build(
                     option,
-                    "value has length {} than is lower than min_len {!r}".format(
+                    "length {} is lower than min_len {!r}".format(
                         len(value),
                         min_len_value))
 
@@ -130,6 +130,6 @@ class CheckMaxLen(Check):
             if len(value) > max_len_value:
                 raise MaxLengthError.build(
                     option,
-                    "value has length {} that is greater than max_len {!r}".format(
+                    "length {} is greater than max_len {!r}".format(
                         len(value),
                         max_len_value))

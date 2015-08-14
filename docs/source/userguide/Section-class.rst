@@ -150,5 +150,5 @@ Interpolation can be applied to any validator argument. In the following example
  >>> config['coeffs'] = [0.1, 0.2, 0.3, 0.4]
  >>> validation = schema.validate(config)
  >>> validation.dump()
- coeffs = MaxLengthError('coeffs=[0.1, 0.2, 0.3, 0.4]: value has length 4 that is greater than max_len 3')
+ coeffs = MaxLengthError('coeffs=[0.1, 0.2, 0.3, 0.4]: length 4 is greater than max_len 3')
 

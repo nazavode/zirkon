@@ -104,7 +104,7 @@ as values.
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError("subsection.y='alpha': value has length 5 than is lower than min_len 6")
+     y = MinLengthError("subsection.y='alpha': length 5 is lower than min_len 6")
      w = MissingRequiredOptionError('subsection.w: required value is missing')
  >>>
 

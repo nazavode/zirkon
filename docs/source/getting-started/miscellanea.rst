@@ -154,7 +154,7 @@ By default the
 d = MissingRequiredOptionError('d: required value is missing')
 w = UnexpectedOptionError('w=1.1: unexpected option')
 [sub]
-    c = MinLengthError("sub.c='x': value has length 1 than is lower than min_len 2")
+    c = MinLengthError("sub.c='x': length 1 is lower than min_len 2")
 
 >>> print(config['b'])
 1.02

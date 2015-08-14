@@ -121,7 +121,7 @@ This schema requires that the *filenames* value is a list of strings with at lea
  >>> config['filenames'] = ['a.dat', 'b.dat', 'c', 'd.dat']
  >>> validation = schema.validate(config)
  >>> validation.dump()
- filenames = MinLengthError("filenames[2]='c': value has length 1 than is lower than min_len 2")
+ filenames = MinLengthError("filenames[2]='c': length 1 is lower than min_len 2")
 
 
 Unexpected options
