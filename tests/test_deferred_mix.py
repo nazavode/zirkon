@@ -2,6 +2,8 @@
 
 import collections
 
+import pickle
+
 import pytest
 
 from daikon.toolbox.deferred import \
@@ -50,6 +52,7 @@ ParamString = collections.namedtuple('ParamString', ('expression', 'string'))
 _data = [
     ParamString(expression=(Y + -X) * -15, string="DMul(DAdd(DName('y'), DNeg(DConst(10))), -15)"),
     ParamString(expression=Y(X), string='DCall(y, (10,), {})'),
+    ParamString(expression=(DName('y', {'y': 10}) + -X) * -15, string="DMul(DAdd(DName('y', {'y': 10}), DNeg(DConst(10))), -15)"),
 ]
 
 @pytest.fixture(params=_data, ids=list(enumerate(_data)))
@@ -73,3 +76,20 @@ def test_contains():
     assert isinstance(dv, bool)
     assert dv
     assert d.unparse() == "10 in l"
+
+_data = [
+    X,
+    X + Y,
+    -X + Y,
+    X(Y),
+    DName('fff'),
+]
+
+@pytest.fixture(params=_data, ids=list(enumerate(_data)))
+def pexpr(request):
+    return request.param
+
+def test_pickle(pexpr):
+    ds = pickle.dumps(pexpr)
+    d = pickle.loads(ds)
+    assert d == pexpr

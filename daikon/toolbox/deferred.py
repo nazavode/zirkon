@@ -235,38 +235,20 @@ class Deferred(metaclass=abc.ABCMeta):
     def __eq__(self, other):
         return DEq(self, other)
 
-    def __req__(self, other):
-        return DEq(other, self)
-
     def __ne__(self, other):
         return DNe(self, other)
-
-    def __rne__(self, other):
-        return DNe(other, self)
 
     def __lt__(self, other):
         return DLt(self, other)
 
-    def __rlt__(self, other):
-        return DGe(other, self)
-
     def __le__(self, other):
         return DLe(self, other)
-
-    def __rle__(self, other):
-        return DGt(self, other)
 
     def __gt__(self, other):
         return DGt(self, other)
 
-    def __rgt__(self, other):
-        return DLe(self, other)
-
     def __ge__(self, other):
         return DGe(self, other)
-
-    def __rge__(self, other):
-        return DLt(self, other)
 
     # cannot work: immediately converted to bool
     # def __contains__(self, other):
