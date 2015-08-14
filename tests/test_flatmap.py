@@ -145,16 +145,16 @@ def test_FlatMap_set_par_err(content):
     flatmap = FlatMap(content)
     with pytest.raises(ValueError) as exc_info:
         flatmap['b'] = {}
-    assert str(exc_info.value) == "cannot replace parameter b with submap"
+    assert str(exc_info.value) == "cannot replace key b with submap"
     with pytest.raises(ValueError) as exc_info:
         flatmap['sub']['x'] = {}
-    assert str(exc_info.value) == "cannot replace parameter sub.x with submap"
+    assert str(exc_info.value) == "cannot replace key sub.x with submap"
 
 def test_FlatMap_set_sub_err(content):
     flatmap = FlatMap(content)
     with pytest.raises(ValueError) as exc_info:
         flatmap['sub'] = 'alpha'
-    assert str(exc_info.value) == "cannot replace submap sub with parameter"
+    assert str(exc_info.value) == "cannot replace submap sub with key"
 
 def test_FlatMap_has_key(content):
     flatmap = FlatMap(content)

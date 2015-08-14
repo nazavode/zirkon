@@ -161,7 +161,7 @@ class FlatMap(collections.abc.Mapping):
         submap_prefix = self.get_submap_prefix(abs_key)
         if isinstance(value, collections.Mapping):
             if abs_key in self.dictionary:
-                raise ValueError("cannot replace parameter {}{} with submap".format(self.prefix, key))
+                raise ValueError("cannot replace key {}{} with submap".format(self.prefix, key))
             if submap_prefix in self.dictionary:
                 # clear all submap's keys
                 self[key].clear()
@@ -171,7 +171,7 @@ class FlatMap(collections.abc.Mapping):
                 submap[sub_key] = sub_value
         else:
             if submap_prefix in self.dictionary:
-                raise ValueError("cannot replace submap {}{} with parameter".format(self.prefix, key))
+                raise ValueError("cannot replace submap {}{} with key".format(self.prefix, key))
             self.dictionary[abs_key] = value
 
     def __delitem__(self, key):
@@ -185,11 +185,11 @@ class FlatMap(collections.abc.Mapping):
             submap.clear()
             del self.dictionary[submap.prefix]
             return
-        raise KeyError(self.prefix + key, "missing parameter/submap{}{}".format(self.prefix, key))
+        raise KeyError(self.prefix + key, "missing key/submap{}{}".format(self.prefix, key))
 
     def has_key(self, key):
         """has_key(self, key)
-           Returns True if parameter/submap named 'key' is found.
+           Returns True if key/submap named 'key' is found.
         """
         abs_key = self.get_abs_key(key)
         if abs_key in self.dictionary:
