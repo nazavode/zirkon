@@ -1,6 +1,6 @@
 Daikon
 ======
-Python configuration library.
+A python configuration library. Daikon requires python >= 3.4.
 
 
 What is daikon
