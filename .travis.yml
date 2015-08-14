@@ -13,6 +13,7 @@ install:
 
 # command to run tests
 script:
+  - env
   - tox -e $TOX_ENV
 
 # notifications:
