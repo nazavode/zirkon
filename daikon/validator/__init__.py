@@ -18,7 +18,7 @@
 """
 config.validator
 ================
-Option validator classes
+Validator classes
 """
 
 __author__ = "Simone Campagna"
@@ -28,19 +28,19 @@ __all__ = [
     'Int',
     'IntList',
     'IntTuple',
-    'IntOption',
+    'IntChoice',
     'Float',
     'FloatList',
     'FloatTuple',
-    'FloatOption',
+    'FloatChoice',
     'Str',
     'StrList',
     'StrTuple',
-    'StrOption',
+    'StrChoice',
     'Bool',
     'BoolList',
     'BoolTuple',
-    'BoolOption',
+    'BoolChoice',
     'ValidatorInstance',
     'Ignore',
     'Remove',
@@ -53,16 +53,16 @@ from ..deferred_object import ROOT, SECTION
 from .validator import Validator
 
 from .int_validators import Int, \
-    IntList, IntTuple, IntOption
+    IntList, IntTuple, IntChoice
 
 from .float_validators import Float, \
-    FloatList, FloatTuple, FloatOption
+    FloatList, FloatTuple, FloatChoice
 
 from .str_validators import Str, \
-    StrList, StrTuple, StrOption
+    StrList, StrTuple, StrChoice
 
 from .bool_validators import Bool, \
-    BoolList, BoolTuple, BoolOption
+    BoolList, BoolTuple, BoolChoice
 
 from .validator_instance import ValidatorInstance
 from .complain import Complain

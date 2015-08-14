@@ -6,8 +6,7 @@ import os
 
 import pytest
 
-from daikon.validator.error import OptionValueError, \
-                                   MinValueError, \
+from daikon.validator.error import MinValueError, \
                                    MaxValueError, \
                                    MinLengthError, \
                                    MaxLengthError, \

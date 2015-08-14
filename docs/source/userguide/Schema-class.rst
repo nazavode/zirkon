@@ -8,90 +8,90 @@ The *Schema* class is a *Config* subclass, adding methods to validate a config. 
 
 A *Validator* is used to validate a key/value; all validators check for a specific type value; if the value type does not match, an *InvalidTypeError* exception is produces.
 
- +------------+--------------------+------------------+
- |Validator   |Basic validation    |Accepted Arguments|
- +------------+--------------------+------------------+
- |Int         |An integer value    |* default         |
- |            |                    |* min             |
- |            |                    |* max             |
- +------------+--------------------+------------------+
- |IntList     |A list of integer   |* default         |
- |            |values              |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |IntTuple    |A tuple of integer  |* default         |
- |            |values              |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |IntOption   |An integer value    |* **values**      |
- |            |contained in a set  |* default         |
- |            |of prefedifed values|                  |
- +------------+--------------------+------------------+
- |Float       |A floating point    |* default         |
- |            |value               |* min             |
- |            |                    |* max             |
- +------------+--------------------+------------------+
- |FloatList   |A list of floating  |* default         |
- |            |point values        |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |FloatTuple  |A tuple of floating |* default         |
- |            |point values        |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |FloatOption |A floating point    |* **values**      |
- |            |value contained in  |* default         |
- |            |a set of            |                  |
- |            |prefedifed values   |                  |
- +------------+--------------------+------------------+
- |Str         |A string            |* default         |
- |            |                    |* min_len         |
- |            |                    |* max_len         |
- +------------+--------------------+------------------+
- |StrList     |A list of strings   |* default         |
- |            |                    |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min_len    |
- |            |                    |* item_max_len    |
- +------------+--------------------+------------------+
- |StrTuple    |A tuple of strings  |* default         |
- |            |                    |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min_len    |
- |            |                    |* item_max_len    |
- +------------+--------------------+------------------+
- |StrOption   |A string            |* **values**      |
- |            |contained in a set  |* default         |
- |            |of prefedifed values|                  |
- +------------+--------------------+------------------+
- |Bool        |A boolean value     |* default         |
- |            |                    |* min             |
- |            |                    |* max             |
- +------------+--------------------+------------------+
- |BoolList    |A list of boolean   |* default         |
- |            |values              |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |BoolTuple   |A tuple of boolean  |* default         |
- |            |values              |* min_len         |
- |            |                    |* max_len         |
- |            |                    |* item_min        |
- |            |                    |* item_max        |
- +------------+--------------------+------------------+
- |BoolOption  |A boolean value     |* **values**      |
- |            |contained in a set  |* default         |
- |            |of prefedifed values|                  |
- +------------+--------------------+------------------+
+ +------------+---------------------+------------------+
+ |Validator   |Basic validation     |Accepted Arguments|
+ +------------+---------------------+------------------+
+ |Int         |An integer value     |* default         |
+ |            |                     |* min             |
+ |            |                     |* max             |
+ +------------+---------------------+------------------+
+ |IntList     |A list of integer    |* default         |
+ |            |values               |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |IntTuple    |A tuple of integer   |* default         |
+ |            |values               |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |IntChoice   |An integer value     |* **choices**     |
+ |            |contained in a set   |* default         |
+ |            |of prefedifed choices|                  |
+ +------------+---------------------+------------------+
+ |Float       |A floating point     |* default         |
+ |            |value                |* min             |
+ |            |                     |* max             |
+ +------------+---------------------+------------------+
+ |FloatList   |A list of floating   |* default         |
+ |            |point values         |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |FloatTuple  |A tuple of floating  |* default         |
+ |            |point values         |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |FloatChoice |A floating point     |* **choices**     |
+ |            |value contained in   |* default         |
+ |            |a set of             |                  |
+ |            |prefedifed choices   |                  |
+ +------------+---------------------+------------------+
+ |Str         |A string             |* default         |
+ |            |                     |* min_len         |
+ |            |                     |* max_len         |
+ +------------+---------------------+------------------+
+ |StrList     |A list of strings    |* default         |
+ |            |                     |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min_len    |
+ |            |                     |* item_max_len    |
+ +------------+---------------------+------------------+
+ |StrTuple    |A tuple of strings   |* default         |
+ |            |                     |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min_len    |
+ |            |                     |* item_max_len    |
+ +------------+---------------------+------------------+
+ |StrChoice   |A string             |* **choices**     |
+ |            |contained in a set   |* default         |
+ |            |of prefedifed choices|                  |
+ +------------+---------------------+------------------+
+ |Bool        |A boolean value      |* default         |
+ |            |                     |* min             |
+ |            |                     |* max             |
+ +------------+---------------------+------------------+
+ |BoolList    |A list of boolean    |* default         |
+ |            |values               |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |BoolTuple   |A tuple of boolean   |* default         |
+ |            |values               |* min_len         |
+ |            |                     |* max_len         |
+ |            |                     |* item_min        |
+ |            |                     |* item_max        |
+ +------------+---------------------+------------------+
+ |BoolChoice  |A boolean value      |* **choices**     |
+ |            |contained in a set   |* default         |
+ |            |of prefedifed choices|                  |
+ +------------+---------------------+------------------+
 
 The explanation of the arguments is:
 
@@ -99,7 +99,7 @@ The explanation of the arguments is:
 - *min*, *max*: if provided, it sets a minimum/maximum value for the value; if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
 - *min_len*, *max_len*: if provided, it sets a minimum/maximum length for the value (sequences or strings); if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
 - *item_min*, *item_max*, *item_min_len*, *item_max_len*: the same as *min*, *max*, *min_len* and *max_len*, but they are applied to all the sequence items (for List and Tuple validators only).
-- **values**: only for Option validators; it is mandatory and defines the set of accepted values. If the value does not match, an OptionValueError is produced.
+- **choices**: only for Choice validators; it is mandatory and defines the set of accepted values. If the value does not match, an InvalidChoiceError is produced.
 
 A validator can also change the section content; for instance, 
 

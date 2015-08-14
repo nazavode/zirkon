@@ -24,7 +24,7 @@ Implementation of the str validator classes
 __author__ = "Simone Campagna"
 __all__ = [
     'Str',
-    'StrOption',
+    'StrChoice',
     'StrList',
     'StrTuple',
 ]
@@ -36,7 +36,7 @@ from .sequence import Sequence
 from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
 from .check_scalar import CheckStr
-from .check_option import CheckOption
+from .check_choice import CheckChoice
 from .check_sequence import CheckList, CheckTuple
 
 
@@ -47,11 +47,11 @@ class Str(Validator):
     CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckMinLen, CheckMaxLen)
 
 
-class StrOption(Validator):
-    """StrOption()
+class StrChoice(Validator):
+    """StrChoice()
        Validator for a str option option.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckStr, CheckChoice)
 
 
 class StrList(Sequence):

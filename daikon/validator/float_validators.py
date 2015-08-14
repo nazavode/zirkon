@@ -24,7 +24,7 @@ Implementation of the float validator classes
 __author__ = "Simone Campagna"
 __all__ = [
     'Float',
-    'FloatOption',
+    'FloatChoice',
     'FloatList',
     'FloatTuple',
 ]
@@ -38,7 +38,7 @@ from .check_range import CheckMin, CheckMax, \
     CheckMinLen, CheckMaxLen
 
 from .check_scalar import CheckFloat
-from .check_option import CheckOption
+from .check_choice import CheckChoice
 from .check_sequence import CheckList, CheckTuple
 
 
@@ -49,11 +49,11 @@ class Float(Validator):
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
 
 
-class FloatOption(Validator):
-    """FloatOption()
+class FloatChoice(Validator):
+    """FloatChoice()
        Validator for a float option option.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckChoice)
 
 
 class FloatList(Sequence):

@@ -24,7 +24,7 @@ Implementation of the Bool classes
 __author__ = "Simone Campagna"
 __all__ = [
     'Bool',
-    'BoolOption',
+    'BoolChoice',
     'BoolList',
     'BoolTuple',
 ]
@@ -37,7 +37,7 @@ from .check_default import CheckDefault
 from .check_range import CheckMinLen, CheckMaxLen
 
 from .check_scalar import CheckBool
-from .check_option import CheckOption
+from .check_choice import CheckChoice
 from .check_sequence import CheckList, CheckTuple
 
 
@@ -48,11 +48,11 @@ class Bool(Validator):
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
 
-class BoolOption(Validator):
-    """BoolOption()
+class BoolChoice(Validator):
+    """BoolChoice()
        Validator for a bool option option.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckChoice)
 
 
 class BoolList(Sequence):

@@ -32,7 +32,7 @@ __all__ = [
     'InvalidValueError',
     'MinValueError',
     'MaxValueError',
-    'OptionValueError',
+    'InvalidChoiceError',
     'InvalidLengthError',
     'MinLengthError',
     'MaxLengthError',
@@ -100,8 +100,8 @@ class MaxValueError(InvalidValueError):
     pass
 
 
-class OptionValueError(InvalidValueError):
-    """OptionValueError()
+class InvalidChoiceError(InvalidValueError):
+    """InvalidChoiceError()
     """
     pass
 

@@ -92,7 +92,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
   an integer list; 
 - ``IntTuple([default=...], [min_len=...], [max_len=...], [item_min=...], [item_max=...])``
   an integer tuple; 
-- ``IntOption(values=(...), [default=...])``
+- ``IntChoice(choices=(...), [default=...])``
   an integer option; 
 - ``Float([default=...], [min=...], [max=...])``
   an float value; 
@@ -100,7 +100,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
   an float list; 
 - ``FloatTuple([default=...], [min_len=...], [max_len=...], [item_min=...], [item_max=...])``
   an float tuple; 
-- ``FloatOption(values=(...), [default=...])``
+- ``FloatChoice(choices=(...), [default=...])``
   an float option; 
 - ``Str([default=...], [min_len=...], [max_len=...])``
   a string; 
@@ -108,7 +108,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
   a string list; 
 - ``StrTuple([default=...], [min_len=...], [max_len=...], [item_min_len=...], [item_max_len=...])``
   a string tuple; 
-- ``StrOption(values=(...), [default=...])``
+- ``StrChoice(choices=(...), [default=...])``
   a string option; 
 - ``Bool([default=...])``
   a boolean value;
@@ -116,7 +116,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
   a boolean list;
 - ``BoolTuple([default=...], [min_len=...], [max_len=...])``
   a boolean tuple;
-- ``BoolOption(values=(...), [default=...])``
+- ``BoolChoice(choices=(...), [default=...])``
   a boolean option.
 
 Additional validators can be used to manage keys unexpected keys found in validated section:

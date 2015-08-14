@@ -16,40 +16,40 @@
 #
 
 """\
-config.validator.check_option
+config.validator.check_choice
 =============================
-Implementation of the CheckOption class
+Implementation of the CheckChoice class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'CheckOption',
+    'CheckChoice',
 ]
 
 from .check_type import CheckType
 from .option import Option
-from .error import OptionValueError
+from .error import InvalidChoiceError
 
 
-class CheckOption(CheckType):
-    """CheckOption(values)
-       Check if option.value is in 'values'.
+class CheckChoice(CheckType):
+    """CheckChoice(choices)
+       Check if option.value is in 'choices'.
     """
-    def __init__(self, values):
-        self.values = values
+    def __init__(self, choices):
+        self.choices = choices
         super().__init__()
 
     def check(self, option, section):
-        values = [self.get_value(value, section) for value in self.values]
+        choices = [self.get_value(choice, section) for choice in self.choices]
         if option.defined:
-            if option.value not in values:
-                raise OptionValueError(
+            if option.value not in choices:
+                raise InvalidChoiceError(
                     option,
-                    "{!r} is not a valid option value; valid values are: ({})".format(
-                        option.value, ', '.join(repr(v) for v in values)))
+                    "{!r} is not a valid choice; valid choices are: ({})".format(
+                        option.value, ', '.join(repr(v) for v in choices)))
 
     def self_validate(self, validator):
-        for value in self.values:
-            if self.has_actual_value(value):
-                option = Option(name='<option>', value=value, defined=True)
+        for choice in self.choices:
+            if self.has_actual_value(choice):
+                option = Option(name='<option>', value=choice, defined=True)
                 validator.validate_option(option, section=None)

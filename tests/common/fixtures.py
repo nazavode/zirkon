@@ -50,7 +50,7 @@ from daikon.toolbox.flatmap import FlatMap
 from daikon.section import Section
 from daikon.config import Config
 from daikon.schema import Schema
-from daikon.validator import Int, Str, StrOption, Float, FloatTuple
+from daikon.validator import Int, Str, StrChoice, Float, FloatTuple
 from daikon.toolbox.serializer import Serializer
 
 @pytest.fixture(params=tuple(Serializer.get_class_tags()))
@@ -195,7 +195,7 @@ def simple_schema_content():
             ('sb', Int(default=3)),
             ('sc', Str()),
             ('subsub', collections.OrderedDict((
-                           ('ssx', StrOption(values=["alpha", "beta", "gamma"])),    # list, non tuple: JSON does not preserve tuples!
+                           ('ssx', StrChoice(choices=["alpha", "beta", "gamma"])),    # list, non tuple: JSON does not preserve tuples!
                            ('ssy', FloatTuple(item_max=5.5)),
             ))),
         ))),
@@ -208,7 +208,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [subsub]
-        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
+        ssx = StrChoice(choices=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """
 
@@ -252,8 +252,8 @@ SIMPLE_SCHEMA_JSON_SERIALIZATION = """\
         },
         "subsub": {
             "ssx": {
-                "__class_name__": "StrOption",
-                "values": [
+                "__class_name__": "StrChoice",
+                "choices": [
                     "alpha",
                     "beta",
                     "gamma"
@@ -275,7 +275,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [[subsub]]
-        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
+        ssx = StrChoice(choices=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """     
 

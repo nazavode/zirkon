@@ -34,8 +34,8 @@ from common.fixtures import dictionary, \
 
 from daikon.config import Config, ROOT, SECTION
 from daikon.schema import Schema
-from daikon.validator import Int, IntOption
-from daikon.validator.error import OptionValueError, \
+from daikon.validator import Int, IntChoice
+from daikon.validator.error import InvalidChoiceError, \
     MinValueError, MaxValueError
 
 from daikon.toolbox.serializer import JSONSerializer, \
@@ -119,7 +119,7 @@ def deferred_schema():
     schema = Schema()
     schema['a'] = Int()
     schema['b'] = Int()
-    schema['c'] = IntOption(values=(SECTION['a'], SECTION['b']))
+    schema['c'] = IntChoice(choices=(SECTION['a'], SECTION['b']))
     schema['sub'] = {}
     schema['sub']['d'] = Int(min=ROOT['a'], max=ROOT['b'])
     schema['sub']['e'] = Int(default=ROOT['a'] + ROOT['b'] + SECTION['d'])
@@ -153,9 +153,9 @@ def test_Schema_deferred_default(deferred_schema, deferred_config):
 
 def test_Schema_deferred_err_option(deferred_schema, deferred_config):
     deferred_config['c'] = 15
-    with pytest.raises(OptionValueError) as exc_info:
+    with pytest.raises(InvalidChoiceError) as exc_info:
         deferred_schema.validate(deferred_config, raise_on_error=True)
-    assert str(exc_info.value) == "c=15: 15 is not a valid option value; valid values are: (10, 20)"
+    assert str(exc_info.value) == "c=15: 15 is not a valid choice; valid choices are: (10, 20)"
 
 def test_Schema_deferred_err_min(deferred_schema, deferred_config):
     deferred_config['a'] = 19

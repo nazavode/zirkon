@@ -29,11 +29,11 @@ from daikon.section import Section
 from daikon.schema_section import SchemaSection
 from daikon.validation import Validation
 from daikon.validator import Int, Str, \
-    FloatTuple, StrOption
+    FloatTuple, StrChoice
 from daikon.validator.ignore import Ignore
 from daikon.validator.remove import Remove
 from daikon.validator.error import \
-    OptionValueError, UnexpectedOptionError
+    InvalidChoiceError, UnexpectedOptionError
 
 
 def test_SchemaSection_create(generic_dictionary, string_io):
@@ -52,7 +52,7 @@ a = Int(min=1)
     sb = Int(default=3)
     sc = Str()
     [subsub]
-        ssx = StrOption(values=['alpha', 'beta', 'gamma'])
+        ssx = StrChoice(choices=['alpha', 'beta', 'gamma'])
         ssy = FloatTuple(item_max=5.5)
 """
 
@@ -79,7 +79,7 @@ def test_SchemaSection_validate_invalid_option(dictionary, generic_dictionary, s
     assert len(validation) == 1
     assert len(validation['sub']) == 1
     assert len(validation['sub']['subsub']) == 1
-    assert isinstance(validation['sub']['subsub']['ssx'], OptionValueError)
+    assert isinstance(validation['sub']['subsub']['ssx'], InvalidChoiceError)
 
 def test_SchemaSection_validate_unexpected(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10

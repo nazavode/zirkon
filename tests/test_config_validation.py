@@ -27,18 +27,18 @@ from common.fixtures import string_io
 from daikon.toolbox.dictutils import compare_dicts
 from daikon.config import Config, ConfigValidationError
 from daikon.schema import Schema
-from daikon.validator import Str, StrOption, Float, Int, FloatList
+from daikon.validator import Str, StrChoice, Float, Int, FloatList
 
 @pytest.fixture
 def schema():
     schema = Schema()
     schema['filename'] = Str()
-    schema['run_mode'] = StrOption(values=("alpha", "beta", "gamma"))
+    schema['run_mode'] = StrChoice(choices=("alpha", "beta", "gamma"))
     schema['values'] = {}
     schema['values']['x'] = Float(min=10.0, max=20.0)
     schema['values']['y'] = Float(min=10.0, max=20.0)
     schema['values']['z'] = Float(min=10.0, max=20.0)
-    schema['operation'] = StrOption(values=("+", "-"))
+    schema['operation'] = StrChoice(choices=("+", "-"))
     schema['parameters'] = {}
     schema['parameters']['max_iterations'] = Int(default=100)
     schema['parameters']['frequencies'] = FloatList(min_len=2)

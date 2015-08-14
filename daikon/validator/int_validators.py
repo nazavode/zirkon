@@ -24,7 +24,7 @@ Implementation of the int validator classes
 __author__ = "Simone Campagna"
 __all__ = [
     'Int',
-    'IntOption',
+    'IntChoice',
     'IntList',
     'IntTuple',
 ]
@@ -38,7 +38,7 @@ from .check_range import CheckMin, CheckMax, \
     CheckMinLen, CheckMaxLen
 
 from .check_scalar import CheckInt
-from .check_option import CheckOption
+from .check_choice import CheckChoice
 from .check_sequence import CheckList, CheckTuple
 
 
@@ -49,11 +49,11 @@ class Int(Validator):
     CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckMin, CheckMax)
 
 
-class IntOption(Validator):
-    """IntOption()
+class IntChoice(Validator):
+    """IntChoice()
        Validator for a int option option.
     """
-    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckOption)
+    CHECK_COMPOSER = Composer(CheckDefault, CheckInt, CheckChoice)
 
 
 class IntList(Sequence):
