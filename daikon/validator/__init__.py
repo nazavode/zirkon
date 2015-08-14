@@ -118,7 +118,7 @@ def _setup_codecs():
             """
             globals_d = {}
             option_validation_error_class = find_subclass(OptionValidationError, type_name, include_self=False)
-            if option_validation_error_class is None:
+            if option_validation_error_class is None:  # pragma: no cover
                 raise NameError("undefined OptionValidationError class {}".format(type_name))
             globals_d[type_name] = option_validation_error_class
             globals_d['ROOT'] = ROOT
@@ -163,7 +163,7 @@ def _setup_codecs():
                OptionValidationError JSON decoder.
             """
             ov_error_subclass = find_subclass(OptionValidationError, type_name)
-            if ov_error_subclass is None:
+            if ov_error_subclass is None:  # pragma: no cover
                 raise NameError("undefined OptionValidationError subclass {}".format(type_name))
             return ov_error_subclass(*args['exception_args'])
 
