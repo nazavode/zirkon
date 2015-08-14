@@ -1,2 +1,0 @@
-# daikon
-Configuration library
