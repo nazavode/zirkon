@@ -54,7 +54,7 @@ class Config(Section):
        >>> config = Config()
        >>> config['x_value'] = 10.1
        >>> config['y_value'] = 20.2
-       >>> config['parameters'] = collections.OrderedDict((
+       >>> config['data'] = collections.OrderedDict((
        ...     ('alpha', 20),
        ...     ('name', 'first experiment'),
        ... ))
@@ -66,14 +66,14 @@ class Config(Section):
        >>> config.dump()
        x_value = 10.1
        y_value = 20.2
-       [parameters]
+       [data]
            alpha = 20
            name = 'first experiment'
        z_value = 30.3
        [velocity]
            filename = 'vel.dat'
            type = 'RAW'
-       >>> del config['parameters']
+       >>> del config['data']
        >>> config.dump()
        x_value = 10.1
        y_value = 20.2

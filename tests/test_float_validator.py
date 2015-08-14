@@ -8,7 +8,7 @@ import pytest
 from daikon.validator.error import MinValueError, \
                                    MaxValueError, \
                                    InvalidTypeError, \
-                                   MissingRequiredParameterError
+                                   MissingRequiredOptionError
 from daikon.validator.float_validators import Float
 
 def test_basic():
@@ -22,7 +22,7 @@ def test_basic():
     assert v == 2.0
     with pytest.raises(InvalidTypeError):
         v = fv.validate(key='alpha', defined=True, value='2.0')
-    with pytest.raises(MissingRequiredParameterError):
+    with pytest.raises(MissingRequiredOptionError):
         v = fv.validate(key='alpha', defined=False, value=None)
 
 def test_default():

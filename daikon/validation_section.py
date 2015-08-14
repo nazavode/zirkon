@@ -38,6 +38,6 @@ class ValidationSection(Section):
     SUPPORTED_SCALAR_TYPES = (KeyValidationError, )
 
     @classmethod
-    def subsection_class(cls):
+    def _subsection_class(cls):
         return ValidationSection
 

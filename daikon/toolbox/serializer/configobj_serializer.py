@@ -66,7 +66,7 @@ class ConfigObjSerializer(TextSerializer):
     def impl_iter_mapping_items(self, mapping):
         # keys before, mappings after
         if self.is_section(mapping):
-            yield from mapping.parameters()
+            yield from mapping.options()
             yield from mapping.sections()
         else:
             yield from mapping.items()

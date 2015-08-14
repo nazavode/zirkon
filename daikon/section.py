@@ -38,14 +38,14 @@ from .toolbox.deferred import Deferred
 
 class Section(collections.abc.Mapping):
     """Section(init=None, *, dictionary=None, parent=None)
-       Dictionary-like object implementing storage of parameters/sections. The
+       Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
 
        >>> section = Section()
        >>> section['x_value'] = 10.1
        >>> section['y_value'] = 20.2
-       >>> section['parameters'] = collections.OrderedDict((
+       >>> section['data'] = collections.OrderedDict((
        ...     ('alpha', 20),
        ...     ('name', 'first experiment'),
        ... ))
@@ -57,14 +57,14 @@ class Section(collections.abc.Mapping):
        >>> section.dump()
        x_value = 10.1
        y_value = 20.2
-       [parameters]
+       [data]
            alpha = 20
            name = 'first experiment'
        z_value = 30.3
        [velocity]
            filename = 'vel.dat'
            type = 'RAW'
-       >>> del section['parameters']
+       >>> del section['data']
        >>> section.dump()
        x_value = 10.1
        y_value = 20.2
@@ -91,17 +91,17 @@ class Section(collections.abc.Mapping):
             self.update(init)
 
     @classmethod
-    def subsection_class(cls):
-        """subsection_class(cls)
+    def _subsection_class(cls):
+        """_subsection_class(cls)
            Return the class to be used for subsections (it must be derived from Section)
         """
         return Section
 
-    def subsection(self, dictionary):
-        """subsection(self, *p_args, **n_args)
+    def _subsection(self, dictionary):
+        """_subsection(self, *p_args, **n_args)
            Return a subsection with the given name
         """
-        return self.subsection_class()(dictionary=dictionary, parent=self)
+        return self._subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
     def dictionary_factory(cls):
@@ -118,7 +118,7 @@ class Section(collections.abc.Mapping):
         elif isinstance(value, self.SUPPORTED_SEQUENCE_TYPES):
             for index, item in enumerate(value):
                 if not isinstance(item, self.SUPPORTED_SCALAR_TYPES):
-                    fmt = "parameter {key}: invalid {value_type}: item #{index} {item!r} has invalid type {item_type}"
+                    fmt = "option {key}: invalid {value_type}: item #{index} {item!r} has invalid type {item_type}"
                     raise TypeError(fmt.format(
                         key=key,
                         value_type=type(value).__name__,
@@ -128,7 +128,7 @@ class Section(collections.abc.Mapping):
                     ))
             return
         else:
-            raise TypeError("parameter {}: invalid value {!r} of type {}".format(
+            raise TypeError("option {}: invalid value {!r} of type {}".format(
                 key,
                 value,
                 type(value).__name__,
@@ -137,7 +137,7 @@ class Section(collections.abc.Mapping):
     def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
-            return self.subsection(dictionary=value)
+            return self._subsection(dictionary=value)
         else:
             self.check_data_type(key=key, value=value)
             return value
@@ -148,17 +148,17 @@ class Section(collections.abc.Mapping):
         elif not is_valid_identifier(key):
             raise ValueError("invalid key {!r}: malformed identifier".format(key))
         if isinstance(value, collections.Mapping):
-            if self.has_parameter(key):
-                raise TypeError("parameter {} cannot be replaced with a section".format(key))
+            if self.has_option(key):
+                raise TypeError("option {} cannot be replaced with a section".format(key))
             self.dictionary[key] = self.dictionary_factory()
-            section = self.subsection(self.dictionary[key])
+            section = self._subsection(self.dictionary[key])
             section.update(value)
         else:
             if isinstance(value, Deferred):
                 value = value.evaluate({'SECTION': self, 'ROOT': self.root})
             self.check_data_type(key=key, value=value)
             if self.has_section(key):
-                raise TypeError("section {} cannot be replaced with a parameter".format(key))
+                raise TypeError("section {} cannot be replaced with an option".format(key))
             self.dictionary[key] = value
 
     def __delitem__(self, key):
@@ -174,7 +174,7 @@ class Section(collections.abc.Mapping):
         """copy()
            Returns a deep copy of the section.
         """
-        return self.subsection_class()(dictionary=self.dictionary.copy())
+        return self._subsection_class()(dictionary=self.dictionary.copy())
 
     def get(self, key, default=None):
         if key in self:
@@ -182,37 +182,43 @@ class Section(collections.abc.Mapping):
         else:
             return default
 
-    def get_parameter(self, parameter_name, default=None):
-        """get_parameter(self, parameter_name, default=None) -> value
-           Get a parameter (raises KeyError if a section is found)
+    def get_option(self, option_name, default=None):
+        """get_option(self, option_name, default=None) -> value
+           Get an option (raises KeyError if a section is found)
         """
-        if parameter_name not in self.dictionary:
+        if option_name not in self.dictionary:
             return default
         else:
-            value = self.dictionary[parameter_name]
+            value = self.dictionary[option_name]
             if isinstance(value, collections.Mapping):
-                raise KeyError("{} is a section, not a parameter".format(parameter_name))
+                raise KeyError("{} is a section, not an option".format(option_name))
             return value
 
     def get_section(self, section_name, default=None):
         """get_section(self, section_name, default=None) -> value
-           Get a section (raises KeyError if a parameter is found)
+           Get a section (raises KeyError if an option is found)
         """
         if section_name not in self.dictionary:
             return default
         else:
             value = self.dictionary[section_name]
             if not isinstance(value, collections.Mapping):
-                raise KeyError("{} is a parameter, not a section".format(section_name))
-            value = self.subsection(dictionary=value)
+                raise KeyError("{} is an option, not a section".format(section_name))
+            value = self._subsection(dictionary=value)
             return value
 
-    def has_parameter(self, parameter_name):
-        """has_parameter(self, parameter_name) -> bool
-           Return True if parameter exists.
+    def has_key(self, key):
+        """has_key(self, key) -> bool
+           Return True if option or section 'key' exists.
         """
-        return parameter_name in self.dictionary and \
-            not isinstance(self.dictionary[parameter_name], collections.Mapping)
+        return key in self.dictionary
+
+    def has_option(self, option_name):
+        """has_option(self, option_name) -> bool
+           Return True if option exists.
+        """
+        return option_name in self.dictionary and \
+            not isinstance(self.dictionary[option_name], collections.Mapping)
 
     def has_section(self, section_name):
         """has_section(self, section_name) -> bool
@@ -228,9 +234,9 @@ class Section(collections.abc.Mapping):
         self[section_name] = {}
         return self[section_name]
 
-    def parameters(self):
-        """parameters(self) -> parameter items
-           Iterator over parameter items
+    def options(self):
+        """options(self) -> option items
+           Iterator over option items
         """
         for key, value in self.items():
             if not isinstance(value, collections.Mapping):
@@ -247,7 +253,7 @@ class Section(collections.abc.Mapping):
     def items(self):
         for key, value in self.dictionary.items():
             if isinstance(value, collections.Mapping):
-                value = self.subsection(dictionary=value)
+                value = self._subsection(dictionary=value)
             yield key, value
 
     def keys(self):
@@ -279,7 +285,7 @@ class Section(collections.abc.Mapping):
            Return a dict with all the section content
         """
         result = dict_class()
-        subsection_class = self.subsection_class()
+        subsection_class = self._subsection_class()
         for key, value in self.items():
             if isinstance(value, subsection_class):
                 result[key] = value.as_dict(dict_class=dict_class)
@@ -292,7 +298,7 @@ class Section(collections.abc.Mapping):
 
     def __str__(self):
         section_data = []
-        subsection_class = self.subsection_class()
+        subsection_class = self._subsection_class()
         for key, value in self.items():
             if isinstance(value, subsection_class):
                 section_data.append((key, str(value)))

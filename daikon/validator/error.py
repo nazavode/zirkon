@@ -25,9 +25,9 @@ __author__ = "Simone Campagna"
 __all__ = [
     'KeyValidationError',
     'InvalidContentError',
-    'MissingRequiredParameterError',
+    'MissingRequiredOptionError',
     'UnexpectedSectionError',
-    'UnexpectedParameterError',
+    'UnexpectedOptionError',
     'InvalidTypeError',
     'InvalidValueError',
     'MinValueError',
@@ -70,8 +70,8 @@ class InvalidValueError(KeyValidationError):
     pass
 
 
-class MissingRequiredParameterError(InvalidContentError):
-    """MissingRequiredParameterError()
+class MissingRequiredOptionError(InvalidContentError):
+    """MissingRequiredOptionError()
     """
     pass
 
@@ -82,8 +82,8 @@ class UnexpectedSectionError(InvalidContentError):
     pass
 
 
-class UnexpectedParameterError(InvalidContentError):
-    """UnexpectedParameterError()
+class UnexpectedOptionError(InvalidContentError):
+    """UnexpectedOptionError()
     """
     pass
 

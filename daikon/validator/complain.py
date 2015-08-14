@@ -34,6 +34,6 @@ from .check_complain import CheckComplain
 
 class Complain(Validator):
     """Complain()
-       Validator for unexpected parameters
+       Validator for unexpected options
     """
     CHECK_COMPOSER = Composer(CheckComplain)

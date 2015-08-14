@@ -33,7 +33,7 @@ from daikon.validator import Int, Str, \
 from daikon.validator.ignore import Ignore
 from daikon.validator.remove import Remove
 from daikon.validator.error import \
-    OptionValueError, UnexpectedParameterError
+    OptionValueError, UnexpectedOptionError
 
 
 def test_SchemaSection_create(generic_dictionary, string_io):
@@ -90,45 +90,45 @@ def test_SchemaSection_validate_unexpected(dictionary, generic_dictionary, strin
     assert validation
     assert len(validation) == 1
     assert len(validation['sub']) == 1
-    assert isinstance(validation['sub']['abc'], UnexpectedParameterError)
+    assert isinstance(validation['sub']['abc'], UnexpectedOptionError)
 
 def test_SchemaSection_validate_unexpected_ignored(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
-    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_parameter_validator=Ignore())
+    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_option_validator=Ignore())
     section = Section(dictionary=dictionary, init=simple_section_content)
     validation = schema_section.validate(section)
     assert not validation
-    assert section['sub'].has_parameter('abc')
+    assert section['sub'].has_option('abc')
     assert section['sub']['abc'] == 10
 
 def test_SchemaSection_validate_unexpected_sub_ignored(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['ssub'] = {'abc': 10}
-    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_parameter_validator=Ignore())
+    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_option_validator=Ignore())
     section = Section(dictionary=dictionary, init=simple_section_content)
     validation = schema_section.validate(section)
     assert not validation
     assert section['sub'].has_section('ssub')
-    assert section['sub']['ssub'].has_parameter('abc')
+    assert section['sub']['ssub'].has_option('abc')
     assert section['sub']['ssub']['abc'] == 10
 
 def test_SchemaSection_validate_unexpected_removed(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['abc'] = 10
-    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_parameter_validator=Remove())
+    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_option_validator=Remove())
     section = Section(dictionary=dictionary, init=simple_section_content)
-    assert section['sub'].has_parameter('abc')
+    assert section['sub'].has_option('abc')
     assert section['sub']['abc'] == 10
     validation = schema_section.validate(section)
     assert not validation
-    assert not section['sub'].has_parameter('abc')
+    assert not section['sub'].has_option('abc')
 
 def test_SchemaSection_validate_unexpected_sub_removed(dictionary, generic_dictionary, string_io, simple_schema_content, simple_section_content):
     simple_section_content['sub']['ssub'] = {'abc': 10}
-    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_parameter_validator=Remove())
+    schema_section = SchemaSection(dictionary=generic_dictionary, init=simple_schema_content, unexpected_option_validator=Remove())
     section = Section(dictionary=dictionary, init=simple_section_content)
     assert section['sub'].has_section('ssub')
-    assert section['sub']['ssub'].has_parameter('abc')
+    assert section['sub']['ssub'].has_option('abc')
     assert section['sub']['ssub']['abc'] == 10
     validation = schema_section.validate(section)
     assert not validation
     assert section['sub'].has_section('ssub')
-    assert not section['sub']['ssub'].has_parameter('abc')
+    assert not section['sub']['ssub'].has_option('abc')

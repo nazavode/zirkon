@@ -27,13 +27,13 @@ __all__ = [
 ]
 
 from .check import Check
-from .error import UnexpectedParameterError
+from .error import UnexpectedOptionError
 
 
 class CheckComplain(Check):
     """CheckComplain()
-       Complains about unexpected parameters by raising UnexpectedParameterErrors.
+       Complains about unexpected options by raising UnexpectedOptionErrors.
     """
 
     def check(self, key_value, section):
-        raise UnexpectedParameterError(key_value, "unexpected parameter {!r}".format(key_value.key))
+        raise UnexpectedOptionError(key_value, "unexpected option {!r}".format(key_value.key))

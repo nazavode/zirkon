@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 from .check import Check
-from .error import MissingRequiredParameterError
+from .error import MissingRequiredOptionError
 
 
 class CheckRequired(Check):
@@ -37,4 +37,4 @@ class CheckRequired(Check):
 
     def check(self, key_value, section):
         if not key_value.defined:
-            raise MissingRequiredParameterError(key_value, "required value is missing")
+            raise MissingRequiredOptionError(key_value, "required value is missing")

@@ -62,17 +62,23 @@ def test_Section_unrepr(simple_section):
     section = eval(repr(simple_section), {'Section': Section, 'OrderedDict': collections.OrderedDict})
     assert section is not simple_section
     assert section == simple_section
-def test_Section_has_parameter(simple_section):
-    assert simple_section.has_parameter('x_value')
-    assert not simple_section.has_parameter('w_value')
-    assert not simple_section.has_parameter('options')
+
+def test_Section_has_option(simple_section):
+    assert simple_section.has_option('x_value')
+    assert not simple_section.has_option('w_value')
+    assert not simple_section.has_option('options')
 
 def test_Section_has_section(simple_section):
     assert not simple_section.has_section('x_value')
     assert not simple_section.has_section('w_section')
     assert simple_section.has_section('options')
 
-def test_Section_getitem_parameter(simple_section):
+def test_Section_has_key(simple_section):
+    assert simple_section.has_key('x_value')
+    assert not simple_section.has_key('w_section')
+    assert simple_section.has_key('options')
+
+def test_Section_getitem_option(simple_section):
     assert simple_section['y_value'] == 20.2
     assert simple_section['options']['i_alpha'] == 100
     assert simple_section['options']['epsilon']['epsilon_z'] == 30
@@ -87,10 +93,10 @@ epsilon_y = 20
 epsilon_z = 30
 """
 
-def test_Section_get_parameter(simple_section):
-    assert simple_section.get_parameter('y_value') == 20.2
+def test_Section_get_option(simple_section):
+    assert simple_section.get_option('y_value') == 20.2
     with pytest.raises(KeyError) as exc_info:
-        simple_section.get_parameter('options')
+        simple_section.get_option('options')
 
 def test_Section_get_section(simple_section):
     options = simple_section.get_section('options')
@@ -99,21 +105,21 @@ def test_Section_get_section(simple_section):
     with pytest.raises(KeyError) as exc_info:
         simple_section.get_section('z_value')
 
-def test_Section_setitem_parameter(simple_section):
+def test_Section_setitem_option(simple_section):
     simple_section['xxx'] = 100
-    assert simple_section.has_parameter('xxx')
+    assert simple_section.has_option('xxx')
     assert simple_section['xxx'] == 100
     simple_section['options']['yyy'] = 200
-    assert simple_section['options'].has_parameter('yyy')
+    assert simple_section['options'].has_option('yyy')
     assert simple_section['options']['yyy'] == 200
 
 def test_Section_setitem_section(simple_section):
     simple_section['xxx'] = {'xx': 11}
     assert simple_section.has_section('xxx')
-    assert simple_section['xxx'].has_parameter('xx')
+    assert simple_section['xxx'].has_option('xx')
     assert simple_section['xxx']['xx'] == 11
 
-def test_Section_setitem_parameter_raises(simple_section):
+def test_Section_setitem_option_raises(simple_section):
     with pytest.raises(TypeError) as exc_info:
         simple_section['options'] = 100
 
@@ -126,19 +132,19 @@ def test_Section_delitem_section(simple_section):
     del simple_section['options']
     assert not simple_section.has_section('options')
     simple_section['options'] = 123
-    assert simple_section.has_parameter('options')
+    assert simple_section.has_option('options')
     assert simple_section['options'] == 123
 
-def test_Section_delitem_parameter(simple_section):
-    assert simple_section.has_parameter('y_value')
+def test_Section_delitem_option(simple_section):
+    assert simple_section.has_option('y_value')
     del simple_section['y_value']
-    assert not simple_section.has_parameter('y_value')
+    assert not simple_section.has_option('y_value')
     simple_section['y_value'] = {'yy': 22}
     assert simple_section.has_section('y_value')
     assert simple_section['y_value']['yy'] == 22
 
-def test_Section_parameters(simple_section):
-    l = list(simple_section.parameters())
+def test_Section_options(simple_section):
+    l = list(simple_section.options())
     assert l[0] == ('x_value', 10.1)
     assert l[1] == ('y_value', 20.2)
     assert l[2] == ('z_value', 30.3)
@@ -266,7 +272,7 @@ def test_Section_invalid_list_content():
     section = Section()
     with pytest.raises(TypeError) as exc_info:
         section['a'] = (1, 23, {})
-    assert str(exc_info.value) == "parameter a: invalid tuple: item #2 {} has invalid type dict"
+    assert str(exc_info.value) == "option a: invalid tuple: item #2 {} has invalid type dict"
 
 def test_Section_invalid_dictionary_content():
     dictionary = {'a': (1, 23, {}), 'b': 8}
@@ -274,4 +280,4 @@ def test_Section_invalid_dictionary_content():
     assert section['b'] == 8
     with pytest.raises(TypeError) as exc_info:
         a = section['a']
-    assert str(exc_info.value) == "parameter a: invalid tuple: item #2 {} has invalid type dict"
+    assert str(exc_info.value) == "option a: invalid tuple: item #2 {} has invalid type dict"

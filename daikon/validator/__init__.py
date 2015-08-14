@@ -18,7 +18,7 @@
 """
 config.validator
 ================
-Parameter validator classes
+Option validator classes
 """
 
 __author__ = "Simone Campagna"

@@ -8,7 +8,7 @@ import pytest
 from daikon.validator.error import MinLengthError, \
                                    MaxLengthError, \
                                    InvalidTypeError, \
-                                   MissingRequiredParameterError
+                                   MissingRequiredOptionError
 from daikon.validator.str_validators import Str
 
 def test_basic():
@@ -21,7 +21,7 @@ def test_basic():
     assert v == '2'
     with pytest.raises(InvalidTypeError):
         v = sv.validate(key='alpha', defined=True, value=2.0)
-    with pytest.raises(MissingRequiredParameterError):
+    with pytest.raises(MissingRequiredOptionError):
         v = sv.validate(key='alpha', defined=False, value=None)
 
 def test_default():

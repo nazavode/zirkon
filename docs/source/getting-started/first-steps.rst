@@ -161,12 +161,12 @@ The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, w
 
 In this case, only the first error can be detected.
 
-Dealing with unexpected parameters
-----------------------------------
+Dealing with unexpected options
+-------------------------------
 
-The *unexpected_parameter_validator* *Schema* attribute can be set to specify how to threat unexpected parameters, i.e. keys found in the *config* and not defined in the *schema*. It is possible to change this validator; interesting alternatives are:
+The *unexpected_option_validator* *Schema* attribute can be set to specify how to threat unexpected options, i.e. options found in the *config* and not defined in the *schema*. It is possible to change this validator; interesting alternatives are:
 
-* ``daikon.validator.Complain``: this is the default: an ``UnexpectedParameterError`` validation error is produced:
+* ``daikon.validator.Complain``: this is the default: an ``UnexpectedOptionError`` validation error is produced:
 
      >>> config = Config()
      >>> config['u'] = 0.35
@@ -174,16 +174,16 @@ The *unexpected_parameter_validator* *Schema* attribute can be set to specify ho
      u = 0.35
      >>> validation = schema.validate(config)
      >>> validation.dump()
-     u = UnexpectedParameterError(KeyValue('u', 0.35), "unexpected parameter 'u'")
+     u = UnexpectedOptionError(KeyValue('u', 0.35), "unexpected option 'u'")
      >>> config.dump()
      u = 0.35
      a = 10
      >>>
 
-* ``daikon.validator.Ignore``: the unexpected parameter is ignored and left in the config;
+* ``daikon.validator.Ignore``: the unexpected option is ignored and left in the config;
 
      >>> from daikon.validator import Ignore
-     >>> schema.unexpected_parameter_validator = Ignore()
+     >>> schema.unexpected_option_validator = Ignore()
      >>> config.dump()
      u = 0.35
      a = 10
@@ -194,10 +194,10 @@ The *unexpected_parameter_validator* *Schema* attribute can be set to specify ho
      a = 10
      >>>
 
-* ``daikon.validator.Remove``: the unexpected parameter is removed;
+* ``daikon.validator.Remove``: the unexpected option is removed;
 
      >>> from daikon.validator import Remove
-     >>> schema.unexpected_parameter_validator = Remove()
+     >>> schema.unexpected_option_validator = Remove()
      >>> config.dump()
      u = 0.35
      a = 10

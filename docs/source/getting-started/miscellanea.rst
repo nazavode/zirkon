@@ -121,7 +121,7 @@ Daikon supports validation. A Schema object defines a validation schema for any 
 
 Additional validators can be used to manage keys unexpected keys found in validated section:
 - ``Complain()``
-  unexpected keys raise an UnexpectedParameterError (the default behaviour);
+  unexpected keys raise an UnexpectedOptionError (the default behaviour);
 - ``Remove()``
   unexpected keys are removed;
 - ``Ignore()``
@@ -151,8 +151,8 @@ By default the
 >>> config['sub'] = {'c': 'x'}
 >>> validation = schema.validate(config)
 >>> validation.dump()
-d = MissingRequiredParameterError(KeyValue('d', None, defined=False), 'required value is missing')
-w = UnexpectedParameterError(KeyValue('w', 1.1), "unexpected parameter 'w'")
+d = MissingRequiredOptionError(KeyValue('d', None, defined=False), 'required value is missing')
+w = UnexpectedOptionError(KeyValue('w', 1.1), "unexpected option 'w'")
 [sub]
     c = MinLengthError(KeyValue('sub.c', 'x'), 'value has length 1 than is lower than min_len 2')
 

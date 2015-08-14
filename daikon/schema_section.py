@@ -34,85 +34,85 @@ from .validator.complain import Complain
 from .validator.key_value import KeyValue
 from .validator.error import KeyValidationError, \
     UnexpectedSectionError, \
-    UnexpectedParameterError
+    UnexpectedOptionError
 
 
-def _validate_parameter(*, validator, section, validation_section,
-                        parameter_name, raise_on_error, key_value):
-    """_validate_parameter(*, ...)
-       Validates a parameter and uses the validation result to
-       eventually change the parameter value.
+def _validate_option(*, validator, section, validation_section,
+                     option_name, raise_on_error, key_value):
+    """_validate_option(*, ...)
+       Validates an option and uses the validation result to
+       eventually change the option value.
        Used to implement SchemaSection.impl_validate(...) method.
     """
     value = key_value.value
     try:
         validator.validate_key_value(key_value, section)
     except KeyValidationError as err:
-        validation_section[parameter_name] = err
+        validation_section[option_name] = err
         if raise_on_error:
             raise
     else:
         if not key_value.defined:
-            del section[parameter_name]
+            del section[option_name]
         elif key_value.value is not value:
-            section[parameter_name] = key_value.value
+            section[option_name] = key_value.value
 
 
 class SchemaSection(Section):
     """SchemaSection(init=None, *, dictionary=None, parent=None,
-                     unexpected_parameter_validator=None,
+                     unexpected_option_validator=None,
                      self_validate=True)
        A Section class to perform validation. All values must be Validator
        instances.
 
-       The 'unexpected_parameter_validator' is used to validate unexpected
-       parameters (parameters found in the section to be validated, but not
+       The 'unexpected_option_validator' is used to validate unexpected
+       options (options found in the section to be validated, but not
        in the schema). By default it is 'Complain()', which
-       raises an UnexpectedParameterError. The 'Ignore()' validator
-       can be used to ignore unexpected parameters (they will be kept in
+       raises an UnexpectedOptionError. The 'Ignore()' validator
+       can be used to ignore unexpected options (they will be kept in
        the validated section), while the 'Remove()' validator can be used
-       to remove unexpected parameters from the validated section.
+       to remove unexpected options from the validated section.
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
     def __init__(self, init=None, *, dictionary=None, parent=None,
-                 unexpected_parameter_validator=None,
+                 unexpected_option_validator=None,
                  self_validate=True):
-        self._unexpected_parameter_validator = None
-        self.unexpected_parameter_validator = unexpected_parameter_validator
+        self._unexpected_option_validator = None
+        self.unexpected_option_validator = unexpected_option_validator
         super().__init__(dictionary=dictionary, init=init, parent=parent)
         if self_validate:
-            schema_validator = self.subsection_class()(dictionary=None,
-                                                       unexpected_parameter_validator=ValidatorInstance(),
-                                                       self_validate=False)
+            schema_validator = self._subsection_class()(dictionary=None,
+                                                        unexpected_option_validator=ValidatorInstance(),
+                                                        self_validate=False)
             schema_validator.validate(section=self, raise_on_error=True)
 
     @classmethod
-    def subsection_class(cls):
+    def _subsection_class(cls):
         return SchemaSection
 
-    def subsection(self, dictionary):
-        return self.subsection_class()(dictionary=dictionary,
-                                       unexpected_parameter_validator=self.unexpected_parameter_validator)
+    def _subsection(self, dictionary):
+        return self._subsection_class()(dictionary=dictionary,
+                                        unexpected_option_validator=self.unexpected_option_validator)
 
     @property
-    def unexpected_parameter_validator(self):
-        """unexpected_parameter_validator [property getter]
-           Returns the validator to be used for unexpected parameters.
+    def unexpected_option_validator(self):
+        """unexpected_option_validator [property getter]
+           Returns the validator to be used for unexpected options.
         """
-        return self._unexpected_parameter_validator
+        return self._unexpected_option_validator
 
-    @unexpected_parameter_validator.setter
-    def unexpected_parameter_validator(self, validator):
-        """unexpected_parameter_validator [property setter]
-           Sets the validator to be used for unexpected parameters.
+    @unexpected_option_validator.setter
+    def unexpected_option_validator(self, validator):
+        """unexpected_option_validator [property setter]
+           Sets the validator to be used for unexpected options.
         """
         if validator is None:
             validator = Complain()
         if not isinstance(validator, Validator):
             raise TypeError("{!r} is not a Validator".format(validator))
-        self._unexpected_parameter_validator = validator
+        self._unexpected_option_validator = validator
 
     def validate(self, section, *, validation=None, raise_on_error=False):
         """validate(section, *, validation=None, raise_on_error=False) -> validation object
@@ -133,7 +133,7 @@ class SchemaSection(Section):
            Implementation of the validate method.
         """
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
-        self.impl_validate_parameters(section=section, validation_section=validation_section, **args)
+        self.impl_validate_options(section=section, validation_section=validation_section, **args)
         self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
 
     def impl_validate_subsections(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
@@ -144,9 +144,9 @@ class SchemaSection(Section):
         expected_subsection_names = set()
         for subsection_name, schema_subsection in self.sections():
             expected_subsection_names.add(subsection_name)
-            if section.has_parameter(subsection_name):
-                validation_section[subsection_name] = UnexpectedParameterError(
-                    "unexpected parameter {} (expecting section)".format(subsection_name))
+            if section.has_option(subsection_name):
+                validation_section[subsection_name] = UnexpectedOptionError(
+                    "unexpected option {} (expecting section)".format(subsection_name))
             else:
                 if section.has_section(subsection_name):
                     subsection = section.get_section(subsection_name)
@@ -165,8 +165,8 @@ class SchemaSection(Section):
         for subsection_name, subsection in section.sections():
             if subsection_name not in expected_subsection_names:
                 subsection_fqname = parent_fqname + subsection_name + '.'
-                schema_subsection = self.subsection_class()(
-                    unexpected_parameter_validator=self.unexpected_parameter_validator)
+                schema_subsection = self._subsection_class()(
+                    unexpected_option_validator=self.unexpected_option_validator)
                 sub_validation_section = ValidationSection()
                 schema_subsection.impl_validate(
                     section[subsection_name],
@@ -176,43 +176,43 @@ class SchemaSection(Section):
                 if sub_validation_section:
                     validation_section[subsection_name] = sub_validation_section
 
-    def impl_validate_parameters(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
-        """impl_validate_parameters(...)
-           Validate parameters.
+    def impl_validate_options(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
+        """impl_validate_options(...)
+           Validate options.
         """
-        # expected parameters:
-        expected_parameter_names = set()
-        for parameter_name, validator in list(self.parameters()):
-            expected_parameter_names.add(parameter_name)
-            key = parent_fqname + parameter_name
-            if section.has_section(parameter_name):
-                validation_section[parameter_name] = UnexpectedSectionError(
-                    "unexpected section {} (expecting parameter)".format(key))
+        # expected options:
+        expected_option_names = set()
+        for option_name, validator in list(self.options()):
+            expected_option_names.add(option_name)
+            key = parent_fqname + option_name
+            if section.has_section(option_name):
+                validation_section[option_name] = UnexpectedSectionError(
+                    "unexpected section {} (expecting option)".format(key))
             else:
-                if section.has_parameter(parameter_name):
-                    value = section.get_parameter(parameter_name)
+                if section.has_option(option_name):
+                    value = section.get_option(option_name)
                     defined = True
                 else:
                     value = None
                     defined = False
                 key_value = KeyValue(key=key, value=value, defined=defined)
-                _validate_parameter(
+                _validate_option(
                     validator=validator,
                     section=section,
                     validation_section=validation_section,
-                    parameter_name=parameter_name,
+                    option_name=option_name,
                     key_value=key_value,
                     raise_on_error=raise_on_error)
-        # unexpected parameters:
-        for parameter_name, parameter_value in list(section.parameters()):
-            if parameter_name not in expected_parameter_names:
-                validator = self.unexpected_parameter_validator
-                key = parent_fqname + parameter_name
-                key_value = KeyValue(key=key, value=parameter_value, defined=True)
-                _validate_parameter(
+        # unexpected options:
+        for option_name, option_value in list(section.options()):
+            if option_name not in expected_option_names:
+                validator = self.unexpected_option_validator
+                key = parent_fqname + option_name
+                key_value = KeyValue(key=key, value=option_value, defined=True)
+                _validate_option(
                     validator=validator,
                     validation_section=validation_section,
                     section=section,
-                    parameter_name=parameter_name,
+                    option_name=option_name,
                     key_value=key_value,
                     raise_on_error=raise_on_error)
