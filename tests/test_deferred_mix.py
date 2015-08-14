@@ -5,7 +5,7 @@ import collections
 import pytest
 
 from daikon.toolbox.deferred import \
-    DName, DConst, DCall
+    DName, DConst, DCall, DContains
 
 Param = collections.namedtuple('Param', ('de', 'expression', 'globals_d'))
 
@@ -45,3 +45,31 @@ def test_DCall(param):
     assert de.unparse() == expression
     value = eval(expression, globals_d)
     assert de.evaluate(globals_d) == value
+
+ParamString = collections.namedtuple('ParamString', ('expression', 'string'))
+_data = [
+    ParamString(expression=(Y + -X) * -15, string="DMul(DAdd(DName('y'), DNeg(DConst(10))), -15)"),
+    ParamString(expression=Y(X), string='DCall(y, (10,), {})'),
+]
+
+@pytest.fixture(params=_data, ids=list(enumerate(_data)))
+def pstring(request):
+    return request.param
+
+def test_str(pstring):
+    assert str(pstring.expression) == pstring.string
+
+def test_contains():
+    l = [1, 2, 3]
+    L = DName('l')
+    d = DContains(X, L)
+    print(type(X), type(L))
+    print(type(d))
+    dv = d.evaluate({'l': l})
+    assert isinstance(dv, bool)
+    assert not dv
+    l.append(X.value)
+    dv = d.evaluate({'l': l})
+    assert isinstance(dv, bool)
+    assert dv
+    assert d.unparse() == "10 in l"

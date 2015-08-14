@@ -58,11 +58,17 @@ _binary_num_operator['mod'] = lambda l, r: l % r
 _binary_num_operator['divmod'] = lambda l, r: divmod(l, r)
 _binary_num_operator['pow'] = lambda l, r: l ** r
 _binary_num_operator['eq'] = lambda l, r: l == r
+_binary_num_operator['req'] = lambda l, r: r == l
 _binary_num_operator['ne'] = lambda l, r: l != r
+_binary_num_operator['rne'] = lambda l, r: r != l
 _binary_num_operator['lt'] = lambda l, r: l <  r
+_binary_num_operator['rlt'] = lambda l, r: r <  l
 _binary_num_operator['le'] = lambda l, r: l <= r
+_binary_num_operator['rle'] = lambda l, r: r <= l
 _binary_num_operator['gt'] = lambda l, r: l >  r
+_binary_num_operator['rgt'] = lambda l, r: r >  l
 _binary_num_operator['ge'] = lambda l, r: l >= r
+_binary_num_operator['rge'] = lambda l, r: r >= l
 
 
 _binary_int_operator = collections.OrderedDict()

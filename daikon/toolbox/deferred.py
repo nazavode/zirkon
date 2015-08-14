@@ -268,8 +268,9 @@ class Deferred(metaclass=abc.ABCMeta):
     def __rge__(self, other):
         return DLt(self, other)
 
-    def __contains__(self, other):
-        return DContains(self, other)
+    # cannot work: immediately converted to bool
+    # def __contains__(self, other):
+    #     return DContains(self, other)
 
     # Call:
     def __call__(self, *p_args, **n_args):
