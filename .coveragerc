@@ -1,5 +1,6 @@
 # .coveragerc to control coverage.py
 [run]
+source = daikon, daikon.toolbox, daikon.toolbox.serializer, daikon.validator
 branch = True
 
 [report]

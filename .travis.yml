@@ -13,7 +13,7 @@ install:
 
 # command to run tests
 script:
-  - py.test --cov daikon --cov-report=html --cov-config=.coveragerc tests
+  - coverage run --source daikon `which py.test`
 
 after_success:
   - coveralls --rcfile=.coveragerc
