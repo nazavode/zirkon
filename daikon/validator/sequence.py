@@ -26,7 +26,7 @@ __all__ = [
     'Sequence',
 ]
 
-from .key_value import KeyValue
+from .option import Option
 from .validator import Validator
 
 
@@ -46,19 +46,19 @@ class Sequence(Validator):
             actual_arguments[sub_prefix + argument_name] = argument_value
         return actual_arguments, objects
 
-    def validate_key_value(self, key_value, section=None):
-        super().validate_key_value(key_value, section)
-        if key_value.defined and key_value.value:
+    def validate_option(self, option, section=None):
+        super().validate_option(option, section)
+        if option.defined and option.value:
             validated_item_values = []
             changed = False
-            for item_idx, item_value in enumerate(key_value.value):
-                item_key = "{}[{}]".format(key_value.key, item_idx)
-                item_key_value = KeyValue(key=item_key, value=item_value, defined=True)
-                validated_item_value = self.item_validator.validate_key_value(item_key_value)
+            for item_idx, item_value in enumerate(option.value):
+                item_name = "{}[{}]".format(option.name, item_idx)
+                item_option = Option(name=item_name, value=item_value, defined=True)
+                validated_item_value = self.item_validator.validate_option(item_option)
                 validated_item_values.append(validated_item_value)
                 if item_value != validated_item_value:
                     changed = True
             if changed:
-                sequence_type = type(key_value.value)
-                key_value.value = sequence_type(validated_item_values)
-        return key_value.value
+                sequence_type = type(option.value)
+                option.value = sequence_type(validated_item_values)
+        return option.value

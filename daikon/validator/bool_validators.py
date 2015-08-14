@@ -43,21 +43,21 @@ from .check_sequence import CheckList, CheckTuple
 
 class Bool(Validator):
     """Bool()
-       Validator for a scalar bool key/value.
+       Validator for a scalar bool option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
 
 class BoolOption(Validator):
     """BoolOption()
-       Validator for a bool option key/value.
+       Validator for a bool option option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckOption)
 
 
 class BoolList(Sequence):
     """BoolList()
-       Validator for a bool list key/value.
+       Validator for a bool list option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Bool
@@ -65,7 +65,7 @@ class BoolList(Sequence):
 
 class BoolTuple(Sequence):
     """BoolTuple()
-       Validator for a bool tuple key/value.
+       Validator for a bool tuple option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Bool

@@ -72,8 +72,8 @@ from .remove import Remove
 from ..toolbox.unrepr import unrepr
 from ..toolbox.subclass import find_subclass
 
-from .error import KeyValidationError
-from .key_value import KeyValue
+from .error import OptionValidationError
+from .option import Option
 
 
 # Validator codecs:
@@ -105,32 +105,32 @@ def _setup_codecs():
             decode=_validator_text_decode,
         )
 
-        def _kv_error_text_encode(key_validation_error):
-            """_kv_error_text_encode(validator)
-               KeyValidationError encoder.
+        def _ov_error_text_encode(option_validation_error):
+            """_ov_error_text_encode(validator)
+               OptionValidationError encoder.
             """
             return "{}({!r}, {!r})".format(
-                type(key_validation_error).__name__,
-                key_validation_error.key_value,
-                key_validation_error.message)
+                type(option_validation_error).__name__,
+                option_validation_error.option,
+                option_validation_error.message)
 
-        def _kv_error_text_decode(type_name, repr_data):
-            """_kv_error_text_encode(type_name, repr_data)
-               KeyValidationError decoder.
+        def _ov_error_text_decode(type_name, repr_data):
+            """_ov_error_text_encode(type_name, repr_data)
+               OptionValidationError decoder.
             """
-            globals_d = {KeyValue.__name__: KeyValue}
-            key_validation_error_class = find_subclass(KeyValidationError, type_name, include_self=False)
-            if key_validation_error_class is None:
-                raise NameError("undefined KeyValidationError class {}".format(type_name))
-            globals_d[type_name] = key_validation_error_class
+            globals_d = {Option.__name__: Option}
+            option_validation_error_class = find_subclass(OptionValidationError, type_name, include_self=False)
+            if option_validation_error_class is None:
+                raise NameError("undefined OptionValidationError class {}".format(type_name))
+            globals_d[type_name] = option_validation_error_class
             globals_d['ROOT'] = ROOT
             globals_d['SECTION'] = SECTION
             return unrepr(repr_data, globals_d)
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
-            class_=KeyValidationError,
-            encode=_kv_error_text_encode,
-            decode=_kv_error_text_decode,
+            class_=OptionValidationError,
+            encode=_ov_error_text_encode,
+            decode=_ov_error_text_decode,
         )
 
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
@@ -154,48 +154,48 @@ def _setup_codecs():
             decode=_validator_json_decode,
         )
 
-        def _key_value_json_encode(key_value):
-            """_key_value_json_encode(validator)
-               KeyValue JSON encoder.
+        def _option_json_encode(option):
+            """_option_json_encode(validator)
+               Option JSON encoder.
             """
-            return {'key': key_value.key,
-                    'value': key_value.value,
-                    'defined': key_value.defined}
+            return {'name': option.name,
+                    'value': option.value,
+                    'defined': option.defined}
 
-        def _key_value_json_decode(type_name, args):
-            """_key_value_json_encode(type_name, repr_data)
-               KeyValalue JSON decoder.
+        def _option_json_decode(type_name, args):
+            """_option_json_encode(type_name, repr_data)
+               OptionValalue JSON decoder.
             """
-            key_value_class = find_subclass(KeyValue, type_name, include_self=True)
-            if key_value_class is None:
-                raise NameError("undefined KeyValue class {}".format(type_name))
-            return key_value_class(**args)
+            option_class = find_subclass(Option, type_name, include_self=True)
+            if option_class is None:
+                raise NameError("undefined Option class {}".format(type_name))
+            return option_class(**args)
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=KeyValue,
-            encode=_key_value_json_encode,
-            decode=_key_value_json_decode,
+            class_=Option,
+            encode=_option_json_encode,
+            decode=_option_json_decode,
         )
 
-        def _kv_error_json_encode(key_validation_error):
-            """_kv_error_json_encode(validator)
-               KeyValidationError JSON encoder.
+        def _ov_error_json_encode(option_validation_error):
+            """_ov_error_json_encode(validator)
+               OptionValidationError JSON encoder.
             """
-            return {'key_value': key_validation_error.key_value,
-                    'message': key_validation_error.message}
+            return {'option': option_validation_error.option,
+                    'message': option_validation_error.message}
 
-        def _kv_error_json_decode(type_name, args):
-            """_kv_error_json_encode(type_name, repr_data)
-               KeyValidationError JSON decoder.
+        def _ov_error_json_decode(type_name, args):
+            """_ov_error_json_encode(type_name, repr_data)
+               OptionValidationError JSON decoder.
             """
-            key_validation_error_subclass = find_subclass(KeyValidationError, type_name)
-            if key_validation_error_subclass is None:
-                raise NameError("undefined KeyValidationError subclass {}".format(type_name))
-            return key_validation_error_subclass(**args)
+            ov_error_subclass = find_subclass(OptionValidationError, type_name)
+            if ov_error_subclass is None:
+                raise NameError("undefined OptionValidationError subclass {}".format(type_name))
+            return ov_error_subclass(**args)
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=KeyValidationError,
-            encode=_kv_error_json_encode,
-            decode=_kv_error_json_decode,
+            class_=OptionValidationError,
+            encode=_ov_error_json_encode,
+            decode=_ov_error_json_decode,
         )
 _setup_codecs()

@@ -28,7 +28,7 @@ __all__ = [
 
 from ..toolbox.registry import Registry
 from ..toolbox.compose import Composer, ArgumentStore
-from .key_value import KeyValue
+from .option import Option
 
 
 class Validator(Registry):
@@ -61,20 +61,20 @@ class Validator(Registry):
         args = ', '.join("{}={!r}".format(o_name, o_value) for o_name, o_value in self.argument_store.items())
         return "{}({})".format(self.__class__.__name__, args)
 
-    def validate(self, key, value, defined, section=None):
-        """validate(key, value, defined, section=None) -> validator repr
-           Validate a key/value.
+    def validate(self, name, value, defined, section=None):
+        """validate(name, value, defined, section=None)
+           Validate a name/value/defined triplet.
         """
-        key_value = KeyValue(key=key, defined=defined, value=value)
-        return self.validate_key_value(key_value, section=section)
+        option = Option(name=name, defined=defined, value=value)
+        return self.validate_option(option, section=section)
 
-    def validate_key_value(self, key_value, section=None):
-        """validate(key, value, defined) -> validator repr
-           Validate a KeyValue object.
+    def validate_option(self, option, section=None):
+        """validate_option(option)
+           Validate a Option object.
         """
         for check in self.checks:
-            check.check(key_value, section)
-        return key_value.value
+            check.check(option, section)
+        return option.value
 
     def __eq__(self, validator):
         if self.__class__ != validator.__class__:

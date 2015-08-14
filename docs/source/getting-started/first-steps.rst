@@ -129,7 +129,7 @@ The list of available serialization protocols is:
 Creating a Schema
 =================
 
-The *Schema* class is a special *Config* whose values can only be *KeyValidator* objects. A *KeyValidator* object is used to validate a key/value pair. There are many predefined *KeyValidator* classes; each class can accept some attributes. For instance:
+The *Schema* class is a special *Config* whose values can only be *Validator* objects. A *Validator* object is used to validate a key/value pair. There are many predefined *Validator* classes; each class can accept some attributes. For instance:
 
  >>> from daikon.schema import Schema
  >>> from daikon.validator import Int
@@ -137,7 +137,7 @@ The *Schema* class is a special *Config* whose values can only be *KeyValidator*
  >>> schema['a'] = Int(default=10, min=3, max=100)
  >>>
  
-These *Schema.validate(config, raise_on_error=False)* method can be used to validate a *Config* object. In this example, ``schema`` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a ``Validation`` object, i.e. a special *Config* accepting only *KeyValidationError* instances as values (these are exceptions representing a validation error for a key):
+These *Schema.validate(config, raise_on_error=False)* method can be used to validate a *Config* object. In this example, ``schema`` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a ``Validation`` object, i.e. a special *Config* accepting only *ValidationError* instances as values (these are exceptions representing a validation error for a key):
 
  >>> config = Config()
  >>> config['a'] = 23
@@ -149,7 +149,7 @@ These *Schema.validate(config, raise_on_error=False)* method can be used to vali
 
 In this case all is fine, since, *config* has a valid integer value for *a*.
 
-Since a *default* value has been provided to the ``Int`` *KeyValidator*, it is acceptable that ``config`` do not have the *a* key: in this case, it is added with the default value *10*:
+Since a *default* value has been provided to the ``Int`` *Validator*, it is acceptable that ``config`` do not have the *a* key: in this case, it is added with the default value *10*:
 
  >>> config = Config()
  >>> config.dump()
@@ -168,7 +168,7 @@ By default, validation errors are not raised: they are stored on the ``Validatio
  >>> config['a'] = "abc"
  >>> validation = schema.validate(config)
  >>> validation.dump()
- a = InvalidTypeError(KeyValue('a', 'abc'), 'invalid type str - expected type is int')
+ a = InvalidTypeError(Option('a', 'abc'), 'invalid type str - expected type is int')
  >>> config.dump()
  a = 'abc'
  >>>
@@ -182,7 +182,7 @@ The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, w
  ...     print("type error!")
  type error!
  >>> validation.dump()
- a = InvalidTypeError(KeyValue('a', 'abc'), 'invalid type str - expected type is int')
+ a = InvalidTypeError(Option('a', 'abc'), 'invalid type str - expected type is int')
  >>> config.dump()
  a = 'abc'
  >>>
@@ -202,7 +202,7 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      u = 0.35
      >>> validation = schema.validate(config)
      >>> validation.dump()
-     u = UnexpectedOptionError(KeyValue('u', 0.35), "unexpected option 'u'")
+     u = UnexpectedOptionError(Option('u', 0.35), "unexpected option 'u'")
      >>> config.dump()
      u = 0.35
      a = 10
@@ -251,8 +251,8 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
  >>> config['y'] = 10
  >>> validation = config.self_validate(raise_on_error=False)
  >>> validation.dump()
- x = MinValueError(KeyValue('x', 10), 'value is lower than min 30')
- y = MaxValueError(KeyValue('y', 10), 'value is greater than max 2')
+ x = MinValueError(Option('x', 10), 'value is lower than min 30')
+ y = MaxValueError(Option('y', 10), 'value is greater than max 2')
 
 The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
  
@@ -263,7 +263,7 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  ...     print("config validation error:")
  ...     err.validation.dump()
  config validation error:
- x = MinValueError(KeyValue('x', 10), 'value is lower than min 30')
- y = MaxValueError(KeyValue('y', 10), 'value is greater than max 2')
+ x = MinValueError(Option('x', 10), 'value is lower than min 30')
+ y = MaxValueError(Option('y', 10), 'value is greater than max 2')
  >>>
 

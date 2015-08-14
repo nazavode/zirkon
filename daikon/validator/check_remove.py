@@ -31,10 +31,10 @@ from .check import Check
 
 class CheckRemove(Check):
     """CheckRemove()
-       Remove key/value.
+       Remove option.
     """
 
-    def check(self, key_value, section):
-        key_value.defined = False
-        key_value.value = None
+    def check(self, option, section):
+        option.defined = False
+        option.value = None
 

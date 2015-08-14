@@ -39,13 +39,13 @@ class CheckSequenceType(CheckType):
 
 class CheckList(CheckSequenceType):
     """CheckList()
-       Check if key/value is a list.
+       Check if option is a list.
     """
     TYPE = list
 
 
 class CheckTuple(CheckSequenceType):
     """CheckList()
-       Check if key/value is a tuple.
+       Check if option is a tuple.
     """
     TYPE = tuple

@@ -31,31 +31,31 @@ from .validation_section import ValidationSection
 from .validation import Validation
 from .validator import Validator, ValidatorInstance
 from .validator.complain import Complain
-from .validator.key_value import KeyValue
-from .validator.error import KeyValidationError, \
+from .validator.option import Option
+from .validator.error import OptionValidationError, \
     UnexpectedSectionError, \
     UnexpectedOptionError
 
 
 def _validate_option(*, validator, section, validation_section,
-                     option_name, raise_on_error, key_value):
+                     option_name, raise_on_error, option):
     """_validate_option(*, ...)
        Validates an option and uses the validation result to
        eventually change the option value.
        Used to implement SchemaSection.impl_validate(...) method.
     """
-    value = key_value.value
+    value = option.value
     try:
-        validator.validate_key_value(key_value, section)
-    except KeyValidationError as err:
+        validator.validate_option(option, section)
+    except OptionValidationError as err:
         validation_section[option_name] = err
         if raise_on_error:
             raise
     else:
-        if not key_value.defined:
+        if not option.defined:
             del section[option_name]
-        elif key_value.value is not value:
-            section[option_name] = key_value.value
+        elif option.value is not value:
+            section[option_name] = option.value
 
 
 class SchemaSection(Section):
@@ -184,10 +184,10 @@ class SchemaSection(Section):
         expected_option_names = set()
         for option_name, validator in list(self.options()):
             expected_option_names.add(option_name)
-            key = parent_fqname + option_name
+            fqname = parent_fqname + option_name
             if section.has_section(option_name):
                 validation_section[option_name] = UnexpectedSectionError(
-                    "unexpected section {} (expecting option)".format(key))
+                    "unexpected section {} (expecting option)".format(fqname))
             else:
                 if section.has_option(option_name):
                     value = section.get_option(option_name)
@@ -195,24 +195,24 @@ class SchemaSection(Section):
                 else:
                     value = None
                     defined = False
-                key_value = KeyValue(key=key, value=value, defined=defined)
+                option = Option(name=fqname, value=value, defined=defined)
                 _validate_option(
                     validator=validator,
                     section=section,
                     validation_section=validation_section,
                     option_name=option_name,
-                    key_value=key_value,
+                    option=option,
                     raise_on_error=raise_on_error)
         # unexpected options:
         for option_name, option_value in list(section.options()):
             if option_name not in expected_option_names:
                 validator = self.unexpected_option_validator
-                key = parent_fqname + option_name
-                key_value = KeyValue(key=key, value=option_value, defined=True)
+                fqname = parent_fqname + option_name
+                option = Option(name=fqname, value=option_value, defined=True)
                 _validate_option(
                     validator=validator,
                     validation_section=validation_section,
                     section=section,
                     option_name=option_name,
-                    key_value=key_value,
+                    option=option,
                     raise_on_error=raise_on_error)

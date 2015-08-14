@@ -13,22 +13,22 @@ from daikon.validator.int_validators import Int
 
 def test_basic():
     iv = Int()
-    v = iv.validate(key='alpha', defined=True, value=2)
+    v = iv.validate(name='alpha', defined=True, value=2)
     assert v == 2
-    v = iv.validate(key='alpha', defined=True, value=-2000)
+    v = iv.validate(name='alpha', defined=True, value=-2000)
     assert v == -2000
     with pytest.raises(InvalidTypeError):
-        v = iv.validate(key='alpha', defined=True, value=2.0)
+        v = iv.validate(name='alpha', defined=True, value=2.0)
     with pytest.raises(MissingRequiredOptionError):
-        v = iv.validate(key='alpha', defined=False, value=None)
+        v = iv.validate(name='alpha', defined=False, value=None)
 
 def test_default():
     iv = Int(default=10)
-    v = iv.validate(key='alpha', defined=True, value=2)
+    v = iv.validate(name='alpha', defined=True, value=2)
     assert v == 2
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == 10
-    v = iv.validate(key='alpha', defined=True, value=3)
+    v = iv.validate(name='alpha', defined=True, value=3)
     assert v == 3
 
 def test_bad_default_type():
@@ -46,10 +46,10 @@ def test_bad_default_max():
 def test_default_min():
     iv = Int(default=10, min=3)
     with pytest.raises(MinValueError):
-        v = iv.validate(key='alpha', defined=True, value=2)
-    v = iv.validate(key='alpha', defined=True, value=3)
+        v = iv.validate(name='alpha', defined=True, value=2)
+    v = iv.validate(name='alpha', defined=True, value=3)
     assert v == 3
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == 10
 
 def test_bad_min_type():
@@ -63,13 +63,13 @@ def test_bad_max_type():
 def test_default_max():
     iv = Int(default=10, min=3, max=100)
     with pytest.raises(MinValueError):
-        v = iv.validate(key='alpha', defined=True, value=2)
+        v = iv.validate(name='alpha', defined=True, value=2)
     with pytest.raises(MaxValueError):
-        v = iv.validate(key='alpha', defined=True, value=101)
-    v = iv.validate(key='alpha', defined=True, value=3)
+        v = iv.validate(name='alpha', defined=True, value=101)
+    v = iv.validate(name='alpha', defined=True, value=3)
     assert v == 3
-    v = iv.validate(key='alpha', defined=True, value=100)
+    v = iv.validate(name='alpha', defined=True, value=100)
     assert v == 100
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == 10
 

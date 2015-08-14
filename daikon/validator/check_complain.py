@@ -35,5 +35,5 @@ class CheckComplain(Check):
        Complains about unexpected options by raising UnexpectedOptionErrors.
     """
 
-    def check(self, key_value, section):
-        raise UnexpectedOptionError(key_value, "unexpected option {!r}".format(key_value.key))
+    def check(self, option, section):
+        raise UnexpectedOptionError(option, "unexpected option {!r}".format(option.name))

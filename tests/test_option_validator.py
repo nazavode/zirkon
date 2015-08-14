@@ -52,10 +52,10 @@ def test_missing_required_argument(parameters):
 def test_basic(parameters):
     iv = parameters.validator_class(values=parameters.values)
     for value in parameters.values:
-        v = iv.validate(key='alpha', defined=True, value=value)
+        v = iv.validate(name='alpha', defined=True, value=value)
         assert v == value
     with pytest.raises(OptionValueError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.invalid_value)
+        v = iv.validate(name='alpha', defined=True, value=parameters.invalid_value)
 
 def test_bad_option_value(parameters):
     invalid_values = parameters.values + (parameters.invalid_option, )

@@ -27,29 +27,29 @@ __all__ = [
 ]
 
 from .check_type import CheckType
-from .key_value import KeyValue
+from .option import Option
 from .error import OptionValueError
 
 
 class CheckOption(CheckType):
     """CheckOption(values)
-       Check if key_value.value is in 'values'.
+       Check if option.value is in 'values'.
     """
     def __init__(self, values):
         self.values = values
         super().__init__()
 
-    def check(self, key_value, section):
+    def check(self, option, section):
         values = [self.get_value(value, section) for value in self.values]
-        if key_value.defined:
-            if key_value.value not in values:
+        if option.defined:
+            if option.value not in values:
                 raise OptionValueError(
-                    key_value,
+                    option,
                     "{!r} is not a valid option value; valid values are: ({})".format(
-                        key_value.value, ', '.join(repr(v) for v in values)))
+                        option.value, ', '.join(repr(v) for v in values)))
 
     def self_validate(self, validator):
         for value in self.values:
             if self.has_actual_value(value):
-                key_value = KeyValue(key='<option>', value=value, defined=True)
-                validator.validate_key_value(key_value, section=None)
+                option = Option(name='<option>', value=value, defined=True)
+                validator.validate_option(option, section=None)

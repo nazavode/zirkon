@@ -34,16 +34,16 @@ from ..toolbox.deferred import Deferred
 class Check(metaclass=abc.ABCMeta):
     """Check()
        Abstract base class for cheks. Checks must implement
-       check(key_value, section) method.
+       check(option, section) method.
     """
 
     def __init__(self):
         pass
 
     @abc.abstractmethod
-    def check(self, key_value, section):
-        """check(key_value, section)
-           Run key/value check (can change key_value.value)
+    def check(self, option, section):
+        """check(option, section)
+           Run option check (can change option.value, option.defined)
         """
         pass
 

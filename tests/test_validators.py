@@ -98,4 +98,4 @@ def test_validator(validator_validator, parameters):
     validator_class = validator.Validator.get_class(parameters.validator_name)
     assert validator_class is parameters.validator_class
     validator_instance = validator_class(**parameters.validator_options)
-    assert validator_instance is validator_validator.validate(key='<key>', value=validator_instance, defined=True)
+    assert validator_instance is validator_validator.validate(name='<key>', value=validator_instance, defined=True)

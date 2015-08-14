@@ -89,35 +89,35 @@ def test_basic(parameters):
     iv = parameters.vclass()
     seq = parameters.vseq(m=3)
     assert len(seq) == 3
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
     seq = parameters.vseq(m=0)
     assert len(seq) == 0
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
     with pytest.raises(InvalidTypeError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.vscalar)
+        v = iv.validate(name='alpha', defined=True, value=parameters.vscalar)
     with pytest.raises(InvalidTypeError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.oseq(m=3))
+        v = iv.validate(name='alpha', defined=True, value=parameters.oseq(m=3))
     with pytest.raises(InvalidTypeError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.bseq(m=3))
+        v = iv.validate(name='alpha', defined=True, value=parameters.bseq(m=3))
     with pytest.raises(MissingRequiredOptionError):
-        v = iv.validate(key='alpha', defined=False, value=None)
+        v = iv.validate(name='alpha', defined=False, value=None)
 
 def test_default(parameters):
     dseq = parameters.vseq(m=4)
     iv = parameters.vclass(default=dseq)
     seq = parameters.vseq(m=2)
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == dseq
     if isinstance(dseq, list):
         # check immutable default:
         assert len(dseq) == 4
         v.append(10)
         assert len(dseq) == 4
-        v2 = iv.validate(key='alpha', defined=False, value=None)
+        v2 = iv.validate(name='alpha', defined=False, value=None)
         assert len(v2) == 4
         assert v2 == dseq
 
@@ -137,11 +137,11 @@ def test_default_min_len(parameters):
     dseq = parameters.vseq(m=4)
     iv = parameters.vclass(default=dseq, min_len=3)
     with pytest.raises(MinLengthError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=2))
+        v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=2))
     seq = parameters.vseq(m=3)
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == dseq
 
 def test_bad_default_min(parameters):
@@ -156,16 +156,16 @@ def test_default_max(parameters):
     dseq = parameters.vseq(m=4)
     iv = parameters.vclass(default=dseq, min_len=3, max_len=5)
     with pytest.raises(MinLengthError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=2))
+        v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=2))
     with pytest.raises(MaxLengthError):
-        v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=6))
+        v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=6))
     seq = parameters.vseq(m=3)
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
     seq = parameters.vseq(m=4)
-    v = iv.validate(key='alpha', defined=True, value=seq)
+    v = iv.validate(name='alpha', defined=True, value=seq)
     assert v is seq
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == dseq
 
 def test_item_options(parameters):
@@ -175,11 +175,11 @@ def test_item_options(parameters):
         imax = parameters.vseq(m=5)[0]
         iv = parameters.vclass(default=dseq, min_len=3, max_len=10, item_min=imin, item_max=imax)
         with pytest.raises(MinValueError):
-            v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=3))
+            v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=3))
         for m in 4, 5:
             seq = parameters.vseq(m=m)
-            v = iv.validate(key='alpha', defined=True, value=seq)
+            v = iv.validate(name='alpha', defined=True, value=seq)
             v is seq
         with pytest.raises(MaxValueError):
-            v = iv.validate(key='alpha', defined=True, value=parameters.vseq(m=6))
+            v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=6))
 

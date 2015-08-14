@@ -30,29 +30,29 @@ import copy
 
 from ..toolbox.undefined import UNDEFINED
 from .check_required import CheckRequired
-from .key_value import KeyValue
+from .option import Option
 
 
 class CheckDefault(CheckRequired):
     """CheckDefault(default=UNDEFINED)
-       Check if key/value is defined; if not:
+       Check if option is defined; if not:
        * if default is UNDEFINED, behaves like CheckRequired;
-       * if default is not UNDEFINED, set key_value.value to default.
+       * if default is not UNDEFINED, set option.value to default.
     """
 
     def __init__(self, default=UNDEFINED):
         self.default = default
         super().__init__()
 
-    def check(self, key_value, section):
-        if not key_value.defined:
+    def check(self, option, section):
+        if not option.defined:
             if self.default is UNDEFINED:
-                super().check(key_value, section)
+                super().check(option, section)
             else:
-                key_value.value = copy.copy(self.get_value(self.default, section))
-                key_value.defined = True
+                option.value = copy.copy(self.get_value(self.default, section))
+                option.defined = True
 
     def self_validate(self, validator):
         if (self.default is not UNDEFINED) and self.has_actual_value(self.default):
-            key_value = KeyValue(key='<default>', value=self.default, defined=True)
-            validator.validate_key_value(key_value, section=None)
+            option = Option(name='<default>', value=self.default, defined=True)
+            validator.validate_option(option, section=None)

@@ -32,9 +32,9 @@ from .error import MissingRequiredOptionError
 
 class CheckRequired(Check):
     """CheckRequired()
-       Check if a required key/value is available (no default).
+       Check if a required option is available (no default).
     """
 
-    def check(self, key_value, section):
-        if not key_value.defined:
-            raise MissingRequiredOptionError(key_value, "required value is missing")
+    def check(self, option, section):
+        if not option.defined:
+            raise MissingRequiredOptionError(option, "required value is missing")

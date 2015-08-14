@@ -16,23 +16,23 @@
 #
 
 """\
-config.validator.key_value
-==========================
-Implementation of the KeyValue class
+config.validator.option
+=======================
+Implementation of the Option class
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'KeyValue',
+    'Option',
 ]
 
 
-class KeyValue(object):
-    """KeyValue(key, value, *, defined=None)
-       Key/value ocject.
+class Option(object):
+    """Option(name, value, *, defined=None)
+       Store option information: the option name, the value and if it has been defined.
     """
-    def __init__(self, key, value, *, defined=True):
-        self.key = key
+    def __init__(self, name, value, *, defined=True):
+        self.name = name
         self.value = value
         self.defined = defined
 
@@ -44,9 +44,9 @@ class KeyValue(object):
 
     def copy(self):
         """copy()
-           Return a copy of the KeyValue object.
+           Return a copy of the Option object.
         """
-        return self.__class__(key=self.key, value=self.value, defined=self.defined)
+        return self.__class__(name=self.name, value=self.value, defined=self.defined)
 
     def __repr__(self):
         if self.defined:
@@ -55,7 +55,7 @@ class KeyValue(object):
             dstring = ", defined=False"
         return "{}({!r}, {!r}{})".format(
             self.__class__.__name__,
-            self.key,
+            self.name,
             self.value,
             dstring)
 
@@ -64,5 +64,5 @@ class KeyValue(object):
             vstring = repr(self.value)
         else:
             vstring = '<undefined>'
-        return "{}={}".format(self.key, vstring)
+        return "{}={}".format(self.name, vstring)
 

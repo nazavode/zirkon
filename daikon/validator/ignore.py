@@ -33,6 +33,6 @@ from .validator import Validator
 
 class Ignore(Validator):
     """Ignore()
-       Ignore key/value.
+       Ignore option.
     """
     CHECK_COMPOSER = Composer()

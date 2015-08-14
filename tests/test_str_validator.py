@@ -13,22 +13,22 @@ from daikon.validator.str_validators import Str
 
 def test_basic():
     sv = Str()
-    v = sv.validate(key='alpha', defined=True, value='abc')
+    v = sv.validate(name='alpha', defined=True, value='abc')
     assert v == 'abc'
-    v = sv.validate(key='alpha', defined=True, value=' fg ')
+    v = sv.validate(name='alpha', defined=True, value=' fg ')
     assert v == ' fg '
-    v = sv.validate(key='alpha', defined=True, value='2')
+    v = sv.validate(name='alpha', defined=True, value='2')
     assert v == '2'
     with pytest.raises(InvalidTypeError):
-        v = sv.validate(key='alpha', defined=True, value=2.0)
+        v = sv.validate(name='alpha', defined=True, value=2.0)
     with pytest.raises(MissingRequiredOptionError):
-        v = sv.validate(key='alpha', defined=False, value=None)
+        v = sv.validate(name='alpha', defined=False, value=None)
 
 def test_default():
     sv = Str(default='x.dat')
-    v = sv.validate(key='alpha', defined=True, value='a.dat')
+    v = sv.validate(name='alpha', defined=True, value='a.dat')
     assert v == 'a.dat'
-    v = sv.validate(key='alpha', defined=False, value=None)
+    v = sv.validate(name='alpha', defined=False, value=None)
     assert v == 'x.dat'
 
 def test_bad_default_type():
@@ -38,10 +38,10 @@ def test_bad_default_type():
 def test_default_min_len():
     iv = Str(default="abcd", min_len=3)
     with pytest.raises(MinLengthError):
-        v = iv.validate(key='alpha', defined=True, value="x")
-    v = iv.validate(key='alpha', defined=True, value="xxx")
+        v = iv.validate(name='alpha', defined=True, value="x")
+    v = iv.validate(name='alpha', defined=True, value="xxx")
     assert v == "xxx"
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == "abcd"
 
 def test_bad_default_min_len():
@@ -55,14 +55,14 @@ def test_bad_default_max_len():
 def test_default_max_len():
     iv = Str(default="abcd", min_len=3, max_len=10)
     with pytest.raises(MinLengthError):
-        v = iv.validate(key='alpha', defined=True, value="ab")
+        v = iv.validate(name='alpha', defined=True, value="ab")
     with pytest.raises(MaxLengthError):
-        v = iv.validate(key='alpha', defined=True, value="abcdefghijk")
-    v = iv.validate(key='alpha', defined=True, value="xxx")
+        v = iv.validate(name='alpha', defined=True, value="abcdefghijk")
+    v = iv.validate(name='alpha', defined=True, value="xxx")
     assert v == "xxx"
-    v = iv.validate(key='alpha', defined=True, value="abcdefghij")
+    v = iv.validate(name='alpha', defined=True, value="abcdefghij")
     assert v == "abcdefghij"
-    v = iv.validate(key='alpha', defined=False, value=None)
+    v = iv.validate(name='alpha', defined=False, value=None)
     assert v == "abcd"
 
 def test_invalid_min_max():

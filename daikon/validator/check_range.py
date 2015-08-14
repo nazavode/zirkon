@@ -35,7 +35,7 @@ from .error import MinValueError, \
     MinLengthError, \
     MaxLengthError
 
-from .key_value import KeyValue
+from .option import Option
 
 
 class CheckRange(Check):  # pylint: disable=W0223
@@ -48,14 +48,14 @@ class CheckRange(Check):  # pylint: disable=W0223
     def self_validate(self, validator):
         value = getattr(self, self.ATTRIBUTE_NAME)
         if (value is not None) and self.has_actual_value(value):
-            key = "<{}>".format(self.ATTRIBUTE_NAME)
-            key_value = KeyValue(key=key, value=value, defined=True)
-            validator.validate_key_value(key_value, section=None)
+            name = "<{}>".format(self.ATTRIBUTE_NAME)
+            option = Option(name=name, value=value, defined=True)
+            validator.validate_option(option, section=None)
 
 
 class CheckMin(CheckRange):
     """CheckMin(min=None)
-       If min is not None, check if key/value is >= min.
+       If min is not None, check if value is >= min.
     """
     ATTRIBUTE_NAME = 'min'
 
@@ -63,18 +63,18 @@ class CheckMin(CheckRange):
         self.min = min
         super().__init__()
 
-    def check(self, key_value, section):
+    def check(self, option, section):
         min_value = self.get_value(self.min, section)
         if min_value is not None:
-            value = key_value.value
+            value = option.value
             if value < min_value:
-                raise MinValueError(key_value,
+                raise MinValueError(option,
                                     "value is lower than min {!r}".format(min_value))
 
 
 class CheckMax(CheckRange):
     """CheckMax(max=None)
-       If max is not None, check if key/value is <= max.
+       If max is not None, check if value is <= max.
     """
     ATTRIBUTE_NAME = 'max'
 
@@ -82,30 +82,30 @@ class CheckMax(CheckRange):
         self.max = max
         super().__init__()
 
-    def check(self, key_value, section):
+    def check(self, option, section):
         max_value = self.get_value(self.max, section)
         if max_value is not None:
-            value = key_value.value
+            value = option.value
             if value > max_value:
-                raise MaxValueError(key_value,
+                raise MaxValueError(option,
                                     "value is greater than max {!r}".format(max_value))
 
 
 class CheckMinLen(Check):
     """CheckMinLen(min_len=None)
-       If min_len is not None, check if len of key/value is >= min_len.
+       If min_len is not None, check if len of value is >= min_len.
     """
 
     def __init__(self, min_len=None):
         self.min_len = min_len
         super().__init__()
 
-    def check(self, key_value, section):
+    def check(self, option, section):
         min_len_value = self.get_value(self.min_len, section)
         if min_len_value is not None:
-            value = key_value.value
+            value = option.value
             if len(value) < min_len_value:
-                raise MinLengthError(key_value,
+                raise MinLengthError(option,
                                      "value has length {} than is lower than min_len {!r}".format(
                                          len(value),
                                          min_len_value))
@@ -113,19 +113,19 @@ class CheckMinLen(Check):
 
 class CheckMaxLen(Check):
     """CheckMaxLen(max_len=None)
-       If max_len is not None, check if len of key/value is <= max_len.
+       If max_len is not None, check if len of value is <= max_len.
     """
 
     def __init__(self, max_len=None):
         self.max_len = max_len
         super().__init__()
 
-    def check(self, key_value, section):
+    def check(self, option, section):
         max_len_value = self.get_value(self.max_len, section)
         if max_len_value is not None:
-            value = key_value.value
+            value = option.value
             if len(value) > max_len_value:
-                raise MaxLengthError(key_value,
+                raise MaxLengthError(option,
                                      "value has length {} that is greater than max_len {!r}".format(
                                          len(value),
                                          max_len_value))

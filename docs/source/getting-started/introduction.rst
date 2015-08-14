@@ -98,14 +98,14 @@ is simply a special Config having Validators as values:
  >>> schema['subsection']['y'] = Str(min_len=6)
  >>> schema['subsection']['w'] = Float()
 
-The validation result itself is a Config object having KeyValidationErrors
+The validation result itself is a Config object having OptionValidationErrors
 as values.
 
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError(KeyValue('subsection.y', 'alpha'), 'value has length 5 than is lower than min_len 6')
-     w = MissingRequiredOptionError(KeyValue('subsection.w', None, defined=False), 'required value is missing')
+     y = MinLengthError(Option('subsection.y', 'alpha'), 'value has length 5 than is lower than min_len 6')
+     w = MissingRequiredOptionError(Option('subsection.w', None, defined=False), 'required value is missing')
  >>>
 
 There list of available Validators can be easily extended.

@@ -18,12 +18,12 @@
 """\
 config.validator.error
 ======================
-KeyValidationError classes
+OptionValidationError classes
 """
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'KeyValidationError',
+    'OptionValidationError',
     'InvalidContentError',
     'MissingRequiredOptionError',
     'UnexpectedSectionError',
@@ -39,32 +39,32 @@ __all__ = [
 ]
 
 
-class KeyValidationError(Exception):
-    """KeyValidationError()
+class OptionValidationError(Exception):
+    """OptionValidationError()
     """
 
-    def __init__(self, key_value, message):
-        self.key_value = key_value
+    def __init__(self, option, message):
+        self.option = option
         self.message = message
-        super().__init__("{}: {}".format(key_value, message))
+        super().__init__("{}: {}".format(option, message))
 
     def __reduce__(self):
-        return (type(self), (self.key_value, self.message))
+        return (type(self), (self.option, self.message))
 
 
-class InvalidContentError(KeyValidationError):
+class InvalidContentError(OptionValidationError):
     """InvalidContentError()
     """
     pass
 
 
-class InvalidTypeError(KeyValidationError):
+class InvalidTypeError(OptionValidationError):
     """InvalidTypeError()
     """
     pass
 
 
-class InvalidValueError(KeyValidationError):
+class InvalidValueError(OptionValidationError):
     """InvalidValueError()
     """
     pass
@@ -106,7 +106,7 @@ class OptionValueError(InvalidValueError):
     pass
 
 
-class InvalidLengthError(KeyValidationError):
+class InvalidLengthError(OptionValidationError):
     """InvalidLengthError()
     """
     pass

@@ -34,6 +34,6 @@ from .validator import Validator
 
 class Remove(Validator):
     """Remove()
-       Ignore key/value.
+       Ignore option.
     """
     CHECK_COMPOSER = Composer(CheckRemove)

@@ -4,9 +4,9 @@
  The Schema class
 ==================
 
-The *Schema* class is a *Config* subclass, adding methods to validate a config. Moreover, it accepts only *KeyValidator* instances as values.
+The *Schema* class is a *Config* subclass, adding methods to validate a config. Moreover, it accepts only *Validator* instances as values.
 
-A *KeyValidator* is used to validate a key/value; all validators check for a specific type value; if the value type does not match, an *InvalidTypeError* exception is produces.
+A *Validator* is used to validate a key/value; all validators check for a specific type value; if the value type does not match, an *InvalidTypeError* exception is produces.
 
  +------------+--------------------+------------------+
  |Validator   |Basic validation    |Accepted Arguments|
@@ -95,7 +95,7 @@ A *KeyValidator* is used to validate a key/value; all validators check for a spe
 
 The explanation of the arguments is:
 
-- *default*: if provided, it  sets a default value for the value; if the corresponding key is missing from the validated section, the default is added. If a key is missing from the validated section and the corresponding *KeyValidator* does not define a default, a *MissingRequiredOptionError* exception is produced;
+- *default*: if provided, it  sets a default value for the value; if the corresponding key is missing from the validated section, the default is added. If a key is missing from the validated section and the corresponding *Validator* does not define a default, a *MissingRequiredOptionError* exception is produced;
 - *min*, *max*: if provided, it sets a minimum/maximum value for the value; if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
 - *min_len*, *max_len*: if provided, it sets a minimum/maximum length for the value (sequences or strings); if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
 - *item_min*, *item_max*, *item_min_len*, *item_max_len*: the same as *min*, *max*, *min_len* and *max_len*, but they are applied to all the sequence items (for List and Tuple validators only).
@@ -121,7 +121,7 @@ This schema requires that the *filenames* value is a list of strings with at lea
  >>> config['filenames'] = ['a.dat', 'b.dat', 'c', 'd.dat']
  >>> validation = schema.validate(config)
  >>> validation.dump()
- filenames = MinLengthError(KeyValue('filenames[2]', 'c'), 'value has length 1 than is lower than min_len 2')
+ filenames = MinLengthError(Option('filenames[2]', 'c'), 'value has length 1 than is lower than min_len 2')
 
 
 Unexpected options
@@ -149,7 +149,7 @@ For instance:
  >>> config = Config({'x': 1})
  >>> validation = schema.validate(config)
  >>> validation.dump()
- x = UnexpectedOptionError(KeyValue('x', 1), "unexpected option 'x'")
+ x = UnexpectedOptionError(Option('x', 1), "unexpected option 'x'")
 
 
  >>> from daikon.validator import Ignore

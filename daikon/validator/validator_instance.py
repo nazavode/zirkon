@@ -34,7 +34,7 @@ from .check_validator_instance import CheckValidatorInstance
 
 class ValidatorInstance(Validator):
     """ValidatorInstance()
-       Validator for a key/value Validator instance.
+       Validator for a option Validator instance.
     """
     CHECK_COMPOSER = Composer(CheckValidatorInstance)
 

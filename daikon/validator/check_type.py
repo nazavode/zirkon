@@ -32,19 +32,19 @@ from .error import InvalidTypeError
 
 class CheckType(Check):
     """CheckType()
-       Check if key/value has type 'TYPE' or 'SECONDARY_TYPES'.
+       Check if option has type 'TYPE' or 'SECONDARY_TYPES'.
        If isinstance(value, SECONDARY_TYPES) then value is converted to 'TYPE'.
     """
     TYPE = type(None)
     SECONDARY_TYPES = None
 
-    def check(self, key_value, section):
-        value = key_value.value
+    def check(self, option, section):
+        value = option.value
         if not isinstance(value, self.TYPE):
             if self.SECONDARY_TYPES and isinstance(value, self.SECONDARY_TYPES):
-                key_value.value = self.TYPE(value)
+                option.value = self.TYPE(value)
             else:
-                raise InvalidTypeError(key_value, "invalid type {} - expected type is {}".format(
+                raise InvalidTypeError(option, "invalid type {} - expected type is {}".format(
                     type(value).__name__,
                     self.TYPE.__name__,
                 ))

@@ -44,21 +44,21 @@ from .check_sequence import CheckList, CheckTuple
 
 class Float(Validator):
     """Float()
-       Validator for a float scalar key/value.
+       Validator for a float scalar option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckMin, CheckMax)
 
 
 class FloatOption(Validator):
     """FloatOption()
-       Validator for a float option key/value.
+       Validator for a float option option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckFloat, CheckOption)
 
 
 class FloatList(Sequence):
     """FloatList()
-       Validator for a float list key/value.
+       Validator for a float list option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Float
@@ -66,7 +66,7 @@ class FloatList(Sequence):
 
 class FloatTuple(Sequence):
     """FloatTuple()
-       Validator for a float tuple key/value.
+       Validator for a float tuple option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Float

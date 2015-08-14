@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 from .section import Section
-from .validator.error import KeyValidationError
+from .validator.error import OptionValidationError
 
 
 class ValidationSection(Section):
@@ -35,7 +35,7 @@ class ValidationSection(Section):
        A Section to store ValidationResult values.
     """
     SUPPORTED_LIST_TYPES = ()
-    SUPPORTED_SCALAR_TYPES = (KeyValidationError, )
+    SUPPORTED_SCALAR_TYPES = (OptionValidationError, )
 
     @classmethod
     def _subsection_class(cls):
