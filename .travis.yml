@@ -15,6 +15,9 @@ install:
 script:
   - tox -e $TOX_ENV
 
+after_success:
+  - coveralls --rcfile=.tox/coverage/tox.coveragerc
+
 # notifications:
 notifications:
   email:
