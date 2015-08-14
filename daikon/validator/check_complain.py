@@ -36,4 +36,4 @@ class CheckComplain(Check):
     """
 
     def check(self, option, section):
-        raise UnexpectedOptionError(option, "unexpected option {!r}".format(option.name))
+        raise UnexpectedOptionError.build(option, "unexpected option")

@@ -168,7 +168,7 @@ By default, validation errors are not raised: they are stored on the ``Validatio
  >>> config['a'] = "abc"
  >>> validation = schema.validate(config)
  >>> validation.dump()
- a = InvalidTypeError(Option('a', 'abc'), 'invalid type str - expected type is int')
+ a = InvalidTypeError("a='abc': invalid type str - expected type is int")
  >>> config.dump()
  a = 'abc'
  >>>
@@ -182,7 +182,7 @@ The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, w
  ...     print("type error!")
  type error!
  >>> validation.dump()
- a = InvalidTypeError(Option('a', 'abc'), 'invalid type str - expected type is int')
+ a = InvalidTypeError("a='abc': invalid type str - expected type is int")
  >>> config.dump()
  a = 'abc'
  >>>
@@ -202,7 +202,7 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      u = 0.35
      >>> validation = schema.validate(config)
      >>> validation.dump()
-     u = UnexpectedOptionError(Option('u', 0.35), "unexpected option 'u'")
+     u = UnexpectedOptionError('u=0.35: unexpected option')
      >>> config.dump()
      u = 0.35
      a = 10
@@ -251,8 +251,8 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
  >>> config['y'] = 10
  >>> validation = config.self_validate(raise_on_error=False)
  >>> validation.dump()
- x = MinValueError(Option('x', 10), 'value is lower than min 30')
- y = MaxValueError(Option('y', 10), 'value is greater than max 2')
+ x = MinValueError('x=10: value is lower than min 30')
+ y = MaxValueError('y=10: value is greater than max 2')
 
 The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
  
@@ -263,7 +263,7 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  ...     print("config validation error:")
  ...     err.validation.dump()
  config validation error:
- x = MinValueError(Option('x', 10), 'value is lower than min 30')
- y = MaxValueError(Option('y', 10), 'value is greater than max 2')
+ x = MinValueError('x=10: value is lower than min 30')
+ y = MaxValueError('y=10: value is greater than max 2')
  >>>
 

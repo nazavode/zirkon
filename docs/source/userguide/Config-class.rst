@@ -100,7 +100,7 @@ Since the *schema* has been provided, the *config* object is immediately validat
  ...     config = Config({'x': 6.5}, schema=schema)
  ... except ConfigValidationError as err:
  ...     err.validation.dump()
- x = InvalidTypeError(Option('x', 6.5), 'invalid type float - expected type is int')
+ x = InvalidTypeError('x=6.5: invalid type float - expected type is int')
  >>>
 
 When a *Config* object has a *schema*, it is automatically validated when serialized/deserialized:
@@ -111,7 +111,7 @@ When a *Config* object has a *schema*, it is automatically validated when serial
  ...     config.dump()  # validation
  ... except ConfigValidationError as err:
  ...     err.validation.dump()
- x = InvalidTypeError(Option('x', 'abc'), 'invalid type str - expected type is int')
+ x = InvalidTypeError("x='abc': invalid type str - expected type is int")
 
 Validation can be manually invoked by means of the ``self_validate`` method:
 
@@ -119,7 +119,7 @@ Validation can be manually invoked by means of the ``self_validate`` method:
  >>> config['x'] = 'abc'  # no validation
  >>> validation = config.self_validate(raise_on_error=False)
  >>> validation.dump()
- x = InvalidTypeError(Option('x', 'abc'), 'invalid type str - expected type is int')
+ x = InvalidTypeError("x='abc': invalid type str - expected type is int")
 
 It is possible to avoid validation during ``__init__``:
 

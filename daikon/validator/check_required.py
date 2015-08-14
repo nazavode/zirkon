@@ -37,4 +37,4 @@ class CheckRequired(Check):
 
     def check(self, option, section):
         if not option.defined:
-            raise MissingRequiredOptionError(option, "required value is missing")
+            raise MissingRequiredOptionError.build(option, "required value is missing")

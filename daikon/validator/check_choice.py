@@ -43,7 +43,7 @@ class CheckChoice(CheckType):
         choices = [self.get_value(choice, section) for choice in self.choices]
         if option.defined:
             if option.value not in choices:
-                raise InvalidChoiceError(
+                raise InvalidChoiceError.build(
                     option,
                     "{!r} is not a valid choice; valid choices are: ({})".format(
                         option.value, ', '.join(repr(v) for v in choices)))

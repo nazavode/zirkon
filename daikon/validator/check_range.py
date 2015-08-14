@@ -68,8 +68,9 @@ class CheckMin(CheckRange):
         if min_value is not None:
             value = option.value
             if value < min_value:
-                raise MinValueError(option,
-                                    "value is lower than min {!r}".format(min_value))
+                raise MinValueError.build(
+                    option,
+                    "value is lower than min {!r}".format(min_value))
 
 
 class CheckMax(CheckRange):
@@ -87,8 +88,9 @@ class CheckMax(CheckRange):
         if max_value is not None:
             value = option.value
             if value > max_value:
-                raise MaxValueError(option,
-                                    "value is greater than max {!r}".format(max_value))
+                raise MaxValueError.build(
+                    option,
+                    "value is greater than max {!r}".format(max_value))
 
 
 class CheckMinLen(Check):
@@ -105,10 +107,11 @@ class CheckMinLen(Check):
         if min_len_value is not None:
             value = option.value
             if len(value) < min_len_value:
-                raise MinLengthError(option,
-                                     "value has length {} than is lower than min_len {!r}".format(
-                                         len(value),
-                                         min_len_value))
+                raise MinLengthError.build(
+                    option,
+                    "value has length {} than is lower than min_len {!r}".format(
+                        len(value),
+                        min_len_value))
 
 
 class CheckMaxLen(Check):
@@ -125,7 +128,8 @@ class CheckMaxLen(Check):
         if max_len_value is not None:
             value = option.value
             if len(value) > max_len_value:
-                raise MaxLengthError(option,
-                                     "value has length {} that is greater than max_len {!r}".format(
-                                         len(value),
-                                         max_len_value))
+                raise MaxLengthError.build(
+                    option,
+                    "value has length {} that is greater than max_len {!r}".format(
+                        len(value),
+                        max_len_value))

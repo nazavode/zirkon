@@ -104,8 +104,8 @@ as values.
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
-     y = MinLengthError(Option('subsection.y', 'alpha'), 'value has length 5 than is lower than min_len 6')
-     w = MissingRequiredOptionError(Option('subsection.w', None, defined=False), 'required value is missing')
+     y = MinLengthError("subsection.y='alpha': value has length 5 than is lower than min_len 6")
+     w = MissingRequiredOptionError('subsection.w: required value is missing')
  >>>
 
 There list of available Validators can be easily extended.

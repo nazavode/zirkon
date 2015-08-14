@@ -151,10 +151,10 @@ By default the
 >>> config['sub'] = {'c': 'x'}
 >>> validation = schema.validate(config)
 >>> validation.dump()
-d = MissingRequiredOptionError(Option('d', None, defined=False), 'required value is missing')
-w = UnexpectedOptionError(Option('w', 1.1), "unexpected option 'w'")
+d = MissingRequiredOptionError('d: required value is missing')
+w = UnexpectedOptionError('w=1.1: unexpected option')
 [sub]
-    c = MinLengthError(Option('sub.c', 'x'), 'value has length 1 than is lower than min_len 2')
+    c = MinLengthError("sub.c='x': value has length 1 than is lower than min_len 2")
 
 >>> print(config['b'])
 1.02

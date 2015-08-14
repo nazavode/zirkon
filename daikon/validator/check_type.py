@@ -44,7 +44,7 @@ class CheckType(Check):
             if self.SECONDARY_TYPES and isinstance(value, self.SECONDARY_TYPES):
                 option.value = self.TYPE(value)
             else:
-                raise InvalidTypeError(option, "invalid type {} - expected type is {}".format(
+                raise InvalidTypeError.build(option, "invalid type {} - expected type is {}".format(
                     type(value).__name__,
                     self.TYPE.__name__,
                 ))

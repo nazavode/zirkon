@@ -43,13 +43,12 @@ class OptionValidationError(Exception):
     """OptionValidationError()
     """
 
-    def __init__(self, option, message):
-        self.option = option
-        self.message = message
-        super().__init__("{}: {}".format(option, message))
-
-    def __reduce__(self):
-        return (type(self), (self.option, self.message))
+    @classmethod
+    def build(cls, option, message):
+        """build(option, message) -> exception instance
+           Build an exception based on the option value.
+        """
+        return cls("{}: {}".format(option, message))
 
 
 class InvalidContentError(OptionValidationError):

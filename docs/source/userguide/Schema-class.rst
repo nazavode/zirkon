@@ -121,7 +121,7 @@ This schema requires that the *filenames* value is a list of strings with at lea
  >>> config['filenames'] = ['a.dat', 'b.dat', 'c', 'd.dat']
  >>> validation = schema.validate(config)
  >>> validation.dump()
- filenames = MinLengthError(Option('filenames[2]', 'c'), 'value has length 1 than is lower than min_len 2')
+ filenames = MinLengthError("filenames[2]='c': value has length 1 than is lower than min_len 2")
 
 
 Unexpected options
@@ -149,7 +149,7 @@ For instance:
  >>> config = Config({'x': 1})
  >>> validation = schema.validate(config)
  >>> validation.dump()
- x = UnexpectedOptionError(Option('x', 1), "unexpected option 'x'")
+ x = UnexpectedOptionError('x=1: unexpected option')
 
 
  >>> from daikon.validator import Ignore

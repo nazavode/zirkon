@@ -61,8 +61,8 @@ class Option(object):
 
     def __str__(self):
         if self.defined:
-            vstring = repr(self.value)
+            vstring = "={!r}".format(self.value)
         else:
-            vstring = '<undefined>'
-        return "{}={}".format(self.name, vstring)
+            vstring = ""
+        return "{}{}".format(self.name, vstring)
 
