@@ -5,7 +5,7 @@ python:
 
 # env:
 env:
- - TOX_ENV=coveralls
+ - TOX_ENV=coverage
 
 # command to install dependencies
 install:
