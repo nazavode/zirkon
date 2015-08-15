@@ -124,6 +124,19 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
+    def _sub_options(self):
+        """_sub_options() -> iterates over section, option_name, option_value"""
+        for option_name, option_value in self.options():
+            yield self, option_name, option_value
+        for _, section in self.sections():
+            yield from section._sub_options()  # pylint: disable=W0212
+
+    def _sub_has_options(self):
+        """_sub_has_options() -> True if _sub_options yields at least one option"""
+        for _ in self._sub_options():
+            return True
+        return False
+
     def check_data_type(self, key, value):
         """check_data_type(key, value)
         """
@@ -181,10 +194,6 @@ class Section(collections.abc.Mapping):
             self.dictionary[key] = value
 
     def __delitem__(self, key):
-        value = self.dictionary[key]
-        if isinstance(value, collections.Mapping):
-            if self._defaults is not None and key in self._defaults:
-                del self._defaults[key]
         del self.dictionary[key]
 
     def clear(self):
@@ -235,9 +244,21 @@ class Section(collections.abc.Mapping):
 
     def has_key(self, key):
         """has_key(self, key) -> bool
-           Return True if option or section 'key' exists.
+           Return True if option or section 'key' is defined or found in defaults.
+           If it is a section and is found in defaults, it must not be empty.
         """
-        return key in self.dictionary or (self._defaults is not None and key in self._defaults)
+        if key in self.dictionary:
+            # locally defined
+            return True
+        elif self._defaults is not None and key in self._defaults:
+            # defined in defaults
+            value = self._defaults[key]
+            if isinstance(value, collections.Mapping):
+                return value._sub_has_options()  # pylint: disable=W0212
+            else:
+                return True
+        else:
+            return False
 
     def has_option(self, option_name):
         """has_option(self, option_name) -> bool
@@ -251,13 +272,14 @@ class Section(collections.abc.Mapping):
 
     def has_section(self, section_name):
         """has_section(self, section_name) -> bool
-           Return True if section exists.
+           Return True if section is defined, or is found in defaults and not empty.
         """
         if section_name in self.dictionary and \
                 isinstance(self.dictionary[section_name], collections.Mapping):
             return True
         else:
-            return self._defaults is not None and self._defaults.has_section(section_name)
+            return self._defaults is not None and self._defaults.has_section(section_name) and \
+                self._defaults[section_name]._sub_has_options()  # pylint: disable=W0212
 
     def add_default(self, **kwargs):
         """add_default(self, **kwargs)

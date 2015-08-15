@@ -381,3 +381,71 @@ def test_Section_defaults_sub():
     assert len(section2) == 0
     assert section2.has_option('a')
     assert section2.has_section('sub')
+
+@pytest.fixture
+def s_option():
+    section = Section()
+    section.add_default(a=10, b=20)
+    section['a'] = 5
+    section['c'] = 15
+    return section
+
+def test_Section_defaults_deloption_loc_def(s_option):
+    section = s_option
+    assert section.has_key('a')
+    assert section.has_option('a')
+    del section['a']
+    assert section.has_key('a')
+    assert section.has_option('a')
+
+def test_Section_defaults_deloption_only_def(s_option):
+    section = s_option
+    assert section.has_key('b')
+    assert section.has_option('b')
+    with pytest.raises(KeyError) as exc_info:
+        del section['b']
+    assert section.has_key('b')
+    assert section.has_option('b')
+
+def test_Section_defaults_deloption_only_loc(s_option):
+    section = s_option
+    assert section.has_key('c')
+    assert section.has_option('c')
+    del section['c']
+    assert not section.has_key('c')
+    assert not section.has_option('c')
+
+@pytest.fixture
+def s_section():
+    section = Section()
+    section.add_default(a={'ax': 1}, b={'bx': 2})
+    section['a'] = {'ax': 10}
+    section['c'] = {'cx': 20}
+    return section
+
+def test_Section_defaults_delsection_loc_def(s_section):
+    section = s_section
+    assert section.has_key('a')
+    assert section.has_section('a')
+    del section['a']
+    assert section.has_key('a')
+    assert section.has_section('a')
+
+def test_Section_defaults_delsection_only_def(s_section):
+    section = s_section
+    assert section.has_key('b')
+    assert section.has_section('b')
+    with pytest.raises(KeyError) as exc_info:
+        del section['b']
+    assert section.has_key('b')
+    assert section.has_section('b')
+
+def test_Section_defaults_delsection_only_loc(s_section):
+    section = s_section
+    assert section.has_key('c')
+    assert section.has_section('c')
+    del section['c']
+    section._defaults.dump()
+    assert not section.has_key('c')
+    assert not section.has_section('c')
+
