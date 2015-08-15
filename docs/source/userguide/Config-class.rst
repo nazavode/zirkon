@@ -47,7 +47,7 @@ It accepts also dict-like objects as values: in this case, a subsection is creat
 
  >>> config['sub'] = {'w': 100}
  >>> type(config['sub'])
- <class 'daikon.section.Section'>
+ <class 'daikon.config_section.ConfigSection'>
 
 Serialization/deserialization methods
 -------------------------------------
