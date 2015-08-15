@@ -300,6 +300,46 @@ def test_Section_defaults():
     del section['alpha']
     assert section['alpha'] == 10
     
+def test_Section_defaults_external():
+    defaults = Section(defaults=False)
+    defaults['a'] = 10
+    defaults['sa'] = {'x': 1}
+    section = Section(defaults=defaults)
+    section.add_default(b=20, sb={'y': 2})
+    for sec in defaults, section:
+        assert sec.has_option('a')
+        assert sec['a'] == 10
+        assert sec.has_section('sa')
+        assert sec['sa'].has_option('x')
+        assert sec['sa']['x'] == 1
+        assert sec.has_option('b')
+        assert sec['b'] == 20
+        assert sec.has_section('sb')
+        assert sec['sb'].has_option('y')
+        assert sec['sb']['y'] == 2
+    #assert defaults == section
+
+def test_Section_no_defaults_add_default():
+    section = Section(defaults=False)
+    section.add_default(alpha=10, beta={'x': 1})
+    assert section.has_option('alpha')
+    assert section['alpha'] == 10
+    assert len(section) == 2
+    assert section.has_section('beta')
+    assert section['beta'].has_option('x')
+    assert section['beta']['x'] == 1
+    assert len(section['beta']) == 1
+
+def test_Section_get_defaults():
+    section = Section(defaults=True)
+    defaults = section.get_defaults()
+    assert isinstance(defaults, Section)
+
+def test_Section_get_defaults_None():
+    section = Section(defaults=False)
+    defaults = section.get_defaults()
+    assert defaults is None
+
 def test_Section_defaults_subsection():
     dictionary = collections.OrderedDict()
     section = Section(dictionary=dictionary)

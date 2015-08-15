@@ -92,11 +92,14 @@ class Section(collections.abc.Mapping):
             self._defaults = self._subsection_class()(defaults=None)
         elif defaults is False:
             self._defaults = None
-        else:
+        elif defaults is None or isinstance(defaults, Section):
             self._defaults = defaults
+        else:
+            raise TypeError("invalid defaults object of type {}: not a Section".format(
+                type(defaults).__name__))
         self._has_defaults = self._defaults is not None
         if self._has_defaults:
-            self._non_empty_defaults = self._defaults._sub_has_options()
+            self._non_empty_defaults = self._defaults._rec_has_options()
         
         if init:
             self.update(init)
@@ -130,16 +133,16 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
-    def _sub_options(self):
-        """_sub_options() -> iterates over section, option_name, option_value"""
+    def _rec_options(self):
+        """_rec_options() -> iterates over section, option_name, option_value"""
         for option_name, option_value in self.options():
             yield self, option_name, option_value
         for _, section in self.sections():
-            yield from section._sub_options()  # pylint: disable=W0212
+            yield from section._rec_options()  # pylint: disable=W0212
 
-    def _sub_has_options(self):
-        """_sub_has_options() -> True if _sub_options yields at least one option"""
-        for _ in self._sub_options():
+    def _rec_has_options(self):
+        """_rec_has_options() -> True if _rec_options yields at least one option"""
+        for _ in self._rec_options():
             return True
         return False
 
@@ -202,6 +205,10 @@ class Section(collections.abc.Mapping):
     def __delitem__(self, key):
         del self.dictionary[key]
 
+    def get_defaults(self):
+        """get_defaults(self) -> defaults section (can be None)"""
+        return self._defaults
+
     def clear(self):
         """clear()
            Clear all the section's content.
@@ -260,7 +267,7 @@ class Section(collections.abc.Mapping):
             # defined in defaults
             value = self._defaults[key]
             if isinstance(value, collections.Mapping):
-                return value._sub_has_options()  # pylint: disable=W0212
+                return value._rec_has_options()  # pylint: disable=W0212
             else:
                 return True
         else:
@@ -285,14 +292,18 @@ class Section(collections.abc.Mapping):
             return True
         else:
             return self._has_defaults and self._defaults.has_section(section_name) and \
-                self._defaults[section_name]._sub_has_options()  # pylint: disable=W0212
+                self._defaults[section_name]._rec_has_options()  # pylint: disable=W0212
 
     def add_default(self, **kwargs):
         """add_default(self, **kwargs)
            Add default options/sections.
         """
+        if self._has_defaults:
+            section = self._defaults
+        else:
+            section = self
         for option_name, option_value in kwargs.items():
-            self._defaults[option_name] = option_value
+            section[option_name] = option_value
 
     def add_section(self, section_name):
         """add_section(self, section_name) -> new section
