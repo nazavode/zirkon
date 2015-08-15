@@ -73,4 +73,4 @@ class Config(ConfigBase, ConfigSection):
     """
 
     def __init__(self, init=None, *, dictionary=None, defaults=True, schema=None, validate=True):
-        super().__init__(dictionary=dictionary, init=init, schema=schema, validate=validate)
+        super().__init__(dictionary=dictionary, init=init, defaults=defaults, schema=schema, validate=validate)

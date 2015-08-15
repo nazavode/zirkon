@@ -26,7 +26,7 @@ __all__ = [
     'ConfigSection',
 ]
 
-from .section import Section
+from .section import Section, has_section_options
 
 
 class ConfigSection(Section):
@@ -63,3 +63,52 @@ class ConfigSection(Section):
         else:
             subdefaults=None
         return self._subsection_class()(dictionary=dictionary, parent=self, defaults=subdefaults)
+
+    def add_defaults(self, **kwargs):
+        """add_defaults(**kwargs)
+           Add default options and sections"""
+        if self._has_defaults:
+            section = self._defaults
+        else:
+            section = self
+        for option_name, option_value in kwargs.items():
+            section[option_name] = option_value
+
+    def has_option(self, option_name):
+        if super().has_option(option_name):
+            return True
+        else:
+            if self._has_defaults:
+                return self._defaults.has_option(option_name)
+            else:
+                return False
+
+    def has_section(self, section_name):
+        if super().has_section(section_name):
+            return True
+        else:
+            if self._has_defaults:
+                return self._defaults.has_section(section_name) and has_section_options(self._defaults[section_name])
+            else:
+                return False
+
+    def has_key(self, key):
+        if super().has_key(key):
+            return True
+        else:
+            if self._has_defaults:
+                if self._defaults.has_section(key):
+                    return has_section_options(self._defaults[key])
+                else:
+                    return self._defaults.has_option(key)
+            else:
+                return False
+
+    def __getitem__(self, key):
+        if super().has_key(key):
+            return super().__getitem__(key)
+        else:
+            if self._has_defaults and key in self._defaults:
+                return self._defaults[key]
+            else:
+                raise KeyError(key)

@@ -31,7 +31,10 @@ from common.fixtures import dictionary, \
                             SIMPLE_SECTION_REPR, \
                             SIMPLE_SECTION_STR
 
-from daikon.section import Section
+from daikon.section import Section, \
+    iter_section_options, \
+    count_section_options, \
+    has_section_options
 
 def test_Section_create(generic_dictionary, string_io):
     section = Section(dictionary=generic_dictionary)
@@ -281,3 +284,53 @@ def test_Section_invalid_dictionary_content():
     with pytest.raises(TypeError) as exc_info:
         a = section['a']
     assert str(exc_info.value) == "option a: invalid tuple: item #2 {} has invalid type dict"
+
+
+def _section_tpl_0():
+    section = Section()
+    section['a'] = 1
+    section['b'] = {'bx': 2}
+    section['b']['by'] = 3
+    section['c'] = 4
+    tpl = (('', 'a', 1), ('', 'c', 4), ('b', 'bx', 2), ('b', 'by', 3))
+    return section, tpl
+
+def _section_tpl_1():
+    section = Section()
+    section['b'] = {}
+    tpl = ()
+    return section, tpl
+
+def _section_tpl_2():
+    section = Section()
+    section['b'] = {}
+    section['b']['bb'] = {}
+    section['b']['bb']['bbb'] = {}
+    tpl = ()
+    return section, tpl
+
+def _section_tpl_3():
+    section = Section()
+    section['b'] = {}
+    section['b']['bb'] = {}
+    section['b']['bb']['bbb'] = {}
+    section['b']['bb']['bbb']['x'] = 0
+    tpl = (('b.bb.bbb', 'x', 0),)
+    return section, tpl
+
+_data = []
+_data.append(_section_tpl_0())
+_data.append(_section_tpl_1())
+_data.append(_section_tpl_2())
+_data.append(_section_tpl_3())
+
+@pytest.fixture(params=_data, ids=tuple(enumerate(_data)))
+def section_tpl(request):
+    return request.param
+
+def test_function_section_options(section_tpl):
+    section, tpl = section_tpl
+    assert tuple(iter_section_options(section)) == tpl
+    assert count_section_options(section) == len(tpl)
+    assert has_section_options(section) == bool(tpl)
+    

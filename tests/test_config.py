@@ -34,6 +34,8 @@ from common.fixtures import dictionary, \
     SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
 from daikon.toolbox.dictutils import compare_dicts
+from daikon.section import Section
+from daikon.config_section import ConfigSection
 from daikon.config import Config, ROOT, SECTION
 from daikon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, PickleSerializer
@@ -146,3 +148,45 @@ def test_Config_deferred_error():
     print(exc_info.value)
     assert str(exc_info.value) == "'b'"
     config['b'] = 20
+
+def test_Config_defaults_option():
+    config = Config(defaults=True)
+    config.add_defaults(a=10)
+    assert 'a' in config
+    assert config.has_key('a')
+    assert config.has_option('a')
+    assert config['a'] == 10
+    assert len(config) == 0
+    assert not 'a' in config.dictionary
+
+def test_Config_defaults_section():
+    print("@@@@@@@@@@@@ 1")
+    config = Config(defaults=True)
+    print("@@@@@@@@@@@@ 2")
+    config.add_defaults(a={'x': 1})
+    print("@@@@@@@@@@@@ 3")
+    assert 'a' in config
+    assert config.has_key('a')
+    assert config.has_section('a')
+    assert isinstance(config['a'], Section)
+    assert len(config['a']) == 1
+    assert config['a'].has_option('x')
+    config['a'] = {'y': 2}
+    assert len(config['a']) == 1
+    assert config['a'].has_option('x')
+    assert config['a'].has_option('y')
+    del config['a']
+    assert config.has_section('a')
+    assert len(config['a']) == 1
+    assert config['a'].has_option('x')
+    config['x'] = {}
+    assert config.has_section('x')
+    del config['x']
+    assert not config.has_section('x')
+
+def test_Config_defaults_empty_section():
+    config = Config(defaults=True)
+    config.add_defaults(a={})
+    assert not 'a' in config
+    assert not config.has_key('a')
+    assert not config.has_section('a')

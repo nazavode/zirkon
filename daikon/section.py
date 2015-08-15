@@ -24,6 +24,9 @@ Implementation of the Section class
 __author__ = "Simone Campagna"
 __all__ = [
     'Section',
+    'iter_section_options',
+    'count_section_options',
+    'has_section_options',
 ]
 
 import collections
@@ -265,7 +268,7 @@ class Section(collections.abc.Mapping):
             yield value
 
     def __contains__(self, key):
-        return key in self.dictionary
+        return self.has_key(key)
 
     def __len__(self):
         return len(self.dictionary)
@@ -338,3 +341,36 @@ class Section(collections.abc.Mapping):
             stream = sys.stdout
         serializer = Serializer.get_class(protocol)()
         serializer.to_stream(stream=stream, config=self)
+
+
+def iter_section_options(section):
+    """iter_section_options(section)
+       Iterates recursively on all option items.
+    """
+    sections = [('', section)]
+    while sections:
+        next_sections = []
+        for rootname, section in sections:
+            for o_name, o_value in section.options():
+                yield rootname, o_name, o_value
+            for s_name, s_value in section.sections():
+                if rootname:
+                    s_rootname = rootname + '.' + s_name
+                else:
+                    s_rootname = s_name
+                next_sections.append((s_rootname, s_value))
+        sections = next_sections
+
+def count_section_options(section):
+    """count_section_options(section)
+       Count number of options.
+    """
+    return sum(1 for _ in iter_section_options(section))
+
+def has_section_options(section):
+    """has_section_options(section)
+       Return True if section has at least 1 option.
+    """
+    for _ in iter_section_options(section):
+        return True
+    return False
