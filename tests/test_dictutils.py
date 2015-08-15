@@ -38,7 +38,7 @@ def test_as_dict_content_conv_depth():
 
 def test_as_dict_content_class():
     dct = {'a': 10, 'b': {'x': 1, 'y': {'r': 222}, 'z': 3}, 'c': 3}
-    stddct = dictutils.as_dict(dct, dict_factory=collections.OrderedDict)
+    stddct = dictutils.as_dict(dct, dict_class=collections.OrderedDict)
     assert type(stddct) == collections.OrderedDict
     assert type(stddct['b']) == collections.OrderedDict
     assert type(stddct['b']['y']) == collections.OrderedDict

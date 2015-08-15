@@ -231,3 +231,14 @@ def test_Config_defaults_deloptions():
     assert config.has_section('c')
     assert config['c']['x'] == 7
 
+def test_Config_defaults_eq():
+    config = Config(defaults=True)
+    config['d'] = 11
+    config['e'] = 12
+    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    
+    config2 = Config(defaults=True)
+    config2['d'] = 11
+    config2['e'] = 12
+
+    assert config != config2

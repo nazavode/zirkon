@@ -26,6 +26,7 @@ __all__ = [
     'ConfigSection',
 ]
 
+import collections
 import contextlib
 
 from .section import Section, has_section_options
@@ -126,4 +127,15 @@ class ConfigSection(Section):
                 super().__delitem__(key)
         else:
             super().__delitem__(key)
-            
+
+    def defaults(self):
+        """defaults() -> the defaults section"""
+        return self._defaults
+
+    def as_dict(self, *, dict_class=collections.OrderedDict):
+        result = super().as_dict(dict_class=dict_class)
+        if self._has_defaults:
+            for key, value in self._defaults.items():
+                if not key in result:
+                    result[key] = value
+        return result

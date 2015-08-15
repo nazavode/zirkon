@@ -66,8 +66,8 @@ def test_read_write(protocol, parameters, tmp_text_file):
     cs2.dump()
 
     if config_class == Validation:
-        tcs = transform(cs, value_transform=str, dict_factory=dict)
-        tcs2 = transform(cs2, value_transform=str, dict_factory=dict)
+        tcs = transform(cs, value_transform=str, dict_class=dict)
+        tcs2 = transform(cs2, value_transform=str, dict_class=dict)
         print("===", type(tcs), type(tcs2))
         assert tcs == tcs2
     else:

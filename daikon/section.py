@@ -34,7 +34,7 @@ import collections.abc
 import sys
 
 from .toolbox.identifier import is_valid_identifier
-from .toolbox.dictutils import compare_dicts
+from .toolbox.dictutils import as_dict
 from .toolbox.serializer import Serializer
 from .toolbox.deferred import Deferred
 
@@ -303,10 +303,12 @@ class Section(collections.abc.Mapping):
         content = ', '.join("{}={}".format(k, v) for k, v in section_data)
         return "{}({})".format(self.__class__.__name__, content)
 
+
     def __eq__(self, section):
         if isinstance(section, Section):
-            return compare_dicts(section.dictionary, self.dictionary)
+            return self.as_dict(dict_class=dict) == section.as_dict(dict_class=dict)
         else:
+            return self.as_dict(dict_class=dict) == as_dict(section, depth=-1, dict_class=dict)
             # coompare self vs section
             for key, value in self.items():
                 if key not in section:
