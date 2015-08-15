@@ -130,6 +130,8 @@ def test_Section_setitem_section_raises(simple_section):
 def test_Section_delitem_section(simple_section):
     assert simple_section.has_section('options')
     del simple_section['options']
+    print(simple_section)
+    print(simple_section._defaults)
     assert not simple_section.has_section('options')
     simple_section['options'] = 123
     assert simple_section.has_option('options')
@@ -285,7 +287,7 @@ def test_Section_invalid_dictionary_content():
 def test_Section_defaults():
     dictionary = collections.OrderedDict()
     section = Section(dictionary=dictionary)
-    section.add_default('alpha', 10)
+    section.add_default(alpha=10)
     assert 'alpha' in section
     assert section['alpha'] == 10
     assert len(tuple(section.keys())) == 0
@@ -304,11 +306,20 @@ def test_Section_defaults():
     del section['alpha']
     assert section['alpha'] == 10
     
-def test_Section_defaults_update():
+def test_Section_defaults_subsection():
     dictionary = collections.OrderedDict()
     section = Section(dictionary=dictionary)
-    section.add_default('alpha', 10)
-    section.add_default('beta', 5)
+    section.add_default(epsilon={'eps': 0.01})
+    assert section.has_section('epsilon')
+    assert section['epsilon'].has_option('eps')
+    assert section['epsilon']['eps'] == 0.01
+    assert len(section) == 0
+    assert len(dictionary) == 0
+
+def test_Section_defaults_update():
+    section = Section()
+    section.add_default(alpha=10)
+    section.add_default(beta=5, epsilon={'eps': 0.01})
     section2 = Section()
     section2['alpha'] = 20
     section2.update(section)
@@ -318,12 +329,11 @@ def test_Section_defaults_update():
     assert section2['alpha'] == 10
     
 def test_Section_defaults_dump(string_io):
-    dictionary = collections.OrderedDict()
-    section = Section(dictionary=dictionary)
+    section = Section()
     section['x'] = 1
-    section.add_default('alpha', 10)
+    section.add_default(alpha=10)
     section['sub'] = {'w': 2}
-    section['sub'].add_default('beta', 20)
+    section['sub'].add_default(beta=20)
     assert section['sub']['beta'] == 20
     section.dump(string_io)
     assert string_io.getvalue() == """\
@@ -332,3 +342,42 @@ x = 1
     w = 2
 """
 
+def test_Section_defaults_sub():
+    section = Section()
+    section.add_default(a=10, sub={'x': 1, 'subsub': {'xx': 11, 'subsubsub': {'xxx': 111, 'yyy': 222}, 'yy': 22}, 'y': 2}, b=20)
+    assert section['a'] == 10
+    assert section['sub']['x'] == 1
+    assert section['sub']['subsub']['xx'] == 11
+    assert section['sub']['subsub']['subsubsub']['xxx'] == 111
+    assert section['sub']['subsub']['subsubsub']['yyy'] == 222
+    assert section['sub']['subsub']['yy'] == 22
+    assert section['sub']['y'] == 2
+    assert section['b'] == 20
+
+def test_Section_defaults_sub():
+    section = Section()
+    section['a'] = 10
+    section['sub'] = {}
+    section['sub']['x'] = 1
+    section['sub']['subsub'] = {}
+    section['sub']['subsub']['xx'] = 11
+    section['sub']['subsub']['subsubsub'] = {}
+    section['sub']['subsub']['subsubsub']['xxx'] = 111
+    section['sub']['subsub']['subsubsub']['yyy'] = 222
+    section['sub']['subsub']['yy'] = 22
+    section['sub']['y'] = 2
+    section['b'] = 20
+    section2 = Section()
+    section2.add_default(**section)
+
+    assert section2['a'] == 10
+    assert section2['sub']['x'] == 1
+    assert section2['sub']['subsub']['xx'] == 11
+    assert section2['sub']['subsub']['subsubsub']['xxx'] == 111
+    assert section2['sub']['subsub']['subsubsub']['yyy'] == 222
+    assert section2['sub']['subsub']['yy'] == 22
+    assert section2['sub']['y'] == 2
+    assert section2['b'] == 20
+    assert len(section2) == 0
+    assert section2.has_option('a')
+    assert section2.has_section('sub')

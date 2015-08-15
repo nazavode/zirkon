@@ -181,6 +181,10 @@ class Section(collections.abc.Mapping):
             self.dictionary[key] = value
 
     def __delitem__(self, key):
+        value = self.dictionary[key]
+        if isinstance(value, collections.Mapping):
+            if self._defaults is not None and key in self._defaults:
+                del self._defaults[key]
         del self.dictionary[key]
 
     def clear(self):
@@ -249,15 +253,18 @@ class Section(collections.abc.Mapping):
         """has_section(self, section_name) -> bool
            Return True if section exists.
         """
-        return section_name in self.dictionary and \
-            isinstance(self.dictionary[section_name], collections.Mapping)
+        if section_name in self.dictionary and \
+                isinstance(self.dictionary[section_name], collections.Mapping):
+            return True
+        else:
+            return self._defaults is not None and self._defaults.has_section(section_name)
 
-    def add_default(self, option_name, option_value):
-        """add_default(self, option_name, option_value)
-           Add a default for option.
+    def add_default(self, **kwargs):
+        """add_default(self, **kwargs)
+           Add default options/sections.
         """
-        self.check_data_type(key=option_name, value=option_value)
-        self._defaults[option_name] = option_value
+        for option_name, option_value in kwargs.items():
+            self._defaults[option_name] = option_value
 
     def add_section(self, section_name):
         """add_section(self, section_name) -> new section
