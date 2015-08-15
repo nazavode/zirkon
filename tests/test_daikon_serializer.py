@@ -7,6 +7,7 @@ import pytest
 
 from common.fixtures import simple_config_content, \
                             dictionary, \
+                            defaultsvalue, \
                             simple_config, \
                             string_io, \
                             tmp_text_file, \

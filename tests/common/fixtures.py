@@ -23,6 +23,7 @@ __all__ = [
     'protocol',
     'simple_config_content',
     'simple_section',
+    'defaultsvalue',
     'simple_config',
     'simple_schema',
     'simple_schema_content',
@@ -71,6 +72,11 @@ def generic_dictionary(request):
 def dictionary():
     return collections.OrderedDict()
 
+# late evaluation through lambda to force a new {} is generated 
+@pytest.fixture(params=[lambda: True, lambda: False, lambda: {}])
+def defaultsvalue(request):
+    return request.param()
+
 @pytest.fixture
 def simple_config_content():
     epsilon = collections.OrderedDict((
@@ -104,8 +110,8 @@ def simple_section(dictionary, simple_config_content):
     return section
 
 @pytest.fixture
-def simple_config(dictionary, simple_config_content):
-    config = Config(dictionary=dictionary, init=simple_config_content)
+def simple_config(dictionary, simple_config_content, defaultsvalue):
+    config = Config(dictionary=dictionary, init=simple_config_content, defaults=defaultsvalue)
     return config
 
 @pytest.fixture

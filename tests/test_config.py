@@ -23,8 +23,10 @@ import io
 import pytest
 
 from common.fixtures import dictionary, \
+    defaultsvalue, \
     generic_dictionary, \
     simple_config_content, \
+    defaultsvalue, \
     simple_config, \
     string_io, \
     tmp_text_file, \
@@ -40,37 +42,33 @@ from daikon.config import Config, ROOT, SECTION
 from daikon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, PickleSerializer
 
-@pytest.fixture(params=[True, False, {}])
-def defval(request):
-    return request.param
-
-def test_Config_create_empty(string_io, defval):
-    config = Config(defaults=defval)
+def test_Config_create_empty(string_io, defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_dictionary(generic_dictionary, string_io, defval):
-    config = Config(dictionary=generic_dictionary, defaults=defval)
+def test_Config_create_dictionary(generic_dictionary, string_io, defaultsvalue):
+    config = Config(dictionary=generic_dictionary, defaults=defaultsvalue)
     config.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
-def test_Config_create_init(simple_config_content, string_io, defval):
-    config = Config(init=simple_config_content, defaults=defval)
+def test_Config_create_init(simple_config_content, string_io, defaultsvalue):
+    config = Config(init=simple_config_content, defaults=defaultsvalue)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
 
-def test_Config_create_dictionary_init(dictionary, simple_config_content, string_io, defval):
-    config = Config(dictionary=dictionary, init=simple_config_content, defaults=defval)
+def test_Config_create_dictionary_init(dictionary, simple_config_content, string_io, defaultsvalue):
+    config = Config(dictionary=dictionary, init=simple_config_content, defaults=defaultsvalue)
     config.dump(stream=string_io)
     assert string_io.getvalue() == SIMPLE_SECTION_DUMP
     assert len(dictionary) > 0
 
-def test_Config_create_dictionary_init_overlap(string_io, defval):
+def test_Config_create_dictionary_init_overlap(string_io, defaultsvalue):
     dictionary = collections.OrderedDict()
     dictionary['x'] = 10
     dictionary['y'] = 10
     init = {'a': 20, 'y': 30}
-    config = Config(init, dictionary=dictionary, defaults=defval)
+    config = Config(init, dictionary=dictionary, defaults=defaultsvalue)
     assert len(config) == 3
     assert config['x'] == 10
     assert config['y'] == 30
@@ -127,8 +125,8 @@ def test_Config_get_serializer_configobj():
 def test_Config_get_serializer_pickle():
     assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
-def test_Config_deferred(defval):
-    config = Config(defaults=defval)
+def test_Config_deferred(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['b'] = 20
     config['c'] = SECTION['a'] * SECTION['b']
@@ -143,8 +141,8 @@ def test_Config_deferred(defval):
     assert isinstance(config['options']['e'], int)
     assert config['options']['e'] == 117
 
-def test_Config_deferred_error(defval):
-    config = Config(defaults=defval)
+def test_Config_deferred_error(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config['a'] = 10
     with pytest.raises(KeyError) as exc_info:
         config['c'] = SECTION['a'] * SECTION['b']

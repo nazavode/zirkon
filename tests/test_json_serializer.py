@@ -6,6 +6,7 @@ import os
 import pytest
 
 from common.fixtures import simple_config, \
+                            defaultsvalue, \
                             dictionary, \
                             simple_config_content, \
                             string_io, \
