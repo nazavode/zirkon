@@ -94,6 +94,10 @@ class Section(collections.abc.Mapping):
             self._defaults = None
         else:
             self._defaults = defaults
+        self._has_defaults = self._defaults is not None
+        if self._has_defaults:
+            self._non_empty_defaults = self._defaults._sub_has_options()
+        
         if init:
             self.update(init)
 
@@ -110,13 +114,13 @@ class Section(collections.abc.Mapping):
         """
         if dictionary is UNDEFINED:
             dictionary = self.dictionary[section_name]
-        if self._defaults is None:
-            defaults = None
-        else:
+        if self._has_defaults:
             if section_name in self._defaults:
                 defaults = self._defaults[section_name]
             else:
                 defaults = self._defaults.add_section(section_name)
+        else:
+            defaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self, defaults=defaults)
 
     @classmethod
@@ -166,7 +170,7 @@ class Section(collections.abc.Mapping):
     def __getitem__(self, key):
         if key in self.dictionary:
             value = self.dictionary[key]
-        elif self._defaults is not None and key in self._defaults:
+        elif self._has_defaults and key in self._defaults:
             value = self._defaults[key]
         else:
             raise KeyError(key)
@@ -221,7 +225,7 @@ class Section(collections.abc.Mapping):
            Get an option (raises KeyError if a section is found)
         """
         if option_name not in self.dictionary:
-            if self._defaults is not None:
+            if self._has_defaults:
                 return self._defaults.get(option_name, default)
             else:
                 return default
@@ -252,7 +256,7 @@ class Section(collections.abc.Mapping):
         if key in self.dictionary:
             # locally defined
             return True
-        elif self._defaults is not None and key in self._defaults:
+        elif self._has_defaults and key in self._defaults:
             # defined in defaults
             value = self._defaults[key]
             if isinstance(value, collections.Mapping):
@@ -270,7 +274,7 @@ class Section(collections.abc.Mapping):
                 not isinstance(self.dictionary[option_name], collections.Mapping):
             return True
         else:
-            return self._defaults is not None and self._defaults.has_option(option_name)
+            return self._has_defaults and self._defaults.has_option(option_name)
 
     def has_section(self, section_name):
         """has_section(self, section_name) -> bool
@@ -280,7 +284,7 @@ class Section(collections.abc.Mapping):
                 isinstance(self.dictionary[section_name], collections.Mapping):
             return True
         else:
-            return self._defaults is not None and self._defaults.has_section(section_name) and \
+            return self._has_defaults and self._defaults.has_section(section_name) and \
                 self._defaults[section_name]._sub_has_options()  # pylint: disable=W0212
 
     def add_default(self, **kwargs):
@@ -301,7 +305,7 @@ class Section(collections.abc.Mapping):
         """defaults(self) -> default items
            Iterator over default option items.
         """
-        if self._defaults is not None:
+        if self._has_defaults:
             for key, value in self._defaults.items():
                 if key not in self.dictionary:
                     yield key, value
@@ -339,7 +343,7 @@ class Section(collections.abc.Mapping):
             yield value
 
     def __contains__(self, key):
-        return key in self.dictionary or (self._defaults is not None and key in self._defaults)
+        return key in self.dictionary or (self._has_defaults and key in self._defaults)
 
     def __len__(self):
         return len(self.dictionary)
@@ -355,7 +359,7 @@ class Section(collections.abc.Mapping):
             self[key] = value
         if isinstance(dictionary, Section):
             dictionary_defaults = dictionary._defaults  # pylint: disable=W0212
-            if self._defaults is not None and dictionary_defaults is not None:
+            if self._has_defaults and dictionary_defaults is not None:
                 self._defaults.update(dictionary_defaults)
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
