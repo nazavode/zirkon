@@ -97,8 +97,8 @@ class ConfigSection(Section):
             else:
                 return False
 
-    def has_key(self, key):
-        if super().has_key(key):
+    def __contains__(self, key):
+        if super().__contains__(key):
             return True
         else:
             if self._has_defaults:
@@ -114,7 +114,7 @@ class ConfigSection(Section):
                                         defaults=self._defaults.copy())
 
     def __getitem__(self, key):
-        if super().has_key(key):
+        if super().__contains__(key):
             return super().__getitem__(key)
         else:
             if self._has_defaults and key in self._defaults:
@@ -127,7 +127,7 @@ class ConfigSection(Section):
         raise KeyError(key)
 
     def __delitem__(self, key):
-        if self._has_defaults and self._defaults.has_key(key):
+        if self._has_defaults and key in self._defaults:
             # ignore del error
             with contextlib.suppress(KeyError):
                 super().__delitem__(key)

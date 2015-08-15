@@ -204,11 +204,17 @@ class Section(collections.abc.Mapping):
             raise KeyError("{} is an option, not a section".format(section_name))
         return value
 
-    def has_key(self, key):
-        """has_key(self, key) -> bool
+    def __contains__(self, key):
+        """__contains__(self, key) -> bool
            Return True if option or section 'key' exists.
         """
         return key in self.dictionary
+
+    def has_key(self, key):
+        """has_key(self, key) -> bool
+           Return True if option or section exists.
+        """
+        return key in self
 
     def has_option(self, option_name):
         """has_option(self, option_name) -> bool
@@ -260,9 +266,6 @@ class Section(collections.abc.Mapping):
     def values(self):
         for _, value in self.items():
             yield value
-
-    def __contains__(self, key):
-        return self.has_key(key)
 
     def __len__(self):
         return len(self.dictionary)
