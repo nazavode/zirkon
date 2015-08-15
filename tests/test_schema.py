@@ -23,6 +23,7 @@ import io
 import pytest
 
 from common.fixtures import dictionary, \
+    defaultsvalue, \
     string_io, \
     tmp_text_file, \
     simple_section_content, \
@@ -126,8 +127,8 @@ def deferred_schema():
     return schema
 
 @pytest.fixture
-def deferred_config():
-    config = Config()
+def deferred_config(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['b'] = 20
     config['c'] = 10
@@ -148,8 +149,14 @@ def test_Schema_deferred_default(deferred_schema, deferred_config):
     assert deferred_config['sub']['e'] == 48
     deferred_config['b'] = -10
     del deferred_config['sub']['e']
+    print("==== start")
     deferred_schema.validate(deferred_config)
+    print("==== stop")
     assert deferred_config['sub']['e'] == 18
+    #if deferred_config.defaults() is None:
+    #    assert deferred_config['sub']['e'] == 18
+    #else:
+    #    assert deferred_config['sub']['e'] == 48
 
 def test_Schema_deferred_err_option(deferred_schema, deferred_config):
     deferred_config['c'] = 15

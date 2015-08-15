@@ -27,6 +27,7 @@ __all__ = [
 ]
 
 from .section import Section
+from .config_section import ConfigSection
 from .validation_section import ValidationSection
 from .validation import Validation
 from .validator import Validator, ValidatorInstance
@@ -37,6 +38,28 @@ from .validator.error import OptionValidationError, \
     UnexpectedOptionError
 
 
+def _reset_option_default(*, section, option, option_name):
+    """_reset_option_default(*, section, option, option_name)
+       Check if the option value is from defaults; if so, it is removed.
+       This is to force re-evaluation of deferred expressions in validator default.
+    """
+    section_defaults = section
+    if isinstance(section, ConfigSection):
+        defaults = section.defaults()
+        if defaults is not None:
+            section_defaults = defaults
+            if option.defined:
+                for key, _ in section.options():
+                    if key == option_name:
+                        # option from standard values
+                        break
+                else:
+                    # option is from section_defaults:
+                    # it is removed in order to be replaced by eventually new value
+                    option.defined = False
+    return section_defaults
+
+
 def _validate_option(*, validator, section, validation_section,
                      option_name, raise_on_error, option):
     """_validate_option(*, ...)
@@ -44,7 +67,9 @@ def _validate_option(*, validator, section, validation_section,
        eventually change the option value.
        Used to implement SchemaSection.impl_validate(...) method.
     """
-    value = option.value
+    section_defaults = _reset_option_default(section=section, option=option, option_name=option_name)
+    prev_defined = option.defined
+    prev_value = option.value
     try:
         validator.validate_option(option, section)
     except OptionValidationError as err:
@@ -53,9 +78,14 @@ def _validate_option(*, validator, section, validation_section,
             raise
     else:
         if not option.defined:
-            del section[option_name]
-        elif option.value is not value:
-            section[option_name] = option.value
+            if prev_defined:
+                del section[option_name]
+        else:
+            if option.value is not prev_value:
+                if prev_defined:
+                    section[option_name] = option.value
+                else:
+                    section_defaults[option_name] = option.value
 
 
 class SchemaSection(Section):

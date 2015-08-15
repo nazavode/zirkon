@@ -16,7 +16,7 @@ What is Daikon
 
     - Python 3.4
 
-Daikon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation and advanced value interpolation.
+Daikon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation, default values and value interpolation.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
@@ -94,26 +94,72 @@ is simply a special Config having Validators as values:
  >>> from daikon.validator import Int, Str, Float
  >>> schema = Schema()
  >>> schema['x'] = Int(min=1)
+ >>> schema['y'] = Int(default=2)
  >>> schema['subsection'] = {}
  >>> schema['subsection']['y'] = Str(min_len=6)
  >>> schema['subsection']['w'] = Float()
 
 The validation result itself is a Config object having OptionValidationErrors
-as values.
+as values:
 
  >>> validation = schema.validate(config)
  >>> validation.dump()
  [subsection]
      y = MinLengthError("subsection.y='alpha': length 5 is lower than min_len 6")
      w = MissingRequiredOptionError('subsection.w: required value is missing')
- >>>
+
+Since the validator for *y* sets a default value and the key is missing from config, it is added:
+
+ >>> print(config['y'])
+ 2
 
 There list of available Validators can be easily extended.
 
-Advanced value interpolation
-----------------------------
+Defaults
+--------
 
-Daikon supports advanced value interpolation: key/values precedently stored in 
+Daikon supports default values; these values are stored in a separated space (not in the dictionary), and they are not serialized; nevertheless they can be accessed as normal values:
+
+ >>> defaults = {'x': 1.0, 'y': 2.0}
+ >>> config = Config(defaults=defaults)
+ >>> print(config['x'], config['y'])
+ 1.0 2.0
+
+Default values can be added:
+
+ >>> config.add_defaults(z=3.0)
+ >>> print(config['z'])
+ 3.0
+
+They can be overwritten by standard values:
+
+ >>> config['x'] = 100
+ >>> print(config['x'])
+ 100
+ >>> del config['x']
+ >>> print(config['x'])
+ 1.0
+
+When enabled, defaults are used to store the default values set during validation:
+
+ >>> config = Config(defaults={})
+ >>> schema = Schema()
+ >>> schema['t'] = Int(default=789)
+ >>> validation = schema.validate(config)
+ >>> config.dump()
+ >>> print(config['t'])
+ 789
+
+Defaults can directly be accessed:
+
+ >>> config.defaults().dump()
+ t = 789
+ 
+
+Value interpolation
+-------------------
+
+Daikon supports value interpolation: key/values precedently stored in 
 the Config object can be accessed and used in complex expressions to set new values.
 For instance:
 

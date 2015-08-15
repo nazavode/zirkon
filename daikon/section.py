@@ -104,6 +104,7 @@ class Section(collections.abc.Mapping):
         """_subsection(self, section_name, dictionary)
            Return a subsection with the given name
         """
+        dummy = section_name
         return self._subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
@@ -303,7 +304,6 @@ class Section(collections.abc.Mapping):
         content = ', '.join("{}={}".format(k, v) for k, v in section_data)
         return "{}({})".format(self.__class__.__name__, content)
 
-
     def __eq__(self, section):
         if isinstance(section, Section):
             return self.as_dict(dict_class=dict) == section.as_dict(dict_class=dict)
@@ -343,11 +343,13 @@ def iter_section_options(section):
                 next_sections.append((s_rootname, s_value))
         sections = next_sections
 
+
 def count_section_options(section):
     """count_section_options(section)
        Count number of options.
     """
     return sum(1 for _ in iter_section_options(section))
+
 
 def has_section_options(section):
     """has_section_options(section)

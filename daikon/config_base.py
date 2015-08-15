@@ -43,6 +43,7 @@ class ConfigValidationError(Exception):
         super().__init__(message)
         self.validation = validation
 
+
 class ConfigBase(Section):
     """ConfigBase(init=None, *, dictionary=None, **section_options)
        Config base class.

@@ -39,7 +39,7 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=True):
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False):
         if defaults is True:
             defaults = Section()
         elif defaults is False:
@@ -66,7 +66,7 @@ class ConfigSection(Section):
             else:
                 subdefaults = self._defaults.add_section(section_name)
         else:
-            subdefaults=None
+            subdefaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self, defaults=subdefaults)
 
     def add_defaults(self, **kwargs):
@@ -141,12 +141,13 @@ class ConfigSection(Section):
     def update(self, dictionary):
         super().update(dictionary)
         if isinstance(dictionary, ConfigSection):
-            self._defaults.update(dictionary.defaults())
+            if self._has_defaults and dictionary.defaults() is not None:
+                self._defaults.update(dictionary.defaults())
 
     def as_dict(self, *, dict_class=collections.OrderedDict):
         result = super().as_dict(dict_class=dict_class)
         if self._has_defaults:
             for key, value in self._defaults.items():
-                if not key in result:
+                if key not in result:
                     result[key] = value
         return result

@@ -34,8 +34,8 @@ from .config_section import ConfigSection
 from .deferred_object import ROOT, SECTION
 
 
-class Config(ConfigBase, ConfigSection):
-    """Config(init=None, *, dictionary=None, defaults=True, schema=None, validate=True)
+class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
+    """Config(init=None, *, dictionary=None, defaults=False, schema=None, validate=True)
        Config class.
 
        >>> import collections
@@ -72,5 +72,5 @@ class Config(ConfigBase, ConfigSection):
        >>>
     """
 
-    def __init__(self, init=None, *, dictionary=None, defaults=True, schema=None, validate=True):
+    def __init__(self, init=None, *, dictionary=None, defaults=False, schema=None, validate=True):
         super().__init__(dictionary=dictionary, init=init, defaults=defaults, schema=schema, validate=validate)

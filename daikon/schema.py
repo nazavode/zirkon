@@ -36,4 +36,3 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
     def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None):
         super().__init__(dictionary=dictionary, init=init)
         self.unexpected_option_validator = unexpected_option_validator
-

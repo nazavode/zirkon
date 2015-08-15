@@ -267,3 +267,39 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  y = MaxValueError('y=10: value is greater than max 2')
  >>>
 
+The Config defaults attibute
+============================
+
+The *defaults* attribute is used to enable the separate storage for default values. It can be:
+
+* *True* or *False* to enable/disable the functionality;
+* an existing *Config* or any mapping to be used as storage.
+
+When enabled, if a mapping is passed as value to *defaults*, it defines the initial content of the defaults:
+
+ >>> defaults_config = Config()
+ >>> config = Config(defaults=defaults_config)
+
+The *add_defaults* method can be used to add default options or sections:
+
+ >>> config['z'] = 100
+ >>> config.add_defaults(a=10)
+ >>> config.add_defaults(sub={'x': 1})
+
+Only standard values are serialized:
+
+ >>> config.dump()
+ z = 100
+
+Defaults can be retrieved:
+
+ >>> config.defaults().dump()
+ a = 10
+ [sub]
+     x = 1
+
+Notice that the original mapping has been modified:
+
+ >>> print(defaults_config['a'])
+ 10
+

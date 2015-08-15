@@ -260,8 +260,8 @@ def test_Config_defaults_empty_section():
     assert not config.has_key('a')
     assert not config.has_section('a')
 
-def test_Config_defaults_update():
-    config1 = Config(defaults=True)
+def test_Config_defaults_update(defaultsvalue):
+    config1 = Config(defaults=defaultsvalue)
     config1['d'] = 11
     config1['e'] = 12
     config1.add_defaults(a={}, b=5, c={'x': 7}, d=8)
@@ -292,7 +292,7 @@ def test_Config_defaults_copy():
     assert config2['e'] == 12
 
 def test_Config_defaults_dump(string_io):
-    config = Config()
+    config = Config(defaults=True)
     config['x'] = 1
     config.add_defaults(alpha=10)
     config['sub'] = {'w': 2}
@@ -373,7 +373,7 @@ def test_Config_defaults_eq():
 
 @pytest.fixture
 def config_option():
-    config = Config()
+    config = Config(defaults=True)
     config.add_defaults(a=10, b=20)
     config['a'] = 5
     config['c'] = 15
@@ -410,7 +410,7 @@ def test_Config_defaults_deloption_only_loc(config_option):
 
 @pytest.fixture
 def config_section():
-    config = Config()
+    config = Config(defaults=True)
     config.add_defaults(a={'ax': 1}, b={'bx': 2})
     config['a'] = {'ax': 10}
     config['c'] = {'cx': 20}
