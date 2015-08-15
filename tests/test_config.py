@@ -156,21 +156,22 @@ def test_Config_defaults_option():
     assert config.has_key('a')
     assert config.has_option('a')
     assert config['a'] == 10
+    assert config.get('a') == 10
+    assert config.get_option('a') == 10
     assert len(config) == 0
     assert not 'a' in config.dictionary
 
 def test_Config_defaults_section():
-    print("@@@@@@@@@@@@ 1")
     config = Config(defaults=True)
-    print("@@@@@@@@@@@@ 2")
     config.add_defaults(a={'x': 1})
-    print("@@@@@@@@@@@@ 3")
     assert 'a' in config
     assert config.has_key('a')
     assert config.has_section('a')
     assert isinstance(config['a'], Section)
     assert len(config['a']) == 1
     assert config['a'].has_option('x')
+    assert config.get('a') == config['a']
+    assert config.get_section('a') == config['a']
     config['a'] = {'y': 2}
     assert len(config['a']) == 1
     assert config['a'].has_option('x')
@@ -190,3 +191,4 @@ def test_Config_defaults_empty_section():
     assert not 'a' in config
     assert not config.has_key('a')
     assert not config.has_section('a')
+

@@ -189,26 +189,19 @@ class Section(collections.abc.Mapping):
         """get_option(self, option_name, default=None) -> value
            Get an option (raises KeyError if a section is found)
         """
-        if option_name not in self.dictionary:
-            return default
-        else:
-            value = self.dictionary[option_name]
-            if isinstance(value, collections.Mapping):
-                raise KeyError("{} is a section, not an option".format(option_name))
-            return value
+        value = self.get(option_name, default)
+        if isinstance(value, collections.Mapping):
+            raise KeyError("{} is a section, not an option".format(option_name))
+        return value
 
     def get_section(self, section_name, default=None):
         """get_section(self, section_name, default=None) -> value
            Get a section (raises KeyError if an option is found)
         """
-        if section_name not in self.dictionary:
-            return default
-        else:
-            value = self.dictionary[section_name]
-            if not isinstance(value, collections.Mapping):
-                raise KeyError("{} is an option, not a section".format(section_name))
-            value = self._subsection(section_name=section_name, dictionary=value)
-            return value
+        value = self.get(section_name, default)
+        if not isinstance(value, collections.Mapping):
+            raise KeyError("{} is an option, not a section".format(section_name))
+        return value
 
     def has_key(self, key):
         """has_key(self, key) -> bool
