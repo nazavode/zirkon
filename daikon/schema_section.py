@@ -60,7 +60,7 @@ def _validate_option(*, validator, section, validation_section,
 
 
 class SchemaSection(Section):
-    """SchemaSection(init=None, *, dictionary=None, parent=None,
+    """SchemaSection(init=None, *, dictionary=None, parent=None, defaults=UNDEFINED,
                      unexpected_option_validator=None,
                      self_validate=True)
        A Section class to perform validation. All values must be Validator
@@ -77,14 +77,14 @@ class SchemaSection(Section):
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
-    def __init__(self, init=None, *, dictionary=None, parent=None,
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=UNDEFINED,
                  unexpected_option_validator=None,
                  self_validate=True):
         self._unexpected_option_validator = None
         self.unexpected_option_validator = unexpected_option_validator
-        super().__init__(dictionary=dictionary, init=init, parent=parent)
+        super().__init__(dictionary=dictionary, init=init, parent=parent, defaults=defaults)
         if self_validate:
-            schema_validator = self._subsection_class()(dictionary=None,
+            schema_validator = self._subsection_class()(dictionary=None, defaults=None,
                                                         unexpected_option_validator=ValidatorInstance(),
                                                         self_validate=False)
             schema_validator.validate(section=self, raise_on_error=True)
