@@ -104,6 +104,10 @@ class ConfigSection(Section):
             else:
                 return False
 
+    def copy(self):
+        return self._subsection_class()(dictionary=self.dictionary.copy(),
+                                        defaults=self._defaults.copy())
+
     def __getitem__(self, key):
         if super().has_key(key):
             return super().__getitem__(key)

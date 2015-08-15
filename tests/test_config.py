@@ -192,3 +192,19 @@ def test_Config_defaults_empty_section():
     assert not config.has_key('a')
     assert not config.has_section('a')
 
+def test_Config_defaults_copy():
+    config = Config(defaults=True)
+    config['d'] = 11
+    config['e'] = 12
+    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config2 = config.copy()
+    assert not config2.has_section('a')
+    assert config2.has_option('b')
+    assert config2['b'] == 5
+    assert config2.has_section('c')
+    assert len(config2['c']) == 1
+    assert config2['c']['x'] == 7
+    assert config2.has_option('d')
+    assert config2['d'] == 11
+    assert config2.has_option('e')
+    assert config2['e'] == 12
