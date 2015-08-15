@@ -25,11 +25,11 @@ __all__ = [
     'Schema',
 ]
 
-from .config import Config
+from .config_base import ConfigBase
 from .schema_section import SchemaSection
 
 
-class Schema(Config, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
+class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
     """Schema(init=None, *, dictionary=None)
        Schema config.
     """

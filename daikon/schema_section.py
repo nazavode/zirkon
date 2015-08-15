@@ -92,7 +92,7 @@ class SchemaSection(Section):
     def _subsection_class(cls):
         return SchemaSection
 
-    def _subsection(self, dictionary):
+    def _subsection(self, section_name, dictionary):
         return self._subsection_class()(dictionary=dictionary,
                                         unexpected_option_validator=self.unexpected_option_validator)
 

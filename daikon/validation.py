@@ -25,11 +25,11 @@ __all__ = [
     'Validation',
 ]
 
-from .config import Config
+from .config_base import ConfigBase
 from .validation_section import ValidationSection
 
 
-class Validation(Config, ValidationSection):  # pylint: disable=too-many-ancestors,I0011
+class Validation(ConfigBase, ValidationSection):  # pylint: disable=too-many-ancestors,I0011
     """Validation(init=None, *, dictionary=None)
        Validation config.
     """

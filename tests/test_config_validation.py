@@ -84,6 +84,12 @@ def test_Config_self_validate(string_io, config):
     config.self_validate(raise_on_error=True)
 
 def test_Config_self_validate_default(string_io, config):
+    config.dump()
+    print("** values:")
+    config['values'].dump()
+    print("** parameters:")
+    config['parameters'].dump()
+    print(config['parameters'])
     assert 'max_iterations' in config['parameters']
     assert config['parameters']['max_iterations'] == 80
     del config['parameters']['max_iterations']

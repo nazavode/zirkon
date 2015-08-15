@@ -79,7 +79,7 @@ class Section(collections.abc.Mapping):
 
     def __init__(self, init=None, *, dictionary=None, parent=None):
         if dictionary is None:
-            dictionary = self.dictionary_factory()
+            dictionary = self._dictionary_factory()
         self.dictionary = dictionary
         if parent is None:
             self.parent = self
@@ -97,21 +97,21 @@ class Section(collections.abc.Mapping):
         """
         return Section
 
-    def _subsection(self, dictionary):
-        """_subsection(self, *p_args, **n_args)
+    def _subsection(self, section_name, dictionary):
+        """_subsection(self, section_name, dictionary)
            Return a subsection with the given name
         """
         return self._subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
-    def dictionary_factory(cls):
-        """dictionary_factory() -> new (empty) dictionary
+    def _dictionary_factory(cls):
+        """_dictionary_factory() -> new (empty) dictionary
            Factory for new dictionaries.
         """
         return collections.OrderedDict()
 
-    def check_data_type(self, key, value):
-        """check_data_type(key, value)
+    def _check_data_type(self, key, value):
+        """_check_data_type(key, value)
         """
         if isinstance(value, self.SUPPORTED_SCALAR_TYPES):
             return
@@ -137,9 +137,9 @@ class Section(collections.abc.Mapping):
     def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
-            return self._subsection(dictionary=value)
+            return self._subsection(section_name=key, dictionary=value)
         else:
-            self.check_data_type(key=key, value=value)
+            self._check_data_type(key=key, value=value)
             return value
 
     def __setitem__(self, key, value):
@@ -150,13 +150,13 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             if self.has_option(key):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
-            self.dictionary[key] = self.dictionary_factory()
-            section = self._subsection(self.dictionary[key])
+            self.dictionary[key] = self._dictionary_factory()
+            section = self._subsection(section_name=key, dictionary=self.dictionary[key])
             section.update(value)
         else:
             if isinstance(value, Deferred):
                 value = value.evaluate({'SECTION': self, 'ROOT': self.root})
-            self.check_data_type(key=key, value=value)
+            self._check_data_type(key=key, value=value)
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
             self.dictionary[key] = value
@@ -204,7 +204,7 @@ class Section(collections.abc.Mapping):
             value = self.dictionary[section_name]
             if not isinstance(value, collections.Mapping):
                 raise KeyError("{} is an option, not a section".format(section_name))
-            value = self._subsection(dictionary=value)
+            value = self._subsection(section_name=section_name, dictionary=value)
             return value
 
     def has_key(self, key):
@@ -253,7 +253,7 @@ class Section(collections.abc.Mapping):
     def items(self):
         for key, value in self.dictionary.items():
             if isinstance(value, collections.Mapping):
-                value = self._subsection(dictionary=value)
+                value = self._subsection(section_name=key, dictionary=value)
             yield key, value
 
     def keys(self):
