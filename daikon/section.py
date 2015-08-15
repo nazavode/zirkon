@@ -80,7 +80,7 @@ class Section(collections.abc.Mapping):
 
     def __init__(self, init=None, *, dictionary=None, parent=None, defaults=UNDEFINED):
         if dictionary is None:
-            dictionary = self.dictionary_factory()
+            dictionary = self._dictionary_factory()
         self.dictionary = dictionary
         if parent is None:
             self.parent = self
@@ -118,8 +118,8 @@ class Section(collections.abc.Mapping):
         return self._subsection_class()(dictionary=dictionary, parent=self, defaults=defaults)
 
     @classmethod
-    def dictionary_factory(cls):
-        """dictionary_factory() -> new (empty) dictionary
+    def _dictionary_factory(cls):
+        """_dictionary_factory() -> new (empty) dictionary
            Factory for new dictionaries.
         """
         return collections.OrderedDict()
@@ -149,7 +149,12 @@ class Section(collections.abc.Mapping):
             ))
 
     def __getitem__(self, key):
-        value = self.dictionary[key]
+        if key in self.dictionary:
+            value = self.dictionary[key]
+        elif self._defaults is not None and key in self._defaults:
+            value = self._defaults[key]
+        else:
+            raise KeyError(key)
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
@@ -164,7 +169,7 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             if self.has_option(key):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
-            self.dictionary[key] = self.dictionary_factory()
+            self.dictionary[key] = self._dictionary_factory()
             section = self._subsection(section_name=key, dictionary=self.dictionary[key])
             section.update(value)
         else:
@@ -201,7 +206,10 @@ class Section(collections.abc.Mapping):
            Get an option (raises KeyError if a section is found)
         """
         if option_name not in self.dictionary:
-            return default
+            if self._defaults is not None:
+                return self._defaults.get(option_name, default)
+            else:
+                return default
         else:
             value = self.dictionary[option_name]
             if isinstance(value, collections.Mapping):
@@ -225,14 +233,17 @@ class Section(collections.abc.Mapping):
         """has_key(self, key) -> bool
            Return True if option or section 'key' exists.
         """
-        return key in self.dictionary
+        return key in self.dictionary or (self._defaults is not None and key in self._defaults)
 
     def has_option(self, option_name):
         """has_option(self, option_name) -> bool
            Return True if option exists.
         """
-        return option_name in self.dictionary and \
-            not isinstance(self.dictionary[option_name], collections.Mapping)
+        if option_name in self.dictionary and \
+                not isinstance(self.dictionary[option_name], collections.Mapping):
+            return True
+        else:
+            return self._defaults is not None and self._defaults.has_option(option_name)
 
     def has_section(self, section_name):
         """has_section(self, section_name) -> bool
@@ -241,6 +252,13 @@ class Section(collections.abc.Mapping):
         return section_name in self.dictionary and \
             isinstance(self.dictionary[section_name], collections.Mapping)
 
+    def add_default(self, option_name, option_value):
+        """add_default(self, option_name, option_value)
+           Add a default for option.
+        """
+        self.check_data_type(key=option_name, value=option_value)
+        self._defaults[option_name] = option_value
+
     def add_section(self, section_name):
         """add_section(self, section_name) -> new section
            Add a new section and return it.
@@ -248,13 +266,24 @@ class Section(collections.abc.Mapping):
         self[section_name] = {}
         return self[section_name]
 
-    def options(self):
-        """options(self) -> option items
-           Iterator over option items
+    def defaults(self):
+        """defaults(self) -> default items
+           Iterator over default option items.
+        """
+        if self._defaults is not None:
+            for key, value in self._defaults.items():
+                if key not in self.dictionary:
+                    yield key, value
+
+    def options(self, defaults=False):
+        """options(self, defaults=False) -> option items
+           Iterator over option items; if defaults, iterates also over defaults.
         """
         for key, value in self.items():
             if not isinstance(value, collections.Mapping):
                 yield key, value
+        if defaults:
+            yield from self.defaults()
 
     def sections(self):
         """sections(self) -> section items
@@ -279,7 +308,7 @@ class Section(collections.abc.Mapping):
             yield value
 
     def __contains__(self, key):
-        return key in self.dictionary
+        return key in self.dictionary or (self._defaults is not None and key in self._defaults)
 
     def __len__(self):
         return len(self.dictionary)
@@ -293,9 +322,13 @@ class Section(collections.abc.Mapping):
         """
         for key, value in dictionary.items():
             self[key] = value
+        if isinstance(dictionary, Section):
+            dictionary_defaults = dictionary._defaults  # pylint: disable=W0212
+            if self._defaults is not None and dictionary_defaults is not None:
+                self._defaults.update(dictionary_defaults)
 
-    def as_dict(self, *, dict_class=collections.OrderedDict):
-        """as_dict(self, *, dict_class=collections.OrderedDict) -> dict
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
+        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True) -> dict
            Return a dict with all the section content
         """
         result = dict_class()
@@ -304,6 +337,9 @@ class Section(collections.abc.Mapping):
             if isinstance(value, subsection_class):
                 result[key] = value.as_dict(dict_class=dict_class)
             else:
+                result[key] = value
+        if defaults:
+            for key, value in self.defaults():
                 result[key] = value
         return result
 

@@ -281,3 +281,54 @@ def test_Section_invalid_dictionary_content():
     with pytest.raises(TypeError) as exc_info:
         a = section['a']
     assert str(exc_info.value) == "option a: invalid tuple: item #2 {} has invalid type dict"
+
+def test_Section_defaults():
+    dictionary = collections.OrderedDict()
+    section = Section(dictionary=dictionary)
+    section.add_default('alpha', 10)
+    assert 'alpha' in section
+    assert section['alpha'] == 10
+    assert len(tuple(section.keys())) == 0
+    assert len(tuple(section.options())) == 0
+    assert len(tuple(section.defaults())) == 1
+    assert len(tuple(section.options(defaults=True))) == 1
+    assert len(dictionary) == 0
+    section['alpha'] = 20
+    assert section['alpha'] == 20
+    assert len(tuple(section.keys())) == 1
+    assert len(tuple(section.options())) == 1
+    assert len(tuple(section.defaults())) == 0
+    assert len(section._defaults) == 1
+    assert len(tuple(section.options(defaults=True))) == 1
+    assert len(dictionary) == 1
+    del section['alpha']
+    assert section['alpha'] == 10
+    
+def test_Section_defaults_update():
+    dictionary = collections.OrderedDict()
+    section = Section(dictionary=dictionary)
+    section.add_default('alpha', 10)
+    section.add_default('beta', 5)
+    section2 = Section()
+    section2['alpha'] = 20
+    section2.update(section)
+    assert section2['alpha'] == 20
+    assert section2['beta'] == 5
+    del section2['alpha']
+    assert section2['alpha'] == 10
+    
+def test_Section_defaults_dump(string_io):
+    dictionary = collections.OrderedDict()
+    section = Section(dictionary=dictionary)
+    section['x'] = 1
+    section.add_default('alpha', 10)
+    section['sub'] = {'w': 2}
+    section['sub'].add_default('beta', 20)
+    assert section['sub']['beta'] == 20
+    section.dump(string_io)
+    assert string_io.getvalue() == """\
+x = 1
+[sub]
+    w = 2
+"""
+

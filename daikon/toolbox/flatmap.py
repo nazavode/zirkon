@@ -57,15 +57,15 @@ class FlatMap(collections.abc.Mapping):
 
     def __init__(self, init=None, *, dictionary=None, prefix=''):
         if dictionary is None:
-            dictionary = self.dictionary_factory()
+            dictionary = self._dictionary_factory()
         self.dictionary = dictionary
         self.prefix = prefix
         if init:
             self.update(init)
 
     @classmethod
-    def dictionary_factory(cls):
-        """dictionary_factory() -> new (empty) dictionary
+    def _dictionary_factory(cls):
+        """_dictionary_factory() -> new (empty) dictionary
            Factory for new dictionaries.
         """
         return collections.OrderedDict()
