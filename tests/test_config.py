@@ -232,7 +232,24 @@ def test_Config_defaults_external(extdefaults):
     edcopy2 = as_dict(extdefaults, depth=-1, dict_class=dict)
     assert edcopy == edcopy2
     
-    
+def test_Config_no_defaults_add_default():
+    config = Config(defaults=False)
+    config.add_defaults(alpha=10, beta={'x': 1})
+    assert config.has_option('alpha')
+    assert config['alpha'] == 10
+    assert len(config) == 2
+    assert config.has_section('beta')
+    assert config['beta'].has_option('x')
+    assert config['beta']['x'] == 1
+    assert len(config['beta']) == 1
+
+def test_Config_defaults_get_defaults():
+    config = Config(defaults=True)
+    config.add_defaults(a={'x': 1}, b=10)
+    assert isinstance(config.defaults(), Section)
+    assert config.defaults() == {'a': {'x': 1}, 'b': 10}
+    config = Config(defaults=False)
+    assert config.defaults() is None
 
 def test_Config_defaults_empty_section():
     config = Config(defaults=True)
@@ -240,6 +257,21 @@ def test_Config_defaults_empty_section():
     assert not 'a' in config
     assert not config.has_key('a')
     assert not config.has_section('a')
+
+def test_Config_defaults_update():
+    config1 = Config(defaults=True)
+    config1['d'] = 11
+    config1['e'] = 12
+    config1.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config2 = Config(defaults=True)
+    config2.update(config1)
+    assert config2 == config1
+    config1.add_defaults(only1=1)
+    assert not config2.has_option('only1')
+    config2.add_defaults(only2=2)
+    assert not config1.has_option('only2')
+    assert config2 != config1
+
 
 def test_Config_defaults_copy():
     config = Config(defaults=True)

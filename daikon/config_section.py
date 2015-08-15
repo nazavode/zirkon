@@ -138,6 +138,11 @@ class ConfigSection(Section):
         """defaults() -> the defaults section"""
         return self._defaults
 
+    def update(self, dictionary):
+        super().update(dictionary)
+        if isinstance(dictionary, ConfigSection):
+            self._defaults.update(dictionary.defaults())
+
     def as_dict(self, *, dict_class=collections.OrderedDict):
         result = super().as_dict(dict_class=dict_class)
         if self._has_defaults:

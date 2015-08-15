@@ -309,19 +309,6 @@ class Section(collections.abc.Mapping):
             return self.as_dict(dict_class=dict) == section.as_dict(dict_class=dict)
         else:
             return self.as_dict(dict_class=dict) == as_dict(section, depth=-1, dict_class=dict)
-            # coompare self vs section
-            for key, value in self.items():
-                if key not in section:
-                    return False
-                if value != section[key]:
-                    return False
-            # coompare section vs self
-            for key, value in section.items():
-                if key not in self:
-                    return False
-                if self[key] != value:
-                    return False
-            return True
 
     def __bool__(self):
         for _ in self.items():
