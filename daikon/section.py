@@ -38,7 +38,7 @@ from .toolbox.undefined import UNDEFINED
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None, defaults=UNDEFINED)
+    """Section(init=None, *, dictionary=None, parent=None, defaults=True)
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -78,7 +78,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=UNDEFINED):
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=True):
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -88,8 +88,10 @@ class Section(collections.abc.Mapping):
         else:
             self.parent = parent
             self.root = self.parent.root
-        if defaults is UNDEFINED:
+        if defaults is True:
             self._defaults = self._subsection_class()(defaults=None)
+        elif defaults is False:
+            self._defaults = None
         else:
             self._defaults = defaults
         if init:
