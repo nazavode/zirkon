@@ -130,8 +130,6 @@ def test_Section_setitem_section_raises(simple_section):
 def test_Section_delitem_section(simple_section):
     assert simple_section.has_section('options')
     del simple_section['options']
-    print(simple_section)
-    print(simple_section._defaults)
     assert not simple_section.has_section('options')
     simple_section['options'] = 123
     assert simple_section.has_option('options')
@@ -239,10 +237,6 @@ def test_Section_ne_0(simple_section):
 def test_Section_ne_1(simple_section):
     s0 = Section(init=simple_section)
     simple_section['options']['f'] = 34
-    print("s0:")
-    s0.dump()
-    print()
-    print("simple_section:")
     simple_section.dump()
     assert simple_section != s0
     assert s0 != simple_section
