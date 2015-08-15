@@ -232,7 +232,7 @@ def test_Config_defaults_external(extdefaults):
     edcopy2 = as_dict(extdefaults, depth=-1, dict_class=dict)
     assert edcopy == edcopy2
     
-def test_Config_no_defaults_add_default():
+def test_Config_no_defaults_add_defaults():
     config = Config(defaults=False)
     config.add_defaults(alpha=10, beta={'x': 1})
     assert config.has_option('alpha')
@@ -272,7 +272,6 @@ def test_Config_defaults_update():
     assert not config1.has_option('only2')
     assert config2 != config1
 
-
 def test_Config_defaults_copy():
     config = Config(defaults=True)
     config['d'] = 11
@@ -289,6 +288,52 @@ def test_Config_defaults_copy():
     assert config2['d'] == 11
     assert config2.has_option('e')
     assert config2['e'] == 12
+
+def test_Config_defaults_dump(string_io):
+    config = Config()
+    config['x'] = 1
+    config.add_defaults(alpha=10)
+    config['sub'] = {'w': 2}
+    config['sub'].add_defaults(beta=20, gamma={'x': 11}, delta={})
+    assert config['sub']['beta'] == 20
+    assert config['sub']['gamma']['x'] == 11
+    config.dump(string_io)
+    assert string_io.getvalue() == """\
+x = 1
+[sub]
+    w = 2
+    [gamma]
+"""
+
+def test_Config_defaults_sub():
+    config = Config(defaults=True)
+    config['a'] = 10
+    config['sub'] = {}
+    config['sub']['x'] = 1
+    config['sub']['subsub'] = {}
+    config['sub']['subsub']['xx'] = 11
+    config['sub']['subsub']['subsubsub'] = {}
+    config['sub']['subsub']['subsubsub']['xxx'] = 111
+    config['sub']['subsub']['subsubsub']['yyy'] = 222
+    config['sub']['subsub']['yy'] = 22
+    config['sub']['y'] = 2
+    config['b'] = 20
+
+    config2 = Config(defaults=True)
+    config2.add_defaults(**config)
+    assert len(config2) == 0
+
+    assert config2['a'] == 10
+    assert config2['sub']['x'] == 1
+    assert config2['sub']['subsub']['xx'] == 11
+    assert config2['sub']['subsub']['subsubsub']['xxx'] == 111
+    assert config2['sub']['subsub']['subsubsub']['yyy'] == 222
+    assert config2['sub']['subsub']['yy'] == 22
+    assert config2['sub']['y'] == 2
+    assert config2['b'] == 20
+    assert len(config2) == 1
+    assert config2.has_option('a')
+    assert config2.has_section('sub')
 
 def test_Config_defaults_deloptions():
     config = Config(defaults=True)
@@ -323,3 +368,79 @@ def test_Config_defaults_eq():
     config2['e'] = 12
 
     assert config != config2
+
+@pytest.fixture
+def config_option():
+    config = Config()
+    config.add_defaults(a=10, b=20)
+    config['a'] = 5
+    config['c'] = 15
+    return config
+
+def test_Config_defaults_deloption_loc_def(config_option):
+    config = config_option
+    assert config.has_key('a')
+    assert config.has_option('a')
+    assert config['a'] == 5
+    del config['a']
+    assert config.has_key('a')
+    assert config.has_option('a')
+    assert config['a'] == 10
+
+def test_Config_defaults_deloption_only_def(config_option):
+    config = config_option
+    assert config.has_key('b')
+    assert config.has_option('b')
+    assert config['b'] == 20
+    del config['b']
+    assert config.has_key('b')
+    assert config.has_option('b')
+    assert config['b'] == 20
+
+def test_Config_defaults_deloption_only_loc(config_option):
+    config = config_option
+    assert config.has_key('c')
+    assert config.has_option('c')
+    assert config['c'] == 15
+    del config['c']
+    assert not config.has_key('c')
+    assert not config.has_option('c')
+
+@pytest.fixture
+def config_section():
+    config = Config()
+    config.add_defaults(a={'ax': 1}, b={'bx': 2})
+    config['a'] = {'ax': 10}
+    config['c'] = {'cx': 20}
+    return config
+
+def test_Config_defaults_delsection_loc_def(config_section):
+    config = config_section
+    assert config.has_key('a')
+    assert config.has_section('a')
+    assert config['a'] == {'ax': 10}
+    del config['a']
+    assert config.has_key('a')
+    assert config.has_section('a')
+    assert config['a'] == {'ax': 1}
+
+def test_Config_defaults_delsection_only_def(config_section):
+    config = config_section
+    assert config.has_key('b')
+    assert config.has_section('b')
+    assert config['b'] == {'bx': 2}
+    del config['b']
+    assert config.has_key('b')
+    assert config.has_section('b')
+    assert config['b'] == {'bx': 2}
+
+def test_Config_defaults_delsection_only_loc(config_section):
+    config = config_section
+    assert config.has_key('c')
+    assert config.has_section('c')
+    assert config['c'] == {'cx': 20}
+    del config['c']
+    config._defaults.dump()
+    assert not config.has_key('c')
+    assert not config.has_section('c')
+
