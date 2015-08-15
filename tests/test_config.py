@@ -208,3 +208,26 @@ def test_Config_defaults_copy():
     assert config2['d'] == 11
     assert config2.has_option('e')
     assert config2['e'] == 12
+
+def test_Config_defaults_deloptions():
+    config = Config(defaults=True)
+    config['d'] = 11
+    config['e'] = 12
+    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    assert config.has_option('d')
+    assert config['d'] == 11
+    del config['d']
+    assert config.has_option('d')
+    assert config['d'] == 8
+    assert config.has_option('e')
+    assert config['e'] == 12
+    del config['e']
+    assert not config.has_option('e')
+    with pytest.raises(KeyError):
+        del config['e']
+    del config['d']
+    assert config.has_option('d')
+    del config['c']
+    assert config.has_section('c')
+    assert config['c']['x'] == 7
+

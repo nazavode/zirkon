@@ -26,6 +26,8 @@ __all__ = [
     'ConfigSection',
 ]
 
+import contextlib
+
 from .section import Section, has_section_options
 
 
@@ -116,3 +118,12 @@ class ConfigSection(Section):
                 return self._defaults[key]
             else:
                 raise KeyError(key)
+
+    def __delitem__(self, key):
+        if self._has_defaults and self._defaults.has_key(key):
+            # ignore del error
+            with contextlib.suppress(KeyError):
+                super().__delitem__(key)
+        else:
+            super().__delitem__(key)
+            
