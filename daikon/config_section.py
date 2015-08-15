@@ -46,6 +46,8 @@ class ConfigSection(Section):
             defaults = None
         elif defaults is None or isinstance(defaults, Section):
             defaults = defaults
+        elif isinstance(defaults, collections.Mapping):
+            defaults = Section(dictionary=defaults)
         else:
             raise TypeError("invalid defaults object of type {}: not a Section".format(
                 type(defaults).__name__))
@@ -116,9 +118,13 @@ class ConfigSection(Section):
             return super().__getitem__(key)
         else:
             if self._has_defaults and key in self._defaults:
-                return self._defaults[key]
-            else:
-                raise KeyError(key)
+                value = self._defaults[key]
+                if isinstance(value, collections.Mapping):
+                    if has_section_options(value):
+                        return self.add_section(key)
+                else:
+                    return value
+        raise KeyError(key)
 
     def __delitem__(self, key):
         if self._has_defaults and self._defaults.has_key(key):

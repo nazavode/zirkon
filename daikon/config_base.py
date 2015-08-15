@@ -44,12 +44,12 @@ class ConfigValidationError(Exception):
         self.validation = validation
 
 class ConfigBase(Section):
-    """ConfigBase(init=None, *, dictionary=None, defaults=True)
+    """ConfigBase(init=None, *, dictionary=None, **section_options)
        Config base class.
     """
 
-    def __init__(self, init=None, *, dictionary=None, defaults=False, schema=None, validate=True):
-        super().__init__(dictionary=dictionary, init=init)
+    def __init__(self, init=None, *, dictionary=None, schema=None, validate=True, **section_options):
+        super().__init__(dictionary=dictionary, init=init, **section_options)
         self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):

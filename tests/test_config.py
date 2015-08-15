@@ -33,7 +33,7 @@ from common.fixtures import dictionary, \
     SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION, \
     SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
-from daikon.toolbox.dictutils import compare_dicts
+from daikon.toolbox.dictutils import compare_dicts, as_dict
 from daikon.section import Section
 from daikon.config_section import ConfigSection
 from daikon.config import Config, ROOT, SECTION
@@ -144,8 +144,6 @@ def test_Config_deferred_error():
     config['a'] = 10
     with pytest.raises(KeyError) as exc_info:
         config['c'] = SECTION['a'] * SECTION['b']
-    print(exc_info)
-    print(exc_info.value)
     assert str(exc_info.value) == "'b'"
     config['b'] = 20
 
@@ -168,7 +166,8 @@ def test_Config_defaults_section():
     assert config.has_key('a')
     assert config.has_section('a')
     assert isinstance(config['a'], Section)
-    assert len(config['a']) == 1
+    assert len(config) == 1
+    assert len(config['a']) == 0
     assert config['a'].has_option('x')
     assert config.get('a') == config['a']
     assert config.get_section('a') == config['a']
@@ -178,12 +177,62 @@ def test_Config_defaults_section():
     assert config['a'].has_option('y')
     del config['a']
     assert config.has_section('a')
-    assert len(config['a']) == 1
+    assert len(config['a']) == 0
     assert config['a'].has_option('x')
-    config['x'] = {}
-    assert config.has_section('x')
-    del config['x']
-    assert not config.has_section('x')
+    #config['x'] = {}
+    #assert config.has_section('x')
+    #del config['x']
+    #assert not config.has_section('x')
+
+def test_Config_defaults_section_add():
+    config = Config(defaults=True)
+    config.add_defaults(a={'x': 1})
+    assert 'a' in config
+    config['a']['t'] = 0.1
+    assert config['a']['x'] == 1
+    assert config['a']['t'] == 0.1
+    assert not config.defaults()['a'].has_option('t')
+    del config['a']
+    assert config.has_section('a')
+    assert config['a'].has_option('x')
+    assert config['a']['x'] == 1
+
+@pytest.fixture(params=[collections.OrderedDict(), Section(), Config()])
+def extdefaults(request):
+    defaults = request.param
+    defaults['i10'] = 10
+    defaults['sub'] = collections.OrderedDict()
+    defaults['sub']['f11'] = 1.1
+    defaults['sub']['f22'] = 2.2
+    defaults['sub']['sse'] = collections.OrderedDict()
+    defaults['sub']['ssf'] = collections.OrderedDict()
+    defaults['sub']['ssf']['f44'] = 4.4
+    defaults['xdat'] = "x.dat"
+    return defaults
+
+def test_Config_defaults_external(extdefaults):
+    edcopy = as_dict(extdefaults, depth=-1, dict_class=dict)
+    config = Config(defaults=extdefaults)
+    assert config.has_section('sub')
+    assert config['sub']['f22'] == 2.2
+    assert not config['sub'].has_section('sse')
+    with pytest.raises(KeyError) as exc_info:
+        config['sub']['sse']['xx'] = 18
+    assert str(exc_info.value) == "'sse'"
+    assert not config['sub'].has_section('sse')
+    assert config['sub'].has_section('ssf')
+    assert len(config['sub']['ssf']) == 0
+    assert config['sub']['ssf']['f44'] == 4.4
+    config['sub']['ssf']['xx'] = 19
+    del config['sub']
+    assert config.has_section('sub')
+    assert config['sub'].has_section('ssf')
+    assert config['sub']['ssf'].has_option('f44')
+    assert config['sub']['ssf']['f44'] == 4.4
+    edcopy2 = as_dict(extdefaults, depth=-1, dict_class=dict)
+    assert edcopy == edcopy2
+    
+    
 
 def test_Config_defaults_empty_section():
     config = Config(defaults=True)
@@ -202,7 +251,7 @@ def test_Config_defaults_copy():
     assert config2.has_option('b')
     assert config2['b'] == 5
     assert config2.has_section('c')
-    assert len(config2['c']) == 1
+    assert len(config2['c']) == 0
     assert config2['c']['x'] == 7
     assert config2.has_option('d')
     assert config2['d'] == 11
