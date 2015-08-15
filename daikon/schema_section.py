@@ -27,6 +27,7 @@ __all__ = [
 ]
 
 from .section import Section
+from .toolbox.undefined import UNDEFINED
 from .validation_section import ValidationSection
 from .validation import Validation
 from .validator import Validator, ValidatorInstance
@@ -92,7 +93,9 @@ class SchemaSection(Section):
     def _subsection_class(cls):
         return SchemaSection
 
-    def _subsection(self, dictionary):
+    def _subsection(self, section_name, dictionary=UNDEFINED):
+        if dictionary is UNDEFINED:
+            dictionary = self.dictionary[section_name]
         return self._subsection_class()(dictionary=dictionary,
                                         unexpected_option_validator=self.unexpected_option_validator)
 

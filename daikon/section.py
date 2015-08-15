@@ -34,6 +34,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.dictutils import compare_dicts
 from .toolbox.serializer import Serializer
 from .toolbox.deferred import Deferred
+from .toolbox.undefined import UNDEFINED
 
 
 class Section(collections.abc.Mapping):
@@ -97,10 +98,12 @@ class Section(collections.abc.Mapping):
         """
         return Section
 
-    def _subsection(self, dictionary):
-        """_subsection(self, *p_args, **n_args)
-           Return a subsection with the given name
+    def _subsection(self, section_name, dictionary=UNDEFINED):
+        """_subsection(self, key, dictionary=UNDEFINED)
+           Return a subsection named 'section_name' with dictionary 'dictionary'
         """
+        if dictionary is UNDEFINED:
+            dictionary = self.dictionary[section_name]
         return self._subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
@@ -137,7 +140,7 @@ class Section(collections.abc.Mapping):
     def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
-            return self._subsection(dictionary=value)
+            return self._subsection(section_name=key, dictionary=value)
         else:
             self.check_data_type(key=key, value=value)
             return value
@@ -151,7 +154,7 @@ class Section(collections.abc.Mapping):
             if self.has_option(key):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
             self.dictionary[key] = self.dictionary_factory()
-            section = self._subsection(self.dictionary[key])
+            section = self._subsection(section_name=key, dictionary=self.dictionary[key])
             section.update(value)
         else:
             if isinstance(value, Deferred):
@@ -204,7 +207,7 @@ class Section(collections.abc.Mapping):
             value = self.dictionary[section_name]
             if not isinstance(value, collections.Mapping):
                 raise KeyError("{} is an option, not a section".format(section_name))
-            value = self._subsection(dictionary=value)
+            value = self._subsection(section_name=section_name, dictionary=value)
             return value
 
     def has_key(self, key):
@@ -253,7 +256,7 @@ class Section(collections.abc.Mapping):
     def items(self):
         for key, value in self.dictionary.items():
             if isinstance(value, collections.Mapping):
-                value = self._subsection(dictionary=value)
+                value = self._subsection(section_name=key, dictionary=value)
             yield key, value
 
     def keys(self):
