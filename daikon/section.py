@@ -332,17 +332,14 @@ def iter_section_options(section):
     """iter_section_options(section)
        Iterates recursively on all option items.
     """
-    sections = [('', section)]
+    sections = [((), section)]
     while sections:
         next_sections = []
         for rootname, section in sections:
             for o_name, o_value in section.options():
                 yield rootname, o_name, o_value
             for s_name, s_value in section.sections():
-                if rootname:
-                    s_rootname = rootname + '.' + s_name
-                else:
-                    s_rootname = s_name
+                s_rootname = rootname + (s_name,)
                 next_sections.append((s_rootname, s_value))
         sections = next_sections
 

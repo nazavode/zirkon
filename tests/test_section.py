@@ -292,7 +292,7 @@ def _section_tpl_0():
     section['b'] = {'bx': 2}
     section['b']['by'] = 3
     section['c'] = 4
-    tpl = (('', 'a', 1), ('', 'c', 4), ('b', 'bx', 2), ('b', 'by', 3))
+    tpl = (((), 'a', 1), ((), 'c', 4), (('b',), 'bx', 2), (('b',), 'by', 3))
     return section, tpl
 
 def _section_tpl_1():
@@ -315,7 +315,7 @@ def _section_tpl_3():
     section['b']['bb'] = {}
     section['b']['bb']['bbb'] = {}
     section['b']['bb']['bbb']['x'] = 0
-    tpl = (('b.bb.bbb', 'x', 0),)
+    tpl = ((('b', 'bb', 'bbb'), 'x', 0),)
     return section, tpl
 
 _data = []
