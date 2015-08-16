@@ -43,6 +43,7 @@ from .config import Config
 from .schema import Schema
 from .validation import Validation
 
+
 FileType = collections.namedtuple('FileType', ('filepath', 'protocol', 'config_class'))
 
 _CONFIG_CLASSES = (
@@ -62,6 +63,7 @@ def get_config_classes():
     """get_config_classes() -> tuple of available config classes"""
     return _CONFIG_CLASSES
 
+
 def get_protocols():
     """get_protocols() -> tuple of available class names"""
     return tuple(Serializer.get_class_tags())
@@ -73,7 +75,7 @@ def guess(filepath):
     protocols = get_protocols()
     for config_class, templates in _TEMPLATES.items():
         for template in templates:
-           for protocol in protocols:
+            for protocol in protocols:
                 pattern = template.format(rootname='*', protocol=protocol, config_class=config_class.__name__.lower())
                 if fnmatch.fnmatchcase(filename, pattern):
                     return FileType(filepath=filepath, protocol=protocol, config_class=config_class)
@@ -88,24 +90,22 @@ def get_config_class(config):
         for config_class in _CONFIG_CLASSES:
             if issubclass(config, config_class):
                 return config_class
-        else:
-            raise TypeError("unsupported config_class {!r}".format(config))
+        raise TypeError("unsupported config_class {!r}".format(config))
     elif isinstance(config, ConfigBase):
         for config_class in _CONFIG_CLASSES:
             if isinstance(config, config_class):
                 return config_class
-        else:
-            raise ValueError("invalid object {!r} of type {}: not a config[_class]".format(config))
+        raise ValueError("invalid object {!r} of type {}: not a config[_class]".format(
+            config, type(config).__name__))
     elif isinstance(config, str):
         for config_class in _CONFIG_CLASSES:
             if config_class.__name__ == config:
                 return config_class
-        else:
-            raise ValueError("unsupported config_class name {!r}".format(config))
+        raise ValueError("unsupported config_class name {!r}".format(config))
     else:
         raise ValueError("invalid object {!r} of type {}: not a config[_class]".format(
             config, type(config).__name__))
-        
+
 
 def standard_filepath(config, rootname, protocol):
     """standard_filepath(config, rootname, protocol) -> filepath

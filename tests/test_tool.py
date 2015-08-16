@@ -31,7 +31,7 @@ from daikon.config import Config
 from daikon.schema import Schema
 from daikon.validation import Validation
 
-from daikon.filetype import guess, standard_filepath, classify, \
+from daikon.filetype import guess, standard_filepath, \
     get_config_classes, get_protocols, FileType
 
 from daikon.tool import main
