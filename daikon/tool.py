@@ -190,8 +190,8 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: di
     defaults['True'] = lambda: True
     defaults['False'] = lambda: False
 
-
     def get_dirs(varname):
+        """get_dirs(varname) -> list of dirs from environment variable varname"""
         if varname in os.environ:
             return list(os.environ[varname].split(':'))
         else:
