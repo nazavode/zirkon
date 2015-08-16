@@ -114,35 +114,43 @@ class ConfigBase(Section):
         super().dump(stream=stream, protocol=protocol, defaults=defaults)
 
     @classmethod
-    def from_file(cls, filename, protocol, *, dictionary=None, schema=None, validate=True):
-        """from_file(filename, protocol, *, dictionary=None, schema=None, validate=True)
+    def from_file(cls, filename, protocol, *,
+                  dictionary=None, schema=None, validate=True, **config_args):
+        """from_file(filename, protocol, *,
+                     dictionary=None, schema=None, validate=True, **config_args)
            Deserialize from file 'filename' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_file(filename)
-        instance = cls(init=content, dictionary=dictionary)
+        instance = cls(init=content, dictionary=dictionary, **config_args)
         instance.set_schema(schema=schema, validate=validate)
         return instance
 
     @classmethod
-    def from_stream(cls, stream, protocol, *, dictionary=None, filename=None, schema=None, validate=True):
-        """from_stream(stream, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
+    def from_stream(cls, stream, protocol, *,
+                    dictionary=None, filename=None,
+                    schema=None, validate=True, **config_args):
+        """from_stream(stream, protocol, *,
+                    dictionary=None, filename=None,
+                    schema=None, validate=True, **config_args)
            Deserialize from stream 'stream' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_stream(stream, filename=filename)
-        instance = cls(init=content, dictionary=dictionary)
+        instance = cls(init=content, dictionary=dictionary, **config_args)
         instance.set_schema(schema=schema, validate=validate)
         return instance
 
     @classmethod
-    def from_string(cls, string, protocol, *, dictionary=None, filename=None, schema=None, validate=True):
-        """from_string(string, protocol, *, dictionary=None, filename=None, schema=None, validate=True)
+    def from_string(cls, string, protocol, *,
+                    dictionary=None, filename=None, schema=None, validate=True, **config_args):
+        """from_string(string, protocol, *,
+                       dictionary=None, filename=None, schema=None, validate=True, **config_args)
            Deserialize from string 'string' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_string(string, filename=filename)
-        instance = cls(init=content, dictionary=dictionary)
+        instance = cls(init=content, dictionary=dictionary, **config_args)
         instance.set_schema(schema=schema, validate=validate)
         return instance
 

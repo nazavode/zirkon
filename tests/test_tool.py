@@ -71,6 +71,7 @@ class Files(collections.OrderedDict):
 @pytest.fixture
 def files(tmpdir):
     fls = Files(temporary_dir=tmpdir.strpath)
+    os.chdir(tmpdir.strpath)
 
     fls.add('x.daikon')
     with open(fls["x.daikon"], "w") as f_out:
@@ -131,6 +132,7 @@ _oc_data = [
     FN(name="out_x.json", protocol="json", force_protocol=None),
     FN(name="out_x.json", protocol="configobj", force_protocol="configobj"),
     FN(name="out_x.no_protocol", protocol=None, force_protocol=None),
+    FN(name="pickle/out_x.pickle", protocol="pickle", force_protocol=None),
     FN(name="", protocol=None, force_protocol=None),
     FN(name="", protocol="configobj", force_protocol="configobj"),
 ]
@@ -143,7 +145,34 @@ def ic_name_protocol(request):
 def oc_name_protocol(request):
     return request.param
 
-def test_main_read_write(files, ic_name_protocol, oc_name_protocol):
+@pytest.fixture(params=[None, True, False])
+def defaults(request):
+    return request.param
+
+def test_main_list(files):
+    fpaths = []
+    for fname, fpath in files.items():
+        fpaths.append(fpath)
+    
+    log_stream, out_stream = run(["--list"])
+
+    out_fpaths = {}
+    for count, line in enumerate(out_stream.getvalue().split('\n')):
+        if not line.strip():
+            continue
+        line_l = line.split()
+        if count == 0:
+            assert line_l[0] == "filename"
+        elif count == 1:
+            assert line_l[0][:len("filename")] == "--------"
+        else:
+            print(repr(line))
+            print(line_l)
+            out_fpaths[line_l[0]] = (line_l[1], line_l[2])
+
+    assert set(fpaths) == set(out_fpaths)
+            
+def test_main_read_write(files, ic_name_protocol, oc_name_protocol, defaults):
     ic_name, ic_protocol, ic_force_protocol = ic_name_protocol
     oc_name, oc_protocol, oc_force_protocol = oc_name_protocol
     if oc_protocol is None:
@@ -161,6 +190,8 @@ def test_main_read_write(files, ic_name_protocol, oc_name_protocol):
             assert not os.path.exists(files[oc_name])
 
         args = ["-c", ic_file_arg, "-co", oc_file_arg]
+        if defaults is not None:
+            args.append("--defaults={!r}".format(defaults))
         log_stream, out_stream = run(args)
 
         if oc_name:
@@ -169,10 +200,14 @@ def test_main_read_write(files, ic_name_protocol, oc_name_protocol):
         print("read in {}:{}".format(files[ic_name], ic_protocol))
         i_config = Config.from_file(files[ic_name], protocol=ic_protocol)
         print("read out {}:{}".format(files[oc_name], oc_protocol))
+
+        config_args = {}
+        if defaults is not None:
+            config_args['defaults'] = defaults
         if oc_name:
-            o_config = Config.from_file(files[oc_name], protocol=oc_protocol)
+            o_config = Config.from_file(files[oc_name], protocol=oc_protocol, **config_args)
         else:
-            o_config = Config.from_string(out_stream.getvalue(), protocol=oc_protocol)
+            o_config = Config.from_string(out_stream.getvalue(), protocol=oc_protocol, **config_args)
         assert i_config == o_config
         out_x_json_path = files[oc_name]
     assert not oc_name in files

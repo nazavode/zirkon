@@ -28,11 +28,12 @@ __all__ = [
 ]
 
 import argparse
+import collections
 import logging
 import os
 import sys
 
-from .filetype import guess, get_protocols, FileType
+from .filetype import guess, get_protocols, FileType, classify
 from .config import Config
 from .schema import Schema
 from .validation import Validation
@@ -42,11 +43,17 @@ def _filetype(config_class, filearg):
     """_filetype(...)"""
     if ':' in filearg:
         filepath, protocol = filearg.rsplit(':', 1)
+        if filepath == '-':
+            filepath = ''
         if protocol not in get_protocols():
             raise ValueError("invalid protocol {}".format(protocol))
         filetype = FileType(filepath=filepath, protocol=protocol, config_class=config_class)
     else:
-        filetype = guess(filearg)
+        if filearg == '-':
+            filepath = ''
+        else:
+            filepath = filearg
+        filetype = guess(filepath)
         replace_d = {}
         if filetype.config_class != config_class:
             replace_d['config_class'] = config_class
@@ -77,15 +84,8 @@ class _IoManager(object):
         self.printer = printer
         self.logger = logger
 
-    def _print_title(self, text):
-        """_print_title(...)"""
-        _hline = "=" * len(text)
-        self.printer.info(_hline)
-        self.printer.info(text)
-        self.printer.info(_hline)
-
     def read_obj(self, obj, filetype):
-        """_input(...)"""
+        """read_obj(obj, filetype)"""
         if filetype:
             filepath = filetype.filepath
             config_class_name = filetype.config_class.__name__.lower()
@@ -98,27 +98,30 @@ class _IoManager(object):
                 sys.exit(1)
             obj.read(filepath, protocol=protocol)
 
+    def dump_obj(self, obj):
+        """dump_obj(obj)"""
+        for line in obj.to_string(protocol="daikon").split('\n'):
+            self.printer(line)
+
     def write_obj(self, obj, filetype):
-        """_output(...)"""
+        """write_obj(obj, input_filepath=None)"""
         if filetype is None:
-            self._print_title(type(obj).__name__)
-            for line in obj.to_string(protocol="daikon").split('\n'):
-                self.printer.info(line)
+            self.dump_obj(obj)
+            return
+        filepath = filetype.filepath
+        config_class_name = filetype.config_class.__name__.lower()
+        protocol = filetype.protocol
+        if filepath:
+            filepath = filepath.format(config_class=config_class_name, protocol=protocol)
+            self.logger.debug("writing {} to file {} using protocol {}...".format(
+                config_class_name, filepath, protocol))
+            filedir = os.path.dirname(os.path.abspath(filepath))
+            if not os.path.exists(filedir):
+                self.logger.debug("creating dir {}...".format(filedir))
+                os.makedirs(filedir)
+            obj.write(filepath, protocol=protocol)
         else:
-            filepath = filetype.filepath
-            config_class_name = filetype.config_class.__name__.lower()
-            protocol = filetype.protocol
-            if filepath:
-                filepath = filepath.format(config_class=config_class_name, protocol=protocol)
-                self.logger.debug("writing {} to file {} using protocol {}...".format(
-                    config_class_name, filepath, protocol))
-                filedir = os.path.dirname(os.path.abspath(filepath))
-                if not os.path.exists(filedir):
-                    self.logger.debug("creating dir {}...".format(filedir))
-                    os.makedirs(filedir)
-                obj.write(filepath, protocol=protocol)
-            else:
-                self.printer.info(obj.to_string(protocol=protocol))
+            self.printer(obj.to_string(protocol=protocol))
 
 
 def _set_missing_args(args):
@@ -132,6 +135,31 @@ def _set_missing_args(args):
             if i_filetype is not None:
                 o_filetype = o_filetype._replace(protocol=i_filetype.protocol)
                 setattr(args, o_arg, o_filetype)
+
+
+def list_files(printer, *data):
+    """list_files(printer, *data)"""
+    directory_d = collections.OrderedDict()
+    for config_class, directories in data:
+        for directory in directories:
+            directory = os.path.normpath(os.path.realpath(os.path.abspath(directory)))
+            directory_d.setdefault(directory, []).append(config_class)
+    filetypes = []
+    for directory, config_classes in directory_d.items():
+        for filetype in classify(directory, config_classes):
+            filetypes.append((filetype.filepath, filetype.config_class.__name__, filetype.protocol))
+    filetypes.sort(key=lambda x: x[0])
+    filetypes.sort(key=lambda x: x[1])
+    filetypes.sort(key=lambda x: x[2])
+    rows = [("filename", "type", "protocol")]
+    rows.extend(filetypes)
+    col_indices = tuple(range(len(rows[0])))
+    lengths = tuple(max(len(row[col_index]) for row in rows) for col_index in col_indices)
+    hdr = tuple(('-' * length) for length in lengths)
+    rows.insert(1, hdr)
+    fmt = ' '.join("{{{i}:{{lengths[{i}]}}}}".format(i=col_index) for col_index in col_indices)
+    for row in rows:
+        printer(fmt.format(*row, lengths=lengths))
 
 
 def _create_logger(stream, verbose_level):
@@ -151,29 +179,28 @@ def _create_logger(stream, verbose_level):
     return logger
 
 
-def _create_printer(stream):
-    """_create_printer() -> logger"""
-    printer = logging.getLogger("DAIKON-OUT")
-    for handler in printer.handlers:
-        printer.removeHandler(handler)
-    out_handler = logging.StreamHandler(stream=stream)
-    out_formatter = logging.Formatter("{message}", style="{")
-    out_handler.setFormatter(out_formatter)
-    printer.addHandler(out_handler)
-    printer.setLevel(logging.INFO)
-    return printer
-
-
-def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):
+def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: disable=R0915
     """main()
        Daikon tool main program.
     """
     if args is None:  # pragma: no cover
         args = sys.argv[1:]
 
-    default_config_dirs = os.environ.get("DAIKON_CONFIG_PATH", "").split(":")
-    default_schema_dirs = os.environ.get("DAIKON_SCHEMA_PATH", "").split(":")
+    defaults = collections.OrderedDict()
+    defaults['True'] = lambda: True
+    defaults['False'] = lambda: False
+
+
+    def get_dirs(varname):
+        if varname in os.environ:
+            return list(os.environ[varname].split(':'))
+        else:
+            return []
+
+    default_config_dirs = ['.'] + get_dirs("DAIKON_CONFIG_PATH")
+    default_schema_dirs = ['.'] + get_dirs("DAIKON_SCHEMA_PATH")
     default_verbose_level = 0
+    default_defaults = 'False'
 
     parser = argparse.ArgumentParser(
         description="""\
@@ -185,6 +212,11 @@ Environment variables
 * DAIKON_SCHEMA_PATH : colon-separated list of directories for schema files
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument("--list", "-l",
+                        action="store_true",
+                        default=False,
+                        help="list available files")
 
     parser.add_argument("--input-config", "-c",
                         metavar="IC",
@@ -199,6 +231,7 @@ Environment variables
                         help="output config file")
 
     parser.add_argument("--config-dir", "-cd",
+                        dest="config_dirs",
                         metavar="CD",
                         action="append",
                         default=default_config_dirs,
@@ -218,6 +251,7 @@ Environment variables
                         help="output schema file")
 
     parser.add_argument("--schema-dir", "-sd",
+                        dest="schema_dirs",
                         metavar="SD",
                         action="append",
                         default=default_schema_dirs,
@@ -230,13 +264,19 @@ Environment variables
                         type=_validation_filetype,
                         help="output validation file")
 
+    parser.add_argument("--defaults", "-d",
+                        metavar="D",
+                        choices=tuple(defaults.keys()),
+                        default=default_defaults,
+                        help="set defaults mode")
+
     parser.add_argument("--verbose", "-v",
                         dest="verbose_level",
                         action="count",
                         default=default_verbose_level,
                         help="increase verbosity")
 
-    parser.add_argument("--debug", "-d",
+    parser.add_argument("--debug",
                         action="store_true",
                         default=False,
                         help="debug mode")
@@ -245,30 +285,38 @@ Environment variables
     _set_missing_args(args)
 
     logger = _create_logger(log_stream, args.verbose_level)
-    printer = _create_printer(out_stream)
+    printer = lambda x: print(x, file=out_stream, flush=True)
 
     if args.output_validation is not None and args.output_validation.protocol is None:
-        if args.input_validation is not None:
+        if args.input_config is not None:
             args.output_validation = args.output_validation._replace(
-                protocol=args.input_validation.protocol)
+                protocol=args.input_config.protocol)
+
+    if args.list:
+        list_files(printer, (Config, args.config_dirs), (Schema, args.schema_dirs))
+        return
 
     io_manager = _IoManager(printer=printer, logger=logger)
+
+    defaults_factory = defaults[args.defaults]
 
     try:
         if args.input_schema:
             schema = Schema()
             io_manager.read_obj(schema, args.input_schema)
-            io_manager.write_obj(schema, args.output_schema)
+            if args.output_schema is not None:
+                io_manager.write_obj(schema, args.output_schema)
         else:
             schema = None
 
         if args.input_config:
-            config = Config()
+            config = Config(defaults=defaults_factory())
             io_manager.read_obj(config, args.input_config)
             if schema is not None:
                 validation = schema.validate(config)
-                logger.warning("validation failed for config %s", args.input_config.filepath)
-                io_manager.write_obj(validation, args.output_validation)
+                if validation:
+                    logger.warning("validation failed for config %s", args.input_config.filepath)
+                    io_manager.write_obj(validation, args.output_validation)
             io_manager.write_obj(config, args.output_config)
     except Exception as err:  # pylint: disable=W0703
         if args.debug:
