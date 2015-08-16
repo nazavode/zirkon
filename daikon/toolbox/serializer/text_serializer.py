@@ -43,14 +43,6 @@ class TextSerializer(Serializer):
     RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
     INDENTATION = "    "
 
-    @classmethod
-    def is_section(cls, mapping):
-        """is_section(mapping) -> True is mapping is a Section"""
-        if hasattr(mapping, 'options') and hasattr(mapping, 'sections'):
-            return True
-        else:
-            return False
-
     def indentation(self, level):
         """indentation(level) -> indentation string"""
         return self.INDENTATION * level

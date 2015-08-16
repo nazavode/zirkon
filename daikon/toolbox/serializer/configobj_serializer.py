@@ -26,6 +26,7 @@ __all__ = [
     'ConfigObjSerializer',
 ]
 
+import collections
 
 from .text_serializer import TextSerializer
 
@@ -65,11 +66,14 @@ class ConfigObjSerializer(TextSerializer):
 
     def impl_iter_mapping_items(self, mapping):
         # keys before, mappings after
-        if self.is_section(mapping):
-            yield from mapping.options()
-            yield from mapping.sections()
-        else:
-            yield from mapping.items()
+        submapping_items = []
+        for key, value in mapping.items():
+            if isinstance(value, collections.Mapping):
+                submapping_items.append((key, value))
+            else:
+                yield key, value
+        for key, value in submapping_items:
+            yield key, value
 
     def impl_from_string(self, config, serialization, *, filename=None):
         mapping_stack = [config]
