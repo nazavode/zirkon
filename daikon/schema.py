@@ -27,12 +27,18 @@ __all__ = [
 
 from .config_base import ConfigBase
 from .schema_section import SchemaSection
+from .validator import ValidatorInstance
 
 
 class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
     """Schema(init=None, *, dictionary=None)
        Schema config.
     """
-    def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None):
-        super().__init__(dictionary=dictionary, init=init)
-        self.unexpected_option_validator = unexpected_option_validator
+    def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None, self_validate=True):
+        super().__init__(dictionary=dictionary, init=init,
+                         unexpected_option_validator=unexpected_option_validator)
+        if self_validate:
+            schema_validator = self._subsection_class()(dictionary=None,
+                                                        unexpected_option_validator=ValidatorInstance())
+            schema_validator.validate(section=self, raise_on_error=True)
+

@@ -30,7 +30,7 @@ from .section import Section
 from .config_section import ConfigSection
 from .validation_section import ValidationSection
 from .validation import Validation
-from .validator import Validator, ValidatorInstance
+from .validator import Validator
 from .validator.complain import Complain
 from .validator.option import Option
 from .validator.error import OptionValidationError, \
@@ -90,8 +90,7 @@ def _validate_option(*, validator, section, validation_section,
 
 class SchemaSection(Section):
     """SchemaSection(init=None, *, dictionary=None, parent=None,
-                     unexpected_option_validator=None,
-                     self_validate=True)
+                     unexpected_option_validator=None)
        A Section class to perform validation. All values must be Validator
        instances.
 
@@ -107,16 +106,10 @@ class SchemaSection(Section):
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
     def __init__(self, init=None, *, dictionary=None, parent=None,
-                 unexpected_option_validator=None,
-                 self_validate=True):
+                 unexpected_option_validator=None):
         self._unexpected_option_validator = None
         self.unexpected_option_validator = unexpected_option_validator
         super().__init__(dictionary=dictionary, init=init, parent=parent)
-        if self_validate:
-            schema_validator = self._subsection_class()(dictionary=None,
-                                                        unexpected_option_validator=ValidatorInstance(),
-                                                        self_validate=False)
-            schema_validator.validate(section=self, raise_on_error=True)
 
     @classmethod
     def _subsection_class(cls):
