@@ -34,7 +34,7 @@ from .codec_catalog import CodecCatalog
 class Serializer(Registry, metaclass=abc.ABCMeta):
     """Serializer()
        Abstract base class for serializers. Serializers must implement
-       to_string(config) and from_string(config_class, serialization, dictionary).
+       to_string(obj) and from_string(serialization).
     """
     CODEC_CATALOG = CodecCatalog()
 
@@ -51,38 +51,38 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
         return False
 
     @abc.abstractmethod
-    def to_string(self, config):
-        """to_string(config) -> str
-           Dump the serialization for 'config'.
+    def to_string(self, obj):
+        """to_string(obj) -> str
+           Dump the serialization for 'obj'.
         """
         raise NotImplementedError
 
-    def to_stream(self, config, stream):
-        """to_stream(config, stream)
-           Write the serialization for 'config' to stream 'stream'.
+    def to_stream(self, obj, stream):
+        """to_stream(obj, stream)
+           Write the serialization for 'obj' to stream 'stream'.
         """
-        return stream.write(self.to_string(config))
+        return stream.write(self.to_string(obj))
 
-    def to_file(self, config, filename):
-        """to_file(config, filename)
-           Write the serialization for 'config' to file 'filename'.
+    def to_file(self, obj, filename):
+        """to_file(obj, filename)
+           Write the serialization for 'obj' to file 'filename'.
         """
         createdir(filename)
         mode = 'w'
         if self.is_binary():
             mode += 'b'
         with open(filename, mode) as f_stream:
-            return self.to_stream(config, f_stream)
+            return self.to_stream(obj, f_stream)
 
     @abc.abstractmethod
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
-        """from_string(config_class, serialization, *, dictionary=None, filename=None) -> config
+    def from_string(self, serialization, *, filename=None):
+        """from_string(serialization, *, filename=None) -> obj
            Load a Config from string 'serialization'.
         """
         raise NotImplementedError
 
-    def from_stream(self, config_class, stream, *, dictionary=None, filename=None):
-        """from_stream(config_class, stream, *, dictionary=None, filename=None) -> config
+    def from_stream(self, stream, *, filename=None):
+        """from_stream(stream, *, filename=None) -> obj
            Load a Config from stream 'stream'.
         """
         if filename is None:
@@ -90,13 +90,11 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
                 filename = stream.name
             else:
                 filename = repr(stream)
-        return self.from_string(config_class=config_class,
-                                serialization=stream.read(),
-                                dictionary=dictionary,
+        return self.from_string(serialization=stream.read(),
                                 filename=filename)
 
-    def from_file(self, config_class, filename, *, dictionary=None):
-        """from_file(config_class, filename, *, dictionary=None) -> config
+    def from_file(self, filename):
+        """from_file(filename) -> obj
            Load a Config from file 'filename'.
         """
         createdir(filename)
@@ -104,5 +102,5 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
         if self.is_binary():
             mode += 'b'
         with open(filename, mode) as f_stream:
-            return self.from_stream(config_class=config_class, stream=f_stream,
-                                    dictionary=dictionary, filename=filename)
+            return self.from_stream(stream=f_stream,
+                                    filename=filename)

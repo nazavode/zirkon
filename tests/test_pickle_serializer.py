@@ -5,8 +5,7 @@ import os
 
 import pytest
 
-from common.fixtures import simple_config, \
-                            defaultsvalue, \
+from common.fixtures import defaultsvalue, \
                             dictionary, \
                             simple_config_content, \
                             string_io, \
@@ -19,7 +18,7 @@ from daikon.toolbox.serializer.pickle_serializer import PickleSerializer
 def serializer():
     return PickleSerializer()
 
-def test_PickleSerializer_to_from_string(simple_config, serializer):
-    serialization = serializer.to_string(simple_config)
-    config = serializer.from_string(config_class=Config, serialization=serialization)
-    assert config == simple_config
+def test_PickleSerializer_to_from_string(simple_config_content, serializer):
+    serialization = serializer.to_string(simple_config_content)
+    obj = serializer.from_string(serialization=serialization)
+    assert obj == simple_config_content

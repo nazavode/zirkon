@@ -75,8 +75,9 @@ class ConfigObjSerializer(TextSerializer):
         for key, value in submapping_items:
             yield key, value
 
-    def impl_from_string(self, config, serialization, *, filename=None):
-        mapping_stack = [config]
+    def impl_from_string(self, dct_class, serialization, *, filename=None):
+        dct = dct_class()
+        mapping_stack = [dct]
         current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
         for line_number, source_line in enumerate(serialization.split('\n')):
             line = source_line.strip()
@@ -92,12 +93,12 @@ class ConfigObjSerializer(TextSerializer):
                 else:
                     raise ValueError("invalid value at line {}@{}: invalid mapping level {}".format(
                         line_number, filename, level))
-                current_mapping[mapping_name] = {}
+                current_mapping[mapping_name] = dct_class()
                 mapping_stack.append(current_mapping[mapping_name])
                 current_mapping, current_level = mapping_stack[-1], len(mapping_stack) - 1
             else:
                 # key:
                 key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
                 current_mapping[key] = value
-        return config
+        return dct
 

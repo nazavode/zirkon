@@ -144,10 +144,11 @@ class ConfigSection(Section):
             if self._has_defaults and dictionary.defaults() is not None:
                 self._defaults.update(dictionary.defaults())
 
-    def as_dict(self, *, dict_class=collections.OrderedDict):
-        result = super().as_dict(dict_class=dict_class)
-        if self._has_defaults:
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
+        result = super().as_dict(dict_class=dict_class, defaults=defaults)
+        if defaults and self._has_defaults:
             for key, value in self._defaults.items():
                 if key not in result:
                     result[key] = value
         return result
+

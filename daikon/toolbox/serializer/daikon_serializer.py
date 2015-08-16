@@ -108,9 +108,10 @@ class DaikonSerializer(TextSerializer):
         # interspersed keys and mappings
         yield from mapping.items()
 
-    def impl_from_string(self, config, serialization, *, filename=None):
+    def impl_from_string(self, dct_class, serialization, *, filename=None):
+        dct = dct_class()
         stack = _Stack()
-        current_indentation, current_mapping, current_level = stack.push(config)
+        current_indentation, current_mapping, current_level = stack.push(dct)
         for line_number, source_line in enumerate(serialization.split('\n')):
             indentation, line = self.RE_INDENTATION_LINE.match(source_line).groups()
             if not line or line[0] == '#':
@@ -133,12 +134,12 @@ class DaikonSerializer(TextSerializer):
             if line[0] == '[':
                 # mapping
                 mapping_name = _parse_mapping(line, line_number, filename)
-                current_mapping[mapping_name] = {}
+                current_mapping[mapping_name] = dct_class()
                 current_indentation, current_mapping, current_level = stack.push(current_mapping[mapping_name])
                 current_level = len(stack) - 1
             else:
                 # key:
                 key, value = self.impl_parse_key_value(line=line, line_number=line_number, filename=filename)
                 current_mapping[key] = value
-        return config
+        return dct
 

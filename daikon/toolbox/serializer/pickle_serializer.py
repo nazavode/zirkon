@@ -41,13 +41,10 @@ class PickleSerializer(Serializer):
     def is_binary(cls):
         return True
 
-    def to_string(self, config):
-        content = config.as_dict()
-        return pickle.dumps(content)
+    def to_string(self, obj):
+        return pickle.dumps(obj)
 
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
+    def from_string(self, serialization, *, filename=None):
         dummy = filename
-        content = pickle.loads(serialization)
-        config = config_class(init=content, dictionary=dictionary)
-        return config
+        return pickle.loads(serialization)
 

@@ -76,14 +76,11 @@ class JSONSerializer(Serializer):
     def class_tag(cls):
         return "json"
 
-    def to_string(self, config):
-        content = config.as_dict()
-        return json.dumps(content, cls=JSONPluggableEncoder, indent=4) + '\n'
+    def to_string(self, obj):
+        return json.dumps(obj, cls=JSONPluggableEncoder, indent=4) + '\n'
 
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
+    def from_string(self, serialization, *, filename=None):
         dummy = filename
         decoder = json.JSONDecoder(object_pairs_hook=_object_pairs_hook)
-        content = decoder.decode(serialization)
-        config = config_class(init=content, dictionary=dictionary)
-        return config
+        return decoder.decode(serialization)
 

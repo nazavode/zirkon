@@ -280,15 +280,15 @@ class Section(collections.abc.Mapping):
         for key, value in dictionary.items():
             self[key] = value
 
-    def as_dict(self, *, dict_class=collections.OrderedDict):
-        """as_dict(self, *, dict_class=collections.OrderedDict) -> dict
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
+        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True) -> dict
            Return a dict with all the section content
         """
         result = dict_class()
         subsection_class = self._subsection_class()
         for key, value in self.items():
             if isinstance(value, subsection_class):
-                result[key] = value.as_dict(dict_class=dict_class)
+                result[key] = value.as_dict(dict_class=dict_class, defaults=defaults)
             else:
                 result[key] = value
         return result
@@ -318,14 +318,14 @@ class Section(collections.abc.Mapping):
             return True
         return False
 
-    def dump(self, stream=None, protocol="daikon"):
-        """dump(self, stream=None, protocol="daikon")
+    def dump(self, stream=None, protocol="daikon", *, defaults=False):
+        """dump(self, stream=None, protocol="daikon", defaults=False)
            Dump the content to a stream.
         """
         if stream is None:
             stream = sys.stdout
         serializer = Serializer.get_class(protocol)()
-        serializer.to_stream(stream=stream, config=self)
+        serializer.to_stream(stream=stream, obj=self.as_dict(defaults=defaults))
 
 
 def iter_section_options(section):

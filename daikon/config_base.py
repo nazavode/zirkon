@@ -85,33 +85,33 @@ class ConfigBase(Section):
             ))
         return serializer_class()
 
-    def to_string(self, protocol):
-        """to_string(protocol)
+    def to_string(self, protocol, *, defaults=False):
+        """to_string(protocol, *, defaults=False)
            Serialize to stream 'stream' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_string(self)
+        return serializer_instance.to_string(self.as_dict(defaults=defaults))
 
-    def to_stream(self, stream, protocol):
-        """to_stream(stream, protocol)
+    def to_stream(self, stream, protocol, *, defaults=False):
+        """to_stream(stream, protocol, *, defaults=False)
            Serialize to stream 'stream' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_stream(self, stream)
+        return serializer_instance.to_stream(self.as_dict(defaults=defaults), stream)
 
-    def to_file(self, filename, protocol):
-        """to_file(filename, protocol)
+    def to_file(self, filename, protocol, *, defaults=False):
+        """to_file(filename, protocol, *, defaults=False)
            Serialize to file 'filename' according to 'protocol'.
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_file(self, filename)
+        return serializer_instance.to_file(self.as_dict(defaults=defaults), filename)
 
-    def dump(self, stream=None, protocol="daikon"):
+    def dump(self, stream=None, protocol="daikon", *, defaults=False):
         self.self_validate(raise_on_error=True)
-        super().dump(stream, protocol)
+        super().dump(stream=stream, protocol=protocol, defaults=defaults)
 
     @classmethod
     def from_file(cls, filename, protocol, *, dictionary=None, schema=None, validate=True):
@@ -119,8 +119,9 @@ class ConfigBase(Section):
            Deserialize from file 'filename' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
-        instance = serializer_instance.from_file(cls, filename, dictionary=dictionary)
-        instance.set_schema(schema, validate=validate)
+        content = serializer_instance.from_file(filename)
+        instance = cls(init=content, dictionary=dictionary)
+        instance.set_schema(schema=schema, validate=validate)
         return instance
 
     @classmethod
@@ -129,8 +130,9 @@ class ConfigBase(Section):
            Deserialize from stream 'stream' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
-        instance = serializer_instance.from_stream(cls, stream, dictionary=dictionary, filename=filename)
-        instance.set_schema(schema, validate=validate)
+        content = serializer_instance.from_stream(stream, filename=filename)
+        instance = cls(init=content, dictionary=dictionary)
+        instance.set_schema(schema=schema, validate=validate)
         return instance
 
     @classmethod
@@ -139,8 +141,9 @@ class ConfigBase(Section):
            Deserialize from string 'string' according to 'protocol'.
         """
         serializer_instance = cls.get_serializer(protocol)
-        instance = serializer_instance.from_string(cls, string, dictionary=dictionary, filename=filename)
-        instance.set_schema(schema, validate=validate)
+        content = serializer_instance.from_string(string, filename=filename)
+        instance = cls(init=content, dictionary=dictionary)
+        instance.set_schema(schema=schema, validate=validate)
         return instance
 
     def read(self, filename, protocol):
@@ -148,7 +151,9 @@ class ConfigBase(Section):
            Read from file 'filename' according to 'protocol'.
         """
         self.clear()
-        self.from_file(filename=filename, protocol=protocol, dictionary=self.dictionary)
+        serializer_instance = self.get_serializer(protocol)
+        content = serializer_instance.from_file(filename)
+        self.update(content)
         self.self_validate(raise_on_error=True)
 
     def write(self, filename, protocol):

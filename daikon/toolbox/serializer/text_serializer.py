@@ -110,9 +110,12 @@ class TextSerializer(Serializer):
                 encoded_value = self.encode_value(value)
                 lines.append(self.impl_dump_key_value(level=level, key=key, value=encoded_value))
 
-    def to_string(self, config):
+    def to_string(self, obj):
+        if not isinstance(obj, collections.Mapping):
+            raise TypeError("{}: cannot serializer object of type {}: not a Mapping".format(
+                type(self).__name__, type(obj).__name__))
         lines = []
-        self.impl_dump_mapping_lines(level=0, lines=lines, mapping=config)
+        self.impl_dump_mapping_lines(level=0, lines=lines, mapping=obj)
         if lines:
             return '\n'.join(lines) + '\n'
         else:
@@ -136,14 +139,12 @@ class TextSerializer(Serializer):
         value = self.decode_value(line_number, filename, key, value, *value_type_names)
         return key.strip(), value
 
-    def from_string(self, config_class, serialization, *, dictionary=None, filename=None):
+    def from_string(self, serialization, *, filename=None):
         if filename is None:
             filename = '<string>'
-        # configobj deserialization
-        config = config_class(dictionary=dictionary)
-        return self.impl_from_string(config, serialization, filename=filename)
+        return self.impl_from_string(collections.OrderedDict, serialization, filename=filename)
 
     @abc.abstractmethod
-    def impl_from_string(self, config, serialization, *, filename=None):
+    def impl_from_string(self, dct_class, serialization, *, filename=None):
         """impl_from_string(...)"""
         raise NotImplementedError

@@ -5,8 +5,7 @@ import os
 
 import pytest
 
-from common.fixtures import simple_config, \
-                            defaultsvalue, \
+from common.fixtures import defaultsvalue, \
                             dictionary, \
                             simple_config_content, \
                             string_io, \
@@ -20,35 +19,35 @@ from daikon.toolbox.serializer.json_serializer import JSONSerializer
 def serializer():
     return JSONSerializer()
 
-def test_JSONSerializer_to_string(simple_config, serializer):
-    serialization = serializer.to_string(simple_config)
+def test_JSONSerializer_to_string(simple_config_content, serializer):
+    serialization = serializer.to_string(simple_config_content)
     assert serialization == SIMPLE_CONFIG_JSON_SERIALIZATION
 
-def test_JSONSerializer_from_string(simple_config, serializer):
-    config = serializer.from_string(config_class=Config, serialization=SIMPLE_CONFIG_JSON_SERIALIZATION)
-    assert config == simple_config
+def test_JSONSerializer_from_string(simple_config_content, serializer):
+    obj = serializer.from_string(serialization=SIMPLE_CONFIG_JSON_SERIALIZATION)
+    assert obj == simple_config_content
 
-def test_JSONSerializer_to_stream(simple_config, serializer, string_io):
-    serializer.to_stream(config=simple_config, stream=string_io)
+def test_JSONSerializer_to_stream(simple_config_content, serializer, string_io):
+    serializer.to_stream(obj=simple_config_content, stream=string_io)
     assert string_io.getvalue() == SIMPLE_CONFIG_JSON_SERIALIZATION
 
-def test_JSONSerializer_from_stream(simple_config, serializer, string_io):
+def test_JSONSerializer_from_stream(simple_config_content, serializer, string_io):
     string_io.write(SIMPLE_CONFIG_JSON_SERIALIZATION)
     string_io.seek(0)
-    config = serializer.from_stream(config_class=Config, stream=string_io)
-    assert config == simple_config
+    obj = serializer.from_stream(stream=string_io)
+    assert obj == simple_config_content
 
-def test_JSONSerializer_to_file(simple_config, serializer, tmp_text_file):
-    serializer.to_file(config=simple_config, filename=tmp_text_file.name)
+def test_JSONSerializer_to_file(simple_config_content, serializer, tmp_text_file):
+    serializer.to_file(obj=simple_config_content, filename=tmp_text_file.name)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_CONFIG_JSON_SERIALIZATION
 
-def test_JSONSerializer_from_file(simple_config, serializer, tmp_text_file):
+def test_JSONSerializer_from_file(simple_config_content, serializer, tmp_text_file):
     tmp_text_file.write(SIMPLE_CONFIG_JSON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    config = serializer.from_file(config_class=Config, filename=tmp_text_file.name)
-    assert config == simple_config
+    obj = serializer.from_file(filename=tmp_text_file.name)
+    assert obj == simple_config_content
 
