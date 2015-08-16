@@ -162,11 +162,13 @@ Environment variables
     logger.setLevel(log_level)
 
     printer = logging.getLogger("DAIKON-OUT")
+    for handler in printer.handlers:
+        printer.removeHandler(handler)
     out_handler = logging.StreamHandler(stream=out_stream)
     out_formatter = logging.Formatter("%(message)s")
     out_handler.setFormatter(out_formatter)
     printer.addHandler(out_handler)
-    printer.setLevel(log_level)
+    printer.setLevel(logging.INFO)
 
     for arg in "config", "schema":
         i_arg = "input_" + arg
@@ -225,7 +227,7 @@ Environment variables
                     os.makedirs(filedir)
                 obj.write(filepath, protocol=protocol)
             else:
-                obj.dump(protocol=protocol)
+                printer.info(obj.to_string(protocol=protocol))
 
     try:
         if args.input_schema:

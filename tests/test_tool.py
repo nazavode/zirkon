@@ -47,7 +47,10 @@ class Files(collections.OrderedDict):
         return tmp_filename
 
     def get(self, filename):
-        return os.path.join(self.temporary_dir, filename)
+        if filename:
+            return os.path.join(self.temporary_dir, filename)
+        else:
+            return filename
 
     @contextlib.contextmanager
     def tmp(self, *filenames):
@@ -115,71 +118,63 @@ def run(args):
     )
     return log_stream, out_stream
 
-FIN = collections.namedtuple('FN', ('name', 'protocol', 'force_protocol', 'schema'))
-FOUT = collections.namedtuple('FN', ('name', 'protocol', 'force_protocol'))
+FN = collections.namedtuple('FN', ('name', 'protocol', 'force_protocol'))
 
-_in_data = [
-    FIN(name="x.daikon", protocol="daikon", force_protocol=None, schema="x.daikon-schema"),
-    FIN(name="x.json", protocol="json", force_protocol=None, schema="x.daikon-schema"),
-    FIN(name="x.json", protocol="json", force_protocol="json", schema=None),
-    FIN(name="xwrong.daikon", protocol="json", force_protocol="json", schema="x.daikon-schema"),
+_ic_data = [
+    FN(name="x.daikon", protocol="daikon", force_protocol=None),
+    FN(name="x.json", protocol="json", force_protocol=None),
+    FN(name="x.json", protocol="json", force_protocol="json"),
+    FN(name="xwrong.daikon", protocol="json", force_protocol="json"),
 ]
 
-_out_data = [
-    FOUT(name="out_x.json", protocol="json", force_protocol=None),
-    FOUT(name="out_x.json", protocol="configobj", force_protocol="configobj"),
-    FOUT(name="out_x.no_protocol", protocol=None, force_protocol=None),
+_oc_data = [
+    FN(name="out_x.json", protocol="json", force_protocol=None),
+    FN(name="out_x.json", protocol="configobj", force_protocol="configobj"),
+    FN(name="out_x.no_protocol", protocol=None, force_protocol=None),
+    FN(name="", protocol=None, force_protocol=None),
+    FN(name="", protocol="configobj", force_protocol="configobj"),
 ]
 
-@pytest.fixture(params=_in_data)
-def in_name_protocol_schema(request):
+@pytest.fixture(params=_ic_data)
+def ic_name_protocol(request):
     return request.param
 
-@pytest.fixture(params=_out_data)
-def out_name_protocol(request):
+@pytest.fixture(params=_oc_data)
+def oc_name_protocol(request):
     return request.param
 
-def test_main_read_write(files, in_name_protocol_schema, out_name_protocol):
-    in_name, in_protocol, in_force_protocol, in_schema = in_name_protocol_schema
-    out_name, out_protocol, out_force_protocol = out_name_protocol
-    if out_protocol is None:
-        out_protocol = in_protocol
-    with files.tmp(out_name):
-        in_file_arg = files[in_name]
-        if in_force_protocol:
-            in_file_arg += ":" + in_force_protocol
-        out_file_arg = files[out_name]
-        if out_force_protocol:
-            out_file_arg += ":" + out_force_protocol
-        print(":::>", files[out_name], out_file_arg)
-        assert not os.path.exists(files[out_name])
-        run(["-c", in_file_arg, "-co", out_file_arg])
-        assert os.path.exists(files[out_name])
-        print("read in {}:{}".format(files[in_name], in_protocol))
-        config1 = Config.from_file(files[in_name], protocol=in_protocol)
-        print("read out {}:{}".format(files[out_name], out_protocol))
-        config2 = Config.from_file(files[out_name], protocol=out_protocol)
-        assert config1 == config2
-        out_x_json_path = files[out_name]
-    assert not out_name in files
+def test_main_read_write(files, ic_name_protocol, oc_name_protocol):
+    ic_name, ic_protocol, ic_force_protocol = ic_name_protocol
+    oc_name, oc_protocol, oc_force_protocol = oc_name_protocol
+    if oc_protocol is None:
+        oc_protocol = ic_protocol
+    with files.tmp(oc_name):
+        ic_file_arg = files[ic_name]
+        if ic_force_protocol:
+            ic_file_arg += ":" + ic_force_protocol
+        oc_file_arg = files[oc_name]
+        if oc_force_protocol:
+            oc_file_arg += ":" + oc_force_protocol
+        print(":::>", files[oc_name], oc_file_arg)
+
+        if oc_name:
+            assert not os.path.exists(files[oc_name])
+
+        args = ["-c", ic_file_arg, "-co", oc_file_arg]
+        log_stream, out_stream = run(args)
+
+        if oc_name:
+            assert os.path.exists(files[oc_name])
+
+        print("read in {}:{}".format(files[ic_name], ic_protocol))
+        i_config = Config.from_file(files[ic_name], protocol=ic_protocol)
+        print("read out {}:{}".format(files[oc_name], oc_protocol))
+        if oc_name:
+            o_config = Config.from_file(files[oc_name], protocol=oc_protocol)
+        else:
+            o_config = Config.from_string(out_stream.getvalue(), protocol=oc_protocol)
+        assert i_config == o_config
+        out_x_json_path = files[oc_name]
+    assert not oc_name in files
     assert not os.path.exists(out_x_json_path)
-    
-def xtest_main_read_write_no_protocol(files):
-    files.add("out_x.no_protocol")
-    print(files["out_x.json"])
-    assert not os.path.exists(files["out_x.json"])
-    run(["-c", files["x.daikon"], "-co", files["out_x.json"]])
-    assert os.path.exists(files["out_x.json"])
-    config1 = Config.from_file(files["x.daikon"], protocol="daikon")
-    config2 = Config.from_file(files["out_x.json"], protocol="json")
-    assert config1 == config2
-    
-#def xtest_main1(example_files):
-#    print('1')
-#    assert not os.path.exists("out_x.json")
-#    run(["-c", "x.daikon", "-co", "out_x.json"])
-#    assert os.path.exists("out_x.json")
-#    config1 = Config.from_file("x.daikon", protocol="daikon")
-#    config2 = Config.from_file("out_x.json", protocol="json")
-#    assert config1 == config2
     
