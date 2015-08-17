@@ -90,7 +90,7 @@ def get_config_class(config):
             config, type(config).__name__))
     elif isinstance(config, str):
         for config_class in _CONFIG_CLASSES:
-            if config_class.__name__ == config:
+            if config in {config_class.__name__.lower(), config_class.__name__}:
                 return config_class
         raise ValueError("unsupported config_class name {!r}".format(config))
     else:
@@ -120,18 +120,20 @@ def _set_protocols(protocols):
     return protocols
 
 
-def guess(filepath):
-    """guess(filepath) -> FileType object"""
-    config_classes = get_config_classes()
-    protocols = get_protocols()
-    filename = os.path.basename(filepath)
+def guess(filepath, *, config_classes=None, protocols=None):
+    """guess_filetypes(filepath, *, config_classes=None, protocols=None) -> FileType objects"""
+    config_classes = _set_config_classes(config_classes)
+    protocols = _set_protocols(protocols)
     for config_class in config_classes:
+        config_class_name = config_class.__name__.lower()
         for template in _TEMPLATES[config_class]:
             for protocol in protocols:
-                pattern = template.format(rootname='*', protocol=protocol, config_class=config_class.__name__.lower())
-                if fnmatch.fnmatchcase(filename, pattern):
-                    return FileType(filepath=filepath, protocol=protocol, config_class=config_class)
-    return FileType(filepath=filepath, protocol=None, config_class=None)
+                pattern = template.format(rootname='*', protocol=protocol, config_class=config_class_name)
+                s_filepath = filepath.format(config_class=config_class_name, protocol=protocol)
+                s_filename = os.path.basename(s_filepath)
+                print(protocol, config_class_name, repr(s_filepath), repr(s_filename), repr(pattern), fnmatch.fnmatchcase(s_filename, pattern))
+                if fnmatch.fnmatchcase(s_filename, pattern):
+                    yield FileType(filepath=s_filepath, protocol=protocol, config_class=config_class)
 
 
 def standard_filepath(config, rootname, protocol):
@@ -216,28 +218,24 @@ def search_rootname(rootname, *, config_classes=None, protocols=None):
     def search_abs_rootname(abs_rootname, config_classes, protocols):
         """search_abs_rootname(abs_rootname, config_classes, protocols)"""
         if os.path.exists(abs_rootname):
-            return guess(abs_rootname)
+            yield from guess(abs_rootname)
         for config_class in config_classes:
             for template in _TEMPLATES[config_class]:
                 for protocol in protocols:
                     filepath = template.format(rootname=abs_rootname, protocol=protocol)
                     if os.path.exists(filepath):
-                        return FileType(filepath=filepath, config_class=config_class, protocol=protocol)
-        return None
+                        yield FileType(filepath=filepath, config_class=config_class, protocol=protocol)
 
     if os.path.isabs(rootname):
         rootname = os.path.normpath(rootname)
-        return search_abs_rootname(rootname, config_classes, protocols)
+        yield search_abs_rootname(rootname, config_classes, protocols)
     else:
         for directory, search_config_classes in search_paths():
             s_config_classes = [c_class for c_class in config_classes if c_class in search_config_classes]
             directory = os.path.normpath(directory)
             if os.path.isdir(directory):
                 abs_rootname = os.path.join(directory, rootname)
-                filetype = search_abs_rootname(abs_rootname, s_config_classes, protocols)
-                if filetype is not None:
-                    return filetype
-        return None
+                yield from search_abs_rootname(abs_rootname, s_config_classes, protocols)
 
 
 def search_filetype(filetype):
@@ -250,4 +248,4 @@ def search_filetype(filetype):
         protocols = None
     else:
         protocols = (filetype.protocol,)
-    return search_rootname(rootname=filetype.filepath, config_classes=config_classes, protocols=protocols)
+    yield from search_rootname(rootname=filetype.filepath, config_classes=config_classes, protocols=protocols)

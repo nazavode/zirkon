@@ -52,7 +52,9 @@ def touch(dirname, filename):
 
 def test_standard_filepath(config_class, protocol):
     filepath = standard_filepath(config=config_class, rootname="root", protocol=protocol)
-    filetype = guess(filepath)
+    filetypes = list(guess(filepath))
+    assert len(filetypes) == 1
+    filetype = filetypes[0]
     assert filetype.filepath == filepath
     assert filetype.protocol == protocol
     assert filetype.config_class == config_class
@@ -61,12 +63,26 @@ def test_standard_filepath(config_class, protocol):
     filepath3 = standard_filepath(config=config_class(), rootname="root", protocol=protocol)
     assert filepath3 == filepath
 
-def test_guess_err():
+def test_guess_mult():
+    filepath = "/a/b{protocol}/{config_class}/xx.{protocol}-{config_class}"
+    filetypes = list(guess(filepath))
+    filetypes_d = {filetype.filepath: filetype for filetype in filetypes}
+    protocols = get_protocols()
+    config_classes = get_config_classes()
+    assert len(filetypes) == len(protocols) * len(config_classes)
+    for config_class in config_classes:
+        for protocol in protocols:
+            fp = filepath.format(protocol=protocol, config_class=config_class.__name__.lower())
+            assert fp in filetypes_d
+            #assert config_class == filetypes_d[fp].config_class
+            #assert protocol == filetypes_d[fp].protocol
+            #assert FileType(filepath=fp, protocol=protocol, config_class=config_class) == filetypes_d[fp]
+            assert FileType(filepath=fp, protocol=protocol, config_class=config_class) in filetypes
+
+def test_guess_no_match():
     filename = "abc.xconfig"
-    filetype = guess(filename)
-    assert filetype.filepath == filename
-    assert filetype.protocol is None
-    assert filetype.config_class is None
+    filetypes = list(guess(filename))
+    assert len(filetypes) == 0
 
 def test_classify(tmpdir):
     config_classes = get_config_classes()
@@ -163,13 +179,13 @@ def test_discover_search(tmpdir):
     os.environ['DAIKON_SCHEMA_PATH'] = tschema
     try:
         filetypes = list(discover((tadd, (Validation, Schema))))
-        ft_e0 = search_rootname(os.path.join("ADD", "e"))
-        ft_e1 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema,))
-        ft_e2 = search_rootname(os.path.join("ADD", "e"), protocols=("daikon", "json"))
-        ft_e3 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "configobj"))
-        ft_e4 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "json"))
-        ftfp_e1 = search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol=None))
-        ftfp_e_ = search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol="pickle"))
+        ft_e0_l = list(search_rootname(os.path.join("ADD", "e")))
+        ft_e1_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema,)))
+        ft_e2_l = list(search_rootname(os.path.join("ADD", "e"), protocols=("daikon", "json")))
+        ft_e3_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "configobj")))
+        ft_e4_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "json")))
+        ftfp_e1_l = list(search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol=None)))
+        ftfp_ex_l = list(search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol="pickle")))
     finally:
         del os.environ['DAIKON_CONFIG_PATH']
         del os.environ['DAIKON_SCHEMA_PATH']
@@ -183,10 +199,34 @@ def test_discover_search(tmpdir):
     #    if file not in files:
     #        print("found, not expected:", file)
     assert files == found_files
-    assert ft_e0 == FileType(filepath=ec_filepath, config_class=Config, protocol="configobj")
+
+    filetypes_d = {filetype.filepath: filetype for filetype in filetypes}
+    assert ec_filepath not in filetypes_d
+    filetypes_d[ec_filepath] = FileType(filepath=ec_filepath, config_class=Config, protocol="configobj")
+
+    assert len(ft_e0_l) == 2
+    dd = {filetype.filepath: filetype for filetype in ft_e0_l}
+    assert ec_filepath in dd
+    assert dd[ec_filepath] == filetypes_d[ec_filepath]
+    assert es_filepath in dd
+    assert dd[es_filepath] == filetypes_d[es_filepath]
+
+    assert len(ft_e1_l) == 1
+    ft_e1 = ft_e1_l[0]
     assert ft_e1 == FileType(filepath=es_filepath, config_class=Schema, protocol="json")
+
+    assert len(ft_e2_l) == 1
+    ft_e2 = ft_e2_l[0]
     assert ft_e2 == ft_e1
-    assert ft_e3 is None
+
+    assert len(ft_e3_l) == 0
+
+    assert len(ft_e4_l) == 1
+    ft_e4 = ft_e4_l[0]
     assert ft_e4 == ft_e1
+
+    assert len(ftfp_e1_l) == 1
+    ftfp_e1 = ftfp_e1_l[0]
     assert ftfp_e1 == ft_e1
-    assert ftfp_e_ is None
+
+    assert len(ftfp_ex_l) == 0
