@@ -24,7 +24,7 @@ import os
 
 import pytest
 
-from common.fixtures import string_io
+from common.fixtures import string_io, late_evaluation
 
 from daikon.config_base import ConfigBase
 from daikon.config import Config
@@ -110,6 +110,23 @@ c = Float(default=ROOT['a'] * ROOT['b'])
     schema = Schema.from_file(fls["x.daikon-schema"], protocol="daikon")
     fls.add("x.s-json")
     schema.to_file(fls["x.s-json"], protocol="json")
+
+    with open(fls.add("x-def-le.daikon"), "w") as f_out:
+        f_out.write("""\
+n = 10
+[sub]
+    n1 = ROOT['n'] + 1
+    [sub]
+        n2 = ROOT['n'] * ROOT['sub']['n1']
+""")
+    with open(fls.add("x-def-ee.daikon"), "w") as f_out:
+        f_out.write("""\
+n = 10
+[sub]
+    n1 = 11
+    [sub]
+        n2 = 110
+""")
     return fls
 
 def run(args):
@@ -170,6 +187,30 @@ def test_main_overwrite_mode(files, overwrite):
                 assert out_stream.getvalue() == ""
                 assert log_stream.getvalue() == "ERROR    cannot overwrite existing file {!r}\n".format(files[oname])
 
+
+@pytest.fixture(params=[True, False])
+def input_late_evaluation(request):
+    return request.param
+
+def test_main_deferred(files, input_late_evaluation, defaults, late_evaluation):
+    if input_late_evaluation:
+        x_def_name = "x-def-le.daikon"
+    else:
+        x_def_name = "x-def-ee.daikon"
+    i_file = files[x_def_name]
+    args = ["-i", i_file, "-o", ":daikon"]
+    if defaults is not None:
+        args.append("--defaults={!r}".format(defaults))
+    if late_evaluation:
+        args.append("--late-evaluation")
+    log_stream, out_stream = run(args)
+    if input_late_evaluation and late_evaluation:
+        ref_name = "x-def-le.daikon"
+    else:
+        ref_name = "x-def-ee.daikon"
+    with open(files[ref_name], "r") as f:
+        content = f.read()
+    assert out_stream.getvalue().rstrip() == content.rstrip()
 
 FN = collections.namedtuple('FN', ('name', 'protocol', 'hints'))
 
