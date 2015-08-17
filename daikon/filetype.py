@@ -229,11 +229,12 @@ def search_rootname(rootname, *, config_classes=None, protocols=None):
         rootname = os.path.normpath(rootname)
         return search_abs_rootname(rootname, config_classes, protocols)
     else:
-        for directory, config_classes in search_paths():
+        for directory, search_config_classes in search_paths():
+            s_config_classes = [c_class for c_class in config_classes if c_class in search_config_classes]
             directory = os.path.normpath(directory)
             if os.path.isdir(directory):
                 abs_rootname = os.path.join(directory, rootname)
-                filetype = search_abs_rootname(abs_rootname, config_classes, protocols)
+                filetype = search_abs_rootname(abs_rootname, s_config_classes, protocols)
                 if filetype is not None:
                     return filetype
         return None

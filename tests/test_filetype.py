@@ -42,6 +42,14 @@ def config_class(request):
 def config_class_name(config_class):
     return config_class.__name__
 
+def touch(dirname, filename):
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
+    filepath = os.path.join(dirname, filename)
+    with open(filepath, "w") as f:
+        pass
+    return filepath
+
 def test_standard_filepath(config_class, protocol):
     filepath = standard_filepath(config=config_class, rootname="root", protocol=protocol)
     filetype = guess(filepath)
@@ -113,18 +121,72 @@ def test_classify_protocol_error(tmpdir):
             pass
     assert str(exc_info.value) == "unsupported protocol 'yaml'"
 
-def test_classify_search_paths(tmpdir):
+def test_search_paths(tmpdir):
     cdirs = ['config_a', 'config_b']
     sdirs = ['config_b', 'schema_c']
     os.environ['DAIKON_CONFIG_PATH'] = ':'.join(cdirs)
     os.environ['DAIKON_SCHEMA_PATH'] = ':'.join(sdirs)
     try:
         lst = tuple(search_paths())
-        assert lst[0] == (os.getcwd(), get_config_classes())
-        assert lst[1] == ('config_a', (Config,))
-        assert lst[2] == ('config_b', (Config,))
-        assert lst[3] == ('config_b', (Schema,))
-        assert lst[4] == ('schema_c', (Schema,))
     finally:
         del os.environ['DAIKON_CONFIG_PATH']
         del os.environ['DAIKON_SCHEMA_PATH']
+    assert lst[0] == (os.getcwd(), get_config_classes())
+    assert lst[1] == ('config_a', (Config,))
+    assert lst[2] == ('config_b', (Config,))
+    assert lst[3] == ('config_b', (Schema,))
+    assert lst[4] == ('schema_c', (Schema,))
+
+def test_discover_search(tmpdir):
+    tdata = os.path.join(tmpdir.strpath, "DISCOVER")
+    tadd = os.path.join(tdata, "ADD")
+    tconfig = os.path.join(tdata, "CONFIG")
+    tschema = os.path.join(tdata, "SCHEMA")
+    os.makedirs(tdata)
+    os.makedirs(tadd)
+    os.makedirs(tconfig)
+    os.makedirs(tschema)
+    files = []
+    files.append(touch(tconfig, "a.daikon"))
+    files.append(touch(tconfig, "b.json"))
+    touch(tconfig, "c.daikon-schema")
+    files.append(touch(tschema, "d.daikon-schema"))
+    touch(tschema, "c.configobj")
+    files.append(touch(tdata, "d.pickle"))
+    files.append(touch(tdata, "d.pickle-schema"))
+    files.append(touch(tadd, "a.json-validation"))
+    files.append(touch(tadd, "e.json-schema"))
+    es_filepath = files[-1]
+    ec_filepath = touch(tadd, "e.configobj")
+    os.chdir(tdata)
+    os.environ['DAIKON_CONFIG_PATH'] = tconfig
+    os.environ['DAIKON_SCHEMA_PATH'] = tschema
+    try:
+        filetypes = list(discover((tadd, (Validation, Schema))))
+        ft_e0 = search_rootname(os.path.join("ADD", "e"))
+        ft_e1 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema,))
+        ft_e2 = search_rootname(os.path.join("ADD", "e"), protocols=("daikon", "json"))
+        ft_e3 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "configobj"))
+        ft_e4 = search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "json"))
+        ftfp_e1 = search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol=None))
+        ftfp_e_ = search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol="pickle"))
+    finally:
+        del os.environ['DAIKON_CONFIG_PATH']
+        del os.environ['DAIKON_SCHEMA_PATH']
+    files.sort()
+    found_files = [ft.filepath for ft in filetypes]
+    found_files.sort()
+    #for file in files:
+    #    if file not in found_files:
+    #        print("expected, not found:", file)
+    #for file in found_files:
+    #    if file not in files:
+    #        print("found, not expected:", file)
+    assert files == found_files
+    assert ft_e0 == FileType(filepath=ec_filepath, config_class=Config, protocol="configobj")
+    assert ft_e1 == FileType(filepath=es_filepath, config_class=Schema, protocol="json")
+    assert ft_e2 == ft_e1
+    assert ft_e3 is None
+    assert ft_e4 == ft_e1
+    assert ftfp_e1 == ft_e1
+    assert ftfp_e_ is None
