@@ -119,22 +119,22 @@ def run(args):
     )
     return log_stream, out_stream
 
-FN = collections.namedtuple('FN', ('name', 'protocol', 'force_protocol'))
+FN = collections.namedtuple('FN', ('name', 'protocol', 'hints'))
 
 _ic_data = [
-    FN(name="x.daikon", protocol="daikon", force_protocol=None),
-    FN(name="x.json", protocol="json", force_protocol=None),
-    FN(name="x.json", protocol="json", force_protocol="json"),
-    FN(name="xwrong.daikon", protocol="json", force_protocol="json"),
+    FN(name="x.daikon", protocol="daikon", hints=''),
+    FN(name="x.json", protocol="json", hints=''),
+    FN(name="x.json", protocol="json", hints=":json"),
+    FN(name="xwrong.daikon", protocol="json", hints=":json:config"),
 ]
 
 _oc_data = [
-    FN(name="out_x.json", protocol="json", force_protocol=None),
-    FN(name="out_x.json", protocol="configobj", force_protocol="configobj"),
-    FN(name="out_x.no_protocol", protocol=None, force_protocol=None),
-    FN(name="pickle/out_x.pickle", protocol="pickle", force_protocol=None),
-    FN(name="", protocol=None, force_protocol=None),
-    FN(name="", protocol="configobj", force_protocol="configobj"),
+    FN(name="out_x.json", protocol="json", hints=''),
+    FN(name="out_x.json", protocol="configobj", hints=":configobj"),
+    FN(name="out_x.no_protocol", protocol=None, hints=''),
+    FN(name="pickle/out_x.pickle", protocol="pickle", hints=''),
+    FN(name="", protocol=None, hints=''),
+    FN(name="", protocol="configobj", hints=":configobj"),
 ]
 
 @pytest.fixture(params=_ic_data)
@@ -173,23 +173,19 @@ def test_main_list(files):
     assert set(fpaths) == set(out_fpaths)
             
 def test_main_read_write(files, ic_name_protocol, oc_name_protocol, defaults):
-    ic_name, ic_protocol, ic_force_protocol = ic_name_protocol
-    oc_name, oc_protocol, oc_force_protocol = oc_name_protocol
+    ic_name, ic_protocol, ic_hints = ic_name_protocol
+    oc_name, oc_protocol, oc_hints = oc_name_protocol
     if oc_protocol is None:
         oc_protocol = ic_protocol
     with files.tmp(oc_name):
-        ic_file_arg = files[ic_name]
-        if ic_force_protocol:
-            ic_file_arg += ":" + ic_force_protocol
-        oc_file_arg = files[oc_name]
-        if oc_force_protocol:
-            oc_file_arg += ":" + oc_force_protocol
+        ic_file_arg = files[ic_name] + ic_hints
+        oc_file_arg = files[oc_name] + oc_hints
         print(":::>", files[oc_name], oc_file_arg)
 
         if oc_name:
             assert not os.path.exists(files[oc_name])
 
-        args = ["-c", ic_file_arg, "-co", oc_file_arg]
+        args = ["-i", ic_file_arg, "-o", oc_file_arg]
         if defaults is not None:
             args.append("--defaults={!r}".format(defaults))
         log_stream, out_stream = run(args)

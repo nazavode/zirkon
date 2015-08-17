@@ -35,7 +35,8 @@ import sys
 
 from .filetype import guess, get_protocols, \
     FileType, discover, search_filetype, \
-    get_config_class_name
+    get_protocols, get_config_classes, \
+    get_config_class, get_config_class_name
 from .config import Config
 from .schema import Schema
 from .validation import Validation
@@ -139,6 +140,7 @@ def _create_logger(stream, verbose_level):
 
 def _die(logger, message, exit_code=1):
     """_die(logger, message, exit_code=1)"""
+    print("DIE[{}]> {}".format(exit_code, message))
     logger.error(message)
     sys.exit(exit_code)
 
@@ -151,7 +153,7 @@ def _filetype(logger, filearg, config_class=None, protocol=None):
     config_class_name = None
     protocol_name = None
     if len(tokens) == 3:
-        config_class_name, filepath, protocol = tokens
+        filepath, protocol, config_class_name = tokens
     elif len(tokens) == 2:
         filepath, protocol = tokens
     elif len(tokens) == 1:
@@ -195,8 +197,9 @@ def _input_filetype(logger, filearg, config_class=None):
     filetype = _filetype(logger, filearg, config_class=config_class)
     found_filetypes = tuple(search_filetype(filetype))
     if len(found_filetypes) == 0:
-        _die(logger, "invalid value {}: input file not found".format(
-            filearg))
+        if not os.path.exists(filetype.filepath):
+            _die(logger, "invalid value {}: input file not found".format(
+                filearg))
     elif len(found_filetypes) > 1:
         logger.warning("{!r}: multiple matches: found {} matches:".format(filearg, len(found_filetypes)))
         for line in tabulate_filetypes(found_filetypes):
@@ -204,11 +207,14 @@ def _input_filetype(logger, filearg, config_class=None):
         _die(logger, "invalid value {!r}: multiple matches".format(
             filearg, len(found_filetypes)))
     else:
-        filetype = found_filetypes[0]
-    for key in 'config_class', 'protocol':
-        if getattr(filetype, key)is None:
-            _die("invalid value {}: cannot detect {}".format(
-                filearg, key))
+        pass #filetype = found_filetypes[0]
+    undetected_attributes = []
+    for attribute in 'config_class', 'protocol':
+        if getattr(filetype, attribute) is None:
+            undetected_attributes.append(attribute)
+    if undetected_attributes:
+        _die(logger, "invalid value {}: cannot detect {}".format(
+            filearg, ', '.join(undetected_attributes)))
     return filetype
 
 
@@ -262,15 +268,31 @@ def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     default_verbose_level = 1
     default_defaults = 'False'
 
-    parser = argparse.ArgumentParser(
-        description="""\
-Daikon tool - read/write/validate config files
+    config_class_names = [get_config_class_name(config_class) for config_class in get_config_classes()]
+    description="""\
+Daikon tool - read/write/validate config files.
+
+The FILE values can be specified with the following syntax:
+
+    filepath[:protocol[:config_class]]
+
+where protocol can be any of the available protocols:
+
+    {protocols}
+
+and config_class any of the available classes:
+
+    {config_classes}
 
 Environment variables
 ---------------------
-* DAIKON_CONFIG_PATH : colon-separated list of directories for config files
-* DAIKON_SCHEMA_PATH : colon-separated list of directories for schema files
-""",
+* DAIKON_CONFIG_PATH colon-separated list of directories for config files search
+* DAIKON_SCHEMA_PATH colon-separated list of directories for schema files search
+""".format(protocols=', '.join(get_protocols()),
+    config_classes=', '.join(config_class_names))
+
+    parser = argparse.ArgumentParser(
+        description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument("--list", "-l",
