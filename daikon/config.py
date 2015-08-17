@@ -35,7 +35,8 @@ from .deferred_object import ROOT, SECTION
 
 
 class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
-    """Config(init=None, *, dictionary=None, defaults=False, schema=None, validate=True)
+    """Config(init=None, *, dictionary=None, defaults=False, schema=None,
+              validate=True, late_evaluation=False)
        Config class.
 
        >>> import collections
@@ -72,5 +73,7 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
        >>>
     """
 
-    def __init__(self, init=None, *, dictionary=None, defaults=False, schema=None, validate=True):
-        super().__init__(dictionary=dictionary, init=init, defaults=defaults, schema=schema, validate=validate)
+    def __init__(self, init=None, *, dictionary=None, defaults=False,
+                 late_evaluation=False, schema=None, validate=True):
+        super().__init__(dictionary=dictionary, init=init, defaults=defaults,
+                         late_evaluation=late_evaluation, schema=schema, validate=validate)

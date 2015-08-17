@@ -23,6 +23,8 @@ import io
 import pytest
 
 from common.fixtures import dictionary, \
+    late_evaluation, \
+    protocol, \
     defaultsvalue, \
     generic_dictionary, \
     simple_config_content, \
@@ -125,8 +127,8 @@ def test_Config_get_serializer_configobj():
 def test_Config_get_serializer_pickle():
     assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
-def test_Config_deferred(defaultsvalue):
-    config = Config(defaults=defaultsvalue)
+def test_Config_deferred(defaultsvalue, late_evaluation):
+    config = Config(defaults=defaultsvalue, late_evaluation=late_evaluation)
     config['a'] = 10
     config['b'] = 20
     config['c'] = SECTION['a'] * SECTION['b']
@@ -141,13 +143,30 @@ def test_Config_deferred(defaultsvalue):
     assert isinstance(config['options']['e'], int)
     assert config['options']['e'] == 117
 
+    config['a'] += 10
+
+    if late_evaluation:
+        assert config['c'] == 400
+        assert config['options']['e'] == 127
+    else:
+        assert config['c'] == 200
+        assert config['options']['e'] == 117
+        
+
 def test_Config_deferred_error(defaultsvalue):
     config = Config(defaults=defaultsvalue)
     config['a'] = 10
     with pytest.raises(KeyError) as exc_info:
         config['c'] = SECTION['a'] * SECTION['b']
     assert str(exc_info.value) == "'b'"
-    config['b'] = 20
+
+def test_Config_deferred_error_late_evaluation(defaultsvalue):
+    config = Config(defaults=defaultsvalue, late_evaluation=True)
+    config['a'] = 10
+    config['c'] = SECTION['a'] * SECTION['b']
+    with pytest.raises(KeyError) as exc_info:
+        x = config['c']
+    assert str(exc_info.value) == "'b'"
 
 def test_Config_defaults_option():
     config = Config(defaults=True)
@@ -446,3 +465,36 @@ def test_Config_defaults_delsection_only_loc(config_section):
     assert not config.has_key('c')
     assert not config.has_section('c')
 
+@pytest.fixture
+def defconfig(late_evaluation):
+    config = Config(late_evaluation=late_evaluation)
+    config['n'] = 10
+    config['sub'] = {}
+    config['sub']['n1'] = ROOT['n'] + 1
+    config['sub']['sub'] = {}
+    config['sub']['sub']['n2'] = ROOT['n'] * ROOT['sub']['n1']
+    return config
+
+def test_Config_deferred_protocol(defconfig, protocol):
+    s_defconfig = defconfig.to_string(protocol=protocol)
+    defconfig_reloaded = Config.from_string(s_defconfig, protocol=protocol, late_evaluation=late_evaluation)
+    assert defconfig_reloaded == defconfig
+
+def test_Config_deferred_dump(defconfig):
+    s_defconfig = defconfig.to_string(protocol="daikon")
+    if defconfig.late_evaluation:
+        assert s_defconfig == """\
+n = 10
+[sub]
+    n1 = ROOT['n'] + 1
+    [sub]
+        n2 = ROOT['n'] * ROOT['sub']['n1']
+"""
+    else:
+        assert s_defconfig == """\
+n = 10
+[sub]
+    n1 = 11
+    [sub]
+        n2 = 110
+"""

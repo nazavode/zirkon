@@ -33,12 +33,13 @@ import logging
 import os
 import sys
 
-from .filetype import FileType, guess, discover, search_filetype, \
+from ..filetype import FileType, guess, discover, search_filetype, \
     get_protocols, get_config_classes, get_config_class, get_config_class_name
-from .config import Config
-from .schema import Schema
-from .validation import Validation
+from ..config import Config
+from ..schema import Schema
+from ..validation import Validation
 
+from .trace_errors import trace_errors
 
 _DEFAULTS = collections.OrderedDict()
 _DEFAULTS['True'] = lambda: True
@@ -386,33 +387,6 @@ Environment variables
     return args, logger, printer
 
 
-class TraceErrors(object):  # pylint: disable=R0903
-    """Context manager to trace errors"""
-
-    def __init__(self, debug_mode=False, exceptions=None, stream=sys.stderr):
-        self._debug_mode = debug_mode
-        if exceptions is None:
-            exceptions = (Exception, )
-        self._exceptions = exceptions
-        self._stream = stream
-
-    def __enter__(self):
-        pass
-
-    def exception_handler(self, exc_instance):
-        """exception_handler(exc_instance)"""
-        if self._debug_mode:
-            import traceback
-            traceback.print_exc()
-        self._stream.write("ERR: {}: {}\n".format(type(exc_instance).__name__, exc_instance))
-        sys.exit(1)
-
-    def __exit__(self, exc_type, exc_instance, exc_traceback):
-        if exc_type is not None:
-            if issubclass(exc_type, self._exceptions):
-                self.exception_handler(exc_instance)
-
-
 def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     """main(...)
        Daikon tool main program.
@@ -434,7 +408,7 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
 
     defaults_factory = _DEFAULTS[args.defaults]
 
-    with TraceErrors(args.debug):
+    with trace_errors(args.debug):
         if args.schema_filetype:
             schema = Schema()
             io_manager.read_obj(schema, args.schema_filetype)

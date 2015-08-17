@@ -34,7 +34,7 @@ from daikon.validation import Validation
 from daikon.filetype import guess, standard_filepath, \
     get_config_classes, get_protocols, FileType
 
-from daikon.tool import main
+from daikon._tool.main import main
 
 class Files(collections.OrderedDict):
     def __init__(self, temporary_dir):

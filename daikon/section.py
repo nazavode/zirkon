@@ -40,7 +40,7 @@ from .toolbox.deferred import Deferred
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None)
+    """Section(init=None, *, dictionary=None, parent=None, late_evaluation=False)
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -80,7 +80,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None):
+    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=False):
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -90,6 +90,7 @@ class Section(collections.abc.Mapping):
         else:
             self.parent = parent
             self.root = self.parent.root
+        self.late_evaluation = late_evaluation
         if init:
             self.update(init)
 
@@ -105,7 +106,8 @@ class Section(collections.abc.Mapping):
            Return a subsection with the given name
         """
         dummy = section_name
-        return self._subsection_class()(dictionary=dictionary, parent=self)
+        return self._subsection_class()(dictionary=dictionary, parent=self,
+                                        late_evaluation=self.late_evaluation)
 
     @classmethod
     def _dictionary_factory(cls):
@@ -143,6 +145,8 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
+            if isinstance(value, Deferred):
+                value = value.evaluate({'SECTION': self, 'ROOT': self.root})
             self._check_data_type(key=key, value=value)
             return value
 
@@ -158,11 +162,14 @@ class Section(collections.abc.Mapping):
             section = self._subsection(section_name=key, dictionary=self.dictionary[key])
             section.update(value)
         else:
-            if isinstance(value, Deferred):
-                value = value.evaluate({'SECTION': self, 'ROOT': self.root})
-            self._check_data_type(key=key, value=value)
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
+            if isinstance(value, Deferred):
+                if not self.late_evaluation:
+                    value = value.evaluate({'SECTION': self, 'ROOT': self.root})
+                    self._check_data_type(key=key, value=value)
+            else:
+                self._check_data_type(key=key, value=value)
             self.dictionary[key] = value
 
     def __delitem__(self, key):
@@ -178,7 +185,7 @@ class Section(collections.abc.Mapping):
         """copy()
            Returns a deep copy of the section.
         """
-        return self._subsection_class()(dictionary=self.dictionary.copy())
+        return self._subsection_class()(dictionary=self.dictionary.copy(), late_evaluation=self.late_evaluation)
 
     def get(self, key, default=None):
         if key in self:
