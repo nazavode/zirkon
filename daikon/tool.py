@@ -61,7 +61,7 @@ class _IoManager(object):
             filepath.format(config_class=config_class_name, protocol=protocol)
             self.logger.info("reading {} from file {} using protocol {}...".format(
                 config_class_name, filepath, protocol))
-            if not os.path.exists(filepath):
+            if not os.path.exists(filepath):  # pragma: no cover
                 self.logger.error("{} file {!r} does not exist".format(config_class_name, filepath))
                 sys.exit(1)
             obj.read(filepath, protocol=protocol)

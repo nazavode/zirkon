@@ -130,18 +130,20 @@ def verbose_level(request):
 _VLOG  = {}
 _VLOG[0] = ""
 _VLOG[1] = ""
-_VLOG[2] = """\
+_VLOG[2] = ""
+_VLOG[3] = """\
 DEBUG    input_filetype:      None
 DEBUG    schema_filetype:     None
 DEBUG    output_filetype:     None
 DEBUG    validation_filetype: None
 """
-_VLOG[3] = _VLOG[2]
 
 def test_main_verbose_level(verbose_level):
     args = []
-    if verbose_level:
-        args.append('-' + ('v' * verbose_level))
+    if verbose_level == 0:
+        args.append('-q')
+    elif verbose_level > 1:
+        args.append('-' + ('v' * (verbose_level - 1)))
     log_stream, out_stream = run(args)
     assert log_stream.getvalue() == _VLOG[verbose_level]
     assert out_stream.getvalue() == ""
