@@ -33,10 +33,8 @@ import logging
 import os
 import sys
 
-from .filetype import guess, get_protocols, \
-    FileType, discover, search_filetype, \
-    get_protocols, get_config_classes, \
-    get_config_class, get_config_class_name
+from .filetype import FileType, guess, discover, search_filetype, \
+    get_protocols, get_config_classes, get_config_class, get_config_class_name
 from .config import Config
 from .schema import Schema
 from .validation import Validation
@@ -45,6 +43,7 @@ from .validation import Validation
 _DEFAULTS = collections.OrderedDict()
 _DEFAULTS['True'] = lambda: True
 _DEFAULTS['False'] = lambda: False
+
 
 class _IoManager(object):
     """_IoManager: read/write daikon config objects"""
@@ -102,12 +101,15 @@ def tabulate_filetypes(filetypes, header=True):
     files.sort(key=lambda x: x[0])
     files.sort(key=lambda x: x[1])
     files.sort(key=lambda x: x[2])
-    rows = [("filename", "type", "protocol")]
+    rows = []
+    if header:
+        rows.append(("filename", "type", "protocol"))
     rows.extend(files)
     col_indices = tuple(range(len(rows[0])))
     lengths = tuple(max(len(row[col_index]) for row in rows) for col_index in col_indices)
-    hdr = tuple(('-' * length) for length in lengths)
-    rows.insert(1, hdr)
+    if header:
+        hdr = tuple(('-' * length) for length in lengths)
+        rows.insert(1, hdr)
     fmt = ' '.join("{{{i}:{{lengths[{i}]}}}}".format(i=col_index) for col_index in col_indices)
     for row in rows:
         yield fmt.format(*row, lengths=lengths)
@@ -118,6 +120,7 @@ def list_files(printer, *data, header=True):
     filetypes = discover(*data, standard_paths=True)
     for line in tabulate_filetypes(filetypes, header=header):
         printer(line)
+
 
 def _create_logger(stream, verbose_level):
     """_create_logger() -> logger"""
@@ -140,7 +143,6 @@ def _create_logger(stream, verbose_level):
 
 def _die(logger, message, exit_code=1):
     """_die(logger, message, exit_code=1)"""
-    print("DIE[{}]> {}".format(exit_code, message))
     logger.error(message)
     sys.exit(exit_code)
 
@@ -150,18 +152,12 @@ def _filetype(logger, filearg, config_class=None, protocol=None):
     if filearg is None:
         return None
     tokens = filearg.rsplit(':', 2)
-    config_class_name = None
-    protocol_name = None
-    if len(tokens) == 3:
-        filepath, protocol, config_class_name = tokens
-    elif len(tokens) == 2:
-        filepath, protocol = tokens
-    elif len(tokens) == 1:
-        filepath, = tokens
+    tokens += tuple(None for _ in range(3 - len(tokens)))
+    filepath, protocol, config_class_name = tokens
     if config_class_name is not None:
         config_class = get_config_class(config_class_name)
-    if protocol_name is not None:
-        protocol = get_protocol(protocol_name)
+    if protocol is not None and protocol not in get_protocols():
+        _die(logger, "invalid protocol {}".format(protocol))
     if filepath == '-':
         filepath = ''
     if protocol is None or config_class is None:
@@ -176,16 +172,10 @@ def _filetype(logger, filearg, config_class=None, protocol=None):
         guessed_filetypes = list(guess(filepath, config_classes=config_classes, protocols=protocols))
         if len(guessed_filetypes) == 1:
             guessed_filetype = guessed_filetypes[0]
-            replace_d = {}
             if protocol is None:
                 protocol = guessed_filetype.protocol
             if config_class is None:
                 config_class = guessed_filetype.config_class
-    #if config_class is None:
-    #    config_class_name = str(None)
-    #else:
-    #    config_class_name = get_config_class_name(config_class)
-    #filepath = filepath.format(protocol=protocol, config_class=config_class_name)
     filetype = FileType(filepath=filepath, protocol=protocol, config_class=config_class)
     return filetype
 
@@ -205,9 +195,7 @@ def _input_filetype(logger, filearg, config_class=None):
         for line in tabulate_filetypes(found_filetypes):
             logger.warning(" * {}".format(line))
         _die(logger, "invalid value {!r}: multiple matches".format(
-            filearg, len(found_filetypes)))
-    else:
-        pass #filetype = found_filetypes[0]
+            filearg))
     undetected_attributes = []
     for attribute in 'config_class', 'protocol':
         if getattr(filetype, attribute) is None:
@@ -269,7 +257,7 @@ def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     default_defaults = 'False'
 
     config_class_names = [get_config_class_name(config_class) for config_class in get_config_classes()]
-    description="""\
+    description = """\
 Daikon tool - read/write/validate config files.
 
 The FILE values can be specified with the following syntax:
@@ -289,7 +277,7 @@ Environment variables
 * DAIKON_CONFIG_PATH colon-separated list of directories for config files search
 * DAIKON_SCHEMA_PATH colon-separated list of directories for schema files search
 """.format(protocols=', '.join(get_protocols()),
-    config_classes=', '.join(config_class_names))
+           config_classes=', '.join(config_class_names))
 
     parser = argparse.ArgumentParser(
         description=description,
@@ -379,19 +367,15 @@ Environment variables
     printer = lambda x: print(x, file=out_stream, flush=True)
 
     input_filetype = _input_filetype(logger, args.input_filetype)
-    #print("input: {!r} -> {!r}".format(args.input_filetype, input_filetype))
     args.input_filetype = input_filetype
 
     schema_filetype = _input_schema_filetype(logger, args.schema_filetype)
-    #print("schema: {!r} -> {!r}".format(args.schema_filetype, schema_filetype))
     args.schema_filetype = schema_filetype
 
     output_filetype = _output_filetype(logger, args.output_filetype)
-    #print("output: {!r} -> {!r}".format(args.output_filetype, output_filetype))
     args.output_filetype = output_filetype
 
     validation_filetype = _validation_filetype(logger, args.validation_filetype)
-    #print("validation: {!r} -> {!r}".format(args.output_filetype, validation_filetype))
     args.validation_filetype = validation_filetype
 
     _validate_args(logger, args)
@@ -400,6 +384,32 @@ Environment variables
     logger.debug("output_filetype:     %s", args.output_filetype)
     logger.debug("validation_filetype: %s", args.validation_filetype)
     return args, logger, printer
+
+
+class TraceErrors(object):  # pylint: disable=R0903
+    """Context manager to trace errors"""
+
+    def __init__(self, debug_mode=False, exceptions=None):
+        self._debug_mode = debug_mode
+        if exceptions is None:
+            exceptions = (Exception, )
+        self._exceptions = exceptions
+
+    def __enter__(self):
+        pass
+
+    def exception_handler(self, exc_instance):
+        """exception_handler(exc_instance)"""
+        if self._debug_mode:
+            import traceback
+            traceback.print_exc()
+        sys.stderr.write("ERR: {}: {}\n".format(type(exc_instance).__name__, exc_instance))
+        sys.exit(1)
+
+    def __exit__(self, exc_type, exc_instance, exc_traceback):
+        if exc_type is not None:
+            self.exception_handler(exc_instance)
+            return True
 
 
 def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
@@ -423,7 +433,7 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
 
     defaults_factory = _DEFAULTS[args.defaults]
 
-    try:
+    with TraceErrors(args.debug):
         if args.schema_filetype:
             schema = Schema()
             io_manager.read_obj(schema, args.schema_filetype)
@@ -448,11 +458,5 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
                 io_manager.dump_obj(config, protocol=args.input_filetype.protocol)
             else:
                 io_manager.write_obj(config, args.output_filetype, overwrite=args.force)
-    except Exception as err:  # pylint: disable=W0703
-        if args.debug:
-            import traceback
-            traceback.print_exc()
-        sys.stderr.write("ERR: {}: {}\n".format(type(err).__name__, err))
-        sys.exit(1)
 
 

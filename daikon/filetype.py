@@ -103,6 +103,7 @@ def get_config_class_name(config_class):
     """get_config_class_name(config_class)"""
     return config_class.__name__.lower()
 
+
 def _set_config_classes(config_classes):
     """_set_config_classes(...)"""
     if config_classes is None:

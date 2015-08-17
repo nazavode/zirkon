@@ -60,12 +60,13 @@ class Files(collections.OrderedDict):
             tmp_filenames.append(tfn)
         yield tuple(tmp_filenames)
         for fn, tfn in zip(filenames, tmp_filenames):
-            if os.path.exists(tfn):
-                print("remove file {}".format(tfn))
-                os.remove(tfn)
-            else:
-                print("{} *not* found".format(tfn))
-            print("remove key {}".format(fn))
+            if tfn is not None:
+                if os.path.exists(tfn):
+                    print("remove file {}".format(tfn))
+                    os.remove(tfn)
+                else:
+                    print("{} *not* found".format(tfn))
+                print("remove key {}".format(fn))
             del self[fn]
         
 @pytest.fixture
@@ -106,6 +107,9 @@ c = Float(default=ROOT['a'] * ROOT['b'])
         enable = Bool()
         value = Float()
 """)
+    schema = Schema.from_file(fls["x.daikon-schema"], protocol="daikon")
+    fls.add("x.s-json")
+    schema.to_file(fls["x.s-json"], protocol="json")
     return fls
 
 def run(args):
@@ -121,14 +125,14 @@ def run(args):
 
 FN = collections.namedtuple('FN', ('name', 'protocol', 'hints'))
 
-_ic_data = [
+_i_data = [
     FN(name="x.daikon", protocol="daikon", hints=''),
     FN(name="x.json", protocol="json", hints=''),
     FN(name="x.json", protocol="json", hints=":json"),
     FN(name="xwrong.daikon", protocol="json", hints=":json:config"),
 ]
 
-_oc_data = [
+_o_data = [
     FN(name="out_x.json", protocol="json", hints=''),
     FN(name="out_x.json", protocol="configobj", hints=":configobj"),
     FN(name="out_x.no_protocol", protocol=None, hints=''),
@@ -137,12 +141,32 @@ _oc_data = [
     FN(name="", protocol="configobj", hints=":configobj"),
 ]
 
-@pytest.fixture(params=_ic_data)
-def ic_name_protocol(request):
+_s_data = [
+    FN(name=None, protocol=None, hints=None),
+    #FN(name="x.daikon-schema", protocol="daikon", hints=''),
+    FN(name="x.s-json", protocol="json", hints=''),
+]
+
+_v_data = [
+    FN(name=None, protocol=None, hints=None),
+    FN(name="out_v.json-validation", protocol="json", hints=''),
+    #FN(name="out_v.daikon-validation", protocol="daikon", hints=''),
+]
+
+@pytest.fixture(params=_i_data)
+def i_name_protocol(request):
     return request.param
 
-@pytest.fixture(params=_oc_data)
-def oc_name_protocol(request):
+@pytest.fixture(params=_o_data)
+def o_name_protocol(request):
+    return request.param
+
+@pytest.fixture(params=_s_data)
+def s_name_protocol(request):
+    return request.param
+
+@pytest.fixture(params=_v_data)
+def v_name_protocol(request):
     return request.param
 
 @pytest.fixture(params=[None, True, False])
@@ -166,46 +190,69 @@ def test_main_list(files):
         elif count == 1:
             assert line_l[0][:len("filename")] == "--------"
         else:
-            print(repr(line))
-            print(line_l)
             out_fpaths[line_l[0]] = (line_l[1], line_l[2])
 
     assert set(fpaths) == set(out_fpaths)
             
-def test_main_read_write(files, ic_name_protocol, oc_name_protocol, defaults):
-    ic_name, ic_protocol, ic_hints = ic_name_protocol
-    oc_name, oc_protocol, oc_hints = oc_name_protocol
-    if oc_protocol is None:
-        oc_protocol = ic_protocol
-    with files.tmp(oc_name):
-        ic_file_arg = files[ic_name] + ic_hints
-        oc_file_arg = files[oc_name] + oc_hints
-        print(":::>", files[oc_name], oc_file_arg)
+def test_main_read_write(files, i_name_protocol, o_name_protocol, s_name_protocol, v_name_protocol, defaults):
+    i_name, i_protocol, i_hints = i_name_protocol
+    o_name, o_protocol, o_hints = o_name_protocol
+    s_name, s_protocol, s_hints = s_name_protocol
+    v_name, v_protocol, v_hints = v_name_protocol
 
-        if oc_name:
-            assert not os.path.exists(files[oc_name])
+    if o_protocol is None:
+        o_protocol = i_protocol
+    with files.tmp(o_name), files.tmp(v_name):
+        i_file_arg = files[i_name] + i_hints
+        o_file_arg = files[o_name] + o_hints
 
-        args = ["-i", ic_file_arg, "-o", oc_file_arg]
+        if o_name:
+            assert not os.path.exists(files[o_name])
+        if v_name:
+            assert not os.path.exists(files[v_name])
+
+        args = ["-i", i_file_arg, "-o", o_file_arg]
+        if s_name is not None:
+            args.extend(["-s", s_name + s_hints])
+            if v_name is not None:
+                args.extend(["-V", v_name + v_hints])
         if defaults is not None:
             args.append("--defaults={!r}".format(defaults))
         log_stream, out_stream = run(args)
 
-        if oc_name:
-            assert os.path.exists(files[oc_name])
-
-        print("read in {}:{}".format(files[ic_name], ic_protocol))
-        i_config = Config.from_file(files[ic_name], protocol=ic_protocol)
-        print("read out {}:{}".format(files[oc_name], oc_protocol))
+        if o_name:
+            assert os.path.exists(files[o_name])
 
         config_args = {}
         if defaults is not None:
             config_args['defaults'] = defaults
-        if oc_name:
-            o_config = Config.from_file(files[oc_name], protocol=oc_protocol, **config_args)
+
+        print("read in {}:{}".format(files[i_name], i_protocol))
+        i_config = Config.from_file(files[i_name], protocol=i_protocol, **config_args)
+        print("read out {}:{}".format(files[o_name], o_protocol))
+
+        schema = None
+        if s_name is not None:
+            schema = Schema.from_file(files[s_name], protocol=s_protocol)
+            validation = schema.validate(i_config)
+            if v_name is not None:
+                assert os.path.exists(v_name)
+                v_data = Validation.from_file(files[v_name], protocol=v_protocol)
+                print("===")
+                validation.dump()
+                print("===")
+                v_data.dump()
+                assert validation.to_string(protocol="daikon") == v_data.to_string(protocol="daikon")
+
+        if o_name:
+            o_config = Config.from_file(files[o_name], protocol=o_protocol, **config_args)
         else:
-            o_config = Config.from_string(out_stream.getvalue(), protocol=oc_protocol, **config_args)
+            o_config = Config.from_string(out_stream.getvalue(), protocol=o_protocol, **config_args)
+        if schema:
+            o_v_data = schema.validate(o_config)
+            
         assert i_config == o_config
-        out_x_json_path = files[oc_name]
-    assert not oc_name in files
+        out_x_json_path = files[o_name]
+    assert not o_name in files
     assert not os.path.exists(out_x_json_path)
     
