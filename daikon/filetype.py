@@ -27,6 +27,10 @@ __all__ = [
     'guess',
     'standard_filepath',
     'classify',
+    'search_paths',
+    'discover',
+    'search_rootname',
+    'search_filetype',
     'get_config_class',
     'get_config_classes',
     'get_protocols',
@@ -69,19 +73,6 @@ def get_protocols():
     return tuple(Serializer.get_class_tags())
 
 
-def guess(filepath):
-    """guess(filepath) -> FileType object"""
-    filename = os.path.basename(filepath)
-    protocols = get_protocols()
-    for config_class, templates in _TEMPLATES.items():
-        for template in templates:
-            for protocol in protocols:
-                pattern = template.format(rootname='*', protocol=protocol, config_class=config_class.__name__.lower())
-                if fnmatch.fnmatchcase(filename, pattern):
-                    return FileType(filepath=filepath, protocol=protocol, config_class=config_class)
-    return FileType(filepath=filepath, protocol=None, config_class=None)
-
-
 def get_config_class(config):
     """get_config_class(config) -> config class name
        'config' can be a config object, a config class or a config class name.
@@ -107,6 +98,42 @@ def get_config_class(config):
             config, type(config).__name__))
 
 
+def _set_config_classes(config_classes):
+    """_set_config_classes(...)"""
+    if config_classes is None:
+        return get_config_classes()
+    elif isinstance(config_classes, ConfigBase):
+        return get_config_class(config_classes)
+    else:
+        return tuple(get_config_class(config_class) for config_class in config_classes)
+
+
+def _set_protocols(protocols):
+    """_set_protocols(...)"""
+    all_protocols = get_protocols()
+    if protocols is None:
+        return all_protocols
+    if isinstance(protocols, str):
+        protocols = (protocols, )
+    for protocol in set(protocols).difference(all_protocols):
+        raise ValueError("unsupported protocol {!r}".format(protocol))
+    return protocols
+
+
+def guess(filepath, *, config_classes=None, protocols=None):
+    """guess(filepath, *, config_classes=None, protocols=None) -> FileType object"""
+    config_classes = _set_config_classes(config_classes)
+    protocols = _set_protocols(protocols)
+    filename = os.path.basename(filepath)
+    for config_class in config_classes:
+        for template in _TEMPLATES[config_class]:
+            for protocol in protocols:
+                pattern = template.format(rootname='*', protocol=protocol, config_class=config_class.__name__.lower())
+                if fnmatch.fnmatchcase(filename, pattern):
+                    return FileType(filepath=filepath, protocol=protocol, config_class=config_class)
+    return FileType(filepath=filepath, protocol=None, config_class=None)
+
+
 def standard_filepath(config, rootname, protocol):
     """standard_filepath(config, rootname, protocol) -> filepath
        Return a standard file path for the given obj/rootname/protocol.
@@ -124,16 +151,8 @@ def classify(directory, config_classes=None, protocols=None):
        Any 'config_class' in 'config_classes' can be a config class
        (Config, Schema, Validation) or its name.
     """
-    if config_classes is None:
-        config_classes = _CONFIG_CLASSES
-    else:
-        config_classes = (get_config_class(config) for config in config_classes)
-    all_protocols = get_protocols()
-    if protocols is None:
-        protocols = all_protocols
-    else:
-        for protocol in set(protocols).difference(all_protocols):
-            raise ValueError("unsupported protocol {!r}".format(protocol))
+    config_classes = _set_config_classes(config_classes)
+    protocols = _set_protocols(protocols)
     for config_class in config_classes:
         for template in _TEMPLATES[config_class]:
             for protocol in protocols:
@@ -142,4 +161,92 @@ def classify(directory, config_classes=None, protocols=None):
                     yield FileType(filepath=filepath, protocol=protocol, config_class=config_class)
 
 
+def search_paths():
+    """search_paths()
+       Iterates on (search_paths, classes)
+    """
+    yield os.getcwd(), _CONFIG_CLASSES
+    if 'DAIKON_CONFIG_PATH' in os.environ:
+        for config_dir in os.environ['DAIKON_CONFIG_PATH'].split(':'):
+            yield config_dir, (Config,)
+    if 'DAIKON_SCHEMA_PATH' in os.environ:
+        for schema_dir in os.environ['DAIKON_SCHEMA_PATH'].split(':'):
+            yield schema_dir, (Schema,)
 
+
+def discover(*directories, standard_paths=True):
+    """discover(*directories)
+       Discover FileTypes in directories. Each directory can be
+        * a pattern
+        * a tuple (pattern, config_classes)
+       If standard_paths is True adds:
+        * os.getcwd()
+        * (os.environ['DAIKON_CONFIG_PATH'].split(':'), (Config,))
+        * (os.environ['DAIKON_SCHEMA_PATH'].split(':'), (Schema,))
+    """
+    directory_d = collections.OrderedDict()
+    if standard_paths:
+        directories += tuple(search_paths())
+
+    for entry in directories:
+        if isinstance(entry, (tuple, list)):
+            pattern, config_classes = entry
+            config_classes = tuple(get_config_class(config_class) for config_class in config_classes)
+        else:
+            pattern = entry
+            config_classes = _CONFIG_CLASSES
+        for directory in glob.glob(pattern):
+            if os.path.isdir(directory):
+                directory = os.path.normpath(os.path.abspath(os.path.realpath(directory)))
+                directory_d.setdefault(directory, set()).update(config_classes)
+
+    for directory, config_classes in directory_d.items():
+        for filetype in classify(directory, config_classes):
+            yield filetype
+
+
+def search_rootname(rootname, *, config_classes=None, protocols=None):
+    """search(rootname, *, config_classes=None, protocols=None)
+       Search for a file matching 'rootname' in filetypes. Return None
+       if not found.
+    """
+    config_classes = _set_config_classes(config_classes)
+    protocols = _set_protocols(protocols)
+
+    def search_abs_rootname(abs_rootname, config_classes, protocols):
+        """search_abs_rootname(abs_rootname, config_classes, protocols)"""
+        if os.path.exists(abs_rootname):
+            return guess(abs_rootname)
+        for config_class in config_classes:
+            for template in _TEMPLATES[config_class]:
+                for protocol in protocols:
+                    filepath = template.format(rootname=abs_rootname, protocol=protocol)
+                    if os.path.exists(filepath):
+                        return FileType(filepath=filepath, config_class=config_class, protocol=protocol)
+        return None
+
+    if os.path.isabs(rootname):
+        rootname = os.path.normpath(rootname)
+        return search_abs_rootname(rootname, config_classes, protocols)
+    else:
+        for directory, config_classes in search_paths():
+            directory = os.path.normpath(directory)
+            if os.path.isdir(directory):
+                abs_rootname = os.path.join(directory, rootname)
+                filetype = search_abs_rootname(abs_rootname, config_classes, protocols)
+                if filetype is not None:
+                    return filetype
+        return None
+
+
+def search_filetype(filetype):
+    """search_filetype(filetype)"""
+    if filetype.config_class is None:
+        config_classes = None
+    else:
+        config_classes = (filetype.config_class,)
+    if filetype.protocol is None:
+        protocols = None
+    else:
+        protocols = (filetype.protocol,)
+    return search_rootname(rootname=filetype.filepath, config_classes=config_classes, protocols=protocols)

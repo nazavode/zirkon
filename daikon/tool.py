@@ -33,7 +33,7 @@ import logging
 import os
 import sys
 
-from .filetype import guess, get_protocols, FileType, classify
+from .filetype import guess, get_protocols, FileType, discover, search_filetype
 from .config import Config
 from .schema import Schema
 from .validation import Validation
@@ -87,8 +87,15 @@ class _IoManager(object):
     def read_obj(self, obj, filetype):
         """read_obj(obj, filetype)"""
         if filetype:
-            filepath = filetype.filepath
             config_class_name = filetype.config_class.__name__.lower()
+            actual_filetype = search_filetype(filetype)
+            if actual_filetype is None:
+                self.logger.error("cannot find {} {}".format(config_class_name, filetype.filepath))
+                sys.exit(2)
+            elif actual_filetype.protocol is None:
+                self.logger.error("cannot guess protocol for {} {}".format(config_class_name, filetype.filepath))
+                sys.exit(2)
+            filepath = actual_filetype.filepath
             protocol = filetype.protocol
             filepath.format(config_class=config_class_name, protocol=protocol)
             self.logger.debug("reading {} from file {} using protocol {}...".format(
@@ -139,20 +146,14 @@ def _set_missing_args(args):
 
 def list_files(printer, *data):
     """list_files(printer, *data)"""
-    directory_d = collections.OrderedDict()
-    for config_class, directories in data:
-        for directory in directories:
-            directory = os.path.normpath(os.path.realpath(os.path.abspath(directory)))
-            directory_d.setdefault(directory, []).append(config_class)
-    filetypes = []
-    for directory, config_classes in directory_d.items():
-        for filetype in classify(directory, config_classes):
-            filetypes.append((filetype.filepath, filetype.config_class.__name__, filetype.protocol))
-    filetypes.sort(key=lambda x: x[0])
-    filetypes.sort(key=lambda x: x[1])
-    filetypes.sort(key=lambda x: x[2])
+    files = []
+    for filetype in discover(*data, standard_paths=True):
+        files.append((filetype.filepath, filetype.config_class.__name__, filetype.protocol))
+    files.sort(key=lambda x: x[0])
+    files.sort(key=lambda x: x[1])
+    files.sort(key=lambda x: x[2])
     rows = [("filename", "type", "protocol")]
-    rows.extend(filetypes)
+    rows.extend(files)
     col_indices = tuple(range(len(rows[0])))
     lengths = tuple(max(len(row[col_index]) for row in rows) for col_index in col_indices)
     hdr = tuple(('-' * length) for length in lengths)
@@ -179,7 +180,7 @@ def _create_logger(stream, verbose_level):
     return logger
 
 
-def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: disable=R0915
+def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: disable=R0912,R0914,R0915
     """main()
        Daikon tool main program.
     """
@@ -190,15 +191,8 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: di
     defaults['True'] = lambda: True
     defaults['False'] = lambda: False
 
-    def get_dirs(varname):
-        """get_dirs(varname) -> list of dirs from environment variable varname"""
-        if varname in os.environ:
-            return list(os.environ[varname].split(':'))
-        else:
-            return []
-
-    default_config_dirs = ['.'] + get_dirs("DAIKON_CONFIG_PATH")
-    default_schema_dirs = ['.'] + get_dirs("DAIKON_SCHEMA_PATH")
+    default_config_dirs = []
+    default_schema_dirs = []
     default_verbose_level = 0
     default_defaults = 'False'
 
@@ -293,7 +287,12 @@ Environment variables
                 protocol=args.input_config.protocol)
 
     if args.list:
-        list_files(printer, (Config, args.config_dirs), (Schema, args.schema_dirs))
+        paths = []
+        for config_dir in args.config_dirs:
+            paths.append((config_dir, (Config,)))
+        for schema_dir in args.schema_dirs:
+            paths.append((schema_dir, (Schema,)))
+        list_files(printer, *paths)
         return
 
     io_manager = _IoManager(printer=printer, logger=logger)
