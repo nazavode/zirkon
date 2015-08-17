@@ -37,6 +37,7 @@ from ..filetype import FileType, guess, discover, search_filetype, \
     get_protocols, get_config_classes, get_config_class, get_config_class_name
 from ..config import Config
 from ..schema import Schema
+from ..utils import create_template_from_schema
 from ..validation import Validation
 
 from .trace_errors import trace_errors
@@ -116,9 +117,14 @@ def tabulate_filetypes(filetypes, header=True):
         yield fmt.format(*row, lengths=lengths)
 
 
-def list_files(printer, *data, header=True):
-    """list_files(printer, *data, header=True)"""
-    filetypes = discover(*data, standard_paths=True)
+def list_files(printer, header=True, *, config_dirs, schema_dirs):
+    """list_files(printer, header=True, *, config_dirs, schema_dirs)"""
+    paths = []
+    for config_dir in config_dirs:
+        paths.append((config_dir, (Config,)))
+    for schema_dir in schema_dirs:
+        paths.append((schema_dir, (Schema,)))
+    filetypes = discover(*paths, standard_paths=True)
     for line in tabulate_filetypes(filetypes, header=header):
         printer(line)
 
@@ -225,25 +231,39 @@ def _validation_filetype(logger, filearg):
 def _validate_args(logger, args):
     """_validate_args(logger, args)"""
     input_filetype = args.input_filetype
+    schema_filetype = args.schema_filetype
     output_filetype = args.output_filetype
+    validation_filetype = args.validation_filetype
+    ref_protocol = None
+    ref_config_class = None
+    if input_filetype is not None:
+        ref_protocol = input_filetype.protocol
+        ref_config_class = input_filetype.config_class
+    elif schema_filetype is not None:
+        ref_protocol = schema_filetype.protocol
+
     if output_filetype is not None:
         replace_d = {}
-        if output_filetype.protocol is None:
-            replace_d['protocol'] = input_filetype.protocol
-        if output_filetype.config_class is None:
-            replace_d['config_class'] = input_filetype.config_class
-        elif output_filetype.config_class != input_filetype.config_class:
-            logger.warning("output filename {}: config_class mismatch: {} or {}?".format(
-                output_filetype.filepath,
-                input_filetype.config_class.__name__,
-                output_filetype.config_class.__name__))
-            replace_d['config_class'] = input_filetype.config_class
+        if output_filetype.protocol is None and ref_protocol is not None:
+            replace_d['protocol'] = ref_protocol
+        if ref_config_class is not None:
+            if output_filetype.config_class is None:
+                replace_d['config_class'] = ref_config_class
+            elif output_filetype.config_class != ref_config_class:
+                logger.warning("output filename {}: config_class mismatch: {} or {}?".format(
+                    output_filetype.filepath,
+                    ref_config_class.__name__,
+                    output_filetype.config_class.__name__))
+                replace_d['config_class'] = ref_config_class
         if replace_d:
             args.output_filetype = output_filetype._replace(**replace_d)
-    validation_filetype = args.validation_filetype
+
     if validation_filetype is not None:
-        if validation_filetype.protocol is None:
-            args.validation_filetype = validation_filetype._replace(protocol=input_filetype.protocol)
+        if validation_filetype.protocol is None and ref_protocol is not None:
+            args.validation_filetype = validation_filetype._replace(protocol=ref_protocol)
+    if args.create_template:
+        if schema_filetype is None:
+            _die(logger, "missing required argument --schema/-s")
 
 
 def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
@@ -284,17 +304,24 @@ Environment variables
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("--list", "-l",
-                        action="store_true",
-                        default=False,
-                        help="list available files")
+    input_group = parser.add_mutually_exclusive_group()
 
-    parser.add_argument("--input", "-i",
-                        dest="input_filetype",
-                        metavar="FILE",
-                        default=None,
-                        type=str,
-                        help="input file")
+    input_group.add_argument("--list", "-l",
+                             action="store_true",
+                             default=False,
+                             help="list available files")
+
+    input_group.add_argument("--input", "-i",
+                             dest="input_filetype",
+                             metavar="FILE",
+                             default=None,
+                             type=str,
+                             help="input file")
+
+    input_group.add_argument("--create-template", "-t",
+                             action="store_true",
+                             default=False,
+                             help="create a template from schema")
 
     parser.add_argument("--output", "-o",
                         dest="output_filetype",
@@ -338,6 +365,11 @@ Environment variables
                         choices=tuple(_DEFAULTS.keys()),
                         default=default_defaults,
                         help="set defaults mode")
+
+    parser.add_argument("--late-evaluation", "-L",
+                        action="store_true",
+                        default=False,
+                        help="set late evaluation mode")
 
     parser.add_argument("--verbose", "-v",
                         dest="verbose_level",
@@ -396,12 +428,7 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
         log_stream=log_stream, out_stream=out_stream, argv=argv)
 
     if args.list:
-        paths = []
-        for config_dir in args.config_dirs:
-            paths.append((config_dir, (Config,)))
-        for schema_dir in args.schema_dirs:
-            paths.append((schema_dir, (Schema,)))
-        list_files(printer, *paths)
+        list_files(printer, config_dirs=args.config_dirs, schema_dirs=args.schema_dirs)
         return
 
     io_manager = _IoManager(printer=printer, logger=logger)
@@ -409,17 +436,20 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     defaults_factory = _DEFAULTS[args.defaults]
 
     with trace_errors(args.debug):
+        schema = None
+        default_output_protocol = "daikon"
         if args.schema_filetype:
             schema = Schema()
             io_manager.read_obj(schema, args.schema_filetype)
-        else:
-            schema = None
 
+        config = None
         if args.input_filetype:
+            default_output_protocol = args.input_filetype.protocol
             config_class = args.input_filetype.config_class
             config_args = {}
             if issubclass(config_class, Config):
                 config_args['defaults'] = defaults_factory()
+            config_args['late_evaluation'] = args.late_evaluation
             config = config_class(**config_args)
             io_manager.read_obj(config, args.input_filetype)
             if schema is not None:
@@ -429,9 +459,13 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
                 if validation and args.validation_filetype is None:
                     logger.warning("validation failed for config %s:", args.input_filetype.filepath)
                     io_manager.dump_obj(validation, print_function=logger.warning)
+        elif args.create_template:
+            late_evaluation = True
+            config = Config(late_evaluation=late_evaluation)
+            create_template_from_schema(schema=schema, config=config)
+
+        if config is not None:
             if args.output_filetype is None:
-                io_manager.dump_obj(config, protocol=args.input_filetype.protocol)
+                io_manager.dump_obj(config, protocol=default_output_protocol)
             else:
                 io_manager.write_obj(config, args.output_filetype, overwrite=args.force)
-
-
