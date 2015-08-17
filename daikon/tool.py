@@ -68,7 +68,7 @@ class _IoManager(object):
 
     def dump_obj(self, obj, *, protocol="daikon", print_function=None):
         """dump_obj(obj, *, protocol="daikon", print_function=None)"""
-        if print_function is None:
+        if print_function is None:  # pragma: no cover
             print_function = self.printer
         for line in obj.to_string(protocol=protocol).split('\n'):
             print_function(line)
@@ -389,11 +389,12 @@ Environment variables
 class TraceErrors(object):  # pylint: disable=R0903
     """Context manager to trace errors"""
 
-    def __init__(self, debug_mode=False, exceptions=None):
+    def __init__(self, debug_mode=False, exceptions=None, stream=sys.stderr):
         self._debug_mode = debug_mode
         if exceptions is None:
             exceptions = (Exception, )
         self._exceptions = exceptions
+        self._stream = stream
 
     def __enter__(self):
         pass
@@ -403,13 +404,13 @@ class TraceErrors(object):  # pylint: disable=R0903
         if self._debug_mode:
             import traceback
             traceback.print_exc()
-        sys.stderr.write("ERR: {}: {}\n".format(type(exc_instance).__name__, exc_instance))
+        self._stream.write("ERR: {}: {}\n".format(type(exc_instance).__name__, exc_instance))
         sys.exit(1)
 
     def __exit__(self, exc_type, exc_instance, exc_traceback):
         if exc_type is not None:
-            self.exception_handler(exc_instance)
-            return True
+            if issubclass(exc_type, self._exceptions):
+                self.exception_handler(exc_instance)
 
 
 def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):

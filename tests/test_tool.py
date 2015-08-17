@@ -123,6 +123,52 @@ def run(args):
     )
     return log_stream, out_stream
 
+@pytest.fixture(params=[0, 1, 2, 3])
+def verbose_level(request):
+    return request.param
+
+_VLOG  = {}
+_VLOG[0] = ""
+_VLOG[1] = ""
+_VLOG[2] = """\
+DEBUG    input_filetype:      None
+DEBUG    schema_filetype:     None
+DEBUG    output_filetype:     None
+DEBUG    validation_filetype: None
+"""
+_VLOG[3] = _VLOG[2]
+
+def test_main_verbose_level(verbose_level):
+    args = []
+    if verbose_level:
+        args.append('-' + ('v' * verbose_level))
+    log_stream, out_stream = run(args)
+    assert log_stream.getvalue() == _VLOG[verbose_level]
+    assert out_stream.getvalue() == ""
+
+
+@pytest.fixture(params=[True, False])
+def overwrite(request):
+    return request.param
+
+def test_main_overwrite_mode(files, overwrite):
+    oname = 'xy.daikon'
+    with files.tmp(oname):
+        with open(files[oname], "w"):
+            pass
+        args = ['-i', files['x.daikon'], '-o', files[oname]]
+        if overwrite:
+            args.append("-f")
+
+        if overwrite:
+            run(args)
+        else:
+            with pytest.raises(SystemExit):
+                log_stream, out_stream = run(args)
+                assert out_stream.getvalue() == ""
+                assert log_stream.getvalue() == "ERROR    cannot overwrite existing file {!r}\n".format(files[oname])
+
+
 FN = collections.namedtuple('FN', ('name', 'protocol', 'hints'))
 
 _i_data = [
