@@ -32,6 +32,7 @@ __all__ = [
     'search_rootname',
     'search_filetype',
     'get_config_class',
+    'get_config_class_name',
     'get_config_classes',
     'get_protocols',
 ]
@@ -90,13 +91,17 @@ def get_config_class(config):
             config, type(config).__name__))
     elif isinstance(config, str):
         for config_class in _CONFIG_CLASSES:
-            if config in {config_class.__name__.lower(), config_class.__name__}:
+            if config in {get_config_class_name(config_class), config_class.__name__}:
                 return config_class
         raise ValueError("unsupported config_class name {!r}".format(config))
     else:
         raise ValueError("invalid object {!r} of type {}: not a config[_class]".format(
             config, type(config).__name__))
 
+
+def get_config_class_name(config_class):
+    """get_config_class_name(config_class)"""
+    return config_class.__name__.lower()
 
 def _set_config_classes(config_classes):
     """_set_config_classes(...)"""
@@ -125,13 +130,12 @@ def guess(filepath, *, config_classes=None, protocols=None):
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
     for config_class in config_classes:
-        config_class_name = config_class.__name__.lower()
+        config_class_name = get_config_class_name(config_class)
         for template in _TEMPLATES[config_class]:
             for protocol in protocols:
                 pattern = template.format(rootname='*', protocol=protocol, config_class=config_class_name)
                 s_filepath = filepath.format(config_class=config_class_name, protocol=protocol)
                 s_filename = os.path.basename(s_filepath)
-                print(protocol, config_class_name, repr(s_filepath), repr(s_filename), repr(pattern), fnmatch.fnmatchcase(s_filename, pattern))
                 if fnmatch.fnmatchcase(s_filename, pattern):
                     yield FileType(filepath=s_filepath, protocol=protocol, config_class=config_class)
 
@@ -232,9 +236,8 @@ def search_rootname(rootname, *, config_classes=None, protocols=None):
     else:
         for directory, search_config_classes in search_paths():
             s_config_classes = [c_class for c_class in config_classes if c_class in search_config_classes]
-            directory = os.path.normpath(directory)
             if os.path.isdir(directory):
-                abs_rootname = os.path.join(directory, rootname)
+                abs_rootname = os.path.normpath(os.path.join(directory, rootname))
                 yield from search_abs_rootname(abs_rootname, s_config_classes, protocols)
 
 

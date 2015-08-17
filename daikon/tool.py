@@ -33,49 +33,17 @@ import logging
 import os
 import sys
 
-from .filetype import guess, get_protocols, FileType, discover, search_filetype
+from .filetype import guess, get_protocols, \
+    FileType, discover, search_filetype, \
+    get_config_class_name
 from .config import Config
 from .schema import Schema
 from .validation import Validation
 
 
-def _filetype(config_class, filearg):
-    """_filetype(...)"""
-    if ':' in filearg:
-        filepath, protocol = filearg.rsplit(':', 1)
-        if filepath == '-':
-            filepath = ''
-        if protocol not in get_protocols():
-            raise ValueError("invalid protocol {}".format(protocol))
-        filetype = FileType(filepath=filepath, protocol=protocol, config_class=config_class)
-    else:
-        if filearg == '-':
-            filepath = ''
-        else:
-            filepath = filearg
-        filetype = guess(filepath)
-        replace_d = {}
-        if filetype.config_class != config_class:
-            replace_d['config_class'] = config_class
-        if replace_d:
-            filetype = filetype._replace(**replace_d)
-    return filetype
-
-
-def _config_filetype(filearg):
-    """_config_filetype(...)"""
-    return _filetype(Config, filearg)
-
-
-def _schema_filetype(filearg):
-    """_schema_filetype(...)"""
-    return _filetype(Schema, filearg)
-
-
-def _validation_filetype(filearg):
-    """_validation_filetype(...)"""
-    return _filetype(Validation, filearg)
-
+_DEFAULTS = collections.OrderedDict()
+_DEFAULTS['True'] = lambda: True
+_DEFAULTS['False'] = lambda: False
 
 class _IoManager(object):
     """_IoManager: read/write daikon config objects"""
@@ -87,67 +55,48 @@ class _IoManager(object):
     def read_obj(self, obj, filetype):
         """read_obj(obj, filetype)"""
         if filetype:
-            config_class_name = filetype.config_class.__name__.lower()
-            actual_filetype = search_filetype(filetype)
-            if actual_filetype is None:
-                self.logger.error("cannot find {} {}".format(config_class_name, filetype.filepath))
-                sys.exit(2)
-            elif actual_filetype.protocol is None:
-                self.logger.error("cannot guess protocol for {} {}".format(config_class_name, filetype.filepath))
-                sys.exit(2)
-            filepath = actual_filetype.filepath
+            config_class_name = get_config_class_name(filetype.config_class)
+            filepath = filetype.filepath
             protocol = filetype.protocol
             filepath.format(config_class=config_class_name, protocol=protocol)
-            self.logger.debug("reading {} from file {} using protocol {}...".format(
+            self.logger.info("reading {} from file {} using protocol {}...".format(
                 config_class_name, filepath, protocol))
             if not os.path.exists(filepath):
                 self.logger.error("{} file {!r} does not exist".format(config_class_name, filepath))
                 sys.exit(1)
             obj.read(filepath, protocol=protocol)
 
-    def dump_obj(self, obj):
-        """dump_obj(obj)"""
-        for line in obj.to_string(protocol="daikon").split('\n'):
-            self.printer(line)
+    def dump_obj(self, obj, *, protocol="daikon", print_function=None):
+        """dump_obj(obj, *, protocol="daikon", print_function=None)"""
+        if print_function is None:
+            print_function = self.printer
+        for line in obj.to_string(protocol=protocol).split('\n'):
+            print_function(line)
 
-    def write_obj(self, obj, filetype):
-        """write_obj(obj, input_filepath=None)"""
-        if filetype is None:
-            self.dump_obj(obj)
-            return
+    def write_obj(self, obj, filetype, overwrite=False):
+        """write_obj(obj, input_filepath=None, overwrite=False)"""
         filepath = filetype.filepath
-        config_class_name = filetype.config_class.__name__.lower()
+        config_class_name = get_config_class_name(filetype.config_class)
         protocol = filetype.protocol
         if filepath:
             filepath = filepath.format(config_class=config_class_name, protocol=protocol)
-            self.logger.debug("writing {} to file {} using protocol {}...".format(
+            if os.path.exists(filepath) and not overwrite:
+                _die(self.logger, "cannot overwrite existing file {!r}".format(filepath))
+            self.logger.info("writing {} to file {} using protocol {}...".format(
                 config_class_name, filepath, protocol))
             filedir = os.path.dirname(os.path.abspath(filepath))
             if not os.path.exists(filedir):
-                self.logger.debug("creating dir {}...".format(filedir))
+                self.logger.info("creating dir {}...".format(filedir))
                 os.makedirs(filedir)
             obj.write(filepath, protocol=protocol)
         else:
             self.printer(obj.to_string(protocol=protocol))
 
 
-def _set_missing_args(args):
-    """_set_missing_args(args)"""
-    for arg in "config", "schema":
-        i_arg = "input_" + arg
-        o_arg = "output_" + arg
-        o_filetype = getattr(args, o_arg)
-        if o_filetype is not None and o_filetype.protocol is None:
-            i_filetype = getattr(args, i_arg)
-            if i_filetype is not None:
-                o_filetype = o_filetype._replace(protocol=i_filetype.protocol)
-                setattr(args, o_arg, o_filetype)
-
-
-def list_files(printer, *data):
-    """list_files(printer, *data)"""
+def tabulate_filetypes(filetypes, header=True):
+    """tabulate_filetypes(filetypes, header=True)"""
     files = []
-    for filetype in discover(*data, standard_paths=True):
+    for filetype in filetypes:
         files.append((filetype.filepath, filetype.config_class.__name__, filetype.protocol))
     files.sort(key=lambda x: x[0])
     files.sort(key=lambda x: x[1])
@@ -160,17 +109,25 @@ def list_files(printer, *data):
     rows.insert(1, hdr)
     fmt = ' '.join("{{{i}:{{lengths[{i}]}}}}".format(i=col_index) for col_index in col_indices)
     for row in rows:
-        printer(fmt.format(*row, lengths=lengths))
+        yield fmt.format(*row, lengths=lengths)
 
+
+def list_files(printer, *data, header=True):
+    """list_files(printer, *data, header=True)"""
+    filetypes = discover(*data, standard_paths=True)
+    for line in tabulate_filetypes(filetypes, header=header):
+        printer(line)
 
 def _create_logger(stream, verbose_level):
     """_create_logger() -> logger"""
     logger = logging.getLogger("DAIKON-LOG")
     if verbose_level == 0:
-        log_level = logging.WARNING
+        log_level = logging.ERROR
     elif verbose_level == 1:
+        log_level = logging.WARNING
+    elif verbose_level == 2:
         log_level = logging.INFO
-    elif verbose_level >= 2:
+    elif verbose_level >= 3:
         log_level = logging.DEBUG
     log_handler = logging.StreamHandler(stream=stream)
     log_formatter = logging.Formatter("{levelname:8s} {message}", style="{")
@@ -180,20 +137,129 @@ def _create_logger(stream, verbose_level):
     return logger
 
 
-def main(log_stream=sys.stderr, out_stream=sys.stdout, args=None):  # pylint: disable=R0912,R0914,R0915
-    """main()
-       Daikon tool main program.
-    """
-    if args is None:  # pragma: no cover
-        args = sys.argv[1:]
+def _die(logger, message, exit_code=1):
+    """_die(logger, message, exit_code=1)"""
+    logger.error(message)
+    sys.exit(exit_code)
 
-    defaults = collections.OrderedDict()
-    defaults['True'] = lambda: True
-    defaults['False'] = lambda: False
+
+def _filetype(logger, filearg, config_class=None, protocol=None):
+    """_filetype(...)"""
+    if filearg is None:
+        return None
+    tokens = filearg.rsplit(':', 2)
+    config_class_name = None
+    protocol_name = None
+    if len(tokens) == 3:
+        config_class_name, filepath, protocol = tokens
+    elif len(tokens) == 2:
+        filepath, protocol = tokens
+    elif len(tokens) == 1:
+        filepath, = tokens
+    if config_class_name is not None:
+        config_class = get_config_class(config_class_name)
+    if protocol_name is not None:
+        protocol = get_protocol(protocol_name)
+    if filepath == '-':
+        filepath = ''
+    if protocol is None or config_class is None:
+        if config_class is None:
+            config_classes = None
+        else:
+            config_classes = (config_class,)
+        if protocol is None:
+            protocols = None
+        else:
+            protocols = (protocol,)
+        guessed_filetypes = list(guess(filepath, config_classes=config_classes, protocols=protocols))
+        if len(guessed_filetypes) == 1:
+            guessed_filetype = guessed_filetypes[0]
+            replace_d = {}
+            if protocol is None:
+                protocol = guessed_filetype.protocol
+            if config_class is None:
+                config_class = guessed_filetype.config_class
+    #if config_class is None:
+    #    config_class_name = str(None)
+    #else:
+    #    config_class_name = get_config_class_name(config_class)
+    #filepath = filepath.format(protocol=protocol, config_class=config_class_name)
+    filetype = FileType(filepath=filepath, protocol=protocol, config_class=config_class)
+    return filetype
+
+
+def _input_filetype(logger, filearg, config_class=None):
+    """_input_filetype(...)"""
+    if filearg is None:
+        return None
+    filetype = _filetype(logger, filearg, config_class=config_class)
+    found_filetypes = tuple(search_filetype(filetype))
+    if len(found_filetypes) == 0:
+        _die(logger, "invalid value {}: input file not found".format(
+            filearg))
+    elif len(found_filetypes) > 1:
+        logger.warning("{!r}: multiple matches: found {} matches:".format(filearg, len(found_filetypes)))
+        for line in tabulate_filetypes(found_filetypes):
+            logger.warning(" * {}".format(line))
+        _die(logger, "invalid value {!r}: multiple matches".format(
+            filearg, len(found_filetypes)))
+    else:
+        filetype = found_filetypes[0]
+    for key in 'config_class', 'protocol':
+        if getattr(filetype, key)is None:
+            _die("invalid value {}: cannot detect {}".format(
+                filearg, key))
+    return filetype
+
+
+def _input_schema_filetype(logger, filearg):
+    """_input_schema_filetype(...)"""
+    return _input_filetype(logger, filearg, config_class=Schema)
+
+
+def _output_filetype(logger, filearg):
+    """_output_filetype(...)"""
+    return _filetype(logger, filearg)
+
+
+def _validation_filetype(logger, filearg):
+    """_validation_filetype(...)"""
+    return _filetype(logger, filearg, config_class=Validation)
+
+
+def _validate_args(logger, args):
+    """_validate_args(logger, args)"""
+    input_filetype = args.input_filetype
+    output_filetype = args.output_filetype
+    if output_filetype is not None:
+        replace_d = {}
+        if output_filetype.protocol is None:
+            replace_d['protocol'] = input_filetype.protocol
+        if output_filetype.config_class is None:
+            replace_d['config_class'] = input_filetype.config_class
+        elif output_filetype.config_class != input_filetype.config_class:
+            logger.warning("output filename {}: config_class mismatch: {} or {}?".format(
+                output_filetype.filepath,
+                input_filetype.config_class.__name__,
+                output_filetype.config_class.__name__))
+            replace_d['config_class'] = input_filetype.config_class
+        if replace_d:
+            args.output_filetype = output_filetype._replace(**replace_d)
+    validation_filetype = args.validation_filetype
+    if validation_filetype is not None:
+        if validation_filetype.protocol is None:
+            args.validation_filetype = validation_filetype._replace(protocol=input_filetype.protocol)
+
+
+def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
+    """main_parse_args(...)
+    """
+    if argv is None:  # pragma: no cover
+        argv = sys.argv[1:]
 
     default_config_dirs = []
     default_schema_dirs = []
-    default_verbose_level = 0
+    default_verbose_level = 1
     default_defaults = 'False'
 
     parser = argparse.ArgumentParser(
@@ -212,17 +278,33 @@ Environment variables
                         default=False,
                         help="list available files")
 
-    parser.add_argument("--input-config", "-c",
-                        metavar="IC",
+    parser.add_argument("--input", "-i",
+                        dest="input_filetype",
+                        metavar="FILE",
                         default=None,
-                        type=_config_filetype,
-                        help="input config file")
+                        type=str,
+                        help="input file")
 
-    parser.add_argument("--output-config", "-co",
+    parser.add_argument("--output", "-o",
+                        dest="output_filetype",
                         metavar="OC",
                         default=None,
-                        type=_config_filetype,
-                        help="output config file")
+                        type=str,
+                        help="output file")
+
+    parser.add_argument("--schema", "-s",
+                        dest="schema_filetype",
+                        metavar="FILE",
+                        default=None,
+                        type=str,
+                        help="schema input file")
+
+    parser.add_argument("--validation", "-V",
+                        dest="validation_filetype",
+                        metavar="FILE",
+                        default=None,
+                        type=str,
+                        help="validation output file")
 
     parser.add_argument("--config-dir", "-cd",
                         dest="config_dirs",
@@ -232,18 +314,6 @@ Environment variables
                         type=str,
                         help="add config dir")
 
-    parser.add_argument("--input-schema", "-s",
-                        metavar="IS",
-                        default=None,
-                        type=_schema_filetype,
-                        help="input schema file")
-
-    parser.add_argument("--output-schema", "-so",
-                        metavar="OS",
-                        default=None,
-                        type=_schema_filetype,
-                        help="output schema file")
-
     parser.add_argument("--schema-dir", "-sd",
                         dest="schema_dirs",
                         metavar="SD",
@@ -252,15 +322,9 @@ Environment variables
                         type=str,
                         help="add config dir")
 
-    parser.add_argument("--output-validation", "-vo",
-                        metavar="OV",
-                        default=None,
-                        type=_validation_filetype,
-                        help="output validation file")
-
     parser.add_argument("--defaults", "-d",
                         metavar="D",
-                        choices=tuple(defaults.keys()),
+                        choices=tuple(_DEFAULTS.keys()),
                         default=default_defaults,
                         help="set defaults mode")
 
@@ -270,21 +334,59 @@ Environment variables
                         default=default_verbose_level,
                         help="increase verbosity")
 
+    parser.add_argument("--quiet", "-q",
+                        dest="verbose_level",
+                        action="store_const",
+                        const=0,
+                        default=default_verbose_level,
+                        help="quiet mode (only errors are shown)")
+
     parser.add_argument("--debug",
                         action="store_true",
                         default=False,
                         help="debug mode")
 
-    args = parser.parse_args(args)
-    _set_missing_args(args)
+    parser.add_argument("--force", "-f",
+                        action="store_true",
+                        default=False,
+                        help="force overwriting existing output files")
+
+    args = parser.parse_args(argv)
 
     logger = _create_logger(log_stream, args.verbose_level)
     printer = lambda x: print(x, file=out_stream, flush=True)
 
-    if args.output_validation is not None and args.output_validation.protocol is None:
-        if args.input_config is not None:
-            args.output_validation = args.output_validation._replace(
-                protocol=args.input_config.protocol)
+    input_filetype = _input_filetype(logger, args.input_filetype)
+    #print("input: {!r} -> {!r}".format(args.input_filetype, input_filetype))
+    args.input_filetype = input_filetype
+
+    schema_filetype = _input_schema_filetype(logger, args.schema_filetype)
+    #print("schema: {!r} -> {!r}".format(args.schema_filetype, schema_filetype))
+    args.schema_filetype = schema_filetype
+
+    output_filetype = _output_filetype(logger, args.output_filetype)
+    #print("output: {!r} -> {!r}".format(args.output_filetype, output_filetype))
+    args.output_filetype = output_filetype
+
+    validation_filetype = _validation_filetype(logger, args.validation_filetype)
+    #print("validation: {!r} -> {!r}".format(args.output_filetype, validation_filetype))
+    args.validation_filetype = validation_filetype
+
+    _validate_args(logger, args)
+    logger.debug("input_filetype:      %s", args.input_filetype)
+    logger.debug("schema_filetype:     %s", args.schema_filetype)
+    logger.debug("output_filetype:     %s", args.output_filetype)
+    logger.debug("validation_filetype: %s", args.validation_filetype)
+    return args, logger, printer
+
+
+def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
+    """main(...)
+       Daikon tool main program.
+    """
+
+    args, logger, printer = main_parse_args(
+        log_stream=log_stream, out_stream=out_stream, argv=argv)
 
     if args.list:
         paths = []
@@ -297,26 +399,33 @@ Environment variables
 
     io_manager = _IoManager(printer=printer, logger=logger)
 
-    defaults_factory = defaults[args.defaults]
+    defaults_factory = _DEFAULTS[args.defaults]
 
     try:
-        if args.input_schema:
+        if args.schema_filetype:
             schema = Schema()
-            io_manager.read_obj(schema, args.input_schema)
-            if args.output_schema is not None:
-                io_manager.write_obj(schema, args.output_schema)
+            io_manager.read_obj(schema, args.schema_filetype)
         else:
             schema = None
 
-        if args.input_config:
-            config = Config(defaults=defaults_factory())
-            io_manager.read_obj(config, args.input_config)
+        if args.input_filetype:
+            config_class = args.input_filetype.config_class
+            config_args = {}
+            if issubclass(config_class, Config):
+                config_args['defaults'] = defaults_factory()
+            config = config_class(**config_args)
+            io_manager.read_obj(config, args.input_filetype)
             if schema is not None:
                 validation = schema.validate(config)
-                if validation:
-                    logger.warning("validation failed for config %s", args.input_config.filepath)
-                    io_manager.write_obj(validation, args.output_validation)
-            io_manager.write_obj(config, args.output_config)
+                if args.validation_filetype is not None:
+                    io_manager.write_obj(validation, args.validation_filetype, overwrite=args.force)
+                if validation and args.validation_filetype is None:
+                    logger.warning("validation failed for config %s:", args.input_filetype.filepath)
+                    io_manager.dump_obj(validation, print_function=logger.warning)
+            if args.output_filetype is None:
+                io_manager.dump_obj(config, protocol=args.input_filetype.protocol)
+            else:
+                io_manager.write_obj(config, args.output_filetype, overwrite=args.force)
     except Exception as err:  # pylint: disable=W0703
         if args.debug:
             import traceback

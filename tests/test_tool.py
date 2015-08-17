@@ -115,7 +115,7 @@ def run(args):
     main(
         log_stream=log_stream,
         out_stream=out_stream,
-        args=args,
+        argv=args,
     )
     return log_stream, out_stream
 
