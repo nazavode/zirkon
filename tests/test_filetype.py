@@ -31,7 +31,8 @@ from daikon.schema import Schema
 from daikon.validation import Validation
 
 from daikon.filetype import guess, standard_filepath, classify, \
-    get_config_classes, get_protocols, FileType
+    get_config_classes, get_protocols, FileType, \
+    discover, search_paths, search_rootname, search_filetype
 
 @pytest.fixture(params=[Config, Schema, Validation])
 def config_class(request):
@@ -111,3 +112,19 @@ def test_classify_protocol_error(tmpdir):
         for x in classify(tmpdir.strpath, protocols=("json", "yaml")):
             pass
     assert str(exc_info.value) == "unsupported protocol 'yaml'"
+
+def test_classify_search_paths(tmpdir):
+    cdirs = ['config_a', 'config_b']
+    sdirs = ['config_b', 'schema_c']
+    os.environ['DAIKON_CONFIG_PATH'] = ':'.join(cdirs)
+    os.environ['DAIKON_SCHEMA_PATH'] = ':'.join(sdirs)
+    try:
+        lst = tuple(search_paths())
+        assert lst[0] == (os.getcwd(), get_config_classes())
+        assert lst[1] == ('config_a', (Config,))
+        assert lst[2] == ('config_b', (Config,))
+        assert lst[3] == ('config_b', (Schema,))
+        assert lst[4] == ('schema_c', (Schema,))
+    finally:
+        del os.environ['DAIKON_CONFIG_PATH']
+        del os.environ['DAIKON_SCHEMA_PATH']
