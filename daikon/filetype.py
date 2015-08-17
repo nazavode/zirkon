@@ -120,10 +120,10 @@ def _set_protocols(protocols):
     return protocols
 
 
-def guess(filepath, *, config_classes=None, protocols=None):
-    """guess(filepath, *, config_classes=None, protocols=None) -> FileType object"""
-    config_classes = _set_config_classes(config_classes)
-    protocols = _set_protocols(protocols)
+def guess(filepath):
+    """guess(filepath) -> FileType object"""
+    config_classes = get_config_classes()
+    protocols = get_protocols()
     filename = os.path.basename(filepath)
     for config_class in config_classes:
         for template in _TEMPLATES[config_class]:
