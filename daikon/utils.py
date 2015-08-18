@@ -25,11 +25,13 @@ __author__ = "Simone Campagna"
 
 __all__ = [
     'create_template_from_schema',
+    'replace_deferred',
 ]
 
 import collections
 
 from .config import Config
+from .config_section import ConfigSection
 from .schema_section import SchemaSection
 from .toolbox.deferred import Deferred
 
@@ -91,3 +93,19 @@ def create_template_from_schema(schema, *, config=None):
             else:
                 config[key] = "# {!r}".format(value)
     return config
+
+
+def replace_deferred(config, *, ref_section=None):
+    """replace_deferred(config, *, ref_section=None)
+       Replace all deferred expressions with their current value.
+    """
+    if ref_section is None:
+        ref_section = config
+    for key, value in config.items():
+        if isinstance(value, collections.Mapping):
+            replace_deferred(value, ref_section=ref_section[key])
+        else:
+            if isinstance(value, Deferred):
+                config[key] = value.evaluate({'SECTION': ref_section, 'ROOT': ref_section.root})
+    if isinstance(config, ConfigSection) and config.defaults() is not None:
+        replace_deferred(config.defaults(), ref_section=config)

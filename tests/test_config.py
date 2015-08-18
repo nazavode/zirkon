@@ -239,6 +239,16 @@ def test_Config_defaults_add_overlap(defaultsvalue):
     assert 'z' in config['sub']
     assert config['sub']['z'] == 22
 
+def test_Config_defaults_add_subsub():
+    config = Config(defaults=True)
+    config['x'] = 10
+    config.add_defaults(a=1, sub={'sa': 2, 'subsub': {'ssa': 3, 'empty1': {}, 'empty2': {'ee1': {}, 'ee2': {}}, 'subsubsub': {'sss': 4}, 'ssb': 5}, 'sb': 6}, b=7)
+    assert config.has_section('sub')
+    assert config['sub'].has_section('subsub')
+    assert config['sub']['subsub'].has_section('subsubsub')
+    assert not config['sub']['subsub'].has_section('empty1')
+    assert not config['sub']['subsub'].has_section('empty2')
+
 @pytest.fixture(params=[collections.OrderedDict(), Section(), Config()])
 def extdefaults(request):
     defaults = request.param

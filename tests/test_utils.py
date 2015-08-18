@@ -27,7 +27,8 @@ from common.fixtures import string_io, late_evaluation
 from daikon.schema import Schema
 from daikon.config import ROOT, SECTION, Config
 from daikon.validator import Int, Float, Str
-from daikon.utils import create_template_from_schema
+from daikon.toolbox.deferred import Deferred
+from daikon.utils import create_template_from_schema, replace_deferred
 
 def test_create_template_from_schema(string_io):
     schema = Schema()
@@ -79,3 +80,58 @@ m0 = 3
 m1 = 4
 """
 
+def test_replace_deferred():
+    a_value = 10
+    c_value = 5
+    x_value = 4
+    z_value = 7
+    config1 = Config(defaults=True)
+    config2 = Config(defaults=True)
+    for config in config1, config2:
+        config['a'] = a_value
+        config['b'] = 2 * ROOT['a']
+        config['sub'] = {}
+        config['sub']['x'] = x_value
+        config['sub']['y'] = SECTION['x'] + ROOT['b']
+        config.add_defaults(c=c_value, d=3 + ROOT['c'] + SECTION['a'],
+                            sub={'z': z_value,
+                                 'subsub': {'t': ROOT['a'] - 1},
+                                 'w': SECTION['x'] + SECTION['z'] + ROOT['a'] + ROOT['c']})
+
+
+    def verify(cnfg, a_value, c_value, x_value, z_value, def_a_value=None):
+        if def_a_value is None:
+            def_a_value = a_value
+        assert cnfg['a'] == a_value
+        assert cnfg['b'] == 2 * def_a_value
+        assert cnfg['sub']['x'] == x_value
+        assert cnfg['sub']['y'] == x_value + (2 * def_a_value)
+        assert cnfg['sub']['z'] == z_value
+        assert cnfg['sub']['w'] == x_value + z_value + def_a_value + c_value
+        assert cnfg['c'] == c_value
+        assert cnfg['d'] == 3 + c_value + def_a_value
+
+    verify(config1, a_value, c_value, x_value, z_value)
+    verify(config2, a_value, c_value, x_value, z_value)
+
+    a_value = 100
+    config1['a'] = a_value
+    config2['a'] = a_value
+    verify(config1, a_value, c_value, x_value, z_value)
+    verify(config2, a_value, c_value, x_value, z_value)
+
+    replace_deferred(config2)
+
+    new_a_value1 = 67
+    config1['a'] = new_a_value1
+    config2['a'] = new_a_value1
+    verify(config1, new_a_value1, c_value, x_value, z_value)
+    verify(config2, new_a_value1, c_value, x_value, z_value, def_a_value=a_value)
+
+    replace_deferred(config1)
+
+    new_a_value2 = 67
+    config1['a'] = new_a_value2
+    config2['a'] = new_a_value2
+    verify(config1, new_a_value2, c_value, x_value, z_value, def_a_value=new_a_value1)
+    verify(config2, new_a_value2, c_value, x_value, z_value, def_a_value=a_value)
