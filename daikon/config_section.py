@@ -109,7 +109,7 @@ class ConfigSection(Section):
         else:
             if self._has_defaults:
                 return self._defaults.has_section(section_name) and \
-                    has_section_options(self._defaults.ref_get(section_name, ref_section=self))
+                    has_section_options(self._defaults[section_name])
             else:
                 return False
 
@@ -119,7 +119,7 @@ class ConfigSection(Section):
         else:
             if self._has_defaults:
                 if self._defaults.has_section(key):
-                    return has_section_options(self._defaults.ref_get(key, ref_section=self))
+                    return has_section_options(self._defaults[key])
                 else:
                     return self._defaults.has_option(key)
             else:
