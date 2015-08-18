@@ -108,21 +108,16 @@ Daikon supports value interpolation: previously defined config values can inflen
 
  >>> from daikon.config import ROOT
  >>> config = Config()
- >>> config['a'] = 10
- >>> config['b'] = ROOT['a'] * 2
+ >>> config['x'] = 2
+ >>> config['y'] = ROOT['x'] * 4
+ >>> print(config['y'])
+ 8
+ >>> config['x'] = 10
+ >>> print(config['y'])
+ 40
  >>> config.dump()
- a = 10
- b = 20
-
- >>> config_s = """
- ... x = 1.0
- ... y = 2.0
- ... z = ROOT['x'] + ROOT['y']"""
- >>> config = Config.from_string(config_s, protocol="daikon")
- >>> config.dump()
- x = 1.0
- y = 2.0
- z = 3.0
+ x = 10
+ y = ROOT['x'] * 4
  >>>
 
 This can be used also in *Validators*:

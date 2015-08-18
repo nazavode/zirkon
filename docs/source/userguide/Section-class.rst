@@ -53,33 +53,13 @@ The expression can be unparsed to the original python expression:
 The ROOT object
 ---------------
 
-The definition of ``ROOT`` is equivalent to
+The Daikon ``ROOT`` object is always mapped to the current *config* (i.e., the *root section*). It can be used to compose expressions:
 
- >>> from daikon.toolbox.deferred import DName
- >>> ROOT = DName('ROOT')
- >>> expr = ROOT['a']
- >>> type(expr)
- <class 'daikon.toolbox.deferred.DGetitem'>
- >>> print(expr.unparse())
- ROOT['a']
-
-In order to evaluate this object it is necessary to provide a dictionary for the name lookup:
-
- >>> from daikon.config import Config
- >>> config1 = Config({'a': 10})
- >>> config2 = Config({'a': 20})
- >>> expr.evaluate({'ROOT': config1})
- 10
- >>> expr.evaluate({'ROOT': config2})
- 20
-
-The Daikon ``ROOT`` object is always mapped to the current *config* (i.e., the *root section*).
-
+ >>> from daikon.config import Config, ROOT
  >>> config = Config({'a': 5})
  >>> config['b'] = ROOT['a'] * 10  # ROOT -> config
- >>> config.dump()
- a = 5
- b = 50
+ >>> print(config['b'])
+ 50
 
 The SECTION object
 ------------------
@@ -92,17 +72,15 @@ The ``SECTION`` object is very similar to ``ROOT``, but it refers to the current
 
 Here, *ROOT* is *config*, while *SECTION* is *config['sub']*:
 
- >>> config.dump()
- a = 5
- b = 50
- [sub]
-    x = 2
-    y = 3
+ >>> print(config['a'], config['sub']['x'], config['sub']['y'])
+ 5 2 3
 
     .. note::
 
-        Notice that deferred expressions are **never** stored on the *config*: they are evaluated at the moment they are inserted into the *config*.
-        The *config* contains always the evaluated values, not the deferred expressions.
+        Values referring to ``ROOT`` and ``SECTION`` (deferred expressions) are always evaluated using getter methods: ``__getitem__``,
+        ``get``, ``get_option``.
+        During iteration, deferred expressions are not evaluated. The ``daikon.utils.replace_deferred`` function can be used to replace
+        all deferred values with their current value.
 
 Interpolation in config files
 =============================
@@ -117,8 +95,10 @@ Interpolation can be used in config files or strings; in the following example, 
  >>> config = Config.from_string(config_s, protocol="daikon")
  >>> config.dump()
  x = 10
- y = 20
- z = 30
+ y = ROOT['x'] * 2
+ z = ROOT['x'] * 3
+ >>> print(config['x'], config['y'], config['z'])
+ 10 20 30
 
 This allows to define values depending on previously defined values. 
 

@@ -55,7 +55,7 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=False, defaults=False):
+    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=True, defaults=False):
         if defaults is True:
             defaults = Section(late_evaluation=late_evaluation)
         elif defaults is False:

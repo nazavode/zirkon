@@ -163,28 +163,32 @@ Daikon supports value interpolation: key/values precedently stored in
 the Config object can be accessed and used in complex expressions to set new values.
 For instance:
 
- >>> config_s = """\
- ... x = 10
- ... y = ROOT['x'] * 4
- ... """
- >>> config = Config.from_string(config_s, protocol="daikon")
+ >>> from daikon.config import ROOT
+ >>> config['x'] = 2
+ >>> config['y'] = ROOT['x'] * 4
+ >>> print(config['y'])
+ 8
+ >>> config['x'] = 10
+ >>> print(config['y'])
+ 40
  >>> config.dump()
  x = 10
- y = 40
+ y = ROOT['x'] * 4
  >>>
 
 Moreover, this can be used in validators:
 
  >>> schema_s = """\
  ... x = Int()
- ... y = Int(min=ROOT['x'] // 2)
+ ... y = Int(min=ROOT['x'] * 5)
  ... z = Int(default=ROOT['x'] * ROOT['y'])
  ... """
  >>> schema = Schema.from_string(schema_s, protocol="daikon")
  >>> validation = schema.validate(config)
  >>> validation.dump()
+ y = MinValueError('y=40: value is lower than min 50')
  >>> config.dump()
  x = 10
- y = 40
- z = 400
- >>>
+ y = ROOT['x'] * 4
+ >>> print(config['x'], config['y'], config['z'])
+ 10 40 400

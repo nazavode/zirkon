@@ -154,7 +154,7 @@ def test_Config_deferred(defaultsvalue, late_evaluation):
         
 
 def test_Config_deferred_error(defaultsvalue):
-    config = Config(defaults=defaultsvalue)
+    config = Config(defaults=defaultsvalue, late_evaluation=False)
     config['a'] = 10
     with pytest.raises(KeyError) as exc_info:
         config['c'] = SECTION['a'] * SECTION['b']

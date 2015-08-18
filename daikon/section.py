@@ -40,7 +40,7 @@ from .toolbox.serializer import Serializer
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None, late_evaluation=False)
+    """Section(init=None, *, dictionary=None, parent=None, late_evaluation=True)
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -80,7 +80,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=False):
+    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=True):
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
