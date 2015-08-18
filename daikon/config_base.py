@@ -91,7 +91,8 @@ class ConfigBase(Section):
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_string(self.as_dict(defaults=defaults))
+        obj = self.as_dict(defaults=defaults, evaluate=False)
+        return serializer_instance.to_string(obj)
 
     def to_stream(self, stream, protocol, *, defaults=False):
         """to_stream(stream, protocol, *, defaults=False)
@@ -99,7 +100,8 @@ class ConfigBase(Section):
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_stream(self.as_dict(defaults=defaults), stream)
+        obj = self.as_dict(defaults=defaults, evaluate=False)
+        return serializer_instance.to_stream(obj, stream)
 
     def to_file(self, filename, protocol, *, defaults=False):
         """to_file(filename, protocol, *, defaults=False)
@@ -107,7 +109,8 @@ class ConfigBase(Section):
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
-        return serializer_instance.to_file(self.as_dict(defaults=defaults), filename)
+        obj = self.as_dict(defaults=defaults, evaluate=False)
+        return serializer_instance.to_file(obj, filename)
 
     def dump(self, stream=None, protocol="daikon", *, defaults=False):
         self.self_validate(raise_on_error=True)

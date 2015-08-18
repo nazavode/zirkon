@@ -218,6 +218,27 @@ def test_Config_defaults_section_add():
     assert config['a'].has_option('x')
     assert config['a']['x'] == 1
 
+def test_Config_defaults_add_overlap(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
+    config['a'] = 100
+    config['b'] = 101
+    config['sub'] = {}
+    config['sub']['x'] = 10
+    config['sub']['y'] = 11
+    config.add_defaults(b=201, c=202, sub={'y': 21, 'z': 22})
+    assert 'a' in config
+    assert config['a'] == 100
+    assert 'b' in config
+    assert config['b'] == 101
+    assert 'c' in config
+    assert config['c'] == 202
+    assert 'x' in config['sub']
+    assert config['sub']['x'] == 10
+    assert 'y' in config['sub']
+    assert config['sub']['y'] == 11
+    assert 'z' in config['sub']
+    assert config['sub']['z'] == 22
+
 @pytest.fixture(params=[collections.OrderedDict(), Section(), Config()])
 def extdefaults(request):
     defaults = request.param
@@ -477,7 +498,8 @@ def defconfig(late_evaluation, defaultsvalue):
     config = Config(late_evaluation=late_evaluation, defaults=defaultsvalue)
     config['n'] = 10
     config['sub'] = {}
-    config['sub']['n1'] = ROOT['n'] + 1
+    config['sub']['n0'] = 1
+    config['sub']['n1'] = ROOT['n'] + SECTION['n0']
     config['sub']['sub'] = {}
     config['sub']['sub']['n2'] = ROOT['n'] * ROOT['sub']['n1']
     return config
@@ -493,7 +515,8 @@ def test_Config_deferred_dump(defconfig):
         assert s_defconfig == """\
 n = 10
 [sub]
-    n1 = ROOT['n'] + 1
+    n0 = 1
+    n1 = ROOT['n'] + SECTION['n0']
     [sub]
         n2 = ROOT['n'] * ROOT['sub']['n1']
 """
@@ -501,6 +524,7 @@ n = 10
         assert s_defconfig == """\
 n = 10
 [sub]
+    n0 = 1
     n1 = 11
     [sub]
         n2 = 110
@@ -538,3 +562,23 @@ def test_Config_deferred_defaults(defconfig):
         assert config['a'] == 7
         assert config['sub']['b'] == 3
      
+def test_Config_deferred_as_dict_evaluate_False(defconfig):
+    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    dct = defconfig.as_dict(evaluate=False)
+    if defconfig.late_evaluation:
+        assert isinstance(dct['sub']['n1'], Deferred)
+        assert isinstance(dct['sub']['b'], Deferred)
+    else:
+        assert dct['sub']['n1'] == 11
+        assert dct['sub']['b'] == 3
+
+def test_Config_deferred_as_dict(defconfig):
+    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    dct = defconfig.as_dict()
+    assert isinstance(dct['sub']['n1'], int)
+    assert dct['sub']['n1'] == 11
+    assert 'b' in dct['sub']
+    assert isinstance(dct['sub']['b'], int)
+    assert dct['sub']['b'] == 3
+
+    

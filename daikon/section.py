@@ -316,16 +316,19 @@ class Section(collections.abc.Mapping):
         """
         return self.ref_update(dictionary)
 
-    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
-        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True) -> dict
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None):
+        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None) -> dict
            Return a dict with all the section content
         """
         result = dict_class()
         subsection_class = self._subsection_class()
         for key, value in self.items():
             if isinstance(value, subsection_class):
-                result[key] = value.as_dict(dict_class=dict_class, defaults=defaults)
+                result[key] = value.as_dict(dict_class=dict_class, defaults=defaults,
+                                            evaluate=evaluate, ref_section=ref_section)
             else:
+                if evaluate:
+                    value = self._evaluate(value, ref_section=ref_section)
                 result[key] = value
         return result
 
@@ -361,7 +364,8 @@ class Section(collections.abc.Mapping):
         if stream is None:
             stream = sys.stdout
         serializer = Serializer.get_class(protocol)()
-        serializer.to_stream(stream=stream, obj=self.as_dict(defaults=defaults))
+        obj = self.as_dict(defaults=defaults, evaluate=False)
+        serializer.to_stream(stream=stream, obj=obj)
 
 
 def iter_section_options(section):

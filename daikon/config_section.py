@@ -32,6 +32,22 @@ import contextlib
 from .section import Section, has_section_options
 
 
+def _update_defaults(config, defaults):
+    """_update_defaults(config, defaults)
+       Update config unset values with defaults.
+    """
+    for key, value in defaults.items():
+        if isinstance(value, collections.Mapping):
+            if config.has_section(key):
+                section = config.get_section(key)
+            else:
+                section = config.add_section(key)
+            _update_defaults(section, value)
+        else:
+            if not config.has_option(key):
+                config[key] = value
+
+
 class ConfigSection(Section):
     """ConfigSection(...)
        Adds support for defaults.
@@ -74,11 +90,10 @@ class ConfigSection(Section):
         """add_defaults(**kwargs)
            Add default options and sections"""
         if self._has_defaults:
-            section = self._defaults
+            for key, value in kwargs.items():
+                self._defaults.ref_set(key, value, ref_section=self)
         else:
-            section = self
-        for option_name, option_value in kwargs.items():
-            section.ref_set(option_name, option_value, ref_section=self)
+            _update_defaults(self, kwargs)
 
     def has_option(self, option_name):
         if super().has_option(option_name):
@@ -151,11 +166,18 @@ class ConfigSection(Section):
             if self._has_defaults and dictionary.defaults() is not None:
                 self._defaults.update(dictionary.defaults())
 
-    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
-        result = super().as_dict(dict_class=dict_class, defaults=defaults)
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True,
+                evaluate=True, ref_section=None):
         if defaults and self._has_defaults:
-            for key, value in self._defaults.items():
-                if key not in result:
-                    result[key] = value
-        return result
+            defaults_dict = self._defaults.as_dict(dict_class=dict_class,
+                                                   evaluate=evaluate, ref_section=self)
+        else:
+            defaults_dict = None
+        self_dict = super().as_dict(dict_class=dict_class, defaults=defaults,
+                                    evaluate=evaluate, ref_section=ref_section)
+        if defaults_dict is None:
+            return self_dict
+        else:
+            defaults_dict.update(self_dict)
+            return defaults_dict
 
