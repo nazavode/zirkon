@@ -111,8 +111,12 @@ class ConfigSection(Section):
                 return False
 
     def copy(self):
+        if self._has_defaults:
+            defaults = self._defaults.copy()
+        else:
+            defaults = None
         return self._subsection_class()(dictionary=self.dictionary.copy(),
-                                        defaults=self._defaults.copy())
+                                        defaults=defaults)
 
     def __getitem__(self, key):
         if super().__contains__(key):

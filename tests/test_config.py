@@ -28,7 +28,6 @@ from common.fixtures import dictionary, \
     defaultsvalue, \
     generic_dictionary, \
     simple_config_content, \
-    defaultsvalue, \
     simple_config, \
     string_io, \
     tmp_text_file, \
@@ -292,6 +291,13 @@ def test_Config_defaults_update(defaultsvalue):
     config2.add_defaults(only2=2)
     assert not config1.has_option('only2')
     assert config2 != config1
+
+def test_Config_copy(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
+    config['a'] = 10
+    config.add_defaults(b=20)
+    config2 = config.copy()
+    assert config2 == config
 
 def test_Config_defaults_copy():
     config = Config(defaults=True)
