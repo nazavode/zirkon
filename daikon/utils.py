@@ -33,7 +33,6 @@ import collections
 from .config import Config
 from .config_section import ConfigSection
 from .schema_section import SchemaSection
-from .toolbox.deferred import Deferred
 
 
 def _get_validator_default(validator):
@@ -87,19 +86,11 @@ def replace_deferred(config):
     """replace_deferred(config)
        Replace all deferred expressions with their current value.
     """
-    def _replace(config, *, ref_section=None):
-        """_replace(config, *, ref_section=None)
-           Implementation function.
-        """
-        if ref_section is None:
-            ref_section = config
-        for key, value in config.items():
-            if isinstance(value, collections.Mapping):
-                _replace(value, ref_section=ref_section[key])
-            else:
-                if isinstance(value, Deferred):
-                    config[key] = value.evaluate({'SECTION': ref_section, 'ROOT': ref_section.root})
-        if isinstance(config, ConfigSection) and config.defaults() is not None:
-            _replace(config.defaults(), ref_section=config)
+    for key, value in config.items():
+        if isinstance(value, collections.Mapping):
+            replace_deferred(value)
+        else:
+            config[key] = config.evaluate_option_value(value)
+    if isinstance(config, ConfigSection) and config.defaults() is not None:
+        replace_deferred(config.defaults())
 
-    _replace(config)

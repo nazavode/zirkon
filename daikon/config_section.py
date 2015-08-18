@@ -30,6 +30,7 @@ import collections
 import contextlib
 
 from .section import Section, has_section_options
+from .defaults_section import DefaultsSection
 
 
 def _update_defaults(config, defaults):
@@ -55,24 +56,25 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False):
-        if defaults is True:
-            defaults = Section()
-        elif defaults is False or defaults is None:
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False, name=None):
+        if defaults is False or defaults is None:
             defaults = None
-        elif isinstance(defaults, Section):
+        elif isinstance(defaults, DefaultsSection):
             pass
+        elif defaults is True:
+            defaults = DefaultsSection()
+        elif isinstance(defaults, Section):
+            defaults = DefaultsSection(dictionary=defaults)
         elif isinstance(defaults, collections.Mapping):
-            defaults = Section(dictionary=defaults)
+            defaults = DefaultsSection(dictionary=defaults)
         else:
             raise TypeError("invalid defaults object of type {}: not a Section".format(
                 type(defaults).__name__))
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
-        if self._has_defaults:
-            # set the reference section for defaults:
-            self._defaults.ref_section = self
-        super().__init__(init=init, dictionary=dictionary, parent=parent)
+        if self._has_defaults and parent is None:
+            self._defaults.set_ref_root(self)
+        super().__init__(init=init, dictionary=dictionary, parent=parent, name=name)
 
     @classmethod
     def _subsection_class(cls):
@@ -86,7 +88,8 @@ class ConfigSection(Section):
                 subdefaults = self._defaults.add_section(section_name)
         else:
             subdefaults = None
-        return self._subsection_class()(dictionary=dictionary, parent=self, defaults=subdefaults)
+        return self._subsection_class()(dictionary=dictionary, parent=self,
+                                        name=section_name, defaults=subdefaults)
 
     def set_defaults(self, **kwargs):
         """set_defaults(**kwargs)
@@ -167,15 +170,14 @@ class ConfigSection(Section):
             if self._has_defaults and dictionary.defaults() is not None:
                 self._defaults.update(dictionary.defaults())
 
-    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True,
-                evaluate=True, ref_section=None):
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
         if defaults and self._has_defaults:
             defaults_dict = self._defaults.as_dict(dict_class=dict_class,
-                                                   evaluate=evaluate, ref_section=self)
+                                                   evaluate=evaluate)
         else:
             defaults_dict = None
         self_dict = super().as_dict(dict_class=dict_class, defaults=defaults,
-                                    evaluate=evaluate, ref_section=ref_section)
+                                    evaluate=evaluate)
         if defaults_dict is None:
             return self_dict
         else:

@@ -105,18 +105,18 @@ class SchemaSection(Section):
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
-    def __init__(self, init=None, *, dictionary=None, parent=None,
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
                  unexpected_option_validator=None):
         self._unexpected_option_validator = None
         self.unexpected_option_validator = unexpected_option_validator
-        super().__init__(dictionary=dictionary, init=init, parent=parent)
+        super().__init__(dictionary=dictionary, init=init, parent=parent, name=name)
 
     @classmethod
     def _subsection_class(cls):
         return SchemaSection
 
     def _subsection(self, section_name, dictionary):
-        return self._subsection_class()(dictionary=dictionary,
+        return self._subsection_class()(dictionary=dictionary, name=section_name,
                                         unexpected_option_validator=self.unexpected_option_validator)
 
     @property

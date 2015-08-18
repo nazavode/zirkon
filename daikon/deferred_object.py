@@ -29,5 +29,20 @@ __all__ = [
 
 from .toolbox.deferred import DName
 
-SECTION = DName('SECTION')
+
+class DProperty(DName):
+    """DProperty - call 'name' as a function without arguments
+       >>> dprop = DProperty('foo')
+       >>> foo_function = lambda: 123
+       >>> dprop.evaluate({'foo': foo_function})
+       123
+       >>> dprop.unparse()
+       'foo'
+
+    """
+    def evaluate(self, globals_d=None):
+        return super().evaluate(globals_d=globals_d)()
+
+
+SECTION = DProperty('SECTION')
 ROOT = DName('ROOT')
