@@ -33,8 +33,8 @@ class DefaultsSection(Section):
     """DefaultsSection(...)
        A Section to store ValidationResult values.
     """
-    def __init__(self, init=None, *, dictionary=None, parent=None, name=None, ref_root=None):
-        self._ref_root = ref_root
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None, reference_root=None):
+        self._reference_root = reference_root
         super().__init__(init=init, dictionary=dictionary, parent=parent, name=name)
 
     @classmethod
@@ -43,16 +43,15 @@ class DefaultsSection(Section):
 
     def _subsection(self, section_name, dictionary):
         return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        name=section_name, ref_root=self._reference_root())
+                                        name=section_name, reference_root=self._get_reference_root())
 
-    def _reference_root(self):
-        # use always the root ref_root, which is correctly set
-        # pylint error: self.root is DefaultsSection, not Section
-        return self.root._ref_root  # pylint: disable=E1101,W0212
+    def _get_reference_root(self):
+        # use always the root reference_root, which is correctly set
+        return self.root._reference_root  # pylint: disable=W0212
 
-    def set_ref_root(self, ref_root):
-        """setup_ref_root(ref_root)"""
-        if self._ref_root is None:
-            self._ref_root = ref_root
-        elif self._ref_root is not ref_root:
+    def set_reference_root(self, reference_root):
+        """setup_reference_root(reference_root)"""
+        if self._reference_root is None:
+            self._reference_root = reference_root
+        elif self._reference_root is not reference_root:
             raise ValueError("reference root already set - defaults cannot be shared")

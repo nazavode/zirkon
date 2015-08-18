@@ -82,6 +82,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None):
+        self._reference_root = None
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -117,19 +118,22 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
-    def _reference_root(self):
+    def _get_reference_root(self):
         """_reference_root(value) -> reference root section
             to be used for ROOT in evaluate_option_value
         """
-        return self.root
+        if self._reference_root is None:
+            return self.root
+        else:
+            return self._reference_root
 
     def evaluate_option_value(self, value):
         """evaluate_option_value(value)
         """
         if isinstance(value, Deferred):
-            ref_root = self._reference_root()
-            section_getter = lambda: get_section_value(ref_root, *self.fqname)
-            value = value.evaluate({'SECTION': section_getter, 'ROOT': ref_root})
+            reference_root = self._get_reference_root()
+            section_getter = lambda: get_section_value(reference_root, *self.fqname)
+            value = value.evaluate({'SECTION': section_getter, 'ROOT': reference_root})
         return value
 
     def _check_option(self, key, value):

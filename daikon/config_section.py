@@ -73,7 +73,7 @@ class ConfigSection(Section):
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
         if self._has_defaults and parent is None:
-            self._defaults.set_ref_root(self)
+            self._defaults.set_reference_root(self)
         super().__init__(init=init, dictionary=dictionary, parent=parent, name=name)
 
     @classmethod
