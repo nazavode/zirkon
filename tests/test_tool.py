@@ -24,7 +24,7 @@ import os
 
 import pytest
 
-from common.fixtures import string_io, late_evaluation
+from common.fixtures import string_io
 
 from daikon.config_base import ConfigBase
 from daikon.config import Config
@@ -188,27 +188,17 @@ def test_main_overwrite_mode(files, overwrite):
                 assert log_stream.getvalue() == "ERROR    cannot overwrite existing file {!r}\n".format(files[oname])
 
 
-@pytest.fixture(params=[True, False])
-def input_late_evaluation(request):
+@pytest.fixture(params=['x-def-le.daikon', 'x-def-ee.daikon'])
+def x_def_name(request):
     return request.param
 
-def test_main_deferred(files, input_late_evaluation, defaults, late_evaluation):
-    if input_late_evaluation:
-        x_def_name = "x-def-le.daikon"
-    else:
-        x_def_name = "x-def-ee.daikon"
+def test_main_deferred(files, x_def_name, defaults):
     i_file = files[x_def_name]
     args = ["-i", i_file, "-o", ":daikon"]
     if defaults is not None:
         args.append("--defaults={!r}".format(defaults))
-    if late_evaluation:
-        args.append("--late-evaluation")
     log_stream, out_stream = run(args)
-    if input_late_evaluation and late_evaluation:
-        ref_name = "x-def-le.daikon"
-    else:
-        ref_name = "x-def-ee.daikon"
-    with open(files[ref_name], "r") as f:
+    with open(files[x_def_name], "r") as f:
         content = f.read()
     assert out_stream.getvalue().rstrip() == content.rstrip()
 

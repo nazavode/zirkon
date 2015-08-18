@@ -22,7 +22,7 @@ import io
 
 import pytest
 
-from common.fixtures import protocol, late_evaluation, \
+from common.fixtures import protocol, \
     simple_config_content, simple_schema_content, \
     simple_section_content, simple_validation, tmp_text_file
 
@@ -117,8 +117,8 @@ CONFIG_DE_STRING['daikon'] = """\
 CONFIG_DE_STRING['configobj'] = CONFIG_DE_STRING['daikon']
 
 @pytest.fixture
-def config_de(late_evaluation):
-    config = Config(late_evaluation=late_evaluation)
+def config_de():
+    config = Config()
     config['sub'] = {}
     config['sub']['x'] = 100
     config['sub']['z'] = SECTION['x'] + 5
@@ -164,7 +164,4 @@ def test_validate_config_de_ko_min(config_protocol, schema_de):
     assert config['beta'] == 7
     assert config['sub']['x'] == 1
     assert config['sub']['y'] == 11
-    if config.late_evaluation:
-        assert config['sub']['z'] == 6
-    else:
-        assert config['sub']['z'] == 105
+    assert config['sub']['z'] == 6

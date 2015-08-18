@@ -23,7 +23,6 @@ import io
 import pytest
 
 from common.fixtures import dictionary, \
-    late_evaluation, \
     protocol, \
     defaultsvalue, \
     generic_dictionary, \
@@ -127,8 +126,8 @@ def test_Config_get_serializer_configobj():
 def test_Config_get_serializer_pickle():
     assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
-def test_Config_deferred(defaultsvalue, late_evaluation):
-    config = Config(defaults=defaultsvalue, late_evaluation=late_evaluation)
+def test_Config_deferred(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['b'] = 20
     config['c'] = SECTION['a'] * SECTION['b']
@@ -145,23 +144,11 @@ def test_Config_deferred(defaultsvalue, late_evaluation):
 
     config['a'] += 10
 
-    if late_evaluation:
-        assert config['c'] == 400
-        assert config['options']['e'] == 127
-    else:
-        assert config['c'] == 200
-        assert config['options']['e'] == 117
-        
+    assert config['c'] == 400
+    assert config['options']['e'] == 127
 
 def test_Config_deferred_error(defaultsvalue):
-    config = Config(defaults=defaultsvalue, late_evaluation=False)
-    config['a'] = 10
-    with pytest.raises(KeyError) as exc_info:
-        config['c'] = SECTION['a'] * SECTION['b']
-    assert str(exc_info.value) == "'b'"
-
-def test_Config_deferred_error_late_evaluation(defaultsvalue):
-    config = Config(defaults=defaultsvalue, late_evaluation=True)
+    config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['c'] = SECTION['a'] * SECTION['b']
     with pytest.raises(KeyError) as exc_info:
@@ -504,8 +491,8 @@ def test_Config_defaults_delsection_only_loc(config_section):
     assert not config.has_section('c')
 
 @pytest.fixture
-def defconfig(late_evaluation, defaultsvalue):
-    config = Config(late_evaluation=late_evaluation, defaults=defaultsvalue)
+def defconfig(defaultsvalue):
+    config = Config(defaults=defaultsvalue)
     config['n'] = 10
     config['sub'] = {}
     config['sub']['n0'] = 1
@@ -516,13 +503,12 @@ def defconfig(late_evaluation, defaultsvalue):
 
 def test_Config_deferred_protocol(defconfig, protocol):
     s_defconfig = defconfig.to_string(protocol=protocol)
-    defconfig_reloaded = Config.from_string(s_defconfig, protocol=protocol, late_evaluation=late_evaluation)
+    defconfig_reloaded = Config.from_string(s_defconfig, protocol=protocol)
     assert defconfig_reloaded == defconfig
 
 def test_Config_deferred_dump(defconfig):
     s_defconfig = defconfig.to_string(protocol="daikon")
-    if defconfig.late_evaluation:
-        assert s_defconfig == """\
+    assert s_defconfig == """\
 n = 10
 [sub]
     n0 = 1
@@ -530,25 +516,11 @@ n = 10
     [sub]
         n2 = ROOT['n'] * ROOT['sub']['n1']
 """
-    else:
-        assert s_defconfig == """\
-n = 10
-[sub]
-    n0 = 1
-    n1 = 11
-    [sub]
-        n2 = 110
-"""
 
 def test_Config_deferred_copy(defconfig):
     config = defconfig.copy()
-    assert config.late_evaluation == defconfig.late_evaluation
-    if config.late_evaluation:
-        assert isinstance(defconfig.dictionary['sub']['n1'], Deferred)
-        assert isinstance(config.dictionary['sub']['n1'], Deferred)
-    else:
-        assert isinstance(defconfig.dictionary['sub']['n1'], int)
-        assert isinstance(config.dictionary['sub']['n1'], int)
+    assert isinstance(defconfig.dictionary['sub']['n1'], Deferred)
+    assert isinstance(config.dictionary['sub']['n1'], Deferred)
     
 def test_Config_deferred_defaults(defconfig):
     defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
@@ -561,26 +533,16 @@ def test_Config_deferred_defaults(defconfig):
     assert config['sub']['b'] == 3
     defconfig['n'] = 20
     config['n'] = 110
-    if defconfig.late_evaluation:
-        assert defconfig['a'] == 17
-        assert defconfig['sub']['b'] == 13
-        assert config['a'] == 107
-        assert config['sub']['b'] == 103
-    else:
-        assert defconfig['a'] == 7
-        assert defconfig['sub']['b'] == 3
-        assert config['a'] == 7
-        assert config['sub']['b'] == 3
+    assert defconfig['a'] == 17
+    assert defconfig['sub']['b'] == 13
+    assert config['a'] == 107
+    assert config['sub']['b'] == 103
      
 def test_Config_deferred_as_dict_evaluate_False(defconfig):
     defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     dct = defconfig.as_dict(evaluate=False)
-    if defconfig.late_evaluation:
-        assert isinstance(dct['sub']['n1'], Deferred)
-        assert isinstance(dct['sub']['b'], Deferred)
-    else:
-        assert dct['sub']['n1'] == 11
-        assert dct['sub']['b'] == 3
+    assert isinstance(dct['sub']['n1'], Deferred)
+    assert isinstance(dct['sub']['b'], Deferred)
 
 def test_Config_deferred_as_dict(defconfig):
     defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})

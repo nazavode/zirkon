@@ -366,11 +366,6 @@ Environment variables
                         default=default_defaults,
                         help="set defaults mode")
 
-    parser.add_argument("--late-evaluation", "-L",
-                        action="store_true",
-                        default=False,
-                        help="set late evaluation mode")
-
     parser.add_argument("--verbose", "-v",
                         dest="verbose_level",
                         action="count",
@@ -449,7 +444,6 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
             config_args = {}
             if issubclass(config_class, Config):
                 config_args['defaults'] = defaults_factory()
-            config_args['late_evaluation'] = args.late_evaluation
             config = config_class(**config_args)
             io_manager.read_obj(config, args.input_filetype)
             if schema is not None:
@@ -460,8 +454,7 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
                     logger.warning("validation failed for config %s:", args.input_filetype.filepath)
                     io_manager.dump_obj(validation, print_function=logger.warning)
         elif args.create_template:
-            late_evaluation = True
-            config = Config(late_evaluation=late_evaluation)
+            config = Config()
             create_template_from_schema(schema=schema, config=config)
 
         if config is not None:

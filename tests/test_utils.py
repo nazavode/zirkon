@@ -22,7 +22,7 @@ import io
 
 import pytest
 
-from common.fixtures import string_io, late_evaluation
+from common.fixtures import string_io
 
 from daikon.schema import Schema
 from daikon.config import ROOT, SECTION, Config
@@ -61,23 +61,17 @@ input_file = '# Str(min_len=1)'
     j = 2
 """
 
-def test_create_template_from_schema_late_evaluation(string_io, late_evaluation):
+def test_create_template_from_schema(string_io):
     schema = Schema()
     schema['m0'] = Int(default=3)
     schema['m1'] = Int(default=ROOT['m0'] + 1)
-    config = Config(late_evaluation=late_evaluation)
+    config = Config()
     create_template_from_schema(schema, config=config)
     
     config.dump(stream=string_io)
-    if late_evaluation:
-        assert string_io.getvalue() == """\
+    assert string_io.getvalue() == """\
 m0 = 3
 m1 = ROOT['m0'] + 1
-"""
-    else:
-        assert string_io.getvalue() == """\
-m0 = 3
-m1 = 4
 """
 
 def test_replace_deferred():

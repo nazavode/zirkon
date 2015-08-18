@@ -40,7 +40,7 @@ from .toolbox.serializer import Serializer
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None, late_evaluation=True)
+    """Section(init=None, *, dictionary=None, parent=None)
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -80,7 +80,7 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=True):
+    def __init__(self, init=None, *, dictionary=None, parent=None):
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -90,7 +90,6 @@ class Section(collections.abc.Mapping):
         else:
             self.parent = parent
             self.root = self.parent.root
-        self.late_evaluation = late_evaluation
         if init:
             self.update(init)
 
@@ -106,8 +105,7 @@ class Section(collections.abc.Mapping):
            Return a subsection with the given name
         """
         dummy = section_name
-        return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        late_evaluation=self.late_evaluation)
+        return self._subsection_class()(dictionary=dictionary, parent=self)
 
     @classmethod
     def _dictionary_factory(cls):
@@ -180,11 +178,7 @@ class Section(collections.abc.Mapping):
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
-            if isinstance(value, Deferred):
-                if not self.late_evaluation:
-                    value = self._evaluate(value, ref_section=ref_section)
-                    self._check_option(key=key, value=value)
-            else:
+            if not isinstance(value, Deferred):
                 self._check_option(key=key, value=value)
             self.dictionary[key] = value
 
@@ -215,7 +209,7 @@ class Section(collections.abc.Mapping):
         """copy()
            Returns a deep copy of the section.
         """
-        return self._subsection_class()(dictionary=self.dictionary.copy(), late_evaluation=self.late_evaluation)
+        return self._subsection_class()(dictionary=self.dictionary.copy())
 
     def get(self, key, default=None):
         if key in self:

@@ -65,8 +65,7 @@ def create_template_from_schema(schema, *, config=None):
            j = 2
     """
     if config is None:
-        config = Config(late_evaluation=True)
-    late_evaluation = config.late_evaluation
+        config = Config()
     if not isinstance(schema, SchemaSection):
         raise ValueError("invalid argument {!r} of type {}: not a Schema".format(
             schema, type(schema).__name__))
@@ -78,17 +77,6 @@ def create_template_from_schema(schema, *, config=None):
         else:
             has_default, default = _get_validator_default(value)
             if has_default:
-                if late_evaluation:
-                    config[key] = default
-                else:
-                    if isinstance(default, Deferred):
-                        try:
-                            default_value = default.evaluate()
-                        except:  # pylint: disable=W0702
-                            default_value = "# default: {}".format(default.unparse())
-                        config[key] = default_value
-                    else:
-                        config[key] = default
                 config[key] = default
             else:
                 config[key] = "# {!r}".format(value)

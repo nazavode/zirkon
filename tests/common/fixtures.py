@@ -29,7 +29,6 @@ __all__ = [
     'simple_schema_content',
     'simple_section_content',
     'simple_validation',
-    'late_evaluation',
     'tmp_text_file',
     'tmp_raw_file',
     'SIMPLE_SECTION_DUMP',
@@ -300,9 +299,5 @@ def simple_validation(simple_schema_content, simple_section_content):
     simple_section_content['sub']['subsub']['ssy'] = []
     config = Config(simple_section_content)
     return schema.validate(config)
-
-@pytest.fixture(params=[True, False])
-def late_evaluation(request):
-    return request.param
 
 

@@ -55,21 +55,21 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, late_evaluation=True, defaults=False):
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False):
         if defaults is True:
-            defaults = Section(late_evaluation=late_evaluation)
+            defaults = Section()
         elif defaults is False:
             defaults = None
         elif defaults is None or isinstance(defaults, Section):
             defaults = defaults
         elif isinstance(defaults, collections.Mapping):
-            defaults = Section(dictionary=defaults, late_evaluation=late_evaluation)
+            defaults = Section(dictionary=defaults)
         else:
             raise TypeError("invalid defaults object of type {}: not a Section".format(
                 type(defaults).__name__))
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
-        super().__init__(init=init, dictionary=dictionary, parent=parent, late_evaluation=late_evaluation)
+        super().__init__(init=init, dictionary=dictionary, parent=parent)
 
     @classmethod
     def _subsection_class(cls):
@@ -83,8 +83,7 @@ class ConfigSection(Section):
                 subdefaults = self._defaults.add_section(section_name)
         else:
             subdefaults = None
-        return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        defaults=subdefaults, late_evaluation=self.late_evaluation)
+        return self._subsection_class()(dictionary=dictionary, parent=self, defaults=subdefaults)
 
     def add_defaults(self, **kwargs):
         """add_defaults(**kwargs)
@@ -132,7 +131,6 @@ class ConfigSection(Section):
         else:
             defaults = None
         return self._subsection_class()(dictionary=self.dictionary.copy(),
-                                        late_evaluation=self.late_evaluation,
                                         defaults=defaults)
 
     def __getitem__(self, key):
