@@ -90,7 +90,7 @@ class ConfigSection(Section):
            Set default options and sections"""
         if self._has_defaults:
             for key, value in kwargs.items():
-                self._defaults.ref_set(key, value, ref_section=self)
+                self._defaults[key] = value
         else:
             _update_defaults(self, kwargs)
 

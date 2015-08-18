@@ -160,11 +160,7 @@ class Section(collections.abc.Mapping):
             self._check_option(key=key, value=value)
             return value
 
-    def ref_set(self, key, value, ref_section=None):
-        """ref_set(self, key, value, ref_section=None)
-           Set 'key'='value'; the 'ref_section' argument is used to set the
-           'ROOT', 'SECTION' values for deferred values evaluation.
-        """
+    def __setitem__(self, key, value):
         if not isinstance(key, str):
             raise TypeError("invalid key {!r} of non-string type {}".format(key, type(key).__name__))
         elif not is_valid_identifier(key):
@@ -174,7 +170,7 @@ class Section(collections.abc.Mapping):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
             self.dictionary[key] = self._dictionary_factory()
             section = self._subsection(section_name=key, dictionary=self.dictionary[key])
-            section.ref_update(value, ref_section=ref_section)
+            section.update(value)
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
@@ -182,19 +178,8 @@ class Section(collections.abc.Mapping):
                 self._check_option(key=key, value=value)
             self.dictionary[key] = value
 
-    def ref_update(self, dictionary, ref_section=None):
-        """ref_update(self, dictionary, ref_section=None)
-           Update with the content of the 'dictionary'; the 'ref_section' argument
-           is used to set the 'ROOT', 'SECTION' values for deferred values evaluation.
-        """
-        for key, value in dictionary.items():
-            self.ref_set(key, value, ref_section=ref_section)
-
     def __getitem__(self, key):
         return self.ref_get(key)
-
-    def __setitem__(self, key, value):
-        return self.ref_set(key, value)
 
     def __delitem__(self, key):
         del self.dictionary[key]
@@ -308,7 +293,8 @@ class Section(collections.abc.Mapping):
         """update(self, dictionary)
            Update with the content of the 'dictionary'
         """
-        return self.ref_update(dictionary)
+        for key, value in dictionary.items():
+            self[key] = value
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None):
         """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None) -> dict
