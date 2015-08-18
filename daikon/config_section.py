@@ -58,10 +58,10 @@ class ConfigSection(Section):
     def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False):
         if defaults is True:
             defaults = Section()
-        elif defaults is False:
+        elif defaults is False or defaults is None:
             defaults = None
-        elif defaults is None or isinstance(defaults, Section):
-            defaults = defaults
+        elif isinstance(defaults, Section):
+            pass
         elif isinstance(defaults, collections.Mapping):
             defaults = Section(dictionary=defaults)
         else:
@@ -69,6 +69,8 @@ class ConfigSection(Section):
                 type(defaults).__name__))
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
+        if self._has_defaults:
+            self._defaults.ref_section = self
         super().__init__(init=init, dictionary=dictionary, parent=parent)
 
     @classmethod
@@ -138,7 +140,7 @@ class ConfigSection(Section):
             return super().__getitem__(key)
         else:
             if self._has_defaults and key in self._defaults:
-                value = self._defaults.ref_get(key, ref_section=self)
+                value = self._defaults[key]
                 if isinstance(value, collections.Mapping):
                     if has_section_options(value):
                         return self.add_section(key)

@@ -90,8 +90,21 @@ class Section(collections.abc.Mapping):
         else:
             self.parent = parent
             self.root = self.parent.root
+        self._ref_section = None
         if init:
             self.update(init)
+
+    @property
+    def ref_section(self):
+        """ref_section property getter"""
+        return self._ref_section
+
+    @ref_section.setter
+    def ref_section(self, section):
+        """ref_section property setter"""
+        if self._ref_section is not None and section is not None and self._ref_section is not section:
+            raise TypeError("reference section already set")
+        self._ref_section = section
 
     @classmethod
     def _subsection_class(cls):
@@ -115,9 +128,11 @@ class Section(collections.abc.Mapping):
         return collections.OrderedDict()
 
     def _evaluate(self, value, ref_section=None):
-        """_evaluate(value, ref_section=None)
+        """_evaluate(value)
         """
         if isinstance(value, Deferred):
+            if ref_section is None:
+                ref_section = self._ref_section
             if ref_section is None:
                 ref_section = self
             value = value.evaluate({'SECTION': ref_section, 'ROOT': ref_section.root})
@@ -147,16 +162,12 @@ class Section(collections.abc.Mapping):
                 type(value).__name__,
             ))
 
-    def ref_get(self, key, ref_section=None):
-        """ref_get(self, key, ref_section=None)
-           Get 'key'; the 'ref_section' argument is used to set the
-           'ROOT', 'SECTION' values for deferred values evaluation.
-        """
+    def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
-            value = self._evaluate(value, ref_section=ref_section)
+            value = self._evaluate(value)
             self._check_option(key=key, value=value)
             return value
 
@@ -177,9 +188,6 @@ class Section(collections.abc.Mapping):
             if not isinstance(value, Deferred):
                 self._check_option(key=key, value=value)
             self.dictionary[key] = value
-
-    def __getitem__(self, key):
-        return self.ref_get(key)
 
     def __delitem__(self, key):
         del self.dictionary[key]
