@@ -124,3 +124,15 @@ def test_Config_self_validate_error_dump(string_io, config):
 [parameters]
     frequencies = MinLengthError('parameters.frequencies=[5.0]: length 1 is lower than min_len 2')
 """
+    
+def test_Config_err_disabled_interpolation_on_validation():
+    from daikon.config import ROOT
+    config = Config(interpolation=False)
+    schema = Schema()
+    schema['x'] = Int()
+    schema['y'] = Int(min=ROOT['x'] + 2)
+    config['x'] = 3
+    config['y'] = 5
+    with pytest.raises(ValueError) as exc_info:
+        validation = schema.validate(config)
+    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 2: interpolation is not enabled"

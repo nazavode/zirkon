@@ -556,3 +556,21 @@ def test_Config_err_shared_defaults():
     with pytest.raises(ValueError) as exc_info:
         config2 = Config(defaults=config.defaults())
     assert str(exc_info.value) == "reference root already set - defaults cannot be shared"
+
+def test_Config_err_disabled_interpolation():
+    config = Config(interpolation=False)
+    config['x'] = 10
+    config['sub'] = {'sub': {}}
+    with pytest.raises(ValueError) as exc_info:
+        config['y'] = ROOT['x'] + 1
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
+    with pytest.raises(ValueError) as exc_info:
+        config['sub']['sub']['y'] = ROOT['x'] + 1
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
+    config.interpolation = True
+    config['sub']['sub']['y'] = ROOT['x'] + 1
+    assert config['sub']['sub']['y'] == 11
+    config.interpolation = False
+    with pytest.raises(ValueError) as exc_info:
+        c = config['sub']['sub']['y']
+    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: interpolation is not enabled"

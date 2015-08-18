@@ -41,7 +41,7 @@ from .toolbox.serializer import Serializer
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None)
+    """Section(init=None, *, dictionary=None, parent=None, name=None, interpolation=True)
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -81,8 +81,9 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, name=None):
-        self._reference_root = None
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None, interpolation=True):
+        self.interpolation = interpolation
+        self.reference_root = None
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -109,7 +110,9 @@ class Section(collections.abc.Mapping):
         """_subsection(self, section_name, dictionary)
            Return a subsection with the given name
         """
-        return self._subsection_class()(dictionary=dictionary, parent=self, name=section_name)
+        return self._subsection_class()(dictionary=dictionary, parent=self,
+                                        interpolation=self.interpolation,
+                                        name=section_name)
 
     @classmethod
     def _dictionary_factory(cls):
@@ -118,22 +121,26 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
-    def _get_reference_root(self):
-        """_reference_root(value) -> reference root section
+    def get_reference_root(self):
+        """get_reference_root(value) -> reference root section
             to be used for ROOT in evaluate_option_value
         """
-        if self._reference_root is None:
+        if self.reference_root is None:
             return self.root
         else:
-            return self._reference_root
+            return self.reference_root
 
     def evaluate_option_value(self, value):
         """evaluate_option_value(value)
         """
         if isinstance(value, Deferred):
-            reference_root = self._get_reference_root()
-            section_getter = lambda: get_section_value(reference_root, *self.fqname)
-            value = value.evaluate({'SECTION': section_getter, 'ROOT': reference_root})
+            if self.interpolation:
+                reference_root = self.get_reference_root()
+                section_getter = lambda: get_section_value(reference_root, *self.fqname)
+                value = value.evaluate({'SECTION': section_getter, 'ROOT': reference_root})
+            else:
+                raise ValueError("cannot evaluate {}: interpolation is not enabled".format(
+                    value.unparse()))
         return value
 
     def _check_option(self, key, value):
@@ -183,7 +190,11 @@ class Section(collections.abc.Mapping):
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
-            if not isinstance(value, Deferred):
+            if isinstance(value, Deferred):
+                if not self.interpolation:
+                    raise ValueError("cannot set {}={}: interpolation is not enabled".format(
+                        key, value.unparse()))
+            else:
                 self._check_option(key=key, value=value)
             self.dictionary[key] = value
 

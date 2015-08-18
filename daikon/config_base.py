@@ -49,8 +49,10 @@ class ConfigBase(Section):
        Config base class.
     """
 
-    def __init__(self, init=None, *, dictionary=None, schema=None, validate=True, **section_options):
-        super().__init__(dictionary=dictionary, init=init, **section_options)
+    def __init__(self, init=None, *, dictionary=None, schema=None, validate=True,
+                 interpolation=True, **section_options):
+        super().__init__(dictionary=dictionary, init=init,
+                         interpolation=interpolation, **section_options)
         self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):

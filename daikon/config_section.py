@@ -56,7 +56,8 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False, name=None):
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False,
+                 interpolation=True, name=None):
         if defaults is False or defaults is None:
             defaults = None
         elif isinstance(defaults, DefaultsSection):
@@ -74,7 +75,8 @@ class ConfigSection(Section):
         self._has_defaults = self._defaults is not None
         if self._has_defaults and parent is None:
             self._defaults.set_reference_root(self)
-        super().__init__(init=init, dictionary=dictionary, parent=parent, name=name)
+        super().__init__(init=init, dictionary=dictionary, parent=parent,
+                         name=name, interpolation=interpolation)
 
     @classmethod
     def _subsection_class(cls):
@@ -89,6 +91,7 @@ class ConfigSection(Section):
         else:
             subdefaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self,
+                                        interpolation=self.interpolation,
                                         name=section_name, defaults=subdefaults)
 
     def set_defaults(self, **kwargs):
