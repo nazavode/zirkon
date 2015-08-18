@@ -87,7 +87,7 @@ def test_replace_deferred():
         config['sub'] = {}
         config['sub']['x'] = x_value
         config['sub']['y'] = SECTION['x'] + ROOT['b']
-        config.add_defaults(c=c_value, d=3 + ROOT['c'] + SECTION['a'],
+        config.set_defaults(c=c_value, d=3 + ROOT['c'] + SECTION['a'],
                             sub={'z': z_value,
                                  'subsub': {'t': ROOT['a'] - 1},
                                  'w': SECTION['x'] + SECTION['z'] + ROOT['a'] + ROOT['c']})

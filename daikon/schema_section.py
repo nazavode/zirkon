@@ -51,7 +51,7 @@ def _reset_option_default(*, section, option, option_name):
             if option.defined:
                 for key, _ in section.options():
                     if key == option_name:
-                        # option from standard values
+                        # option is from standard values
                         break
                 else:
                     # option is from section_defaults:

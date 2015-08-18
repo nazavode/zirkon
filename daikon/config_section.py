@@ -85,9 +85,9 @@ class ConfigSection(Section):
             subdefaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self, defaults=subdefaults)
 
-    def add_defaults(self, **kwargs):
-        """add_defaults(**kwargs)
-           Add default options and sections"""
+    def set_defaults(self, **kwargs):
+        """set_defaults(**kwargs)
+           Set default options and sections"""
         if self._has_defaults:
             for key, value in kwargs.items():
                 self._defaults.ref_set(key, value, ref_section=self)

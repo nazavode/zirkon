@@ -127,7 +127,7 @@ Daikon supports default values; these values are stored in a separated space (no
 
 Default values can be added:
 
- >>> config.add_defaults(z=3.0)
+ >>> config.set_defaults(z=3.0)
  >>> print(config['z'])
  3.0
 

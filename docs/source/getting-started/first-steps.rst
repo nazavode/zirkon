@@ -280,11 +280,11 @@ When enabled, if a mapping is passed as value to *defaults*, it defines the init
  >>> defaults_config = Config()
  >>> config = Config(defaults=defaults_config)
 
-The *add_defaults* method can be used to add default options or sections:
+The *set_defaults* method can be used to add default options or sections:
 
  >>> config['z'] = 100
- >>> config.add_defaults(a=10)
- >>> config.add_defaults(sub={'x': 1})
+ >>> config.set_defaults(a=10)
+ >>> config.set_defaults(sub={'x': 1})
 
 Only standard values are serialized:
 

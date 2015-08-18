@@ -157,7 +157,7 @@ def test_Config_deferred_error(defaultsvalue):
 
 def test_Config_defaults_option():
     config = Config(defaults=True)
-    config.add_defaults(a=10)
+    config.set_defaults(a=10)
     assert 'a' in config
     assert config.has_key('a')
     assert config.has_option('a')
@@ -169,7 +169,7 @@ def test_Config_defaults_option():
 
 def test_Config_defaults_section():
     config = Config(defaults=True)
-    config.add_defaults(a={'x': 1})
+    config.set_defaults(a={'x': 1})
     assert 'a' in config
     assert config.has_key('a')
     assert config.has_section('a')
@@ -194,7 +194,7 @@ def test_Config_defaults_section():
 
 def test_Config_defaults_section_add():
     config = Config(defaults=True)
-    config.add_defaults(a={'x': 1})
+    config.set_defaults(a={'x': 1})
     assert 'a' in config
     config['a']['t'] = 0.1
     assert config['a']['x'] == 1
@@ -212,7 +212,7 @@ def test_Config_defaults_add_overlap(defaultsvalue):
     config['sub'] = {}
     config['sub']['x'] = 10
     config['sub']['y'] = 11
-    config.add_defaults(b=201, c=202, sub={'y': 21, 'z': 22})
+    config.set_defaults(b=201, c=202, sub={'y': 21, 'z': 22})
     assert 'a' in config
     assert config['a'] == 100
     assert 'b' in config
@@ -229,7 +229,7 @@ def test_Config_defaults_add_overlap(defaultsvalue):
 def test_Config_defaults_add_subsub():
     config = Config(defaults=True)
     config['x'] = 10
-    config.add_defaults(a=1, sub={'sa': 2, 'subsub': {'ssa': 3, 'empty1': {}, 'empty2': {'ee1': {}, 'ee2': {}}, 'subsubsub': {'sss': 4}, 'ssb': 5}, 'sb': 6}, b=7)
+    config.set_defaults(a=1, sub={'sa': 2, 'subsub': {'ssa': 3, 'empty1': {}, 'empty2': {'ee1': {}, 'ee2': {}}, 'subsubsub': {'sss': 4}, 'ssb': 5}, 'sb': 6}, b=7)
     assert config.has_section('sub')
     assert config['sub'].has_section('subsub')
     assert config['sub']['subsub'].has_section('subsubsub')
@@ -271,9 +271,9 @@ def test_Config_defaults_external(extdefaults):
     edcopy2 = as_dict(extdefaults, depth=-1, dict_class=dict)
     assert edcopy == edcopy2
     
-def test_Config_no_defaults_add_defaults():
+def test_Config_no_defaults_set_defaults():
     config = Config(defaults=False)
-    config.add_defaults(alpha=10, beta={'x': 1})
+    config.set_defaults(alpha=10, beta={'x': 1})
     assert config.has_option('alpha')
     assert config['alpha'] == 10
     assert len(config) == 2
@@ -284,7 +284,7 @@ def test_Config_no_defaults_add_defaults():
 
 def test_Config_defaults_get_defaults():
     config = Config(defaults=True)
-    config.add_defaults(a={'x': 1}, b=10)
+    config.set_defaults(a={'x': 1}, b=10)
     assert isinstance(config.defaults(), Section)
     assert config.defaults() == {'a': {'x': 1}, 'b': 10}
     config = Config(defaults=False)
@@ -292,7 +292,7 @@ def test_Config_defaults_get_defaults():
 
 def test_Config_defaults_empty_section():
     config = Config(defaults=True)
-    config.add_defaults(a={})
+    config.set_defaults(a={})
     assert not 'a' in config
     assert not config.has_key('a')
     assert not config.has_section('a')
@@ -301,20 +301,20 @@ def test_Config_defaults_update(defaultsvalue):
     config1 = Config(defaults=defaultsvalue)
     config1['d'] = 11
     config1['e'] = 12
-    config1.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config1.set_defaults(a={}, b=5, c={'x': 7}, d=8)
     config2 = Config(defaults=True)
     config2.update(config1)
     assert config2 == config1
-    config1.add_defaults(only1=1)
+    config1.set_defaults(only1=1)
     assert not config2.has_option('only1')
-    config2.add_defaults(only2=2)
+    config2.set_defaults(only2=2)
     assert not config1.has_option('only2')
     assert config2 != config1
 
 def test_Config_copy(defaultsvalue):
     config = Config(defaults=defaultsvalue)
     config['a'] = 10
-    config.add_defaults(b=20)
+    config.set_defaults(b=20)
     config2 = config.copy()
     assert config2 == config
 
@@ -322,7 +322,7 @@ def test_Config_defaults_copy():
     config = Config(defaults=True)
     config['d'] = 11
     config['e'] = 12
-    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config.set_defaults(a={}, b=5, c={'x': 7}, d=8)
     config2 = config.copy()
     assert not config2.has_section('a')
     assert config2.has_option('b')
@@ -338,9 +338,9 @@ def test_Config_defaults_copy():
 def test_Config_defaults_dump(string_io):
     config = Config(defaults=True)
     config['x'] = 1
-    config.add_defaults(alpha=10)
+    config.set_defaults(alpha=10)
     config['sub'] = {'w': 2}
-    config['sub'].add_defaults(beta=20, gamma={'x': 11}, delta={})
+    config['sub'].set_defaults(beta=20, gamma={'x': 11}, delta={})
     assert config['sub']['beta'] == 20
     assert config['sub']['gamma']['x'] == 11
     config.dump(string_io)
@@ -366,7 +366,7 @@ def test_Config_defaults_sub():
     config['b'] = 20
 
     config2 = Config(defaults=True)
-    config2.add_defaults(**config)
+    config2.set_defaults(**config)
     assert len(config2) == 0
 
     assert config2['a'] == 10
@@ -385,7 +385,7 @@ def test_Config_defaults_deloptions():
     config = Config(defaults=True)
     config['d'] = 11
     config['e'] = 12
-    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config.set_defaults(a={}, b=5, c={'x': 7}, d=8)
     assert config.has_option('d')
     assert config['d'] == 11
     del config['d']
@@ -407,7 +407,7 @@ def test_Config_defaults_eq():
     config = Config(defaults=True)
     config['d'] = 11
     config['e'] = 12
-    config.add_defaults(a={}, b=5, c={'x': 7}, d=8)
+    config.set_defaults(a={}, b=5, c={'x': 7}, d=8)
     
     config2 = Config(defaults=True)
     config2['d'] = 11
@@ -418,7 +418,7 @@ def test_Config_defaults_eq():
 @pytest.fixture
 def config_option():
     config = Config(defaults=True)
-    config.add_defaults(a=10, b=20)
+    config.set_defaults(a=10, b=20)
     config['a'] = 5
     config['c'] = 15
     return config
@@ -455,7 +455,7 @@ def test_Config_defaults_deloption_only_loc(config_option):
 @pytest.fixture
 def config_section():
     config = Config(defaults=True)
-    config.add_defaults(a={'ax': 1}, b={'bx': 2})
+    config.set_defaults(a={'ax': 1}, b={'bx': 2})
     config['a'] = {'ax': 10}
     config['c'] = {'cx': 20}
     return config
@@ -523,7 +523,7 @@ def test_Config_deferred_copy(defconfig):
     assert isinstance(config.dictionary['sub']['n1'], Deferred)
     
 def test_Config_deferred_defaults(defconfig):
-    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     assert defconfig['a'] == 7
     assert defconfig['sub']['b'] == 3
     print(defconfig.defaults())
@@ -539,13 +539,13 @@ def test_Config_deferred_defaults(defconfig):
     assert config['sub']['b'] == 103
      
 def test_Config_deferred_as_dict_evaluate_False(defconfig):
-    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     dct = defconfig.as_dict(evaluate=False)
     assert isinstance(dct['sub']['n1'], Deferred)
     assert isinstance(dct['sub']['b'], Deferred)
 
 def test_Config_deferred_as_dict(defconfig):
-    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     dct = defconfig.as_dict()
     assert isinstance(dct['sub']['n1'], int)
     assert dct['sub']['n1'] == 11
