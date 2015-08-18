@@ -49,6 +49,24 @@ def _update_defaults(config, defaults):
                 config[key] = value
 
 
+def _make_defaults(value):
+    """_make_defaults(value) -> defaults"""
+    if value is False or value is None:
+        defaults = None
+    elif isinstance(value, DefaultsSection):
+        defaults = value
+    elif value is True:
+        defaults = DefaultsSection()
+    elif isinstance(value, Section):
+        defaults = DefaultsSection(dictionary=value)
+    elif isinstance(value, collections.Mapping):
+        defaults = DefaultsSection(dictionary=value)
+    else:
+        raise TypeError("invalid defaults object of type {}: not a Section".format(
+            type(value).__name__))
+    return defaults
+
+
 class ConfigSection(Section):
     """ConfigSection(...)
        Adds support for defaults.
@@ -58,25 +76,29 @@ class ConfigSection(Section):
 
     def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False,
                  interpolation=True, name=None):
-        if defaults is False or defaults is None:
-            defaults = None
-        elif isinstance(defaults, DefaultsSection):
-            pass
-        elif defaults is True:
-            defaults = DefaultsSection()
-        elif isinstance(defaults, Section):
-            defaults = DefaultsSection(dictionary=defaults)
-        elif isinstance(defaults, collections.Mapping):
-            defaults = DefaultsSection(dictionary=defaults)
-        else:
-            raise TypeError("invalid defaults object of type {}: not a Section".format(
-                type(defaults).__name__))
+        defaults = _make_defaults(defaults)
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
         if self._has_defaults and parent is None:
-            self._defaults.set_reference_root(self)
+            self._defaults.root.set_reference_root(self)
         super().__init__(init=init, dictionary=dictionary, parent=parent,
                          name=name, interpolation=interpolation)
+
+    @property
+    def defaults(self):
+        """defaults getter"""
+        return self._defaults
+
+    @defaults.setter
+    def defaults(self, value):
+        """defaults setter"""
+        if self._has_defaults:
+            self._defaults.set_reference_root(None)
+        defaults = _make_defaults(value)
+        self._defaults = defaults
+        self._has_defaults = self._defaults is not None
+        if self._has_defaults:
+            self._defaults.set_reference_root(self.root)
 
     @classmethod
     def _subsection_class(cls):
@@ -163,15 +185,11 @@ class ConfigSection(Section):
         else:
             super().__delitem__(key)
 
-    def defaults(self):
-        """defaults() -> the defaults section"""
-        return self._defaults
-
     def update(self, dictionary):
         super().update(dictionary)
         if isinstance(dictionary, ConfigSection):
-            if self._has_defaults and dictionary.defaults() is not None:
-                self._defaults.update(dictionary.defaults())
+            if self._has_defaults and dictionary.defaults is not None:
+                self._defaults.update(dictionary.defaults)
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
         if defaults and self._has_defaults:

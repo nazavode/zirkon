@@ -91,6 +91,6 @@ def replace_deferred(config):
             replace_deferred(value)
         else:
             config[key] = config.evaluate_option_value(value)
-    if isinstance(config, ConfigSection) and config.defaults() is not None:
-        replace_deferred(config.defaults())
+    if isinstance(config, ConfigSection) and config.defaults is not None:
+        replace_deferred(config.defaults)
 

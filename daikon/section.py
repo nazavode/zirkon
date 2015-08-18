@@ -121,6 +121,13 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
+    def set_reference_root(self, reference_root):
+        """set_reference_root(reference_root)"""
+        if self.root.reference_root is None or reference_root is None:
+            self.root.reference_root = reference_root
+        elif self.root.reference_root is not reference_root:
+            raise ValueError("reference root already set - defaults cannot be shared")
+
     def get_reference_root(self):
         """get_reference_root(value) -> reference root section
             to be used for ROOT in evaluate_option_value

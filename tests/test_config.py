@@ -199,7 +199,7 @@ def test_Config_defaults_section_add():
     config['a']['t'] = 0.1
     assert config['a']['x'] == 1
     assert config['a']['t'] == 0.1
-    assert not config.defaults()['a'].has_option('t')
+    assert not config.defaults['a'].has_option('t')
     del config['a']
     assert config.has_section('a')
     assert config['a'].has_option('x')
@@ -285,10 +285,10 @@ def test_Config_no_defaults_set_defaults():
 def test_Config_defaults_get_defaults():
     config = Config(defaults=True)
     config.set_defaults(a={'x': 1}, b=10)
-    assert isinstance(config.defaults(), Section)
-    assert config.defaults() == {'a': {'x': 1}, 'b': 10}
+    assert isinstance(config.defaults, Section)
+    assert config.defaults == {'a': {'x': 1}, 'b': 10}
     config = Config(defaults=False)
-    assert config.defaults() is None
+    assert config.defaults is None
 
 def test_Config_defaults_empty_section():
     config = Config(defaults=True)
@@ -554,7 +554,7 @@ def test_Config_deferred_as_dict(defconfig):
 def test_Config_err_shared_defaults():
     config = Config(defaults=True)
     with pytest.raises(ValueError) as exc_info:
-        config2 = Config(defaults=config.defaults())
+        config2 = Config(defaults=config.defaults)
     assert str(exc_info.value) == "reference root already set - defaults cannot be shared"
 
 def test_Config_err_disabled_interpolation():
@@ -574,3 +574,24 @@ def test_Config_err_disabled_interpolation():
     with pytest.raises(ValueError) as exc_info:
         c = config['sub']['sub']['y']
     assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: interpolation is not enabled"
+
+def test_Config_change_defaults():
+    config1 = Config(defaults=True)
+    defaults1 = config1.defaults
+    config1.set_defaults(s={'a': 1, 'b': 2})
+    config2 = Config(defaults=True)
+    defaults2 = config2.defaults
+    config2.set_defaults(s={'a': 10, 'c': 20})
+
+    assert config1['s']['a'] == 1
+    assert config2['s']['a'] == 10
+
+    config1.defaults = None
+
+    config2.defaults = defaults1
+
+    config1.defaults = defaults2
+
+    assert config1.has_section('s')
+    assert config1['s']['a'] == 10
+    assert config2['s']['a'] == 1

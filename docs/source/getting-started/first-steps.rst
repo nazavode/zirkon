@@ -293,7 +293,7 @@ Only standard values are serialized:
 
 Defaults can be retrieved:
 
- >>> config.defaults().dump()
+ >>> config.defaults.dump()
  a = 10
  [sub]
      x = 1

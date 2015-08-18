@@ -45,7 +45,7 @@ def _reset_option_default(*, section, option, option_name):
     """
     section_defaults = section
     if isinstance(section, ConfigSection):
-        defaults = section.defaults()
+        defaults = section.defaults
         if defaults is not None:
             section_defaults = defaults
             if option.defined:

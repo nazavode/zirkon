@@ -51,10 +51,3 @@ class DefaultsSection(Section):
     def get_reference_root(self):
         # use always the root reference_root, which is correctly set
         return self.root.reference_root
-
-    def set_reference_root(self, reference_root):
-        """set_reference_root(reference_root)"""
-        if self.reference_root is None:
-            self.reference_root = reference_root
-        elif self.reference_root is not reference_root:
-            raise ValueError("reference root already set - defaults cannot be shared")

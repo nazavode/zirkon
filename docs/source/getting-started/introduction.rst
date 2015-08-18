@@ -152,7 +152,7 @@ When enabled, defaults are used to store the default values set during validatio
 
 Defaults can directly be accessed:
 
- >>> config.defaults().dump()
+ >>> config.defaults.dump()
  t = 789
  
 
