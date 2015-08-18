@@ -104,7 +104,7 @@ Notice that two values have been added to *config*, due to the defaults defined 
 Interpolation
 -------------
 
-Daikon supports value interpolation: previously defined config values can inflence new values:
+Daikon supports value interpolation: *config* values can be influenced by other values:
 
  >>> from daikon.config import ROOT
  >>> config = Config()
@@ -119,6 +119,8 @@ Daikon supports value interpolation: previously defined config values can inflen
  x = 10
  y = ROOT['x'] * 4
  >>>
+
+The value of *y* is tied to *x* by means of the expression ``ROOT['x'] * 4``.
 
 This can be used also in *Validators*:
 
