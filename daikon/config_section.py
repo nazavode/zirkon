@@ -70,6 +70,7 @@ class ConfigSection(Section):
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
         if self._has_defaults:
+            # set the reference section for defaults:
             self._defaults.ref_section = self
         super().__init__(init=init, dictionary=dictionary, parent=parent)
 

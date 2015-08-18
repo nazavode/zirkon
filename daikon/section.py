@@ -90,6 +90,7 @@ class Section(collections.abc.Mapping):
         else:
             self.parent = parent
             self.root = self.parent.root
+        # the reference section for ROOT and SECTION:
         self._ref_section = None
         if init:
             self.update(init)
