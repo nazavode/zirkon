@@ -526,9 +526,7 @@ def test_Config_deferred_defaults(defconfig):
     defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     assert defconfig['a'] == 7
     assert defconfig['sub']['b'] == 3
-    print(defconfig.defaults())
     config = defconfig.copy()
-    print(config.defaults())
     assert config['a'] == 7
     assert config['sub']['b'] == 3
     defconfig['n'] = 20
@@ -553,4 +551,8 @@ def test_Config_deferred_as_dict(defconfig):
     assert isinstance(dct['sub']['b'], int)
     assert dct['sub']['b'] == 3
 
-    
+def test_Config_err_shared_defaults():
+    config = Config(defaults=True)
+    with pytest.raises(ValueError) as exc_info:
+        config2 = Config(defaults=config.defaults())
+    assert str(exc_info.value) == "reference root already set - defaults cannot be shared"

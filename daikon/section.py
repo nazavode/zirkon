@@ -27,6 +27,7 @@ __all__ = [
     'iter_section_options',
     'count_section_options',
     'has_section_options',
+    'get_section_value',
 ]
 
 import collections
@@ -80,16 +81,19 @@ class Section(collections.abc.Mapping):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None):
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None):
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
         if parent is None:
             self.parent = self
             self.root = self
+            self.fqname = ()
         else:
             self.parent = parent
             self.root = self.parent.root
+            self.fqname = self.parent.fqname + (name,)
+        # the reference root for ROOT and SECTION:
         if init:
             self.update(init)
 
@@ -104,8 +108,7 @@ class Section(collections.abc.Mapping):
         """_subsection(self, section_name, dictionary)
            Return a subsection with the given name
         """
-        dummy = section_name
-        return self._subsection_class()(dictionary=dictionary, parent=self)
+        return self._subsection_class()(dictionary=dictionary, parent=self, name=section_name)
 
     @classmethod
     def _dictionary_factory(cls):
@@ -114,13 +117,19 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
-    def _evaluate(self, value, ref_section=None):
-        """_evaluate(value, ref_section=None)
+    def _reference_root(self):
+        """_reference_root(value) -> reference root section
+            to be used for ROOT in evaluate_option_value
+        """
+        return self.root
+
+    def evaluate_option_value(self, value):
+        """evaluate_option_value(value)
         """
         if isinstance(value, Deferred):
-            if ref_section is None:
-                ref_section = self
-            value = value.evaluate({'SECTION': ref_section, 'ROOT': ref_section.root})
+            ref_root = self._reference_root()
+            section_getter = lambda: get_section_value(ref_root, *self.fqname)
+            value = value.evaluate({'SECTION': section_getter, 'ROOT': ref_root})
         return value
 
     def _check_option(self, key, value):
@@ -147,24 +156,16 @@ class Section(collections.abc.Mapping):
                 type(value).__name__,
             ))
 
-    def ref_get(self, key, ref_section=None):
-        """ref_get(self, key, ref_section=None)
-           Get 'key'; the 'ref_section' argument is used to set the
-           'ROOT', 'SECTION' values for deferred values evaluation.
-        """
+    def __getitem__(self, key):
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
-            value = self._evaluate(value, ref_section=ref_section)
+            value = self.evaluate_option_value(value)
             self._check_option(key=key, value=value)
             return value
 
-    def ref_set(self, key, value, ref_section=None):
-        """ref_set(self, key, value, ref_section=None)
-           Set 'key'='value'; the 'ref_section' argument is used to set the
-           'ROOT', 'SECTION' values for deferred values evaluation.
-        """
+    def __setitem__(self, key, value):
         if not isinstance(key, str):
             raise TypeError("invalid key {!r} of non-string type {}".format(key, type(key).__name__))
         elif not is_valid_identifier(key):
@@ -174,27 +175,13 @@ class Section(collections.abc.Mapping):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
             self.dictionary[key] = self._dictionary_factory()
             section = self._subsection(section_name=key, dictionary=self.dictionary[key])
-            section.ref_update(value, ref_section=ref_section)
+            section.update(value)
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
             if not isinstance(value, Deferred):
                 self._check_option(key=key, value=value)
             self.dictionary[key] = value
-
-    def ref_update(self, dictionary, ref_section=None):
-        """ref_update(self, dictionary, ref_section=None)
-           Update with the content of the 'dictionary'; the 'ref_section' argument
-           is used to set the 'ROOT', 'SECTION' values for deferred values evaluation.
-        """
-        for key, value in dictionary.items():
-            self.ref_set(key, value, ref_section=ref_section)
-
-    def __getitem__(self, key):
-        return self.ref_get(key)
-
-    def __setitem__(self, key, value):
-        return self.ref_set(key, value)
 
     def __delitem__(self, key):
         del self.dictionary[key]
@@ -308,10 +295,11 @@ class Section(collections.abc.Mapping):
         """update(self, dictionary)
            Update with the content of the 'dictionary'
         """
-        return self.ref_update(dictionary)
+        for key, value in dictionary.items():
+            self[key] = value
 
-    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None):
-        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True, ref_section=None) -> dict
+    def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
+        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True) -> dict
            Return a dict with all the section content
         """
         result = dict_class()
@@ -319,10 +307,10 @@ class Section(collections.abc.Mapping):
         for key, value in self.items():
             if isinstance(value, subsection_class):
                 result[key] = value.as_dict(dict_class=dict_class, defaults=defaults,
-                                            evaluate=evaluate, ref_section=ref_section)
+                                            evaluate=evaluate)
             else:
                 if evaluate:
-                    value = self._evaluate(value, ref_section=ref_section)
+                    value = self.evaluate_option_value(value)
                 result[key] = value
         return result
 
@@ -392,3 +380,13 @@ def has_section_options(section):
     for _ in iter_section_options(section):
         return True
     return False
+
+
+def get_section_value(config, *keys):
+    """get_section_value(config, *keys)
+       Config getter; get_section_value(config, k0, k1, k2) is equivalent to config[k0][k1][k2].
+    """
+    result = config
+    for key in keys:
+        result = result[key]
+    return result

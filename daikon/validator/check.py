@@ -62,7 +62,5 @@ class Check(metaclass=abc.ABCMeta):
     def get_value(self, value, section):  # pylint: disable=R0201
         """get_value(value, section) -> value"""
         if section is not None:
-            if isinstance(value, Deferred):
-                globals_d = {'SECTION': section, 'ROOT': section.root}
-                value = value.evaluate(globals_d=globals_d)
+            value = section.evaluate_option_value(value)
         return value
