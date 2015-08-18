@@ -36,6 +36,7 @@ from common.fixtures import dictionary, \
     SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION, \
     SIMPLE_CONFIG_DAIKON_SERIALIZATION
 
+from daikon.toolbox.deferred import Deferred
 from daikon.toolbox.dictutils import compare_dicts, as_dict
 from daikon.section import Section
 from daikon.config_section import ConfigSection
@@ -472,8 +473,8 @@ def test_Config_defaults_delsection_only_loc(config_section):
     assert not config.has_section('c')
 
 @pytest.fixture
-def defconfig(late_evaluation):
-    config = Config(late_evaluation=late_evaluation)
+def defconfig(late_evaluation, defaultsvalue):
+    config = Config(late_evaluation=late_evaluation, defaults=defaultsvalue)
     config['n'] = 10
     config['sub'] = {}
     config['sub']['n1'] = ROOT['n'] + 1
@@ -504,3 +505,36 @@ n = 10
     [sub]
         n2 = 110
 """
+
+def test_Config_deferred_copy(defconfig):
+    config = defconfig.copy()
+    assert config.late_evaluation == defconfig.late_evaluation
+    if config.late_evaluation:
+        assert isinstance(defconfig.dictionary['sub']['n1'], Deferred)
+        assert isinstance(config.dictionary['sub']['n1'], Deferred)
+    else:
+        assert isinstance(defconfig.dictionary['sub']['n1'], int)
+        assert isinstance(config.dictionary['sub']['n1'], int)
+    
+def test_Config_deferred_defaults(defconfig):
+    defconfig.add_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
+    assert defconfig['a'] == 7
+    assert defconfig['sub']['b'] == 3
+    print(defconfig.defaults())
+    config = defconfig.copy()
+    print(config.defaults())
+    assert config['a'] == 7
+    assert config['sub']['b'] == 3
+    defconfig['n'] = 20
+    config['n'] = 110
+    if defconfig.late_evaluation:
+        assert defconfig['a'] == 17
+        assert defconfig['sub']['b'] == 13
+        assert config['a'] == 107
+        assert config['sub']['b'] == 103
+    else:
+        assert defconfig['a'] == 7
+        assert defconfig['sub']['b'] == 3
+        assert config['a'] == 7
+        assert config['sub']['b'] == 3
+     

@@ -33,10 +33,10 @@ import collections
 import collections.abc
 import sys
 
-from .toolbox.identifier import is_valid_identifier
-from .toolbox.dictutils import as_dict
-from .toolbox.serializer import Serializer
 from .toolbox.deferred import Deferred
+from .toolbox.dictutils import as_dict
+from .toolbox.identifier import is_valid_identifier
+from .toolbox.serializer import Serializer
 
 
 class Section(collections.abc.Mapping):
@@ -116,11 +116,20 @@ class Section(collections.abc.Mapping):
         """
         return collections.OrderedDict()
 
-    def _check_data_type(self, key, value):
-        """_check_data_type(key, value)
+    def _evaluate(self, value, ref_section=None):
+        """_evaluate(value, ref_section=None)
+        """
+        if isinstance(value, Deferred):
+            if ref_section is None:
+                ref_section = self
+            value = value.evaluate({'SECTION': ref_section, 'ROOT': ref_section.root})
+        return value
+
+    def _check_option(self, key, value):
+        """_check_option(key, value)
         """
         if isinstance(value, self.SUPPORTED_SCALAR_TYPES):
-            return
+            return value
         elif isinstance(value, self.SUPPORTED_SEQUENCE_TYPES):
             for index, item in enumerate(value):
                 if not isinstance(item, self.SUPPORTED_SCALAR_TYPES):
@@ -132,7 +141,7 @@ class Section(collections.abc.Mapping):
                         item=item,
                         item_type=type(item).__name__,
                     ))
-            return
+            return value
         else:
             raise TypeError("option {}: invalid value {!r} of type {}".format(
                 key,
@@ -140,17 +149,24 @@ class Section(collections.abc.Mapping):
                 type(value).__name__,
             ))
 
-    def __getitem__(self, key):
+    def ref_get(self, key, ref_section=None):
+        """ref_get(self, key, ref_section=None)
+           Get 'key'; the 'ref_section' argument is used to set the
+           'ROOT', 'SECTION' values for deferred values evaluation.
+        """
         value = self.dictionary[key]
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
-            if isinstance(value, Deferred):
-                value = value.evaluate({'SECTION': self, 'ROOT': self.root})
-            self._check_data_type(key=key, value=value)
+            value = self._evaluate(value, ref_section=ref_section)
+            self._check_option(key=key, value=value)
             return value
 
-    def __setitem__(self, key, value):
+    def ref_set(self, key, value, ref_section=None):
+        """ref_set(self, key, value, ref_section=None)
+           Set 'key'='value'; the 'ref_section' argument is used to set the
+           'ROOT', 'SECTION' values for deferred values evaluation.
+        """
         if not isinstance(key, str):
             raise TypeError("invalid key {!r} of non-string type {}".format(key, type(key).__name__))
         elif not is_valid_identifier(key):
@@ -160,17 +176,31 @@ class Section(collections.abc.Mapping):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
             self.dictionary[key] = self._dictionary_factory()
             section = self._subsection(section_name=key, dictionary=self.dictionary[key])
-            section.update(value)
+            section.ref_update(value, ref_section=ref_section)
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
             if isinstance(value, Deferred):
                 if not self.late_evaluation:
-                    value = value.evaluate({'SECTION': self, 'ROOT': self.root})
-                    self._check_data_type(key=key, value=value)
+                    value = self._evaluate(value, ref_section=ref_section)
+                    self._check_option(key=key, value=value)
             else:
-                self._check_data_type(key=key, value=value)
+                self._check_option(key=key, value=value)
             self.dictionary[key] = value
+
+    def ref_update(self, dictionary, ref_section=None):
+        """ref_update(self, dictionary, ref_section=None)
+           Update with the content of the 'dictionary'; the 'ref_section' argument
+           is used to set the 'ROOT', 'SECTION' values for deferred values evaluation.
+        """
+        for key, value in dictionary.items():
+            self.ref_set(key, value, ref_section=ref_section)
+
+    def __getitem__(self, key):
+        return self.ref_get(key)
+
+    def __setitem__(self, key, value):
+        return self.ref_set(key, value)
 
     def __delitem__(self, key):
         del self.dictionary[key]
@@ -284,8 +314,7 @@ class Section(collections.abc.Mapping):
         """update(self, dictionary)
            Update with the content of the 'dictionary'
         """
-        for key, value in dictionary.items():
-            self[key] = value
+        return self.ref_update(dictionary)
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True):
         """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True) -> dict

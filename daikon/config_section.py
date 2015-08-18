@@ -78,7 +78,7 @@ class ConfigSection(Section):
         else:
             section = self
         for option_name, option_value in kwargs.items():
-            section[option_name] = option_value
+            section.ref_set(option_name, option_value, ref_section=self)
 
     def has_option(self, option_name):
         if super().has_option(option_name):
@@ -94,7 +94,8 @@ class ConfigSection(Section):
             return True
         else:
             if self._has_defaults:
-                return self._defaults.has_section(section_name) and has_section_options(self._defaults[section_name])
+                return self._defaults.has_section(section_name) and \
+                    has_section_options(self._defaults.ref_get(section_name, ref_section=self))
             else:
                 return False
 
@@ -104,7 +105,7 @@ class ConfigSection(Section):
         else:
             if self._has_defaults:
                 if self._defaults.has_section(key):
-                    return has_section_options(self._defaults[key])
+                    return has_section_options(self._defaults.ref_get(key, ref_section=self))
                 else:
                     return self._defaults.has_option(key)
             else:
@@ -116,6 +117,7 @@ class ConfigSection(Section):
         else:
             defaults = None
         return self._subsection_class()(dictionary=self.dictionary.copy(),
+                                        late_evaluation=self.late_evaluation,
                                         defaults=defaults)
 
     def __getitem__(self, key):
@@ -123,7 +125,7 @@ class ConfigSection(Section):
             return super().__getitem__(key)
         else:
             if self._has_defaults and key in self._defaults:
-                value = self._defaults[key]
+                value = self._defaults.ref_get(key, ref_section=self)
                 if isinstance(value, collections.Mapping):
                     if has_section_options(value):
                         return self.add_section(key)
