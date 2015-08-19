@@ -1,24 +1,66 @@
-Daikon
+Zirkon
 ======
-A python configuration library. Daikon requires python >= 3.4.
+A python configuration library. Zirkon requires python >= 3.4.
 
-.. image:: https://travis-ci.org/simone-campagna/daikon.svg
-    :target: https://travis-ci.org/simone-campagna/daikon
+.. image:: https://travis-ci.org/simone-campagna/zirkon.svg
+    :target: https://travis-ci.org/simone-campagna/zirkon
 
-.. image:: https://coveralls.io/repos/simone-campagna/daikon/badge.svg?branch=master&service=github
-  :target: https://coveralls.io/github/simone-campagna/daikon?branch=master
+.. image:: https://coveralls.io/repos/simone-campagna/zirkon/badge.svg?branch=master&service=github
+  :target: https://coveralls.io/github/simone-campagna/zirkon?branch=master
 
-.. image:: https://codeclimate.com/github/simone-campagna/daikon/badges/gpa.svg
-   :target: https://codeclimate.com/github/simone-campagna/daikon
+.. image:: https://codeclimate.com/github/simone-campagna/zirkon/badges/gpa.svg
+   :target: https://codeclimate.com/github/simone-campagna/zirkon
    :alt: Code Climate
 
 
-What is daikon
+What is zirkon
 --------------
 
-Daikon is a python library to handle configuration data. It behaves like a dictionary, and supports nested sections:
+Zirkon is a python library to handle configuration data. It behaves like a dictionary, and supports nested sections:
 
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
+ >>> config = Config()
+ >>> config['num'] = 10
+ >>> config['mode'] = 'xy'
+ >>> config['sub'] = {'enable': True}
+ >>> config['sub']['x'] = 1.5
+ >>> config['sub']['y'] = -1.5
+ >>> config['name'] = 'alpha'
+ >>> config['w'] = 5
+ >>> config.dump()
+ num = 10
+ mode = 'xy'
+ [sub]
+     enable = True
+     x = 1.5
+     y = -1.5
+ name = 'alpha'
+ w = 5
+
+
+
+ >>> from zirkon.config import Config
+ >>> config = Config()
+ >>> config['num'] = 10
+ >>> config['mode'] = 'xy'
+ >>> config['sub'] = {'enable': True}
+ >>> config['sub']['x'] = 1.5
+ >>> config['sub']['y'] = -1.5
+ >>> config['name'] = 'alpha'
+ >>> config['w'] = 5
+ >>> config.dump()
+ num = 10
+ mode = 'xy'
+ [sub]
+     enable = True
+     x = 1.5
+     y = -1.5
+ name = 'alpha'
+ w = 5
+
+
+
+ >>> from zirkon.config import Config
  >>> config = Config()
  >>> config['num'] = 10
  >>> config['mode'] = 'xy'
@@ -40,12 +82,12 @@ Daikon is a python library to handle configuration data. It behaves like a dicti
 Multiple serialization protocols
 --------------------------------
 
-Daikon currently supports the following serialization protocols:
+Zirkon currently supports the following serialization protocols:
 
  +---------+--------+---------------------------------------------------------------+
  |Protocol |text/raw|description                                                    |
  +=========+========+===============================================================+
- |daikon   |text    |the native protocol; it implements a nested INI file           |
+ |zirkon   |text    |the native protocol; it implements a nested INI file           |
  +---------+--------+---------------------------------------------------------------+
  |configobj|raw     |partially compatible with ConfigObj using the ``unrepr`` option|
  |         |        |see http://www.voidspace.org.uk/python/configobj.html          |
@@ -63,15 +105,111 @@ The serialization methods are
  * ``from_string``, ``from_stream``, ``from_file`` (classmethods): build a new *Config* reading content from sring/stream/file
  * ``write``: equivalent to ``to_file``
  * ``read``: replace an existing *Config* object with the content read from file
- * ``dump``: a shorthand for ``to_stream``, where by default *stream=sys.stdout* and *protocol="daikon"* 
+ * ``dump``: a shorthand for ``to_stream``, where by default *stream=sys.stdout* and *protocol="zirkon"* 
 
 Validation
 ----------
 
-Daikon supports validation through a *Schema* object. A *Schema* is a *Config* with *Validator* values:
+Zirkon supports validation through a *Schema* object. A *Schema* is a *Config* with *Validator* values:
 
- >>> from daikon.schema import Schema
- >>> from daikon.validator import Int, Str, StrChoice, Float, Bool, FloatList
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
+ >>> schema = Schema()
+ >>> schema['num'] = Int(min=0)
+ >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
+ >>> schema['sub'] = {}
+ >>> schema['sub']['enable'] = Bool()
+ >>> schema['sub']['x'] = Float(min=0.0)
+ >>> schema['sub']['y'] = Float(min=0.0)
+ >>> schema['name'] = Str()
+ >>> schema['min_value'] = Int(default=100)
+ >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
+ >>> validation = schema.validate(config)
+ >>> validation.dump()
+ w = UnexpectedOptionError('w=5: unexpected option')
+ [sub]
+     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
+ >>> print(config['min_value'])
+ 100
+ >>> print(config['coeffs'])
+ [1.0, 1.0, 1.0]
+
+Notice that two values have been added to
+
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
+ >>> schema = Schema()
+ >>> schema['num'] = Int(min=0)
+ >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
+ >>> schema['sub'] = {}
+ >>> schema['sub']['enable'] = Bool()
+ >>> schema['sub']['x'] = Float(min=0.0)
+ >>> schema['sub']['y'] = Float(min=0.0)
+ >>> schema['name'] = Str()
+ >>> schema['min_value'] = Int(default=100)
+ >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
+ >>> validation = schema.validate(config)
+ >>> validation.dump()
+ w = UnexpectedOptionError('w=5: unexpected option')
+ [sub]
+     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
+ >>> print(config['min_value'])
+ 100
+ >>> print(config['coeffs'])
+ [1.0, 1.0, 1.0]
+
+Notice that two values have been added to
+
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
+ >>> schema = Schema()
+ >>> schema['num'] = Int(min=0)
+ >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
+ >>> schema['sub'] = {}
+ >>> schema['sub']['enable'] = Bool()
+ >>> schema['sub']['x'] = Float(min=0.0)
+ >>> schema['sub']['y'] = Float(min=0.0)
+ >>> schema['name'] = Str()
+ >>> schema['min_value'] = Int(default=100)
+ >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
+ >>> validation = schema.validate(config)
+ >>> validation.dump()
+ w = UnexpectedOptionError('w=5: unexpected option')
+ [sub]
+     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
+ >>> print(config['min_value'])
+ 100
+ >>> print(config['coeffs'])
+ [1.0, 1.0, 1.0]
+
+Notice that two values have been added to
+
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
+ >>> schema = Schema()
+ >>> schema['num'] = Int(min=0)
+ >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
+ >>> schema['sub'] = {}
+ >>> schema['sub']['enable'] = Bool()
+ >>> schema['sub']['x'] = Float(min=0.0)
+ >>> schema['sub']['y'] = Float(min=0.0)
+ >>> schema['name'] = Str()
+ >>> schema['min_value'] = Int(default=100)
+ >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
+ >>> validation = schema.validate(config)
+ >>> validation.dump()
+ w = UnexpectedOptionError('w=5: unexpected option')
+ [sub]
+     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
+ >>> print(config['min_value'])
+ 100
+ >>> print(config['coeffs'])
+ [1.0, 1.0, 1.0]
+
+Notice that two values have been added to
+
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
  >>> schema = Schema()
  >>> schema['num'] = Int(min=0)
  >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
@@ -97,9 +235,41 @@ Notice that two values have been added to *config*, due to the defaults defined 
 Interpolation
 -------------
 
-Daikon supports value interpolation: *config* values can be influenced by other values:
+Zirkon supports value interpolation: *config* values can be influenced by other values:
 
- >>> from daikon.config import ROOT
+ >>> from zirkon.config import ROOT
+ >>> config = Config()
+ >>> config['x'] = 2
+ >>> config['y'] = ROOT['x'] * 4
+ >>> print(config['y'])
+ 8
+ >>> config['x'] = 10
+ >>> print(config['y'])
+ 40
+ >>> config.dump()
+ x = 10
+ y = ROOT['x'] * 4
+ >>>
+
+The value of *y* is tied to *x* by means of the expression
+
+ >>> from zirkon.config import ROOT
+ >>> config = Config()
+ >>> config['x'] = 2
+ >>> config['y'] = ROOT['x'] * 4
+ >>> print(config['y'])
+ 8
+ >>> config['x'] = 10
+ >>> print(config['y'])
+ 40
+ >>> config.dump()
+ x = 10
+ y = ROOT['x'] * 4
+ >>>
+
+The value of *y* is tied to *x* by means of the expression
+
+ >>> from zirkon.config import ROOT
  >>> config = Config()
  >>> config['x'] = 2
  >>> config['y'] = ROOT['x'] * 4

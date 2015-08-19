@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinValueError, \
+from zirkon.validator.error import MinValueError, \
                                    MaxValueError, \
                                    InvalidTypeError, \
                                    MissingRequiredOptionError
-from daikon.validator.float_validators import Float
+from zirkon.validator.float_validators import Float
 
 def test_basic():
     fv = Float()

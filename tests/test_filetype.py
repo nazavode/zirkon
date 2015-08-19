@@ -25,12 +25,12 @@ import pytest
 
 from common.fixtures import protocol
 
-from daikon.config_base import ConfigBase
-from daikon.config import Config
-from daikon.schema import Schema
-from daikon.validation import Validation
+from zirkon.config_base import ConfigBase
+from zirkon.config import Config
+from zirkon.schema import Schema
+from zirkon.validation import Validation
 
-from daikon.filetype import guess, standard_filepath, classify, \
+from zirkon.filetype import guess, standard_filepath, classify, \
     get_config_classes, get_protocols, FileType, \
     discover, search_paths, search_rootname, search_filetype
 
@@ -106,18 +106,18 @@ def test_classify(tmpdir):
     assert len(ref_filetypes) == 0
 
 def test_classify_config_classes_protocols(tmpdir):
-    for filetype in classify(tmpdir.strpath, config_classes=("Config", "Schema"), protocols=("daikon", "json")):
+    for filetype in classify(tmpdir.strpath, config_classes=("Config", "Schema"), protocols=("zirkon", "json")):
         pass
 
 def test_classify_class(tmpdir):
-    for filetype in classify(tmpdir.strpath, config_classes=(Config, Schema), protocols=("daikon", "json")):
+    for filetype in classify(tmpdir.strpath, config_classes=(Config, Schema), protocols=("zirkon", "json")):
         pass
 
 def test_classify_class_error(tmpdir):
     with pytest.raises(TypeError) as exc_info:
         for x in classify(tmpdir.strpath, config_classes=(Config, Schema, ConfigBase)):
             pass
-    assert str(exc_info.value) == "unsupported config_class <class 'daikon.config_base.ConfigBase'>"
+    assert str(exc_info.value) == "unsupported config_class <class 'zirkon.config_base.ConfigBase'>"
 
 def test_classify_class_name_error(tmpdir):
     with pytest.raises(ValueError) as exc_info:
@@ -140,13 +140,13 @@ def test_classify_protocol_error(tmpdir):
 def test_search_paths(tmpdir):
     cdirs = ['config_a', 'config_b']
     sdirs = ['config_b', 'schema_c']
-    os.environ['DAIKON_CONFIG_PATH'] = ':'.join(cdirs)
-    os.environ['DAIKON_SCHEMA_PATH'] = ':'.join(sdirs)
+    os.environ['ZIRKON_CONFIG_PATH'] = ':'.join(cdirs)
+    os.environ['ZIRKON_SCHEMA_PATH'] = ':'.join(sdirs)
     try:
         lst = tuple(search_paths())
     finally:
-        del os.environ['DAIKON_CONFIG_PATH']
-        del os.environ['DAIKON_SCHEMA_PATH']
+        del os.environ['ZIRKON_CONFIG_PATH']
+        del os.environ['ZIRKON_SCHEMA_PATH']
     assert lst[0] == (os.getcwd(), get_config_classes())
     assert lst[1] == ('config_a', (Config,))
     assert lst[2] == ('config_b', (Config,))
@@ -163,10 +163,10 @@ def test_discover_search(tmpdir):
     os.makedirs(tconfig)
     os.makedirs(tschema)
     files = []
-    files.append(touch(tconfig, "a.daikon"))
+    files.append(touch(tconfig, "a.zirkon"))
     files.append(touch(tconfig, "b.json"))
-    touch(tconfig, "c.daikon-schema")
-    files.append(touch(tschema, "d.daikon-schema"))
+    touch(tconfig, "c.zirkon-schema")
+    files.append(touch(tschema, "d.zirkon-schema"))
     touch(tschema, "c.configobj")
     files.append(touch(tdata, "d.pickle"))
     files.append(touch(tdata, "d.pickle-schema"))
@@ -175,20 +175,20 @@ def test_discover_search(tmpdir):
     es_filepath = files[-1]
     ec_filepath = touch(tadd, "e.configobj")
     os.chdir(tdata)
-    os.environ['DAIKON_CONFIG_PATH'] = tconfig
-    os.environ['DAIKON_SCHEMA_PATH'] = tschema
+    os.environ['ZIRKON_CONFIG_PATH'] = tconfig
+    os.environ['ZIRKON_SCHEMA_PATH'] = tschema
     try:
         filetypes = list(discover((tadd, (Validation, Schema))))
         ft_e0_l = list(search_rootname(os.path.join("ADD", "e")))
         ft_e1_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema,)))
-        ft_e2_l = list(search_rootname(os.path.join("ADD", "e"), protocols=("daikon", "json")))
-        ft_e3_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "configobj")))
-        ft_e4_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("daikon", "json")))
+        ft_e2_l = list(search_rootname(os.path.join("ADD", "e"), protocols=("zirkon", "json")))
+        ft_e3_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("zirkon", "configobj")))
+        ft_e4_l = list(search_rootname(os.path.join("ADD", "e"), config_classes=(Schema, Validation), protocols=("zirkon", "json")))
         ftfp_e1_l = list(search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol=None)))
         ftfp_ex_l = list(search_filetype(FileType(filepath=os.path.join("ADD", "e"), config_class=Schema, protocol="pickle")))
     finally:
-        del os.environ['DAIKON_CONFIG_PATH']
-        del os.environ['DAIKON_SCHEMA_PATH']
+        del os.environ['ZIRKON_CONFIG_PATH']
+        del os.environ['ZIRKON_SCHEMA_PATH']
     files.sort()
     found_files = [ft.filepath for ft in filetypes]
     found_files.sort()

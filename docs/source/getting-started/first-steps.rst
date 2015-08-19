@@ -13,7 +13,7 @@ Creating a Config
 
 Creating a *Config* object is simple:
 
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
  >>> config = Config()
 
 An initializer mapping can be passed:
@@ -30,7 +30,7 @@ All the configuration data are kept in a newly created *OrderedDict*:
 This dictionary can be passed during construction; in this case, all the dictionary content is loaded:
 
  >>> import collections
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
  >>> dictionary = collections.OrderedDict()
  >>> dictionary['x'] = 10
  >>> dictionary['y'] = 10
@@ -104,7 +104,7 @@ The ``to_stream``, ``from_stream`` methods allow serialization to/from a stream;
  >>> print(config3 == config)
  True
 
-Finally, the ``dump(stream=None, protocol="daikon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
+Finally, the ``dump(stream=None, protocol="zirkon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
 
  >>> config.dump()
  a = 10
@@ -116,10 +116,10 @@ Finally, the ``dump(stream=None, protocol="daikon")`` method is based on ``to_st
 
 The list of available serialization protocols is:
 
- >>> from daikon.toolbox.serializer import Serializer
+ >>> from zirkon.toolbox.serializer import Serializer
  >>> for protocol in Serializer.class_dict():
  ...     print(protocol)
- daikon
+ zirkon
  configobj
  json
  pickle
@@ -131,8 +131,8 @@ Creating a Schema
 
 The *Schema* class is a special *Config* whose values can only be *Validator* objects. A *Validator* object is used to validate a key/value pair. There are many predefined *Validator* classes; each class can accept some attributes. For instance:
 
- >>> from daikon.schema import Schema
- >>> from daikon.validator import Int
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int
  >>> schema = Schema()
  >>> schema['a'] = Int(default=10, min=3, max=100)
  >>>
@@ -175,7 +175,7 @@ By default, validation errors are not raised: they are stored on the ``Validatio
 
 The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, which is *False* by default; if *True*, the first validation error is raised.
 
- >>> from daikon.validator.error import InvalidTypeError
+ >>> from zirkon.validator.error import InvalidTypeError
  >>> try:
  ...     validation = schema.validate(config, raise_on_error=True)
  ... except InvalidTypeError:
@@ -194,7 +194,7 @@ Dealing with unexpected options
 
 The *unexpected_option_validator* *Schema* attribute can be set to specify how to threat unexpected options, i.e. options found in the *config* and not defined in the *schema*. It is possible to change this validator; interesting alternatives are:
 
-* ``daikon.validator.Complain``: this is the default: an ``UnexpectedOptionError`` validation error is produced:
+* ``zirkon.validator.Complain``: this is the default: an ``UnexpectedOptionError`` validation error is produced:
 
      >>> config = Config()
      >>> config['u'] = 0.35
@@ -211,9 +211,9 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      0.35
      >>>
 
-* ``daikon.validator.Ignore``: the unexpected option is ignored and left in the config;
+* ``zirkon.validator.Ignore``: the unexpected option is ignored and left in the config;
 
-     >>> from daikon.validator import Ignore
+     >>> from zirkon.validator import Ignore
      >>> schema.unexpected_option_validator = Ignore()
      >>> validation = schema.validate(config)
      >>> validation.dump()  # no errors
@@ -224,9 +224,9 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      0.35
      >>>
 
-* ``daikon.validator.Remove``: the unexpected option is removed;
+* ``zirkon.validator.Remove``: the unexpected option is removed;
 
-     >>> from daikon.validator import Remove
+     >>> from zirkon.validator import Remove
      >>> schema.unexpected_option_validator = Remove()
      >>> validation = schema.validate(config)
      >>> validation.dump()  # no errors
@@ -258,7 +258,7 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
 
 The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
  
- >>> from daikon.config import ConfigValidationError
+ >>> from zirkon.config import ConfigValidationError
  >>> try:
  ...     config.dump()
  ... except ConfigValidationError as err:

@@ -13,7 +13,7 @@ install:
 
 # command to run tests
 script:
-  - coverage run --source daikon `which py.test`
+  - coverage run --source zirkon `which py.test`
 
 after_success:
   - coveralls --rcfile=.coveragerc

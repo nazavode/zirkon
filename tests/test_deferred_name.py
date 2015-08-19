@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred import \
+from zirkon.toolbox.deferred import \
     Deferred, DName
 
 Param = collections.namedtuple('Param', ('de', 'expression', 'globals_d'))

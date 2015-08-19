@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox import subclass
+from zirkon.toolbox import subclass
 
 
 class A0(object):

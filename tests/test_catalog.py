@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.catalog import Catalog
+from zirkon.toolbox.catalog import Catalog
 
 
 class A0(object):

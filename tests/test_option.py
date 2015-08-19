@@ -2,7 +2,7 @@
 
 import pytest
 
-from daikon.validator.option import Option
+from zirkon.validator.option import Option
 
 
 def test_option_is_defined():

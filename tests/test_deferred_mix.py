@@ -6,7 +6,7 @@ import pickle
 
 import pytest
 
-from daikon.toolbox.deferred import \
+from zirkon.toolbox.deferred import \
     DName, DConst, DCall, DContains
 
 Param = collections.namedtuple('Param', ('de', 'expression', 'globals_d'))

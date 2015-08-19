@@ -26,15 +26,15 @@ import pytest
 
 from common.fixtures import string_io
 
-from daikon.config_base import ConfigBase
-from daikon.config import Config
-from daikon.schema import Schema
-from daikon.validation import Validation
+from zirkon.config_base import ConfigBase
+from zirkon.config import Config
+from zirkon.schema import Schema
+from zirkon.validation import Validation
 
-from daikon.filetype import guess, standard_filepath, \
+from zirkon.filetype import guess, standard_filepath, \
     get_config_classes, get_protocols, FileType
 
-from daikon._tool.main import main
+from zirkon._tool.main import main
 
 class Files(collections.OrderedDict):
     def __init__(self, temporary_dir):
@@ -74,8 +74,8 @@ def files(tmpdir):
     fls = Files(temporary_dir=tmpdir.strpath)
     os.chdir(tmpdir.strpath)
 
-    fls.add('x.daikon')
-    with open(fls["x.daikon"], "w") as f_out:
+    fls.add('x.zirkon')
+    with open(fls["x.zirkon"], "w") as f_out:
         f_out.write("""\
 a = 100
 b = 1.4
@@ -87,14 +87,14 @@ b = 1.4
         value = 0.4
 """)
     config = Config()
-    config.read(fls["x.daikon"], protocol="daikon")
+    config.read(fls["x.zirkon"], protocol="zirkon")
     fls.add("x.json")
     config.write(fls["x.json"], protocol="json")
-    fls.add("xwrong.daikon")
-    config.write(fls["xwrong.daikon"], protocol="json")
+    fls.add("xwrong.zirkon")
+    config.write(fls["xwrong.zirkon"], protocol="json")
 
-    fls.add('x.daikon-schema')
-    with open(fls["x.daikon-schema"], "w") as f_out:
+    fls.add('x.zirkon-schema')
+    with open(fls["x.zirkon-schema"], "w") as f_out:
         f_out.write("""\
 a = Int()
 b = Float()
@@ -107,11 +107,11 @@ c = Float(default=ROOT['a'] * ROOT['b'])
         enable = Bool()
         value = Float()
 """)
-    schema = Schema.from_file(fls["x.daikon-schema"], protocol="daikon")
+    schema = Schema.from_file(fls["x.zirkon-schema"], protocol="zirkon")
     fls.add("x.s-json")
     schema.to_file(fls["x.s-json"], protocol="json")
 
-    with open(fls.add("x-def-le.daikon"), "w") as f_out:
+    with open(fls.add("x-def-le.zirkon"), "w") as f_out:
         f_out.write("""\
 n = 10
 [sub]
@@ -119,7 +119,7 @@ n = 10
     [sub]
         n2 = ROOT['n'] * ROOT['sub']['n1']
 """)
-    with open(fls.add("x-def-ee.daikon"), "w") as f_out:
+    with open(fls.add("x-def-ee.zirkon"), "w") as f_out:
         f_out.write("""\
 n = 10
 [sub]
@@ -171,11 +171,11 @@ def overwrite(request):
     return request.param
 
 def test_main_overwrite_mode(files, overwrite):
-    oname = 'xy.daikon'
+    oname = 'xy.zirkon'
     with files.tmp(oname):
         with open(files[oname], "w"):
             pass
-        args = ['-i', files['x.daikon'], '-o', files[oname]]
+        args = ['-i', files['x.zirkon'], '-o', files[oname]]
         if overwrite:
             args.append("-f")
 
@@ -188,13 +188,13 @@ def test_main_overwrite_mode(files, overwrite):
                 assert log_stream.getvalue() == "ERROR    cannot overwrite existing file {!r}\n".format(files[oname])
 
 
-@pytest.fixture(params=['x-def-le.daikon', 'x-def-ee.daikon'])
+@pytest.fixture(params=['x-def-le.zirkon', 'x-def-ee.zirkon'])
 def x_def_name(request):
     return request.param
 
 def test_main_deferred(files, x_def_name, defaults):
     i_file = files[x_def_name]
-    args = ["-i", i_file, "-o", ":daikon"]
+    args = ["-i", i_file, "-o", ":zirkon"]
     if defaults is not None:
         args.append("--defaults={!r}".format(defaults))
     log_stream, out_stream = run(args)
@@ -205,10 +205,10 @@ def test_main_deferred(files, x_def_name, defaults):
 FN = collections.namedtuple('FN', ('name', 'protocol', 'hints'))
 
 _i_data = [
-    FN(name="x.daikon", protocol="daikon", hints=''),
+    FN(name="x.zirkon", protocol="zirkon", hints=''),
     FN(name="x.json", protocol="json", hints=''),
     FN(name="x.json", protocol="json", hints=":json"),
-    FN(name="xwrong.daikon", protocol="json", hints=":json:config"),
+    FN(name="xwrong.zirkon", protocol="json", hints=":json:config"),
 ]
 
 _o_data = [
@@ -222,14 +222,14 @@ _o_data = [
 
 _s_data = [
     FN(name=None, protocol=None, hints=None),
-    #FN(name="x.daikon-schema", protocol="daikon", hints=''),
+    #FN(name="x.zirkon-schema", protocol="zirkon", hints=''),
     FN(name="x.s-json", protocol="json", hints=''),
 ]
 
 _v_data = [
     FN(name=None, protocol=None, hints=None),
     FN(name="out_v.json-validation", protocol="json", hints=''),
-    #FN(name="out_v.daikon-validation", protocol="daikon", hints=''),
+    #FN(name="out_v.zirkon-validation", protocol="zirkon", hints=''),
 ]
 
 @pytest.fixture(params=_i_data)
@@ -321,7 +321,7 @@ def test_main_read_write(files, i_name_protocol, o_name_protocol, s_name_protoco
                 validation.dump()
                 print("===")
                 v_data.dump()
-                assert validation.to_string(protocol="daikon") == v_data.to_string(protocol="daikon")
+                assert validation.to_string(protocol="zirkon") == v_data.to_string(protocol="zirkon")
 
         if o_name:
             o_config = Config.from_file(files[o_name], protocol=o_protocol, **config_args)

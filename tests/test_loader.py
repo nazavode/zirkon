@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.toolbox import loader
+from zirkon.toolbox import loader
 
 
 def test_load_module_mypack():

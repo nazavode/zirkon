@@ -6,12 +6,12 @@ import os
 
 import pytest
 
-from daikon.validator.error import InvalidChoiceError, \
+from zirkon.validator.error import InvalidChoiceError, \
                                    InvalidTypeError
-from daikon.validator.int_validators import IntChoice
-from daikon.validator.float_validators import FloatChoice
-from daikon.validator.str_validators import StrChoice
-from daikon.validator.bool_validators import BoolChoice
+from zirkon.validator.int_validators import IntChoice
+from zirkon.validator.float_validators import FloatChoice
+from zirkon.validator.str_validators import StrChoice
+from zirkon.validator.bool_validators import BoolChoice
 
 scenario = collections.OrderedDict()
 

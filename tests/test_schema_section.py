@@ -25,14 +25,14 @@ from common.fixtures import \
     string_io, \
     simple_section_content, \
     simple_schema_content
-from daikon.section import Section
-from daikon.schema_section import SchemaSection
-from daikon.validation import Validation
-from daikon.validator import Int, Str, \
+from zirkon.section import Section
+from zirkon.schema_section import SchemaSection
+from zirkon.validation import Validation
+from zirkon.validator import Int, Str, \
     FloatTuple, StrChoice
-from daikon.validator.ignore import Ignore
-from daikon.validator.remove import Remove
-from daikon.validator.error import \
+from zirkon.validator.ignore import Ignore
+from zirkon.validator.remove import Remove
+from zirkon.validator.error import \
     InvalidChoiceError, UnexpectedOptionError
 
 

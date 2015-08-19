@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from daikon.toolbox.identifier import is_valid_identifier
+from zirkon.toolbox.identifier import is_valid_identifier
 
 _data = [
     ('', False),

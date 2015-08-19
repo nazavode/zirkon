@@ -1,6 +1,6 @@
 # .coveragerc to control coverage.py
 [run]
-source = daikon, daikon.toolbox, daikon.toolbox.serializer, daikon.validator
+source = zirkon, zirkon.toolbox, zirkon.toolbox.serializer, zirkon.validator, zirkon._tool
 branch = True
 
 [report]

@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred_eval import deferred_eval
+from zirkon.toolbox.deferred_eval import deferred_eval
 
 Parameters = collections.namedtuple('Parameters', ('string', 'globals_d', 'expected'))
 

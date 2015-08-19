@@ -24,11 +24,11 @@ import pytest
 
 from common.fixtures import string_io
 
-from daikon.schema import Schema
-from daikon.config import ROOT, SECTION, Config
-from daikon.validator import Int, Float, Str
-from daikon.toolbox.deferred import Deferred
-from daikon.utils import create_template_from_schema, replace_deferred
+from zirkon.schema import Schema
+from zirkon.config import ROOT, SECTION, Config
+from zirkon.validator import Int, Float, Str
+from zirkon.toolbox.deferred import Deferred
+from zirkon.utils import create_template_from_schema, replace_deferred
 
 def test_create_template_from_schema(string_io):
     schema = Schema()

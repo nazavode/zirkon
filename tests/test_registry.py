@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.toolbox.registry import Registry
+from zirkon.toolbox.registry import Registry
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-Daikon documentation
+Zirkon documentation
 ====================
 
 Contents:

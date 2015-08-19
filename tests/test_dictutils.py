@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from daikon.toolbox import dictutils
+from zirkon.toolbox import dictutils
 
 
 def test_as_dict():

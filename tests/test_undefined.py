@@ -2,7 +2,7 @@
 
 import pytest
 
-from daikon.toolbox.undefined import UNDEFINED
+from zirkon.toolbox.undefined import UNDEFINED
 
 
 def test_undefined():

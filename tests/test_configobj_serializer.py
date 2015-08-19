@@ -12,9 +12,9 @@ from common.fixtures import simple_config_content, \
     tmp_text_file, \
     SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION
 
-from daikon.config import Config
-from daikon.toolbox.dictutils import compare_dicts
-from daikon.toolbox.serializer.configobj_serializer import ConfigObjSerializer
+from zirkon.config import Config
+from zirkon.toolbox.dictutils import compare_dicts
+from zirkon.toolbox.serializer.configobj_serializer import ConfigObjSerializer
 
 @pytest.fixture
 def serializer():

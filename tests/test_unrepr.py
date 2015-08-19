@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.unrepr import unrepr
+from zirkon.toolbox.unrepr import unrepr
 
 
 Parameters = collections.namedtuple('Parameters', ('string', 'expected'))

@@ -33,7 +33,7 @@ if __name__ == "__main__":
         py_dirname = DIRNAME
         sys.path.insert(0, py_dirname)
     
-        from daikon.version import VERSION
+        from zirkon.version import VERSION
         version = VERSION
     finally:
         del sys.path[0]
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             scripts.append(filepath)
     
     # search packages
-    root_packages = ['daikon']
+    root_packages = ['zirkon']
     packages = []
     for package in root_packages:
         package_dirname = os.path.join(DIRNAME, package)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         data_files.append((data_dirname, files))
     
     setup(
-        name="daikon",
+        name="zirkon",
         version=version,
         requires=[],
         description="Config Project",

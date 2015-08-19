@@ -22,7 +22,7 @@ import io
 
 import pytest
 
-from daikon.toolbox.flatmap import FlatMap
+from zirkon.toolbox.flatmap import FlatMap
 
 @pytest.fixture
 def content():

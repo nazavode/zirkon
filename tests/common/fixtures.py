@@ -47,12 +47,12 @@ import tempfile
 
 import pytest
 
-from daikon.toolbox.flatmap import FlatMap
-from daikon.section import Section
-from daikon.config import Config
-from daikon.schema import Schema
-from daikon.validator import Int, Str, StrChoice, Float, FloatTuple
-from daikon.toolbox.serializer import Serializer
+from zirkon.toolbox.flatmap import FlatMap
+from zirkon.section import Section
+from zirkon.config import Config
+from zirkon.schema import Schema
+from zirkon.validator import Int, Str, StrChoice, Float, FloatTuple
+from zirkon.toolbox.serializer import Serializer
 
 @pytest.fixture(params=tuple(Serializer.get_class_tags()))
 def protocol(request):
@@ -189,7 +189,7 @@ z_value = 30.3
     b = 2
 """
 
-SIMPLE_CONFIG_DAIKON_SERIALIZATION = SIMPLE_SECTION_DUMP
+SIMPLE_CONFIG_ZIRKON_SERIALIZATION = SIMPLE_SECTION_DUMP
 
 ##################
 @pytest.fixture
@@ -285,7 +285,7 @@ a = Int(min=1)
         ssy = FloatTuple(item_max=5.5)
 """     
 
-SIMPLE_SCHEMA_DAIKON_SERIALIZATION = SIMPLE_SCHEMA_DUMP
+SIMPLE_SCHEMA_ZIRKON_SERIALIZATION = SIMPLE_SCHEMA_DUMP
 
 ###
 @pytest.fixture

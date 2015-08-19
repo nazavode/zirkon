@@ -31,16 +31,16 @@ from common.fixtures import dictionary, \
     SIMPLE_SCHEMA_DUMP, \
     SIMPLE_SCHEMA_JSON_SERIALIZATION, \
     SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION, \
-    SIMPLE_SCHEMA_DAIKON_SERIALIZATION
+    SIMPLE_SCHEMA_ZIRKON_SERIALIZATION
 
-from daikon.config import Config, ROOT, SECTION
-from daikon.schema import Schema
-from daikon.validator import Int, IntChoice
-from daikon.validator.error import InvalidChoiceError, \
+from zirkon.config import Config, ROOT, SECTION
+from zirkon.schema import Schema
+from zirkon.validator import Int, IntChoice
+from zirkon.validator.error import InvalidChoiceError, \
     MinValueError, MaxValueError
 
-from daikon.toolbox.serializer import JSONSerializer, \
-    ConfigObjSerializer, DaikonSerializer, PickleSerializer
+from zirkon.toolbox.serializer import JSONSerializer, \
+    ConfigObjSerializer, ZirkonSerializer, PickleSerializer
 
 def test_Schema_create_empty(string_io):
     schema = Schema()
@@ -64,56 +64,59 @@ def test_Schema_create_dictionary_init(dictionary, simple_schema_content, string
     assert string_io.getvalue() == SIMPLE_SCHEMA_DUMP
     assert len(dictionary) > 0
 
-def test_Schema_to_file_JSON(simple_schema, tmp_text_file):
+def test_Schema_to_file_json(simple_schema, tmp_text_file):
     simple_schema.to_file(filename=tmp_text_file.name, protocol="json")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_SCHEMA_JSON_SERIALIZATION
 
-def test_Schema_from_file_JSON(simple_schema, tmp_text_file):
+def test_Schema_from_file_json(simple_schema, tmp_text_file):
     tmp_text_file.write(SIMPLE_SCHEMA_JSON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     schema = Schema.from_file(filename=tmp_text_file.name, protocol="json")
     assert schema == simple_schema
 
-def test_Schema_to_file_ConfigObj(simple_schema, tmp_text_file):
+def test_Schema_to_file_configobj(simple_schema, tmp_text_file):
     simple_schema.to_file(filename=tmp_text_file.name, protocol="configobj")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
     assert serialization == SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION
 
-def test_Schema_from_file_ConfigObj(simple_schema, tmp_text_file):
+def test_Schema_from_file_configobj(simple_schema, tmp_text_file):
     tmp_text_file.write(SIMPLE_SCHEMA_CONFIGOBJ_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     schema = Schema.from_file(filename=tmp_text_file.name, protocol="configobj")
     assert schema == simple_schema
 
-def test_Schema_to_file_Daikon(simple_schema, tmp_text_file):
-    simple_schema.to_file(filename=tmp_text_file.name, protocol="daikon")
+def test_Schema_to_file_zirkon(simple_schema, tmp_text_file):
+    simple_schema.to_file(filename=tmp_text_file.name, protocol="zirkon")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
-    assert serialization == SIMPLE_SCHEMA_DAIKON_SERIALIZATION
+    assert serialization == SIMPLE_SCHEMA_ZIRKON_SERIALIZATION
 
-def test_Schema_from_file_Daikon(simple_schema, tmp_text_file):
-    tmp_text_file.write(SIMPLE_SCHEMA_DAIKON_SERIALIZATION)
+def test_Schema_from_file_zirkon(simple_schema, tmp_text_file):
+    tmp_text_file.write(SIMPLE_SCHEMA_ZIRKON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    schema = Schema.from_file(filename=tmp_text_file.name, protocol="daikon")
+    schema = Schema.from_file(filename=tmp_text_file.name, protocol="zirkon")
     assert schema == simple_schema
 
-def test_Schema_get_serializer_JSON():
+def test_Schema_get_serializer_json():
     assert isinstance(Schema.get_serializer("json"), JSONSerializer)
 
-def test_Schema_get_serializer_ConfigObj():
+def test_Schema_get_serializer_configobj():
     assert isinstance(Schema.get_serializer("configobj"), ConfigObjSerializer)
 
-def test_Schema_get_serializer_Pickle():
+def test_Schema_get_serializer_pickle():
     assert isinstance(Schema.get_serializer("pickle"), PickleSerializer)
+
+def test_Schema_get_serializer_zirkon():
+    assert isinstance(Schema.get_serializer("zirkon"), ZirkonSerializer)
 
 @pytest.fixture
 def deferred_schema():

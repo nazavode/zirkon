@@ -24,8 +24,8 @@ import pytest
 
 from common.fixtures import string_io
 
-from daikon.toolbox.flatmap import FlatMap
-from daikon.section import Section
+from zirkon.toolbox.flatmap import FlatMap
+from zirkon.section import Section
 
 @pytest.fixture
 def content():

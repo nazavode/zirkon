@@ -22,8 +22,8 @@ import io
 
 import pytest
 
-from daikon.config import Config, ROOT, SECTION
-from daikon.defaults_section import DefaultsSection
+from zirkon.config import Config, ROOT, SECTION
+from zirkon.defaults_section import DefaultsSection
 
 @pytest.fixture
 def defaults_section():

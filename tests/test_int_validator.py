@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinValueError, \
+from zirkon.validator.error import MinValueError, \
                                    MaxValueError, \
                                    InvalidTypeError, \
                                    MissingRequiredOptionError
-from daikon.validator.int_validators import Int
+from zirkon.validator.int_validators import Int
 
 def test_basic():
     iv = Int()

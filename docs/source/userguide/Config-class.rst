@@ -6,7 +6,7 @@
 
 The *Config* class behaves like a dict: it has ``__getitem__``, ``__setitem__`` and ``__delitem__`` methods:
 
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
  >>> config = Config()
  >>> config['x'] = 10
  >>> print(config['x'])
@@ -47,7 +47,7 @@ It accepts also dict-like objects as values: in this case, a subsection is creat
 
  >>> config['sub'] = {'w': 100}
  >>> type(config['sub'])
- <class 'daikon.config_section.ConfigSection'>
+ <class 'zirkon.config_section.ConfigSection'>
 
 Serialization/deserialization methods
 -------------------------------------
@@ -56,12 +56,12 @@ The config class provides serialization/deserialization methods. Config object c
 
  >>> config = Config({'x': 10})
  >>> config['sub'] = {'a': 20}
- >>> config_s = config.to_string(protocol="daikon")
+ >>> config_s = config.to_string(protocol="zirkon")
  >>> print(config_s)
  x = 10
  [sub]
      a = 20
- >>> config2 = Config.from_string(config_s, protocol="daikon")
+ >>> config2 = Config.from_string(config_s, protocol="zirkon")
  >>> print(config == config2)
  True
 
@@ -81,21 +81,21 @@ Similarly:
 * ``to_stream`` and ``from_stream`` can be used to write to/read from a stream;
 * ``to_file`` and ``from_file`` can be used to write to/read from a file.
 
-The ``dump(stream=None, protocol="daikon")`` method is based on ``to_stream``; by default, *stream* is *sys.stdout*.
+The ``dump(stream=None, protocol="zirkon")`` method is based on ``to_stream``; by default, *stream* is *sys.stdout*.
 
 The schema and validate attributes
 ----------------------------------
 
 It is possible to attach a *schema* to a newly created *config*:
 
- >>> from daikon.schema import Schema
- >>> from daikon.validator import Int
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int
  >>> schema = Schema({'x': Int()})
  >>> config = Config({'x': 10}, schema=schema)
 
 Since the *schema* has been provided, the *config* object is immediately validated. In case of errors, a ``ConfigValidationError`` exception is raised; this exception contains a *validation* attribute referring to the validation result:
 
- >>> from daikon.config import ConfigValidationError
+ >>> from zirkon.config import ConfigValidationError
  >>> try:
  ...     config = Config({'x': 6.5}, schema=schema)
  ... except ConfigValidationError as err:
@@ -163,7 +163,7 @@ The main reason for that is to allow to change the information container; for in
  >>> with tempfile.TemporaryDirectory() as tdir:
  ...     tfile = os.path.join(tdir, 'x.shelf')
  ...     shelf = shelve.open(tfile)
- ...     from daikon.toolbox.flatmap import FlatMap
+ ...     from zirkon.toolbox.flatmap import FlatMap
  ...     flatshelf = FlatMap(dictionary=shelf)
  ...     config = Config(dictionary=flatshelf)
  ...     config['sub'] = {}

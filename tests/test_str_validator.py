@@ -5,11 +5,11 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinLengthError, \
+from zirkon.validator.error import MinLengthError, \
                                    MaxLengthError, \
                                    InvalidTypeError, \
                                    MissingRequiredOptionError
-from daikon.validator.str_validators import Str
+from zirkon.validator.str_validators import Str
 
 def test_basic():
     sv = Str()

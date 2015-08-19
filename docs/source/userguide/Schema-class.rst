@@ -109,14 +109,14 @@ A validator can also change the section content; for instance,
 
 For instance:
 
- >>> from daikon.schema import Schema
- >>> from daikon.validator import StrList
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import StrList
  >>> schema = Schema()
  >>> schema['filenames'] = StrList(min_len=3, item_min_len=2)
 
 This schema requires that the *filenames* value is a list of strings with at least 3 items; the minimum length of the items is 2.
 
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
  >>> config = Config()
  >>> config['filenames'] = ['a.dat', 'b.dat', 'c', 'd.dat']
  >>> validation = schema.validate(config)
@@ -152,7 +152,7 @@ For instance:
  x = UnexpectedOptionError('x=1: unexpected option')
 
 
- >>> from daikon.validator import Ignore
+ >>> from zirkon.validator import Ignore
  >>> schema = Schema(unexpected_option_validator=Ignore())
  >>> config = Config({'x': 1})
  >>> validation = schema.validate(config)
@@ -161,7 +161,7 @@ For instance:
  x = 1
  >>>
 
- >>> from daikon.validator import Remove
+ >>> from zirkon.validator import Remove
  >>> schema = Schema(unexpected_option_validator=Remove())
  >>> config = Config({'x': 1})
  >>> validation = schema.validate(config)

@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from daikon.toolbox import files
+from zirkon.toolbox import files
 
 
 def test_createdir(tmpdir):

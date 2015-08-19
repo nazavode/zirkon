@@ -24,10 +24,10 @@ import pytest
 
 from common.fixtures import string_io
 
-from daikon.toolbox.dictutils import compare_dicts
-from daikon.config import Config, ConfigValidationError
-from daikon.schema import Schema
-from daikon.validator import Str, StrChoice, Float, Int, FloatList
+from zirkon.toolbox.dictutils import compare_dicts
+from zirkon.config import Config, ConfigValidationError
+from zirkon.schema import Schema
+from zirkon.validator import Str, StrChoice, Float, Int, FloatList
 
 @pytest.fixture
 def schema():
@@ -126,7 +126,7 @@ def test_Config_self_validate_error_dump(string_io, config):
 """
     
 def test_Config_err_disabled_interpolation_on_validation():
-    from daikon.config import ROOT
+    from zirkon.config import ROOT
     config = Config(interpolation=False)
     schema = Schema()
     schema['x'] = Int()

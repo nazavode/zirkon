@@ -25,9 +25,9 @@ import pytest
 
 from common.fixtures import string_io
 
-from daikon.toolbox.flatmap import FlatMap
+from zirkon.toolbox.flatmap import FlatMap
 
-from daikon.config import Config
+from zirkon.config import Config
 
 
 #@pytest.fixture

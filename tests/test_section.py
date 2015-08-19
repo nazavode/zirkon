@@ -31,7 +31,7 @@ from common.fixtures import dictionary, \
                             SIMPLE_SECTION_REPR, \
                             SIMPLE_SECTION_STR
 
-from daikon.section import Section, \
+from zirkon.section import Section, \
     iter_section_options, \
     count_section_options, \
     has_section_options

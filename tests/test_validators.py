@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from daikon import validator
+from zirkon import validator
 
 scenario = collections.OrderedDict()
 

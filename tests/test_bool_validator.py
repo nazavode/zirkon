@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-from daikon.validator.error import InvalidTypeError, \
+from zirkon.validator.error import InvalidTypeError, \
                                    MissingRequiredOptionError
-from daikon.validator.bool_validators import Bool
+from zirkon.validator.bool_validators import Bool
 
 def test_basic():
     bv = Bool()

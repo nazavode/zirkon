@@ -1,34 +1,34 @@
 .. _intro:
 
 ========================
- Introduction to Daikon
+ Introduction to Zirkon
 ========================
 
 .. contents::
     :local:
     :depth: 1
 
-What is Daikon
+What is Zirkon
 ==============
 
 .. sidebar:: Requirements
-    :subtitle: Daikon requires only
+    :subtitle: Zirkon requires only
 
     - Python 3.4
 
-Daikon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation, default values and value interpolation.
+Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation, default values and value interpolation.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
-Daikon features
+Zirkon features
 ===============
 
 Simplicity
 ----------
 
-Daikon Config objects behaves like traditional mappings:
+Zirkon Config objects behaves like traditional mappings:
 
- >>> from daikon.config import Config
+ >>> from zirkon.config import Config
  >>> config = Config()
  >>> config['x'] = 10
  >>> config['subsection'] = {}
@@ -39,7 +39,7 @@ Daikon Config objects behaves like traditional mappings:
 Flexibility
 -----------
 
-Daikon Config objects internally store information in a dict-like
+Zirkon Config objects internally store information in a dict-like
 object, by default ad OrderedDict. It is possible to change this
 internal dictionary and to use (for instance a ``shelve``, in order
 to add persistency).
@@ -47,13 +47,13 @@ to add persistency).
 Multiple file serializations
 ----------------------------
 
-Daikon supports multiple serialization methods; currently four are
+Zirkon supports multiple serialization methods; currently four are
 available:
 
  +---------+--------+---------------------------------------------------------------+
  |Protocol |text/raw|description                                                    |
  +=========+========+===============================================================+
- |daikon   |text    |the native protocol; it implements a nested INI file           |
+ |zirkon   |text    |the native protocol; it implements a nested INI file           |
  +---------+--------+---------------------------------------------------------------+
  |configobj|raw     |partially compatible with ConfigObj using the ``unrepr`` option|
  |         |        |see http://www.voidspace.org.uk/python/configobj.html          |
@@ -65,7 +65,7 @@ available:
 
 Some examples:
 
- >>> print(config.to_string(protocol="daikon"))
+ >>> print(config.to_string(protocol="zirkon"))
  x = 10
  [subsection]
      y = 'alpha'
@@ -77,7 +77,7 @@ Some examples:
      }
  }
 
-The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="daikon")``:
+The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirkon")``:
 
  >>> config.dump()
  x = 10
@@ -87,11 +87,11 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="daiko
 Validation
 ----------
     
-Daikon allows to define a SChema for the validation of Config objects. A Schema
+Zirkon allows to define a SChema for the validation of Config objects. A Schema
 is simply a special Config having Validators as values:
 
- >>> from daikon.schema import Schema
- >>> from daikon.validator import Int, Str, Float
+ >>> from zirkon.schema import Schema
+ >>> from zirkon.validator import Int, Str, Float
  >>> schema = Schema()
  >>> schema['x'] = Int(min=1)
  >>> schema['y'] = Int(default=2)
@@ -118,7 +118,7 @@ There list of available Validators can be easily extended.
 Defaults
 --------
 
-Daikon supports default values; these values are stored in a separated space (not in the dictionary), and they are not serialized; nevertheless they can be accessed as normal values:
+Zirkon supports default values; these values are stored in a separated space (not in the dictionary), and they are not serialized; nevertheless they can be accessed as normal values:
 
  >>> defaults = {'x': 1.0, 'y': 2.0}
  >>> config = Config(defaults=defaults)
@@ -159,11 +159,11 @@ Defaults can directly be accessed:
 Value interpolation
 -------------------
 
-Daikon supports value interpolation: key/values precedently stored in 
+Zirkon supports value interpolation: key/values precedently stored in 
 the Config object can be accessed and used in complex expressions to set new values.
 For instance:
 
- >>> from daikon.config import ROOT
+ >>> from zirkon.config import ROOT
  >>> config['x'] = 2
  >>> config['y'] = ROOT['x'] * 4
  >>> print(config['y'])
@@ -183,7 +183,7 @@ Moreover, this can be used in validators:
  ... y = Int(min=ROOT['x'] * 5)
  ... z = Int(default=ROOT['x'] * ROOT['y'])
  ... """
- >>> schema = Schema.from_string(schema_s, protocol="daikon")
+ >>> schema = Schema.from_string(schema_s, protocol="zirkon")
  >>> validation = schema.validate(config)
  >>> validation.dump()
  y = MinValueError('y=40: value is lower than min 50')

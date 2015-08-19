@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred import DName
+from zirkon.toolbox.deferred import DName
 
 py_globals_d = {
     't': 10,

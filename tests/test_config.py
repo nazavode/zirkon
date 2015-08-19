@@ -33,15 +33,15 @@ from common.fixtures import dictionary, \
     SIMPLE_SECTION_DUMP, \
     SIMPLE_CONFIG_JSON_SERIALIZATION, \
     SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION, \
-    SIMPLE_CONFIG_DAIKON_SERIALIZATION
+    SIMPLE_CONFIG_ZIRKON_SERIALIZATION
 
-from daikon.toolbox.deferred import Deferred
-from daikon.toolbox.dictutils import compare_dicts, as_dict
-from daikon.section import Section
-from daikon.defaults_section import DefaultsSection
-from daikon.config_section import ConfigSection
-from daikon.config import Config, ROOT, SECTION
-from daikon.toolbox.serializer import JSONSerializer, \
+from zirkon.toolbox.deferred import Deferred
+from zirkon.toolbox.dictutils import compare_dicts, as_dict
+from zirkon.section import Section
+from zirkon.defaults_section import DefaultsSection
+from zirkon.config_section import ConfigSection
+from zirkon.config import Config, ROOT, SECTION
+from zirkon.toolbox.serializer import JSONSerializer, \
     ConfigObjSerializer, PickleSerializer
 
 def test_Config_create_empty(string_io, defaultsvalue):
@@ -104,18 +104,18 @@ def test_Config_from_file_configobj(simple_config, tmp_text_file):
     config = Config.from_file(filename=tmp_text_file.name, protocol="configobj")
     assert config == simple_config
 
-def test_Config_to_file_daikon(simple_config, tmp_text_file):
-    simple_config.to_file(filename=tmp_text_file.name, protocol="daikon")
+def test_Config_to_file_zirkon(simple_config, tmp_text_file):
+    simple_config.to_file(filename=tmp_text_file.name, protocol="zirkon")
     tmp_text_file.flush()
     tmp_text_file.seek(0)
     serialization = tmp_text_file.read()
-    assert serialization == SIMPLE_CONFIG_DAIKON_SERIALIZATION
+    assert serialization == SIMPLE_CONFIG_ZIRKON_SERIALIZATION
 
-def test_Config_from_file_daikon(simple_config, tmp_text_file):
-    tmp_text_file.write(SIMPLE_CONFIG_DAIKON_SERIALIZATION)
+def test_Config_from_file_zirkon(simple_config, tmp_text_file):
+    tmp_text_file.write(SIMPLE_CONFIG_ZIRKON_SERIALIZATION)
     tmp_text_file.flush()
     tmp_text_file.seek(0)
-    config = Config.from_file(filename=tmp_text_file.name, protocol="daikon")
+    config = Config.from_file(filename=tmp_text_file.name, protocol="zirkon")
     assert config == simple_config
 
 def test_Config_get_serializer_json():
@@ -508,7 +508,7 @@ def test_Config_deferred_protocol(defconfig, protocol):
     assert defconfig_reloaded == defconfig
 
 def test_Config_deferred_dump(defconfig):
-    s_defconfig = defconfig.to_string(protocol="daikon")
+    s_defconfig = defconfig.to_string(protocol="zirkon")
     assert s_defconfig == """\
 n = 10
 [sub]

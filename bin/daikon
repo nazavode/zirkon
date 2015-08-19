@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from daikon._tool.main import main
+from zirkon._tool.main import main
 
 
 if __name__ == "__main__":

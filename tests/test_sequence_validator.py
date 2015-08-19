@@ -6,16 +6,16 @@ import os
 
 import pytest
 
-from daikon.validator.error import MinValueError, \
+from zirkon.validator.error import MinValueError, \
                                    MaxValueError, \
                                    MinLengthError, \
                                    MaxLengthError, \
                                    InvalidTypeError, \
                                    MissingRequiredOptionError
-from daikon.validator.int_validators import IntList, IntTuple
-from daikon.validator.float_validators import FloatList, FloatTuple
-from daikon.validator.str_validators import StrList, StrTuple
-from daikon.validator.bool_validators import BoolList, BoolTuple
+from zirkon.validator.int_validators import IntList, IntTuple
+from zirkon.validator.float_validators import FloatList, FloatTuple
+from zirkon.validator.str_validators import StrList, StrTuple
+from zirkon.validator.bool_validators import BoolList, BoolTuple
 
 def sequence(sequence_type, value, mult):
     return sequence_type(value for i in range(mult))

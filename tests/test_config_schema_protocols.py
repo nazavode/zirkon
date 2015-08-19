@@ -26,13 +26,13 @@ from common.fixtures import protocol, \
     simple_config_content, simple_schema_content, \
     simple_section_content, simple_validation, tmp_text_file
 
-from daikon.config import Config, SECTION, ROOT
-from daikon.schema import Schema
-from daikon.validation import Validation
-from daikon.validator import Int
-from daikon.validator.error import MinValueError
-from daikon.toolbox.dictutils import compare_dicts, transform
-from daikon.toolbox.serializer import Serializer
+from zirkon.config import Config, SECTION, ROOT
+from zirkon.schema import Schema
+from zirkon.validation import Validation
+from zirkon.validator import Int
+from zirkon.validator.error import MinValueError
+from zirkon.toolbox.dictutils import compare_dicts, transform
+from zirkon.toolbox.serializer import Serializer
 
 Parameters = collections.namedtuple('Parameters', ('config_class', 'config_content'))
 
@@ -85,7 +85,7 @@ def schema_de():
     return schema
 
 SCHEMA_DE_STRING = {}
-SCHEMA_DE_STRING['daikon'] = """\
+SCHEMA_DE_STRING['zirkon'] = """\
 alpha = Int(default=10)
 beta = Int(default=ROOT['alpha'] - 3)
 [sub]
@@ -93,7 +93,7 @@ beta = Int(default=ROOT['alpha'] - 3)
     y = Int(default=ROOT['alpha'] + SECTION['x'])
     z = Int(default=0)
 """
-SCHEMA_DE_STRING['configobj'] = SCHEMA_DE_STRING['daikon']
+SCHEMA_DE_STRING['configobj'] = SCHEMA_DE_STRING['zirkon']
 
 def test_read_write_schema_de(protocol, schema_de):
     schema_de_string = schema_de.to_string(protocol=protocol)
@@ -106,15 +106,15 @@ def test_read_write_schema_de(protocol, schema_de):
     if ref_schema_de_string:
         assert schema_de_reloaded_string == schema_de_string
     else:
-        assert schema_de_reloaded.to_string(protocol='daikon') == schema_de.to_string(protocol='daikon')
+        assert schema_de_reloaded.to_string(protocol='zirkon') == schema_de.to_string(protocol='zirkon')
 
 CONFIG_DE_STRING = {}
-CONFIG_DE_STRING['daikon'] = """\
+CONFIG_DE_STRING['zirkon'] = """\
 [sub]
     x = 100
     z = SECTION['x'] + 5
 """
-CONFIG_DE_STRING['configobj'] = CONFIG_DE_STRING['daikon']
+CONFIG_DE_STRING['configobj'] = CONFIG_DE_STRING['zirkon']
 
 @pytest.fixture
 def config_de():

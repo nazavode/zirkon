@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from daikon.version import VERSION_INFO
+from zirkon.version import VERSION_INFO
 
 # General configuration
 # ---------------------
@@ -23,7 +23,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'daikon'
+project = 'zirkon'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

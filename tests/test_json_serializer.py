@@ -12,8 +12,8 @@ from common.fixtures import defaultsvalue, \
                             tmp_text_file, \
                             SIMPLE_CONFIG_JSON_SERIALIZATION
 
-from daikon.config import Config
-from daikon.toolbox.serializer.json_serializer import JSONSerializer
+from zirkon.config import Config
+from zirkon.toolbox.serializer.json_serializer import JSONSerializer
 
 @pytest.fixture
 def serializer():

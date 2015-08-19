@@ -4,7 +4,7 @@ import collections
 
 import pytest
 
-from daikon.toolbox.deferred import *
+from zirkon.toolbox.deferred import *
 
 _data = collections.OrderedDict()
 
