@@ -2,7 +2,7 @@ Zirkon
 ======
 A python configuration library. Zirkon requires python >= 3.4.
 
-.. image:: https://travis-ci.org/simone-campagna/zirkon.svg
+.. image:: https://travis-ci.org/simone-campagna/zirkon.svg?branch=master
     :target: https://travis-ci.org/simone-campagna/zirkon
 
 .. image:: https://coveralls.io/repos/simone-campagna/zirkon/badge.svg?branch=master&service=github
