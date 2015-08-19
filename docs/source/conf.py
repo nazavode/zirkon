@@ -53,4 +53,4 @@ html_use_modindex = True
 # If false, no index is generated.
 html_use_index = True
 
-html_logo = "img/logo.jpg"
+html_logo = "img/logo.png"

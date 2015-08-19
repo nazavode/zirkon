@@ -71,7 +71,7 @@ if __name__ == "__main__":
                                    ('docs/source', ('conf.py', '*.rst')),
                                    ('docs/source/getting-started', ('*.rst',)),
                                    ('docs/source/userguide', ('*.rst',)),
-                                   ('docs/source/img', ('*.jpg',)),
+                                   ('docs/source/img', ('*.png',)),
                                    ('.', ('tox.ini', 'pylint.ini', 'flake8.ini',)),
                                   ]:
         files = []
