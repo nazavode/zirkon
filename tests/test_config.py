@@ -193,6 +193,16 @@ def test_Config_defaults_section():
     #del config['x']
     #assert not config.has_section('x')
 
+def test_Config_defaults_Config():
+    defaults = Config()
+    defaults["y"] = ROOT["x"] * 10
+    config1 = Config(defaults=defaults)
+    config1["x"] = 3
+    config2 = Config(defaults=defaults)
+    config2["x"] = 7
+    assert config1["y"] == 30
+    assert config2["y"] == 70
+
 def test_Config_defaults_section_add():
     config = Config(defaults=True)
     config.set_defaults(a={'x': 1})

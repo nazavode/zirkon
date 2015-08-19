@@ -16,7 +16,7 @@ What is Zirkon
 
     - Python 3.4
 
-Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation, default values and value interpolation.
+Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation and value interpolation.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
@@ -31,18 +31,38 @@ Zirkon Config objects behaves like traditional mappings:
  >>> from zirkon.config import Config
  >>> config = Config()
  >>> config['x'] = 10
+ >>> config['y'] = 20
+
+When a dictionary is added, it becomes a subsection:
+
  >>> config['subsection'] = {}
  >>> config['subsection']['y'] = "alpha"
  >>> print(config['subsection']['y'])
  alpha
 
+Subsections can be nested at any level:
+ >>> config['subsection'] = {'sub2': {'sub3': {'a' : 3}}}
+ >>> print(config['subsection']['sub2']['sub3']['a'])
+ 3
+
 Flexibility
 -----------
 
 Zirkon Config objects internally store information in a dict-like
-object, by default ad OrderedDict. It is possible to change this
-internal dictionary and to use (for instance a ``shelve``, in order
-to add persistency).
+object, by default ad OrderedDict:
+
+ >>> config = Config({'x': 1})
+ >>> config['y'] = 2
+ >>> config.dictionary
+ OrderedDict([('x', 1), ('y', 2)])
+
+It is possible to explicitly set this internal dictionary:
+
+ >>> dct = {}
+ >>> config = Config(dictionary=dct)
+ >>> config['x'] = 1
+ >>> dct
+ {'x': 1}
 
 Multiple file serializations
 ----------------------------
@@ -65,6 +85,9 @@ available:
 
 Some examples:
 
+ >>> config = Config()
+ >>> config["x"] = 10
+ >>> config["subsection"] = {"y": "alpha"}
  >>> print(config.to_string(protocol="zirkon"))
  x = 10
  [subsection]
@@ -87,7 +110,7 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirko
 Validation
 ----------
     
-Zirkon allows to define a SChema for the validation of Config objects. A Schema
+Zirkon allows to define a Schema for the validation of Config objects. A Schema
 is simply a special Config having Validators as values:
 
  >>> from zirkon.schema import Schema
@@ -118,7 +141,7 @@ There list of available Validators can be easily extended.
 Defaults
 --------
 
-Zirkon supports default values; these values are stored in a separated space (not in the dictionary), and they are not serialized; nevertheless they can be accessed as normal values:
+Zirkon supports default values; these values are stored in a separated space, not in the dictionary, and they are not serialized; nevertheless they can be accessed as normal values:
 
  >>> defaults = {'x': 1.0, 'y': 2.0}
  >>> config = Config(defaults=defaults)
@@ -140,7 +163,7 @@ They can be overwritten by standard values:
  >>> print(config['x'])
  1.0
 
-When enabled, defaults are used to store the default values set during validation:
+The main purpose for defaults is to store the default values set during validation:
 
  >>> config = Config(defaults={})
  >>> schema = Schema()
@@ -155,17 +178,27 @@ Defaults can directly be accessed:
  >>> config.defaults.dump()
  t = 789
  
+It is possible to disable defaults by simply setting defaults to *None*:
+
+ >>> config = Config(defaults=None)
+ >>> validation = schema.validate(config)
+ >>> config.dump()
+ t = 789
+
+In this case the default value set during the validation is stored in the dictionary as a standard value.
 
 Value interpolation
 -------------------
 
-Zirkon supports value interpolation: key/values precedently stored in 
-the Config object can be accessed and used in complex expressions to set new values.
-For instance:
+Zirkon supports an advanced version of value interpolation: it is possible to set new options by means of complex expressions involving other option values. For instance:
 
  >>> from zirkon.config import ROOT
+ >>> config = Config()
  >>> config['x'] = 2
  >>> config['y'] = ROOT['x'] * 4
+
+Here ``ROOT`` is a reference to the *config* itself. Notice that the expression ``ROOT['x'] * 4`` is not immediately evaluated: it will be evaluated when the *y* value is accessed:
+
  >>> print(config['y'])
  8
  >>> config['x'] = 10
@@ -175,6 +208,8 @@ For instance:
  x = 10
  y = ROOT['x'] * 4
  >>>
+
+Using this feature, values can be set as functions of other values.
 
 Moreover, this can be used in validators:
 
@@ -192,3 +227,17 @@ Moreover, this can be used in validators:
  y = ROOT['x'] * 4
  >>> print(config['x'], config['y'], config['z'])
  10 40 400
+
+So validation parameters can be tied to particular values found in the validated config.
+
+    .. tip::
+       Suppose you want a config with two values: the dimension *N*, which can be 1, 2 or 3, and the *coefficients*, a tuple of *N* floating point values. The schema can be defined as follows:
+
+        >>> from zirkon.validator import FloatTuple
+        >>> schema = Schema()
+        >>> schema['N'] = Int(min=1, max=3)
+        >>> schema['coefficients'] = FloatTuple(min_len=ROOT['N'], max_len=ROOT['N'])
+        
+Value interpolation can be disabled by setting ``interpolation=False``:
+
+ >>> config = Config(interpolation=False)

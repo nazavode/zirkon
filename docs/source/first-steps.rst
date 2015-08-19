@@ -11,7 +11,7 @@
 Creating a Config
 =================
 
-Creating a *Config* object is simple:
+Creating a *Config* object is easy:
 
  >>> from zirkon.config import Config
  >>> config = Config()
@@ -58,7 +58,7 @@ The *Config* is a dict-like object, with some restrictions:
  >>> config['a'] = 10
  >>> config['l'] = [1, 2, 'x']
 
-The *Config* object can contain subsections; in order to have a subsection, you can simply add any dict-like object (the actual dict type is not significant):
+Setting a dict-like value is also possible, but in this case a subsection, and not an option, is added:
 
  >>> config['sub'] = {}  # empty subsection added
 
@@ -69,7 +69,7 @@ If the dict-like object is not empty, its content is added to the subsection:
  1
  >>>
 
-Notice that, regardless of the actual type of the inserted dictionary, *Config* will internally use for subsection the same type used for the ``dictionary`` attribute:
+The actual type of the dictionary is not significant [#fn0]_: the subsection is always stored using the same *dict* class of the root *dictionary*.
 
  >>> type(config['sub'].dictionary)
  <class 'collections.OrderedDict'>
@@ -116,8 +116,8 @@ Finally, the ``dump(stream=None, protocol="zirkon")`` method is based on ``to_st
 
 The list of available serialization protocols is:
 
- >>> from zirkon.toolbox.serializer import Serializer
- >>> for protocol in Serializer.class_dict():
+ >>> from zirkon.filetype import get_protocols
+ >>> for protocol in get_protocols():
  ...     print(protocol)
  zirkon
  configobj
@@ -137,7 +137,7 @@ The *Schema* class is a special *Config* whose values can only be *Validator* ob
  >>> schema['a'] = Int(default=10, min=3, max=100)
  >>>
  
-These *Schema.validate(config, raise_on_error=False)* method can be used to validate a *Config* object. In this example, ``schema`` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a ``Validation`` object, i.e. a special *Config* accepting only *ValidationError* instances as values (these are exceptions representing a validation error for a key):
+These *Schema.validate(config, raise_on_error=False)* method can be used to validate a *Config* object. In this example, ``schema`` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a ``Validation`` object, i.e. a special *Config* accepting only *ValidationError* instances as values (these are exceptions representing a specific validation error for a key):
 
  >>> config = Config()
  >>> config['a'] = 23
@@ -152,7 +152,6 @@ In this case all is fine, since, *config* has a valid integer value for *a*.
 Since a *default* value has been provided to the ``Int`` *Validator*, it is acceptable that ``config`` do not have the *a* key: in this case, it is added with the default value *10*:
 
  >>> config = Config()
- >>> config.dump()
  >>> validation = schema.validate(config)
  >>> assert not validation  # no errors!
  >>> print(config['a'])
@@ -269,21 +268,30 @@ The ``self_validate`` method is automatically called by all the *store/load* met
  y = MaxValueError('y=10: value is greater than max 2')
  >>>
 
-The Config defaults attibute
-============================
+The Config defaults
+===================
 
-The *defaults* attribute is used to enable the separate storage for default values. It can be:
+The *defaults* is a separate, memory-only storage for default values. It's main purpose is to contain default values set by validation; normally it's preferrable to explicitly store in config files only required values, since defaults depend on the schema and are already stored in it.
+Defaults can be used also for dependent values, i.e. options whose value depend on other options through some expression like ``ROOT["x"] * ROOT["y"]``; it's worthelss to store this values, since they must be computed at any access.
 
-* *True* or *False* to enable/disable the functionality;
-* an existing *Config* or any mapping to be used as storage.
+The ``defaults`` argument of the *Config* class can be used to pass a specific defaults object; it can be another config, or any mapping. It can also be shared between configs:
 
-When enabled, if a mapping is passed as value to *defaults*, it defines the initial content of the defaults:
+ >>> from zirkon.config import ROOT
+ >>> defaults = Config()
+ >>> defaults["y"] = ROOT["x"] * 10
 
- >>> defaults_config = Config()
- >>> config = Config(defaults=defaults_config)
+ >>> config1 = Config(defaults=defaults)
+ >>> config1["x"] = 3
+ >>> config2 = Config(defaults=defaults)
+ >>> config2["x"] = 7
+ >>> config1["y"]
+ 30
+ >>> config2["y"]
+ 70
 
 The *set_defaults* method can be used to add default options or sections:
 
+ >>> config = Config()
  >>> config['z'] = 100
  >>> config.set_defaults(a=10)
  >>> config.set_defaults(sub={'x': 1})
@@ -300,8 +308,20 @@ Defaults can be retrieved:
  [sub]
      x = 1
 
-Notice that the original mapping has been modified:
+The *set_defaults* method is a shorthand for explicitly adding options to the ``defaults`` attribute:
 
- >>> print(defaults_config['a'])
- 10
+ >>> config.defaults["g"] = 9.8
+ >>> config["g"]
+ 9.8
 
+Anyway, if defaults are disabled, the *set_defaults* still works, and it behaves like normal key setting:
+
+ >>> config = Config(defaults=None)
+ >>> config.set_defaults(a=1)
+ >>> config.dump()
+ a = 1
+
+
+.. rubric:: Footnotes
+
+.. [#fn0] Nevertheless, consider that the internal dictionary is by default an *OrderedDict*, so, if the subsection content is added using a standard unordered *dict*, its ordering is abritrary.
