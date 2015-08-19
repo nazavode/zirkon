@@ -26,12 +26,28 @@ __all__ = [
     'DefaultsSection',
 ]
 
+import contextlib
+
 from .section import Section
 
 
 class DefaultsSection(Section):
     """DefaultsSection(...)
-       A Section to store ValidationResult values.
+       A Section to store defaults for ConfigSection.
+
+       The reference_root attribute is used for evaluation of deferred expressions;
+       it must be set through the 'referencing' context manager method:
+
+       >>> from daikon.deferred_object import ROOT
+       >>> defaults = DefaultsSection({'x': ROOT['n'] + 2})
+       >>> section1 = Section({'n': 10})
+       >>> section2 = Section({'n': 30})
+       >>> with defaults.referencing(section1):
+       ...     print(defaults['x'])
+       12
+       >>> with defaults.referencing(section2):
+       ...     print(defaults['x'])
+       32
     """
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
                  interpolation=True, reference_root=None):
@@ -48,6 +64,16 @@ class DefaultsSection(Section):
                                         interpolation=self.interpolation,
                                         name=section_name, reference_root=self.get_reference_root())
 
+    @contextlib.contextmanager
+    def referencing(self, section):
+        """referencing(section)
+           Context manager to temporarily switch reference_root
+        """
+        saved_reference_root = self.reference_root
+        reference_root = section.get_reference_root()
+        self.reference_root = reference_root
+        yield self
+        self.reference_root = saved_reference_root
+
     def get_reference_root(self):
-        # use always the root reference_root, which is correctly set
-        return self.root.reference_root
+        return self.reference_root

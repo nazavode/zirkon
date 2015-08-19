@@ -90,7 +90,9 @@ def replace_deferred(config):
         if isinstance(value, collections.Mapping):
             replace_deferred(value)
         else:
-            config[key] = config.evaluate_option_value(value)
+            value = config[key]
+            config[key] = value
     if isinstance(config, ConfigSection) and config.defaults is not None:
-        replace_deferred(config.defaults)
+        with config.defaults.referencing(config):
+            replace_deferred(config.defaults)
 

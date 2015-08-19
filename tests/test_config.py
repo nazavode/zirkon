@@ -38,6 +38,7 @@ from common.fixtures import dictionary, \
 from daikon.toolbox.deferred import Deferred
 from daikon.toolbox.dictutils import compare_dicts, as_dict
 from daikon.section import Section
+from daikon.defaults_section import DefaultsSection
 from daikon.config_section import ConfigSection
 from daikon.config import Config, ROOT, SECTION
 from daikon.toolbox.serializer import JSONSerializer, \
@@ -551,11 +552,20 @@ def test_Config_deferred_as_dict(defconfig):
     assert isinstance(dct['sub']['b'], int)
     assert dct['sub']['b'] == 3
 
-def test_Config_err_shared_defaults():
-    config = Config(defaults=True)
-    with pytest.raises(ValueError) as exc_info:
-        config2 = Config(defaults=config.defaults)
-    assert str(exc_info.value) == "reference root already set - defaults cannot be shared"
+def test_Config_shared_defaults():
+    defaults = DefaultsSection()
+    defaults['sub'] = {'x': ROOT['n'] * 3, 'sub': {'x': ROOT['n'] * 4}}
+    defaults['x'] = 1000 + ROOT['n']
+    config1 = Config(defaults=defaults)
+    config1['n'] = 10
+    config2 = Config(defaults=defaults)
+    config2['n'] = 20
+    assert config1['x'] == 1010
+    assert config1['sub']['x'] == 30
+    assert config1['sub']['sub']['x'] == 40
+    assert config2['x'] == 1020
+    assert config2['sub']['x'] == 60
+    assert config2['sub']['sub']['x'] == 80
 
 def test_Config_err_disabled_interpolation():
     config = Config(interpolation=False)

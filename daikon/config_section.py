@@ -79,8 +79,6 @@ class ConfigSection(Section):
         defaults = _make_defaults(defaults)
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
-        if self._has_defaults and parent is None:
-            self._defaults.root.set_reference_root(self)
         super().__init__(init=init, dictionary=dictionary, parent=parent,
                          name=name, interpolation=interpolation)
 
@@ -92,13 +90,9 @@ class ConfigSection(Section):
     @defaults.setter
     def defaults(self, value):
         """defaults setter"""
-        if self._has_defaults:
-            self._defaults.set_reference_root(None)
         defaults = _make_defaults(value)
         self._defaults = defaults
         self._has_defaults = self._defaults is not None
-        if self._has_defaults:
-            self._defaults.set_reference_root(self.root)
 
     @classmethod
     def _subsection_class(cls):
@@ -106,10 +100,11 @@ class ConfigSection(Section):
 
     def _subsection(self, section_name, dictionary):
         if self._has_defaults:
-            if section_name in self._defaults:
-                subdefaults = self._defaults[section_name]
-            else:
-                subdefaults = self._defaults.add_section(section_name)
+            with self._defaults.referencing(self):
+                if section_name in self._defaults:
+                    subdefaults = self._defaults[section_name]
+                else:
+                    subdefaults = self._defaults.add_section(section_name)
         else:
             subdefaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self,
@@ -169,7 +164,8 @@ class ConfigSection(Section):
             return super().__getitem__(key)
         else:
             if self._has_defaults and key in self._defaults:
-                value = self._defaults[key]
+                with self._defaults.referencing(self):
+                    value = self._defaults[key]
                 if isinstance(value, collections.Mapping):
                     if has_section_options(value):
                         return self.add_section(key)
@@ -189,12 +185,14 @@ class ConfigSection(Section):
         super().update(dictionary)
         if isinstance(dictionary, ConfigSection):
             if self._has_defaults and dictionary.defaults is not None:
-                self._defaults.update(dictionary.defaults)
+                with self._defaults.referencing(self):
+                    self._defaults.update(dictionary.defaults)
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
         if defaults and self._has_defaults:
-            defaults_dict = self._defaults.as_dict(dict_class=dict_class,
-                                                   evaluate=evaluate)
+            with self._defaults.referencing(self):
+                defaults_dict = self._defaults.as_dict(dict_class=dict_class,
+                                                       evaluate=evaluate)
         else:
             defaults_dict = None
         self_dict = super().as_dict(dict_class=dict_class, defaults=defaults,
