@@ -567,6 +567,15 @@ def test_Config_shared_defaults():
     assert config2['sub']['x'] == 60
     assert config2['sub']['sub']['x'] == 80
 
+def test_Config_sub_setdef():
+    config = Config(defaults={'sub': {'a': 100}})
+    config['x'] = 10
+    config['sub'] = {'b': 3}
+    assert config['sub']['a'] == 100
+    with pytest.raises(AttributeError):
+        config['sub'].defaults = {'a': 200}
+    assert config['sub']['a'] == 100
+
 def test_Config_err_disabled_interpolation():
     config = Config(interpolation=False)
     config['x'] = 10

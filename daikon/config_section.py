@@ -49,24 +49,6 @@ def _update_defaults(config, defaults):
                 config[key] = value
 
 
-def _make_defaults(value):
-    """_make_defaults(value) -> defaults"""
-    if value is False or value is None:
-        defaults = None
-    elif isinstance(value, DefaultsSection):
-        defaults = value
-    elif value is True:
-        defaults = DefaultsSection()
-    elif isinstance(value, Section):
-        defaults = DefaultsSection(dictionary=value)
-    elif isinstance(value, collections.Mapping):
-        defaults = DefaultsSection(dictionary=value)
-    else:
-        raise TypeError("invalid defaults object of type {}: not a Section".format(
-            type(value).__name__))
-    return defaults
-
-
 class ConfigSection(Section):
     """ConfigSection(...)
        Adds support for defaults.
@@ -76,23 +58,32 @@ class ConfigSection(Section):
 
     def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False,
                  interpolation=True, name=None):
-        defaults = _make_defaults(defaults)
-        self._defaults = defaults
-        self._has_defaults = self._defaults is not None
+        self._set_defaults(defaults)
         super().__init__(init=init, dictionary=dictionary, parent=parent,
                          name=name, interpolation=interpolation)
+
+    def _set_defaults(self, value):
+        """_create_defaults(value) -> defaults"""
+        if value is False or value is None:
+            defaults = None
+        elif isinstance(value, DefaultsSection):
+            defaults = value
+        elif value is True:
+            defaults = DefaultsSection()
+        elif isinstance(value, Section):
+            defaults = DefaultsSection(dictionary=value)
+        elif isinstance(value, collections.Mapping):
+            defaults = DefaultsSection(dictionary=value)
+        else:
+            raise TypeError("invalid defaults object of type {}: not a Section".format(
+                type(value).__name__))
+        self._defaults = defaults
+        self._has_defaults = self._defaults is not None
 
     @property
     def defaults(self):
         """defaults getter"""
         return self._defaults
-
-    @defaults.setter
-    def defaults(self, value):
-        """defaults setter"""
-        defaults = _make_defaults(value)
-        self._defaults = defaults
-        self._has_defaults = self._defaults is not None
 
     @classmethod
     def _subsection_class(cls):

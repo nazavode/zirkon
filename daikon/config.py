@@ -76,3 +76,10 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
                  schema=None, validate=True, interpolation=True):
         super().__init__(dictionary=dictionary, init=init, defaults=defaults,
                          schema=schema, validate=validate, interpolation=interpolation)
+
+    @ConfigSection.defaults.setter
+    def defaults(self, value):  # pylint: disable=W0221
+        """defaults setter"""
+        self._set_defaults(value)
+
+
