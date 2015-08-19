@@ -28,7 +28,7 @@ from zirkon.schema import Schema
 from zirkon.config import ROOT, SECTION, Config
 from zirkon.validator import Int, Float, Str
 from zirkon.toolbox.deferred import Deferred
-from zirkon.utils import create_template_from_schema, replace_deferred
+from zirkon.utils import create_template_from_schema, replace_deferred, get_key, set_key
 
 def test_create_template_from_schema(string_io):
     schema = Schema()
@@ -129,3 +129,49 @@ def test_replace_deferred():
     config2['a'] = new_a_value2
     verify(config1, new_a_value2, c_value, x_value, z_value, def_a_value=new_a_value1)
     verify(config2, new_a_value2, c_value, x_value, z_value, def_a_value=a_value)
+
+def test_get_key():
+    config = Config()
+    config['x'] = 10
+    config['sub'] = {'y': 20}
+    config['sub']['sub'] = {'z': 30}
+    
+    assert get_key(config, "x") == 10
+    assert get_key(config, "sub.y") == 20
+    assert get_key(config, ("sub", "y")) == 20
+    assert get_key(config, "sub.sub.z") == 30
+    assert get_key(config, ("sub", "sub", "z")) == 30
+    assert get_key(config, ()) == config
+    with pytest.raises(KeyError) as exc_info:
+        get_key(config, "y")
+    assert str(exc_info.value) == "'y'"
+
+def test_set_key(string_io):
+    config = Config()
+    with pytest.raises(KeyError) as exc_info:
+        set_key(config, (), 3)
+    assert str(exc_info.value) == "()"
+
+    with pytest.raises(KeyError) as exc_info:
+        set_key(config, "", 3)
+    assert str(exc_info.value) == "''"
+
+    set_key(config, "x", 10)
+    set_key(config, "sub", {'y': 20})
+    set_key(config, "sub.z", 30)
+    with pytest.raises(KeyError) as exc_info:
+        set_key(config, "sub.sub2.w", 40)
+    assert str(exc_info.value) == "'sub2'"
+    set_key(config, "sub.sub2.w", 40, parents=True)
+
+    config.dump(string_io)
+    assert string_io.getvalue() == """\
+x = 10
+[sub]
+    y = 20
+    z = 30
+    [sub2]
+        w = 40
+"""
+
+    

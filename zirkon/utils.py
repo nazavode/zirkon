@@ -26,6 +26,8 @@ __author__ = "Simone Campagna"
 __all__ = [
     'create_template_from_schema',
     'replace_deferred',
+    'set_key',
+    'get_key',
 ]
 
 import collections
@@ -95,4 +97,74 @@ def replace_deferred(config):
     if isinstance(config, ConfigSection) and config.defaults is not None:
         with config.defaults.referencing(config):
             replace_deferred(config.defaults)
+
+
+def _get_key_tuple(key):
+    """_get_key_tuple(key) -> key-tuple"""
+    if isinstance(key, (list, tuple)):
+        return key
+    elif isinstance(key, str):
+        key = key.strip()
+        if key:
+            return key.split(".")
+        else:
+            return ()
+    else:
+        raise TypeError("invalid object {!r} of type {}".format(key, type(key).__name__))
+
+
+def get_key(config, key):
+    """get_key(config, key)
+       Get a key value from config. Key can be
+       * a dot-separated list of keys, or
+       * a tuple of keys.
+
+       >>> config = Config()
+       >>> config["x"] = 10
+       >>> config["sub"] = {"y": 20}
+       >>> get_key(config, "x")
+       10
+       >>> get_key(config, "sub.y")
+       20
+       >>> get_key(config, ("sub", "y"))
+       20
+       >>> get_key(config, "sub")
+       ConfigSection(dictionary=OrderedDict([('y', 20)]))
+       >>>
+    """
+    key_tuple = _get_key_tuple(key)
+    section = config
+    for key in key_tuple:
+        section = section[key]
+    return section
+
+
+def set_key(config, key, value, *, parents=False):
+    """set_key(config, key, value, *, parents=False)
+       Set a key value from config. Key can be
+       * a dot-separated list of keys, or
+       * a tuple of keys.
+       If 'parents', create missing intermediate sections.
+
+       >>> config = Config()
+       >>> set_key(config, "x", 10)
+       >>> set_key(config, "sub", {'y': 20})
+       >>> set_key(config, "sub.z", 30)
+       >>> config.dump()
+       x = 10
+       [sub]
+           y = 20
+           z = 30
+       >>>
+    """
+    key_tuple = _get_key_tuple(key)
+    if len(key_tuple) == 0:
+        raise KeyError(key)
+    section = config
+    for key in key_tuple[:-1]:
+        if parents and not section.has_section(key):
+            section = section.add_section(key)
+        else:
+            section = section[key]
+    section[key_tuple[-1]] = value
 

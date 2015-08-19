@@ -84,17 +84,30 @@ if __name__ == "__main__":
         name="zirkon",
         version=version,
         requires=[],
-        description="Config Project",
+        description="Python library for configuration data",
         author="Simone Campagna",
         author_email="simone.campagna11@gmail.com",
         install_requires=read_requirements('install'),
         package_data={},
         data_files=data_files,
-        url="...",
-        download_url='...',
+        url="https://github.com/simone-campagna/zirkon",
+        download_url = 'https://github.com/simone-campagna/zirkon/archive/{}.tar.gz'.format(version),
         packages=packages,
         scripts=scripts,
-#        tests_require=['tox'],
-#        cmdclass = {'test': Tox},
+        classifiers=[
+            # status:
+            #   3 - Alpha
+            #   4 - Beta
+            #   5 - Production/Stable
+            'Development Status :: 3 - Alpha',
+            # audience:
+            'Intended Audience :: Developers',
+            'Topic :: Software Development :: Build Tools',
+            # license:
+            'License :: OSI Approved :: Apple Public Source License',
+            # language:
+            'Programming Language :: Python :: 3.4',
+        ],
+        keywords='configuration files',
     )
 
