@@ -71,7 +71,7 @@ class ConfigSection(Section):
         elif value is True:
             defaults = DefaultsSection()
         elif isinstance(value, Section):
-            defaults = DefaultsSection(dictionary=value)
+            defaults = DefaultsSection(dictionary=value.dictionary)
         elif isinstance(value, collections.Mapping):
             defaults = DefaultsSection(dictionary=value)
         else:
