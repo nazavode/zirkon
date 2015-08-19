@@ -116,8 +116,11 @@ Interpolation can be used to set validators' arguments; for instance:
  >>> config = Config({'x': 10}, schema=schema)
  >>> config.dump()
  x = 10
- y = 20
- z = 30
+
+The default values *y* and *z* are not shown, but they are available:
+
+ >>> print(config['y'], config['z'])
+ 20 30
 
 Interpolation can be applied to any validator argument. In the following example, interpolation is used to force a list *coeffs* to have the length specified by a config parametes *num*:
 

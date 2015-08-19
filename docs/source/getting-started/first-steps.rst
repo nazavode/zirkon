@@ -154,9 +154,9 @@ Since a *default* value has been provided to the ``Int`` *Validator*, it is acce
  >>> config = Config()
  >>> config.dump()
  >>> validation = schema.validate(config)
- >>> assert not validation
- >>> config.dump()
- a = 10
+ >>> assert not validation  # no errors!
+ >>> print(config['a'])
+ 10
  >>>
 
 Validation errors
@@ -203,36 +203,38 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      >>> validation = schema.validate(config)
      >>> validation.dump()
      u = UnexpectedOptionError('u=0.35: unexpected option')
-     >>> config.dump()
-     u = 0.35
-     a = 10
+     >>>
+
+  Notice that the option is not removed:
+
+     >>> config['u']
+     0.35
      >>>
 
 * ``daikon.validator.Ignore``: the unexpected option is ignored and left in the config;
 
      >>> from daikon.validator import Ignore
      >>> schema.unexpected_option_validator = Ignore()
-     >>> config.dump()
-     u = 0.35
-     a = 10
      >>> validation = schema.validate(config)
-     >>> validation.dump()
-     >>> config.dump()
-     u = 0.35
-     a = 10
+     >>> validation.dump()  # no errors
+
+  The unexpected option is still there:
+
+     >>> config['u']
+     0.35
      >>>
 
 * ``daikon.validator.Remove``: the unexpected option is removed;
 
      >>> from daikon.validator import Remove
      >>> schema.unexpected_option_validator = Remove()
-     >>> config.dump()
-     u = 0.35
-     a = 10
      >>> validation = schema.validate(config)
-     >>> validation.dump()
-     >>> config.dump()
-     a = 10
+     >>> validation.dump()  # no errors
+
+  The unexpected option has been removed:
+
+     >>> 'u' in config
+     False
      >>>
 
 Anyway, any othe validator can be used.

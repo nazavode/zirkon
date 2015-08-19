@@ -56,7 +56,7 @@ class ConfigSection(Section):
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=False,
+    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=True,
                  interpolation=True, name=None):
         self._set_defaults(defaults)
         super().__init__(init=init, dictionary=dictionary, parent=parent,

@@ -87,17 +87,10 @@ Daikon supports validation through a *Schema* object. A *Schema* is a *Config* w
  w = UnexpectedOptionError('w=5: unexpected option')
  [sub]
      y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
- >>> config.dump()
- num = 10
- mode = 'xy'
- [sub]
-     enable = True
-     x = 1.5
-     y = -1.5
- name = 'alpha'
- w = 5
- min_value = 100
- coeffs = [1.0, 1.0, 1.0]
+ >>> print(config['min_value'])
+ 100
+ >>> print(config['coeffs'])
+ [1.0, 1.0, 1.0]
 
 Notice that two values have been added to *config*, due to the defaults defined in the *schema*.
 
