@@ -12,6 +12,8 @@ A python configuration library. Zirkon requires python >= 3.4.
    :target: https://codeclimate.com/github/simone-campagna/zirkon
    :alt: Code Climate
 
+.. image:: https://badge.fury.io/py/zirkon.svg
+    :target: http://badge.fury.io/py/zirkon
 
 What is zirkon
 --------------
