@@ -26,8 +26,9 @@ __author__ = "Simone Campagna"
 __all__ = [
     'create_template_from_schema',
     'replace_deferred',
-    'set_key',
     'get_key',
+    'set_key',
+    'del_key',
 ]
 
 import collections
@@ -167,4 +168,38 @@ def set_key(config, key, value, *, parents=False):
         else:
             section = section[key]
     section[key_tuple[-1]] = value
+
+
+def del_key(config, key, *, ignore_errors=False):
+    """del_key(config, key, *, ignore_errors=False)
+       Del a key value from config. Key can be
+       * a dot-separated list of keys, or
+       * a tuple of keys.
+       If 'ignore_errors' and an intermediate section is missin, error is not raised.
+
+       >>> config = Config()
+       >>> config["x"] = 10
+       >>> config["sub1"] = {"y": 20, "z": 30}
+       >>> config["sub2"] = {"y": 20, "z": 30}
+       >>> del_key(config, "x")
+       >>> del_key(config, "sub1")
+       >>> del_key(config, "sub2.y")
+       >>> config.dump()
+       [sub2]
+           z = 30
+       >>>
+    """
+    key_tuple = _get_key_tuple(key)
+    if len(key_tuple) == 0:
+        config.clear()
+    else:
+        section = config
+        for key in key_tuple[:-1]:
+            if ignore_errors and not section.has_section(key):
+                return
+            section = section[key]
+        key = key_tuple[-1]
+        if ignore_errors and key not in section:
+            return
+        del section[key]
 

@@ -28,7 +28,8 @@ from zirkon.schema import Schema
 from zirkon.config import ROOT, SECTION, Config
 from zirkon.validator import Int, Float, Str
 from zirkon.toolbox.deferred import Deferred
-from zirkon.utils import create_template_from_schema, replace_deferred, get_key, set_key
+from zirkon.utils import create_template_from_schema, replace_deferred, \
+    get_key, set_key, del_key
 
 def test_create_template_from_schema(string_io):
     schema = Schema()
@@ -174,4 +175,29 @@ x = 10
         w = 40
 """
 
+def test_del_key(string_io):
+    config = Config()
+    config['x'] = 10
+    config['sub'] = {'y': 20}
+    config['sub']['sub1'] = {'z': 30, 'w': 40}
+    config['sub']['sub2'] = {'z': 30, 'w': 40}
+
+    del_key(config, "x")
+    with pytest.raises(KeyError) as exc_info:
+        del_key(config, "x")
+    assert str(exc_info.value) == "'x'"
+    del_key(config, "x", ignore_errors=True)
+
+    with pytest.raises(KeyError) as exc_info:
+        del_key(config, "sub.sub3.xx")
+    assert str(exc_info.value) == "'sub3'"
     
+    del_key(config, "sub.sub1")
+    del_key(config, "sub.sub2.z")
+    config.dump(string_io)
+    assert string_io.getvalue() == """\
+[sub]
+    y = 20
+    [sub2]
+        w = 40
+"""
