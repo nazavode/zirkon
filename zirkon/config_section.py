@@ -32,8 +32,7 @@ from .defaults_section import DefaultsSection
 
 
 def _update_defaults(config, defaults):
-    """_update_defaults(config, defaults)
-       Update config unset values with defaults.
+    """Update config unset values with defaults.
     """
     for key, value in defaults.items():
         if isinstance(value, collections.Mapping):
@@ -48,20 +47,34 @@ def _update_defaults(config, defaults):
 
 
 class ConfigSection(Section):
-    """ConfigSection(...)
-       Adds support for defaults.
+    """Config section adding support for default values.
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent Section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
+       defaults: bool, optional
+           enables defaults
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, defaults=True,
-                 interpolation=True, name=None):
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
+                 defaults=True, interpolation=True):
         self._set_defaults(defaults)
         super().__init__(init=init, dictionary=dictionary, parent=parent,
                          name=name, interpolation=interpolation)
 
     def _set_defaults(self, value):
-        """_create_defaults(value) -> defaults"""
+        """Set defaults attribute"""
         if value is False or value is None:
             defaults = None
         elif isinstance(value, DefaultsSection):
@@ -101,8 +114,13 @@ class ConfigSection(Section):
                                         name=section_name, defaults=subdefaults)
 
     def set_defaults(self, **kwargs):
-        """set_defaults(**kwargs)
-           Set default options and sections"""
+        """Set default options and sections
+
+           Parameters
+           ----------
+           \*\*kwargs
+               a list of key=value items
+        """
         if self._has_defaults:
             for key, value in kwargs.items():
                 self._defaults[key] = value

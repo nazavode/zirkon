@@ -38,6 +38,14 @@ class DNameCall(DName):
        123
        >>> dprop.unparse()
        'foo'
+
+       Parameters
+       ----------
+       name: str
+           the name of the function
+       globals_d: dict, optional
+           the globals dictionary
+
     """
     def evaluate(self, globals_d=None):
         return super().evaluate(globals_d=globals_d)()

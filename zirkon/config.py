@@ -65,14 +65,28 @@ from .deferred_object import ROOT, SECTION
 
 
 class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
-    """Config(init=None, *, dictionary=None, defaults=True, schema=None, validate=True, interpolation=True)
-       Config class.
+    """Config class.
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       defaults: bool, optional
+           enables defaults
+       interpolation: bool, optional
+           enables interpolation
+       schema: Schema, optional
+           the validation schema
+       validate: bool, optional
+           self validate during construction
     """
 
     def __init__(self, init=None, *, dictionary=None, defaults=True,
-                 schema=None, validate=True, interpolation=True):
+                 interpolation=True, schema=None, validate=True):
         super().__init__(dictionary=dictionary, init=init, defaults=defaults,
-                         schema=schema, validate=validate, interpolation=interpolation)
+                         interpolation=interpolation, schema=schema, validate=validate)
 
     @ConfigSection.defaults.setter
     def defaults(self, value):  # pylint: disable=W0221

@@ -35,11 +35,14 @@ from zirkon.version import VERSION_INFO
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
 ]
+
+napoleon_use_param = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -343,3 +346,12 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+
+#def skip(app, what, name, obj, skip, options):
+#    if name == "__init__":
+#        return False
+#    return skip
+#
+#def setup(app):
+#    app.connect("autodoc-skip-member", skip)

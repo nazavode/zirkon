@@ -68,10 +68,22 @@ from .toolbox.serializer import Serializer
 
 
 class Section(collections.abc.Mapping):
-    """Section(init=None, *, dictionary=None, parent=None, name=None, interpolation=True)
-       Dictionary-like object implementing storage of options/sections. The
+    """Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
@@ -95,14 +107,22 @@ class Section(collections.abc.Mapping):
 
     @classmethod
     def _subsection_class(cls):
-        """_subsection_class(cls)
-           Return the class to be used for subsections (it must be derived from Section)
+        """Returns the class to be used for subsections (it must be derived from Section)
+
+           Returns
+           -------
+           type
+               the class to be used for subsections
         """
         return Section
 
     def _subsection(self, section_name, dictionary):
-        """_subsection(self, section_name, dictionary)
-           Return a subsection with the given name
+        """Returns a subsection with the given name
+
+           Returns
+           -------
+           subsection_class
+               a subsection_class instance
         """
         return self._subsection_class()(dictionary=dictionary, parent=self,
                                         interpolation=self.interpolation,
@@ -110,19 +130,37 @@ class Section(collections.abc.Mapping):
 
     @classmethod
     def _dictionary_factory(cls):
-        """_dictionary_factory() -> new (empty) dictionary
-           Factory for new dictionaries.
+        """Factory for new dictionaries.
+
+           Returns
+           -------
+           Mapping
+               a dictionary
         """
         return collections.OrderedDict()
 
     def get_reference_root(self):
-        """get_reference_root(value) -> reference root section
-            to be used for ROOT in evaluate_option_value
+        """Returns the reference_root to be used for evaluation of deferred expressions.
+
+           Returns
+           -------
+           Section
+               the reference_root
         """
         return self.root
 
     def evaluate_option_value(self, value):
-        """evaluate_option_value(value)
+        """Evaluates an option's value.
+
+           Parameters
+           ----------
+           value: any
+               the option value
+
+           Returns
+           -------
+           any
+               the evaluated value
         """
         if isinstance(value, Deferred):
             if self.interpolation:
@@ -135,10 +173,17 @@ class Section(collections.abc.Mapping):
         return value
 
     def _check_option(self, key, value):
-        """_check_option(key, value)
+        """Checks the option type. Raises in case of errors.
+
+           Parameters
+           ----------
+           key: str
+               the key
+           value: any
+               the value
         """
         if isinstance(value, self.SUPPORTED_SCALAR_TYPES):
-            return value
+            pass
         elif isinstance(value, self.SUPPORTED_SEQUENCE_TYPES):
             for index, item in enumerate(value):
                 if not isinstance(item, self.SUPPORTED_SCALAR_TYPES):
@@ -150,7 +195,6 @@ class Section(collections.abc.Mapping):
                         item=item,
                         item_type=type(item).__name__,
                     ))
-            return value
         else:
             raise TypeError("option {}: invalid value {!r} of type {}".format(
                 key,
@@ -193,14 +237,12 @@ class Section(collections.abc.Mapping):
         del self.dictionary[key]
 
     def clear(self):
-        """clear()
-           Clear all the section's content.
+        """Clears all the section's content.
         """
         self.dictionary.clear()
 
     def copy(self):
-        """copy()
-           Returns a deep copy of the section.
+        """Returns a deep copy of the section.
         """
         return self._subsection_class()(dictionary=self.dictionary.copy())
 
@@ -211,8 +253,19 @@ class Section(collections.abc.Mapping):
             return default
 
     def get_option(self, option_name, default=None):
-        """get_option(self, option_name, default=None) -> value
-           Get an option (raises KeyError if a section is found)
+        """Returns an option (raises KeyError if a section is found)
+
+           Parameters
+           ----------
+           option_name: str
+               the option name
+           default: any
+               the value to be used as default
+
+           Returns
+           -------
+           any
+               the option value, or None
         """
         value = self.get(option_name, default)
         if isinstance(value, collections.Mapping):
@@ -220,8 +273,19 @@ class Section(collections.abc.Mapping):
         return value
 
     def get_section(self, section_name, default=None):
-        """get_section(self, section_name, default=None) -> value
-           Get a section (raises KeyError if an option is found)
+        """Returns a section (raises KeyError if an option is found)
+
+           Parameters
+           ----------
+           section_name: str
+               the section name
+           default: any
+               the value to be used as default
+
+           Returns
+           -------
+           any
+               the section, or None
         """
         value = self.get(section_name, default)
         if not isinstance(value, collections.Mapping):
@@ -229,49 +293,89 @@ class Section(collections.abc.Mapping):
         return value
 
     def __contains__(self, key):
-        """__contains__(self, key) -> bool
-           Return True if option or section 'key' exists.
-        """
         return key in self.dictionary
 
     def has_key(self, key):
-        """has_key(self, key) -> bool
-           Return True if option or section exists.
+        """Returns True if option or section exists.
+
+           Parameters
+           ----------
+           key: str
+               the key
+
+           Returns
+           -------
+           bool
+               True if key exists
         """
         return key in self
 
     def has_option(self, option_name):
-        """has_option(self, option_name) -> bool
-           Return True if option exists.
+        """Returns True if option exists.
+
+           Parameters
+           ----------
+           option_name: str
+               the option name
+
+           Returns
+           -------
+           bool
+               True if option exists
         """
         return option_name in self.dictionary and \
             not isinstance(self.dictionary[option_name], collections.Mapping)
 
     def has_section(self, section_name):
-        """has_section(self, section_name) -> bool
-           Return True if section exists.
+        """Returns True if section exists.
+
+           Parameters
+           ----------
+           section_name: str
+               the section name
+
+           Returns
+           -------
+           bool
+               True if section exists
         """
         return section_name in self.dictionary and \
             isinstance(self.dictionary[section_name], collections.Mapping)
 
     def add_section(self, section_name):
-        """add_section(self, section_name) -> new section
-           Add a new section and return it.
+        """Adds a new section and return it.
+           Parameters
+           ----------
+           section_name: str
+               the section name
+
+           Returns
+           -------
+           section
+               the new section
         """
         self[section_name] = {}
         return self[section_name]
 
     def options(self):
-        """options(self) -> option items
-           Iterator over option items
+        """Iterator over option items.
+
+           Returns
+           -------
+           iterator
+               iterator over (option_name, option_value)
         """
         for key, value in self.items():
             if not isinstance(value, collections.Mapping):
                 yield key, value
 
     def sections(self):
-        """sections(self) -> section items
-           Iterator over section items
+        """Iterator over section items.
+
+           Returns
+           -------
+           iterator
+               iterator over (section_name, section_value)
         """
         for key, value in self.items():
             if isinstance(value, collections.Mapping):
@@ -298,15 +402,27 @@ class Section(collections.abc.Mapping):
         yield from self.keys()
 
     def update(self, dictionary):
-        """update(self, dictionary)
-           Update with the content of the 'dictionary'
+        """Updates with the content of the 'dictionary'
+
+           Parameters
+           ----------
+           dictionary: Mapping
+               the dictionary
         """
         for key, value in dictionary.items():
             self[key] = value
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
-        """as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True) -> dict
-           Return a dict with all the section content
+        """Returns a dict copy of all the section content.
+
+           Parameters
+           ----------
+           dict_class: type, optional
+               the dict class to be used to create dictionaries
+           defaults: bool, optional
+               if True copy also default values
+           evaluate: bool, optional
+               if True evaluate deferred expressions
         """
         result = dict_class()
         subsection_class = self._subsection_class()
@@ -346,8 +462,16 @@ class Section(collections.abc.Mapping):
         return False
 
     def dump(self, stream=None, protocol="zirkon", *, defaults=False):
-        """dump(self, stream=None, protocol="zirkon", defaults=False)
-           Dump the content to a stream.
+        """Dumps the content to a stream.
+
+           Parameters
+           ----------
+           stream: file, optional
+               the stream where to write (defaults to sys.stdout)
+           protocol: str, optional
+               the protocol (defaults to "zirkon")
+           defaults: bool, optional
+               if True, dump defaults too
         """
         if stream is None:
             stream = sys.stdout
@@ -357,8 +481,17 @@ class Section(collections.abc.Mapping):
 
 
 def iter_section_options(section):
-    """iter_section_options(section)
-       Iterates recursively on all option items.
+    """Iterates recursively on all option items.
+
+       Parameters
+       ----------
+       section: Section
+           a section object
+
+       Returns
+       -------
+       iterator
+           iterator over (rootname, option_name, option_value)
     """
     sections = [((), section)]
     while sections:
@@ -373,15 +506,33 @@ def iter_section_options(section):
 
 
 def count_section_options(section):
-    """count_section_options(section)
-       Count number of options.
+    """Counts the number of options.
+
+       Parameters
+       ----------
+       section: Section
+           a section object
+
+       Returns
+       -------
+       int
+           the number of options
     """
     return sum(1 for _ in iter_section_options(section))
 
 
 def has_section_options(section):
-    """has_section_options(section)
-       Return True if section has at least 1 option.
+    """Returns True if section has at least 1 option.
+
+       Parameters
+       ----------
+       section: Section
+           a section object
+
+       Returns
+       -------
+       bool
+           True if at least one option is found
     """
     for _ in iter_section_options(section):
         return True
@@ -389,8 +540,21 @@ def has_section_options(section):
 
 
 def get_section_value(config, *keys):
-    """get_section_value(config, *keys)
-       Config getter; get_section_value(config, k0, k1, k2) is equivalent to config[k0][k1][k2].
+    """Returns the value for a tuple of keys.
+       get_section_value(config, k0, k1, k2) is equivalent to
+       config[k0][k1][k2]
+
+       Parameters
+       ----------
+       config: Section
+           the config object
+       \*keys: tuple
+           the keys for successive gets
+
+       Returns
+       -------
+       any
+           the value
     """
     result = config
     for key in keys:

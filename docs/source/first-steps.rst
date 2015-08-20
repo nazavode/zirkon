@@ -50,6 +50,7 @@ Accessing the Config content
 The *Config* is a dict-like object, with some restrictions:
 * keys must be strings representing valid python identifiers (for instance, ``10``, ``c.x``, ``9c`` are all invalid keys)
 * values can be
+
   - scalars of type ``int``, ``float``, ``str``, ``bool`` or ``NoneType``;
   - a ``list`` of scalars;
   - a ``tuple`` of scalars;

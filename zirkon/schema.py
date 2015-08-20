@@ -30,8 +30,19 @@ from .validator import ValidatorInstance
 
 
 class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
-    """Schema(init=None, *, dictionary=None)
-       Schema config.
+    """Schema config class.
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       unexpected_option_validator: Validator, optional
+           the validator to be used for unexpected options
+       self_validate: bool, optional
+           enables self validation in construction
+
     """
     def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None, self_validate=True):
         super().__init__(dictionary=dictionary, init=init, interpolation=True,

@@ -29,6 +29,5 @@ from .validation_section import ValidationSection
 
 
 class Validation(ConfigBase, ValidationSection):  # pylint: disable=too-many-ancestors,I0011
-    """Validation(init=None, *, dictionary=None)
-       Validation config.
+    """Validation config, used to store validation errors.
     """

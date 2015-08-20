@@ -32,9 +32,7 @@ from .section import Section
 
 
 class DefaultsSection(Section):
-    """DefaultsSection(...)
-       A Section to store defaults for ConfigSection.
-
+    """A Section to store defaults for ConfigSection.
        The reference_root attribute is used for evaluation of deferred expressions;
        it must be set through the 'referencing' context manager method:
 
@@ -48,6 +46,22 @@ class DefaultsSection(Section):
        >>> with defaults.referencing(section2):
        ...     print(defaults['x'])
        32
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent Section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
+       reference_root: Section, optional
+           the reference root
+
     """
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
                  interpolation=True, reference_root=None):
@@ -66,8 +80,17 @@ class DefaultsSection(Section):
 
     @contextlib.contextmanager
     def referencing(self, section):
-        """referencing(section)
-           Context manager to temporarily switch reference_root
+        """Context manager to temporarily switch reference_root to section.
+
+           Parameters
+           ----------
+           section: ConfigSection
+               a section to be temporarily used as reference_root
+
+           Returns
+           -------
+           context-manager
+               the context manager for temporary substitution of reference_root
         """
         saved_reference_root = self.reference_root
         reference_root = section.get_reference_root()

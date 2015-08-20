@@ -63,18 +63,26 @@ _TEMPLATES = {
 
 
 def get_config_classes():
-    """get_config_classes() -> tuple of available config classes"""
+    """Get the list of config classes"""
     return _CONFIG_CLASSES
 
 
 def get_protocols():
-    """get_protocols() -> tuple of available class names"""
+    """Get the list of serialization protocols"""
     return tuple(Serializer.get_class_tags())
 
 
 def get_config_class(config):
-    """get_config_class(config) -> config class name
-       'config' can be a config object, a config class or a config class name.
+    """Get a config class
+
+       Parameters
+       ----------
+       config: any
+           a config object, config class or config class name
+
+       Returns:
+       ConfigBase
+           the requested config class
     """
     if isinstance(config, type):
         for config_class in _CONFIG_CLASSES:
@@ -98,12 +106,24 @@ def get_config_class(config):
 
 
 def get_config_class_name(config_class):
-    """get_config_class_name(config_class)"""
+    """Get a config class name
+
+    Parameters
+    ----------
+    config_class: ConfigBase
+        the config class
+
+    Returns
+    -------
+    str
+        the config class name
+
+    """
     return config_class.__name__.lower()
 
 
 def _set_config_classes(config_classes):
-    """_set_config_classes(...)"""
+    """Setup config classes"""
     if config_classes is None:
         return get_config_classes()
     elif isinstance(config_classes, ConfigBase):
@@ -113,7 +133,7 @@ def _set_config_classes(config_classes):
 
 
 def _set_protocols(protocols):
-    """_set_protocols(...)"""
+    """Setup protocols"""
     all_protocols = get_protocols()
     if protocols is None:
         return all_protocols
@@ -125,7 +145,22 @@ def _set_protocols(protocols):
 
 
 def guess(filepath, *, config_classes=None, protocols=None):
-    """guess_filetypes(filepath, *, config_classes=None, protocols=None) -> FileType objects"""
+    """Guess a Filetype from a path
+
+       Parameters
+       ----------
+       filepath: str
+           the file path
+       config_classes: tuple, optional
+           a tuple of config classes to restrict search
+       protocols: tuple, optional
+           a tuple of protocols to restrict search
+
+       Returns
+       -------
+       FileType
+           the guessed filetype
+    """
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
     for config_class in config_classes:
@@ -140,9 +175,21 @@ def guess(filepath, *, config_classes=None, protocols=None):
 
 
 def standard_filepath(config, rootname, protocol):
-    """standard_filepath(config, rootname, protocol) -> filepath
-       Return a standard file path for the given obj/rootname/protocol.
-       'obj' can be a config object or class.
+    """Get a standard filepath for a given config/rootname/protocol
+
+       Parameters
+       ----------
+       config: ConfigBase
+           the config object
+       rootname: str
+           the path rootname
+       protocol: str
+           the protocol
+
+       Returns
+       -------
+       str
+           the standard file path
     """
     config_class = get_config_class(config)
     template = _TEMPLATES[config_class][0]
@@ -150,11 +197,21 @@ def standard_filepath(config, rootname, protocol):
 
 
 def classify(directory, config_classes=None, protocols=None):
-    """classify(directory, *config_classes)
-       Iterates on FileTypes for all the files in 'directory'.
-       'directory' it can be a pattern for any directory path.
-       Any 'config_class' in 'config_classes' can be a config class
-       (Config, Schema, Validation) or its name.
+    """Classify the content of a directory
+
+       Parameters
+       ----------
+       directory: str
+           the directory name
+       config_classes: tuple, optional
+           a tuple of config classes to restrict search
+       protocols: tuple, optional
+           a tuple of protocols to restrict search
+
+       Returns
+       -------
+       iterator
+           iterator over found FileTypes
     """
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
@@ -167,8 +224,12 @@ def classify(directory, config_classes=None, protocols=None):
 
 
 def search_paths():
-    """search_paths()
-       Iterates on (search_paths, classes)
+    """Returns the standard search paths
+
+       Returns
+       -------
+       iterator
+           iterates over (search_paths, classes)
     """
     yield os.getcwd(), _CONFIG_CLASSES
     if 'ZIRKON_CONFIG_PATH' in os.environ:
@@ -180,14 +241,14 @@ def search_paths():
 
 
 def discover(*directories, standard_paths=True):
-    """discover(*directories)
-       Discover FileTypes in directories. Each directory can be
-        * a pattern
-        * a tuple (pattern, config_classes)
-       If standard_paths is True adds:
-        * os.getcwd()
-        * (os.environ['ZIRKON_CONFIG_PATH'].split(':'), (Config,))
-        * (os.environ['ZIRKON_SCHEMA_PATH'].split(':'), (Schema,))
+    """Discover FileTypes in directories.
+
+       Parameters
+       ----------
+       \*directories: str
+           each directory can be a pattern or tuple (pattern, config_classes)
+       standard_paths: bool, optional
+           if True, add standard search_paths
     """
     directory_d = collections.OrderedDict()
     if standard_paths:
@@ -211,15 +272,27 @@ def discover(*directories, standard_paths=True):
 
 
 def search_rootname(rootname, *, config_classes=None, protocols=None):
-    """search(rootname, *, config_classes=None, protocols=None)
-       Search for a file matching 'rootname' in filetypes. Return None
-       if not found.
+    """Searches FileTypes matching a given rootname
+
+       Parameters
+       ----------
+       rootname: str
+           the rootname
+       config_classes: tuple, optional
+           a tuple of config classes to restrict search
+       protocols: tuple, optional
+           a tuple of protocols to restrict search
+
+       Returns
+       -------
+       iterator
+           iterator over found FileTypes
     """
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
 
     def search_abs_rootname(abs_rootname, config_classes, protocols):
-        """search_abs_rootname(abs_rootname, config_classes, protocols)"""
+        """Searches for an absolute rootname"""
         if os.path.exists(abs_rootname):
             yield from guess(abs_rootname)
         for config_class in config_classes:
@@ -241,7 +314,22 @@ def search_rootname(rootname, *, config_classes=None, protocols=None):
 
 
 def search_filetype(filetype):
-    """search_filetype(filetype)"""
+    """Searches FileTypes matching a given FileType
+
+       Parameters
+       ----------
+       filetype: FileType
+           the filetype object
+       config_classes: tuple, optional
+           a tuple of config classes to restrict search
+       protocols: tuple, optional
+           a tuple of protocols to restrict search
+
+       Returns
+       -------
+       iterator
+           iterator over found FileTypes
+    """
     if filetype.config_class is None:
         config_classes = None
     else:

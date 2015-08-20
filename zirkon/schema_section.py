@@ -37,8 +37,7 @@ from .validator.error import OptionValidationError, \
 
 
 def _reset_option_default(*, section, option, option_name):
-    """_reset_option_default(*, section, option, option_name)
-       Check if the option value is from defaults; if so, it is removed.
+    """Check if the option value is from defaults; if so, it is removed.
        This is to force re-evaluation of deferred expressions in validator default.
     """
     section_defaults = section
@@ -60,8 +59,7 @@ def _reset_option_default(*, section, option, option_name):
 
 def _validate_option(*, validator, section, validation_section,
                      option_name, raise_on_error, option):
-    """_validate_option(*, ...)
-       Validates an option and uses the validation result to
+    """Validates an option and uses the validation result to
        eventually change the option value.
        Used to implement SchemaSection.impl_validate(...) method.
     """
@@ -87,10 +85,7 @@ def _validate_option(*, validator, section, validation_section,
 
 
 class SchemaSection(Section):
-    """SchemaSection(init=None, *, dictionary=None, parent=None,
-                     name=None, interpolation=True,
-                     unexpected_option_validator=None)
-       A Section class to perform validation. All values must be Validator
+    """ A Section class to perform validation. All values must be Validator
        instances.
 
        The 'unexpected_option_validator' is used to validate unexpected
@@ -100,6 +95,23 @@ class SchemaSection(Section):
        can be used to ignore unexpected options (they will be kept in
        the validated section), while the 'Remove()' validator can be used
        to remove unexpected options from the validated section.
+
+
+       Parameters
+       ----------
+       init: Mapping, optional
+           some initial content
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
+       unexpected_option_validator: Validator, optional
+           the Validator to be used for unexpected options
+
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
@@ -122,15 +134,23 @@ class SchemaSection(Section):
 
     @property
     def unexpected_option_validator(self):
-        """unexpected_option_validator [property getter]
-           Returns the validator to be used for unexpected options.
+        """Returns the validator to be used for unexpected options.
+
+           Returns
+           -------
+           Validator
+               the current validator for unexpected options
         """
         return self._unexpected_option_validator
 
     @unexpected_option_validator.setter
     def unexpected_option_validator(self, validator):
-        """unexpected_option_validator [property setter]
-           Sets the validator to be used for unexpected options.
+        """Sets the validator to be used for unexpected options.
+
+           Parameters
+           ----------
+           validator: Validator
+               the validator to be used for unexpected options
         """
         if validator is None:
             validator = Complain()
@@ -139,10 +159,22 @@ class SchemaSection(Section):
         self._unexpected_option_validator = validator
 
     def validate(self, section, *, validation=None, raise_on_error=False):
-        """validate(section, *, validation=None, raise_on_error=False) -> validation object
-           Validates 'section' and returns a ValidationSection with the found
+        """Validates 'section' and returns a ValidationSection with the found
            validation errors.
-           If 'raise_on_error', the first validation error is fatal.
+
+           Parameters
+           ----------
+           section: Section
+               the section to be validated
+           validation: Validation, optional
+               the Validation object to be used, or None
+           raise_on_error: bool, optional
+               if True, the first error is raised.
+
+           Returns
+           -------
+           Validation
+               the validation result
         """
         if validation is None:
             validation = Validation()
@@ -153,16 +185,36 @@ class SchemaSection(Section):
         return validation
 
     def impl_validate(self, section, validation_section, *, raise_on_error=False, parent_fqname=''):
-        """impl_validate(section, validation_section, *, raise_on_error=False, parent_fqname='')
-           Implementation of the validate method.
+        """Implementation of the validate method.
+
+           Parameters
+           ----------
+           section: Section
+               the section to be validated
+           validation_section: ValidationSection, optional
+               the ValidationSection object to be used, or None
+           raise_on_error: bool, optional
+               if True, the first error is raised.
+           parent_fqname: str, optional
+               the fully qualified name (with dots) of the parent
         """
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
         self.impl_validate_options(section=section, validation_section=validation_section, **args)
         self.impl_validate_subsections(section=section, validation_section=validation_section, **args)
 
     def impl_validate_subsections(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
-        """impl_validate_subsections(...)
-           Validate subsections.
+        """Implementation of the validate method for subsections
+
+           Parameters
+           ----------
+           section: Section
+               the section to be validated
+           validation_section: ValidationSection, optional
+               the ValidationSection object to be used, or None
+           raise_on_error: bool, optional
+               if True, the first error is raised.
+           parent_fqname: str, optional
+               the fully qualified name (with dots) of the parent
         """
         # expected subsections:
         expected_subsection_names = set()
@@ -201,8 +253,18 @@ class SchemaSection(Section):
                     validation_section[subsection_name] = sub_validation_section
 
     def impl_validate_options(self, *, section, validation_section, raise_on_error=False, parent_fqname=''):
-        """impl_validate_options(...)
-           Validate options.
+        """Implementation of the validate method for options
+
+           Parameters
+           ----------
+           section: Section
+               the section to be validated
+           validation_section: ValidationSection, optional
+               the ValidationSection object to be used, or None
+           raise_on_error: bool, optional
+               if True, the first error is raised.
+           parent_fqname: str, optional
+               the fully qualified name (with dots) of the parent
         """
         # expected options:
         expected_option_names = set()

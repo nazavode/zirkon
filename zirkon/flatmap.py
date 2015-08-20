@@ -29,8 +29,7 @@ from .toolbox.identifier import is_valid_identifier
 
 
 class FlatMap(collections.abc.Mapping):
-    """FlatMap(dictionary, *, init=None, ='')
-       FlatMap implements a standard mapping using a flattened internal
+    """FlatMap implements a standard mapping using a flattened internal
        representation. The internal storage is provided by a standard dictionary
        (dict, OrderedDict).
 
@@ -50,6 +49,16 @@ class FlatMap(collections.abc.Mapping):
        >>> print(flatmap)
        FlatMap(a=10, c=30)
        >>>
+
+       Parameters
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       init: Mapping, optional
+           some initialization content
+       prefix: str, optional
+           an initial prefix for keys
+
     """
     DOT = '.'
     SUBMAP_PLACEHOLDER = None
@@ -64,21 +73,36 @@ class FlatMap(collections.abc.Mapping):
 
     @classmethod
     def dictionary_factory(cls):
-        """dictionary_factory() -> new (empty) dictionary
-           Factory for new dictionaries.
+        """Factory for new dictionaries.
         """
         return collections.OrderedDict()
 
     def get_abs_key(self, rel_key, check=True):
-        """get_abs_key(self, rel_key, check=True) -> abs_key
+        """Returns an absolute key name
+
+           Parameters
+           ----------
+           rel_key: str
+               the relative key
+           check: bool, optional
+               if True, runs check_rel_key(rel_key)
+
+           Returns
+           -------
+           str
+               the absolute key
         """
         if check:
             self.check_rel_key(rel_key)
         return self.prefix + rel_key
 
     def check_rel_key(self, rel_key):
-        """check_rel_key(self, rel_key)
-           Check if 'rel_key' is correctly formed (== a valid python identifier)
+        """Checks if 'rel_key' is correctly formed (== a valid python identifier). Raises in case on errors.
+
+           Parameters
+           ----------
+           rel_key: str
+               the relative key
         """
         if not isinstance(rel_key, str):
             raise TypeError("invalid key {}{} of type {}: {} keys must be strings".format(
@@ -100,13 +124,32 @@ class FlatMap(collections.abc.Mapping):
             ))
 
     def get_submap_prefix(self, abs_key):
-        """get_submap_prefix(self, abs_key) -> submap_prefix
+        """Returns the submap prefix for a given absolute key.
+
+           Parameters
+           ----------
+           abs_key: str
+               the absolute key
+
+           Returns
+           -------
+           str
+               the submap prefix
         """
         return abs_key + self.DOT
 
     def nesting_level(self, rel_key):
-        """nesting_level(self, rel_key) -> True/False
-           Returns the nesting_level for a key.
+        """Returns the nesting_level for a key.
+
+           Parameters
+           ----------
+           rel_key: str
+               the relative key
+
+           Returns
+           -------
+           int
+               the nesting level
         """
         level = rel_key.count(self.DOT)
         if rel_key.endswith(self.DOT):
@@ -114,9 +157,16 @@ class FlatMap(collections.abc.Mapping):
         return level
 
     def get_submap_name(self, rel_key):
-        """get_submap_name(self, rel_key) -> submap_name or None
-           Returns the submap name if this is a submap placeholder,
-           None otherwise.
+        """Returns the submap name for a given relative key, or None is this is not a submap placeholder.
+           Parameters
+           ----------
+           rel_key: str
+               the relative key
+
+           Returns
+           -------
+           str
+               the submap name
         """
         if rel_key.endswith(self.DOT):
             return rel_key[:-1]
@@ -124,7 +174,7 @@ class FlatMap(collections.abc.Mapping):
             return None
 
     def _iter_keys(self):
-        """_iter_keys(self) -> iterator over abs_key, rel_key
+        """Iterates over (abs_key, rel_key)
         """
         for abs_key in self.dictionary.keys():
             if abs_key.startswith(self.prefix):
@@ -134,14 +184,27 @@ class FlatMap(collections.abc.Mapping):
 
     @classmethod
     def submap_class(cls):
-        """submap_class(cls)
-           Return the class to be used for submaps
+        """Returns the class to be used for submaps.
+
+           Returns
+           -------
+           type
+               the submap FlatMap class
         """
         return FlatMap
 
     def submap(self, prefix):
-        """submap(cls)
-           Return a submap with a given prefix
+        """Return a submap with a given prefix.
+
+           Parameters
+           ----------
+           prefix: str
+               the prefix
+
+           Returns
+           -------
+           FlatMap
+               the submap instance
         """
         return self.submap_class()(dictionary=self.dictionary, prefix=prefix)
 
@@ -187,8 +250,17 @@ class FlatMap(collections.abc.Mapping):
         raise KeyError(self.prefix + key, "missing key/submap{}{}".format(self.prefix, key))
 
     def has_key(self, key):
-        """has_key(self, key)
-           Returns True if key/submap named 'key' is found.
+        """Returns True if key/submap named 'key' is found.
+
+           Parameters
+           ----------
+           key: str
+               the key
+
+           Returns
+           -------
+           bool
+               True if key is in the flatmap
         """
         abs_key = self.get_abs_key(key)
         if abs_key in self.dictionary:
@@ -199,8 +271,7 @@ class FlatMap(collections.abc.Mapping):
         return False
 
     def clear(self):
-        """clear(self)
-           Clear all the dictionary content
+        """Clears all the dictionary content.
         """
         for abs_key, _ in self._iter_keys():
             if len(abs_key) > len(self.prefix):
@@ -249,8 +320,7 @@ class FlatMap(collections.abc.Mapping):
             yield value
 
     def copy(self):
-        """copy() -> dictionary
-           Return a deep copy of the FlatMap instance.
+        """Returns a deep copy of the FlatMap instance.
         """
         if hasattr(self.dictionary, 'copy'):
             return self.__class__(dictionary=self.dictionary.copy())
@@ -258,8 +328,17 @@ class FlatMap(collections.abc.Mapping):
             return self.__class__(self.dictionary_factory(), init=self.dictionary)
 
     def as_dict(self, *, dict_class=collections.OrderedDict):
-        """as_dict(self, *, dict_class=collections.OrderedDict) -> dict
-           Return a dict with all the flatmap's content
+        """Returns a dict with all the flatmap's content
+
+           Parameters
+           ----------
+           dict_class: type, optional
+               the class to be used to create dictionaries
+
+           Returns
+           -------
+           dict_class
+               the dictionary
         """
         result = dict_class()
         submap_class = self.submap_class()
@@ -271,8 +350,12 @@ class FlatMap(collections.abc.Mapping):
         return result
 
     def update(self, dictionary):
-        """update(self, dictionary)
-           Update with the content of the 'dictionary'
+        """Updates with the content of the 'dictionary'.
+
+           Parameters
+           ----------
+           dictionary: Mapping
+               the dictionary
         """
         for key, value in dictionary.items():
             self[key] = value

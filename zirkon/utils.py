@@ -37,7 +37,7 @@ from .schema_section import SchemaSection
 
 
 def _get_validator_default(validator):
-    """_get_validator_default(validator) -> has_default, default"""
+    """Returns the default value for a validator"""
     for argument_name, argument_value in validator.actual_arguments.items():
         if argument_name == "default":
             return True, argument_value
@@ -45,8 +45,7 @@ def _get_validator_default(validator):
 
 
 def create_template_from_schema(schema, *, config=None):
-    """create_template_from_schema(schema, *, config=None)
-       Create a template file from a schema.
+    """Creates a template file from a schema.
 
        >>> from zirkon.schema import Schema
        >>> from zirkon.validator import Float, Int, Str
@@ -63,6 +62,18 @@ def create_template_from_schema(schema, *, config=None):
        [data]
            i = '# Int(max=10)'
            j = 2
+
+       Parameters
+       ----------
+       schema: Schema
+           the validating schema
+       config: Config, optional
+           the config object to be filled in
+
+       Returns
+       -------
+       Config
+           the filled config object
     """
     if config is None:
         config = Config()
@@ -84,8 +95,11 @@ def create_template_from_schema(schema, *, config=None):
 
 
 def replace_deferred(config):
-    """replace_deferred(config)
-       Replace all deferred expressions with their current value.
+    """Replaces all deferred expressions with their current value.
+       Parameters
+       ----------
+       config: Config, optional
+           the config object
     """
     for key, value in config.items():
         if isinstance(value, collections.Mapping):
@@ -99,7 +113,7 @@ def replace_deferred(config):
 
 
 def _get_key_tuple(key):
-    """_get_key_tuple(key) -> key-tuple"""
+    """Returns a keys tuple from a key name: "k0.k2" -> ("k0", "k1")"""
     if isinstance(key, (list, tuple)):
         return key
     elif isinstance(key, str):
@@ -113,8 +127,7 @@ def _get_key_tuple(key):
 
 
 def get_key(config, key):
-    """get_key(config, key)
-       Get a key value from config. Key can be
+    """Returns the value for a key from config. Key can be
        * a dot-separated list of keys, or
        * a tuple of keys.
 
@@ -130,6 +143,18 @@ def get_key(config, key):
        >>> get_key(config, "sub")
        ConfigSection(dictionary=OrderedDict([('y', 20)]))
        >>>
+
+       Parameters
+       ----------
+       config: Config, optional
+           the config object
+       key: str, tuple
+           a string like "k0.k1..." or a tuple ("k0", "k1", ...)
+
+       Returns
+       -------
+       any
+           the value
     """
     key_tuple = _get_key_tuple(key)
     section = config
@@ -139,11 +164,9 @@ def get_key(config, key):
 
 
 def set_key(config, key, value, *, parents=False):
-    """set_key(config, key, value, *, parents=False)
-       Set a key value from config. Key can be
+    """Sets a key value from config. Key can be
        * a dot-separated list of keys, or
        * a tuple of keys.
-       If 'parents', create missing intermediate sections.
 
        >>> config = Config()
        >>> set_key(config, "x", 10)
@@ -155,6 +178,15 @@ def set_key(config, key, value, *, parents=False):
            y = 20
            z = 30
        >>>
+
+       Parameters
+       ----------
+       config: Config, optional
+           the config object
+       key: str, tuple
+           a string like "k0.k1..." or a tuple ("k0", "k1", ...)
+       parents: bool, optional
+           if True, creates missing intermediate sections
     """
     key_tuple = _get_key_tuple(key)
     if len(key_tuple) == 0:
@@ -169,11 +201,9 @@ def set_key(config, key, value, *, parents=False):
 
 
 def del_key(config, key, *, ignore_errors=False):
-    """del_key(config, key, *, ignore_errors=False)
-       Del a key value from config. Key can be
+    """Deletes a key value from config. Key can be
        * a dot-separated list of keys, or
        * a tuple of keys.
-       If 'ignore_errors' and an intermediate section is missin, error is not raised.
 
        >>> config = Config()
        >>> config["x"] = 10
@@ -186,6 +216,15 @@ def del_key(config, key, *, ignore_errors=False):
        [sub2]
            z = 30
        >>>
+
+       Parameters
+       ----------
+       config: Config, optional
+           the config object
+       key: str, tuple
+           a string like "k0.k1..." or a tuple ("k0", "k1", ...)
+       ignore_errors: bool, optional
+           if True, ignore errors about missing intermediate sections
     """
     key_tuple = _get_key_tuple(key)
     if len(key_tuple) == 0:

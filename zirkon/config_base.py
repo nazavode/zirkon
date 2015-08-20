@@ -33,8 +33,8 @@ from .deferred_object import ROOT, SECTION
 
 
 class ConfigValidationError(Exception):
-    """ConfigValidationError()
-       Error in Config validation; the validation attribute contains the validation result.
+    """This exception class represents a validation error; the 'validation' attribute
+       contains the Validation result.
     """
     def __init__(self, validation, message=None):
         if message is None:
@@ -44,8 +44,22 @@ class ConfigValidationError(Exception):
 
 
 class ConfigBase(Section):
-    """ConfigBase(init=None, *, dictionary=None, **section_options)
-       Config base class.
+    """ Config base class; adds to Section serialization/deserialization methods.
+
+        Parameters
+        ----------
+        init: Mapping, optional
+            some initialization content
+        dictionary: Mapping, optional
+            the internal dictionary
+        schema: Schema, optional
+            the validation schema
+        validate: bool, optional
+            self validate during initialization;
+        interpolation: bool, optional
+            enables interpolation (defaults to True);
+        **section_options:
+            keyword arguments to be passed to the Section contructor
     """
 
     def __init__(self, init=None, *, dictionary=None, schema=None, validate=True,
@@ -55,16 +69,34 @@ class ConfigBase(Section):
         self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):
-        """set_schema(self, schema, *, validate=True)
-           Set the validation schema (None to disable validation).
+        """Sets the validation schema
+
+           Parameters
+           ----------
+           schema: Schema
+               the schema to be used for self-validation
+               (can be None to disable self-validation)
+           validate: bool
+               execute self-validation now (defaults to True)
+
         """
         self.schema = schema
         if validate:
             self.self_validate(raise_on_error=True)
 
     def self_validate(self, raise_on_error=False):
-        """self_validate(self, raise_on_error=False)
-           Validate the config itself using the 'schema' attribute.
+        """Validate the config itself using the 'schema' attribute.
+
+           Parameters
+           ----------
+           raise_on_error: bool, optional
+               raise an exception at the very first validation error; defaults to False;
+
+           Returns
+           -------
+           Validation
+               the Validation object containing all the found errors.
+               If 'raise_on_errors' is True, it contains at most one error.
         """
         if self.schema is not None:
             validation = self.schema.validate(self, raise_on_error=False)
@@ -75,8 +107,17 @@ class ConfigBase(Section):
 
     @classmethod
     def get_serializer(cls, protocol):
-        """get_serializer(protocol)
-           Return a serializer for the required protocol.
+        """Returns a serializer for the required protocol.
+
+           Parameters
+           ----------
+           protocol: str
+               a valid protocol name
+
+           Returns
+           -------
+           Serializer
+               the serializer instance.
         """
         serializer_class = Serializer.get_class(protocol)
         if serializer_class is None:
@@ -87,8 +128,19 @@ class ConfigBase(Section):
         return serializer_class()
 
     def to_string(self, protocol, *, defaults=False):
-        """to_string(protocol, *, defaults=False)
-           Serialize to stream 'stream' according to 'protocol'.
+        """Serializes to string according to 'protocol'.
+
+           Parameters
+           ----------
+           protocol: str
+               a valid protocol name
+           defaults: bool, optional
+               if True, serialize also default values (defaults to False)
+
+           Returns
+           -------
+           str
+               the serialization string
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
@@ -96,22 +148,38 @@ class ConfigBase(Section):
         return serializer_instance.to_string(obj)
 
     def to_stream(self, stream, protocol, *, defaults=False):
-        """to_stream(stream, protocol, *, defaults=False)
-           Serialize to stream 'stream' according to 'protocol'.
+        """Serializes to file stream 'stream' according to 'protocol'.
+
+           Parameters
+           ----------
+           stream: file
+               a file stream
+           protocol: str
+               a valid protocol name
+           defaults: bool, optional
+               if True, serialize also default values (defaults to False)
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
         obj = self.as_dict(defaults=defaults, evaluate=False)
-        return serializer_instance.to_stream(obj, stream)
+        serializer_instance.to_stream(obj, stream)
 
     def to_file(self, filename, protocol, *, defaults=False):
-        """to_file(filename, protocol, *, defaults=False)
-           Serialize to file 'filename' according to 'protocol'.
+        """Serializes to file 'filename' according to 'protocol'.
+
+           Parameters
+           ----------
+           filename: str
+               a file name
+           protocol: str
+               a valid protocol name
+           defaults: bool, optional
+               if True, serialize also default values (defaults to False)
         """
         self.self_validate(raise_on_error=True)
         serializer_instance = self.get_serializer(protocol)
         obj = self.as_dict(defaults=defaults, evaluate=False)
-        return serializer_instance.to_file(obj, filename)
+        serializer_instance.to_file(obj, filename)
 
     def dump(self, stream=None, protocol="zirkon", *, defaults=False):
         self.self_validate(raise_on_error=True)
@@ -120,9 +188,27 @@ class ConfigBase(Section):
     @classmethod
     def from_file(cls, filename, protocol, *,
                   dictionary=None, schema=None, validate=True, **config_args):
-        """from_file(filename, protocol, *,
-                     dictionary=None, schema=None, validate=True, **config_args)
-           Deserialize from file 'filename' according to 'protocol'.
+        """Deserializes from file 'filename' according to 'protocol'.
+
+           Parameters
+           ----------
+           filename: str
+               a file name
+           protocol: str
+               a valid protocol name
+           dictionary: mapping, optional
+               the internal dictionary (defaults to None)
+           schema: Schema, optional
+               the validation schema (defaults to None)
+           validate: bool, optional
+               if True self-validate on contruction (defaults to True)
+           **config_args
+               keyword arguments to be passed to the constructor
+
+           Returns
+           -------
+           cls
+               the deserialized object
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_file(filename)
@@ -134,10 +220,27 @@ class ConfigBase(Section):
     def from_stream(cls, stream, protocol, *,
                     dictionary=None, filename=None,
                     schema=None, validate=True, **config_args):
-        """from_stream(stream, protocol, *,
-                    dictionary=None, filename=None,
-                    schema=None, validate=True, **config_args)
-           Deserialize from stream 'stream' according to 'protocol'.
+        """Deserializes from file stream 'stream' according to 'protocol'.
+
+           Parameters
+           ----------
+           stream: file
+               a file stream
+           protocol: str
+               a valid protocol name
+           dictionary: mapping, optional
+               the internal dictionary (defaults to None)
+           schema: Schema, optional
+               the validation schema (defaults to None)
+           validate: bool, optional
+               if True self-validate on contruction (defaults to True)
+           **config_args
+               keyword arguments to be passed to the constructor
+
+           Returns
+           -------
+           cls
+               the deserialized object
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_stream(stream, filename=filename)
@@ -148,9 +251,27 @@ class ConfigBase(Section):
     @classmethod
     def from_string(cls, string, protocol, *,
                     dictionary=None, filename=None, schema=None, validate=True, **config_args):
-        """from_string(string, protocol, *,
-                       dictionary=None, filename=None, schema=None, validate=True, **config_args)
-           Deserialize from string 'string' according to 'protocol'.
+        """Deserializes from string 'string' according to 'protocol'.
+
+           Parameters
+           ----------
+           string: str
+               a serialization string
+           protocol: str
+               a valid protocol name
+           dictionary: mapping, optional
+               the internal dictionary (defaults to None)
+           schema: Schema, optional
+               the validation schema (defaults to None)
+           validate: bool, optional
+               if True self-validate on contruction (defaults to True)
+           **config_args
+               keyword arguments to be passed to the constructor
+
+           Returns
+           -------
+           cls
+               the deserialized object
         """
         serializer_instance = cls.get_serializer(protocol)
         content = serializer_instance.from_string(string, filename=filename)
@@ -159,8 +280,14 @@ class ConfigBase(Section):
         return instance
 
     def read(self, filename, protocol):
-        """read(filename, protocol)
-           Read from file 'filename' according to 'protocol'.
+        """Reads from file 'filename' according to 'protocol'. The initial content is cleared.
+
+           Parameters
+           ----------
+           filename: str
+               a file name
+           protocol: str
+               a valid protocol name
         """
         self.clear()
         serializer_instance = self.get_serializer(protocol)
@@ -169,8 +296,14 @@ class ConfigBase(Section):
         self.self_validate(raise_on_error=True)
 
     def write(self, filename, protocol):
-        """write(filename, protocol)
-           Write to file 'filename' according to 'protocol'.
+        """Writes to file 'filename' according to 'protocol'.
+
+           Parameters
+           ----------
+           filename: str
+               a file name
+           protocol: str
+               a valid protocol name
         """
         self.to_file(filename, protocol)
 
@@ -188,14 +321,34 @@ def _setup_codecs():
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
     if _json_serializer_module is not None:
         def _deferred_encode(deferred_object):
-            """_deferred_encode(deferred_object)
-               Encoder for Deferred instances
+            """Encodes a Deferred object to json.
+
+               Parameters
+               ----------
+               deferred_object: Deferred
+                   the deferred object
+
+               Returns
+               -------
+               dict
+                   the encoded dictionary
             """
             return {'expression': deferred_object.unparse()}
 
         def _deferred_decode(deferred_class_name, arguments):
-            """_deferred_decode(deferred_class_name, arguments)
-               Decoder for Deferred instances
+            """Decodes a Deferred object from JSON.
+
+               Parameters
+               ----------
+               deferred_class_name: str
+                   the deferred class name
+               arguments: dict
+                   the encoded dict
+
+               Returns
+               -------
+               Deferred
+                   the decoded object
             """
             deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
             if deferred_class is None:
@@ -211,14 +364,33 @@ def _setup_codecs():
     _text_serializer_module = getattr(serializer, 'text_serializer', None)
     if _text_serializer_module is not None:
         def _str_text_encode(str_object):
-            """_str_text_encode(str_object)
-               configobj/zirkon encoder for str instances
+            """Encodes a string to configobj/zirkon.
+
+               Parameters
+               ----------
+               str_object: str
+                   the string
+
+               Returns
+               -------
+               str
+                   the encoded string
             """
             return repr(str_object)
 
         def _str_text_decode(type_name, repr_data):  # pylint: disable=W0613
-            """_str_text_decode(str_name, arguments)
-               configobj/zirkon decoder for str instances
+            """Decodes a string from configobj/zirkon.
+
+               Parameters
+               ----------
+               type_name: str
+                   the class name ("str")
+               repr_data: str
+                   the encoded string
+
+               Returns
+               -------
+               str: the decoded string
             """
             return unrepr(repr_data, {'SECTION': SECTION, 'ROOT': ROOT})
 

@@ -29,8 +29,7 @@ from .validator.error import OptionValidationError
 
 
 class ValidationSection(Section):
-    """ValidationSection(...)
-       A Section to store ValidationResult values.
+    """A Section to store ValidationResult values.
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (OptionValidationError, )
