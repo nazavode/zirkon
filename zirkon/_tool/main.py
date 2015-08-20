@@ -37,6 +37,7 @@ from ..config import Config
 from ..schema import Schema
 from ..utils import create_template_from_schema
 from ..validation import Validation
+from ..version import VERSION
 
 from .trace_errors import trace_errors
 
@@ -386,6 +387,11 @@ Environment variables
                         action="store_true",
                         default=False,
                         help="force overwriting existing output files")
+
+    parser.add_argument("--version",
+                        action="version",
+                        version="%(prog)s {}".format(VERSION),
+                        help="show version")
 
     args = parser.parse_args(argv)
 
