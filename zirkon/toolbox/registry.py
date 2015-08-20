@@ -31,6 +31,7 @@ from . import subclass
 class Registry(object):
     """Registry
        Abstract base class for registry classes
+
        >>> class MyRegistry(Registry):
        ...     pass
        >>> print([cls.__name__ for cls in MyRegistry.classes()])

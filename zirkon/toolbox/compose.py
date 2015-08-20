@@ -133,6 +133,7 @@ class Composer(object):
        Function calls composer; given a list of functions, returns a callable
        object whose __call__ method merges all the function's arguments.
        For instance:
+
        >>> class Alpha(object):
        ...     def __init__(self, x, y):
        ...         self.x, self.y = x, y

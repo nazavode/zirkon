@@ -29,19 +29,19 @@ __all__ = [
 from .toolbox.deferred import DName
 
 
-class DProperty(DName):
-    """DProperty - call 'name' as a function without arguments
-       >>> dprop = DProperty('foo')
+class DNameCall(DName):
+    """Deferred name lookup and function call: DNameCall('foo') evaluates to 'foo()'.
+
+       >>> dprop = DNameCall('foo')
        >>> foo_function = lambda: 123
        >>> dprop.evaluate({'foo': foo_function})
        123
        >>> dprop.unparse()
        'foo'
-
     """
     def evaluate(self, globals_d=None):
         return super().evaluate(globals_d=globals_d)()
 
 
-SECTION = DProperty('SECTION')
+SECTION = DNameCall('SECTION')
 ROOT = DName('ROOT')

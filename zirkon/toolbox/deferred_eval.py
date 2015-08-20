@@ -36,6 +36,7 @@ from .subclass import find_subclass
 class DeferredEval(object):  # pylint: disable=R0903
     """DeferredEval(expression, globals_d=None)
        Deferred evaluation of expression. For instance:
+
        >>> lst = []
        >>> d = DeferredEval("10 + len(x)", globals_d={'x': lst, 'len': len})
        >>> lst.extend((1, 2, 3))

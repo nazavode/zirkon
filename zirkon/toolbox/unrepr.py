@@ -31,6 +31,7 @@ import ast
 def unrepr(string, globals_d=None):
     """unrepr(string, globals_d=None) -> object
        Returns the object whose representation is 'string'.
+
        >>> for string in "1.05", "[2, 'a']", "3", "()":
        ...     obj = unrepr(string)
        ...     print(obj, type(obj).__name__)

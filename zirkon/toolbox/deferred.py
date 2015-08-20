@@ -84,8 +84,7 @@ import abc
 
 
 class Deferred(metaclass=abc.ABCMeta):
-    """Deferred()
-       Abstract base class to compose generic expressions.
+    """Abstract base class to compose generic expressions.
        Concrete classes must implement the evaluate(globals_d=None) method.
     """
     PRIORITY = {
@@ -327,9 +326,7 @@ class Deferred(metaclass=abc.ABCMeta):
 
 
 class DConst(Deferred):
-    """DConst(value)
-       DConst value expression.
-    """
+    """Deferred const expression."""
 
     def __init__(self, value):
         self.value = value
@@ -348,9 +345,7 @@ class DConst(Deferred):
 
 
 class DName(Deferred):
-    """DName(name)
-       DName name expression.
-    """
+    """Deferred name lookup."""
 
     def __init__(self, name, globals_d=None):
         self.name = name
@@ -382,7 +377,7 @@ class DName(Deferred):
 
 
 class DCall(Deferred):
-    """'call' operator."""
+    """Deferred object call."""
 
     def __init__(self, functor, p_args=None, n_args=None):
         super().__init__()
@@ -421,9 +416,7 @@ class DCall(Deferred):
 
 
 class DUnaryOperator(Deferred):
-    """DUnaryOperator(operand)
-       Abstract base class for unary operators.
-    """
+    """Abstract base class for deferred unary operators."""
 
     def __init__(self, operand):
         self.operand = operand
@@ -445,7 +438,7 @@ class DUnaryOperator(Deferred):
 
 
 class DAbs(DUnaryOperator):
-    """'abs' unary operator."""
+    """Deferred 'abs()' function."""
 
     def _impl_unary_operation(self, value):
         return abs(value)
@@ -455,7 +448,7 @@ class DAbs(DUnaryOperator):
 
 
 class DPos(DUnaryOperator):
-    """'pos' unary operator."""
+    """Deferred '+' unary operator."""
 
     def _impl_unary_operation(self, value):
         return +value
@@ -465,7 +458,7 @@ class DPos(DUnaryOperator):
 
 
 class DNeg(DUnaryOperator):
-    """'neg' unary operator."""
+    """Deferred '-' unary operator."""
 
     def _impl_unary_operation(self, value):
         return -value
@@ -474,8 +467,18 @@ class DNeg(DUnaryOperator):
         return "-{}".format(self._impl_unparse_operand(self.operand))
 
 
+class DNot(DUnaryOperator):
+    """Deferred 'not' unary operator."""
+
+    def _impl_unary_operation(self, value):
+        return not value
+
+    def _impl_unparse(self):
+        return "not {}".format(self._impl_unparse_operand(self.operand))
+
+
 class DLen(DUnaryOperator):
-    """'len' unary operator."""
+    """Deferred 'len' function."""
 
     def _impl_unary_operation(self, value):
         return len(value)
@@ -485,7 +488,7 @@ class DLen(DUnaryOperator):
 
 
 class DStr(DUnaryOperator):
-    """'str' unary operator."""
+    """Deferred 'str' function."""
 
     def _impl_unary_operation(self, value):
         return str(value)
@@ -495,7 +498,7 @@ class DStr(DUnaryOperator):
 
 
 class DRepr(DUnaryOperator):
-    """'repr' unary operator."""
+    """Deferred 'repr' function."""
 
     def _impl_unary_operation(self, value):
         return repr(value)
@@ -504,20 +507,8 @@ class DRepr(DUnaryOperator):
         return "repr({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
-class DNot(DUnaryOperator):
-    """'not' unary operator."""
-
-    def _impl_unary_operation(self, value):
-        return not value
-
-    def _impl_unparse(self):
-        return "not {}".format(self._impl_unparse_operand(self.operand))
-
-
 class DBinaryOperator(Deferred):
-    """DBinaryOperator(operand)
-       Abstract base class for binary operators.
-    """
+    """Abstract base class for deferred binary operators."""
     BINOP_SYMBOL = None
 
     def __init__(self, left_operand, right_operand):
@@ -551,7 +542,7 @@ class DBinaryOperator(Deferred):
 
 
 class DAdd(DBinaryOperator):
-    """'add' binary operator."""
+    """Deferred '+' binary operator."""
     BINOP_SYMBOL = '+'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -559,7 +550,7 @@ class DAdd(DBinaryOperator):
 
 
 class DMul(DBinaryOperator):
-    """'mul' binary operator."""
+    """Deferred '*' binary operator."""
     BINOP_SYMBOL = '*'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -567,7 +558,7 @@ class DMul(DBinaryOperator):
 
 
 class DSub(DBinaryOperator):
-    """'sub' binary operator."""
+    """Deferred '-' binary operator."""
     BINOP_SYMBOL = '-'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -575,7 +566,7 @@ class DSub(DBinaryOperator):
 
 
 class DTrueDiv(DBinaryOperator):
-    """'truediv' binary operator."""
+    """Deferred '/' binary operator."""
     BINOP_SYMBOL = '/'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -583,7 +574,7 @@ class DTrueDiv(DBinaryOperator):
 
 
 class DFloorDiv(DBinaryOperator):
-    """'floordiv' binary operator."""
+    """Deferred '//' binary operator."""
     BINOP_SYMBOL = '//'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -591,7 +582,7 @@ class DFloorDiv(DBinaryOperator):
 
 
 class DMod(DBinaryOperator):
-    """'mod' binary operator."""
+    """Deferred '%' binary operator."""
     BINOP_SYMBOL = '%'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -599,7 +590,7 @@ class DMod(DBinaryOperator):
 
 
 class DDivMod(DBinaryOperator):
-    """'divmod' binary operator."""
+    """Deferred 'divmod' function."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
@@ -611,7 +602,7 @@ class DDivMod(DBinaryOperator):
 
 
 class DPow(DBinaryOperator):
-    """'pow' binary operator."""
+    """Deferred '**' binary operator."""
     BINOP_SYMBOL = '**'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -619,7 +610,7 @@ class DPow(DBinaryOperator):
 
 
 class DEq(DBinaryOperator):
-    """'eq' binary operator."""
+    """Deferred '==' binary operator."""
     BINOP_SYMBOL = '=='
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -627,7 +618,7 @@ class DEq(DBinaryOperator):
 
 
 class DNe(DBinaryOperator):
-    """'ne' binary operator."""
+    """Deferred '!=' binary operator."""
     BINOP_SYMBOL = '!='
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -635,7 +626,7 @@ class DNe(DBinaryOperator):
 
 
 class DLt(DBinaryOperator):
-    """'lt' binary operator."""
+    """Deferred '<' binary operator."""
     BINOP_SYMBOL = '<'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -643,7 +634,7 @@ class DLt(DBinaryOperator):
 
 
 class DLe(DBinaryOperator):
-    """'le' binary operator."""
+    """Deferred '<=' binary operator."""
     BINOP_SYMBOL = '<='
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -651,7 +642,7 @@ class DLe(DBinaryOperator):
 
 
 class DGt(DBinaryOperator):
-    """'gt' binary operator."""
+    """Deferred '>' binary operator."""
     BINOP_SYMBOL = '>'
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -659,7 +650,7 @@ class DGt(DBinaryOperator):
 
 
 class DGe(DBinaryOperator):
-    """'ge' binary operator."""
+    """Deferred '>=' binary operator."""
     BINOP_SYMBOL = '>='
 
     def _impl_binary_operation(self, left_value, right_value):
@@ -667,7 +658,7 @@ class DGe(DBinaryOperator):
 
 
 class DAnd(DBinaryOperator):
-    """'and' binary operator."""
+    """Deferred 'and' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value and right_value
@@ -678,8 +669,15 @@ class DAnd(DBinaryOperator):
             self._impl_unparse_right_operand(self.right_operand))
 
 
+class DOr(DBinaryOperator):
+    """Deferred 'or' binary operator."""
+
+    def _impl_binary_operation(self, left_value, right_value):
+        return left_value or right_value
+
+
 class DGetattr(DUnaryOperator):
-    """'getattr' binary operator."""
+    """Deferred 'getattr' function."""
     def __init__(self, operand, attr_name):
         super().__init__(operand)
         self.attr_name = attr_name
@@ -694,7 +692,7 @@ class DGetattr(DUnaryOperator):
 
 
 class DGetitem(DBinaryOperator):
-    """'getitem' binary operator."""
+    """Deferred 'getitem' function."""
 
     def _impl_binary_operation(self, left, right):
         return left[right]
@@ -707,7 +705,7 @@ class DGetitem(DBinaryOperator):
 
 
 class DContains(DBinaryOperator):
-    """'in' binary operator."""
+    """Deferred 'in' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value in right_value
@@ -716,10 +714,3 @@ class DContains(DBinaryOperator):
         return "{} in {}".format(
             self._impl_unparse_left_operand(self.left_operand),
             self._impl_unparse_right_operand(self.right_operand))
-
-
-class DOr(DBinaryOperator):
-    """'or' binary operator."""
-
-    def _impl_binary_operation(self, left_value, right_value):
-        return left_value or right_value
