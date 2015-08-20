@@ -29,7 +29,6 @@ from .validator import Validator
 
 
 class CheckValidatorInstance(CheckType):
-    """CheckValidatorInstance()
-       Check if option is a Validator instance.
+    """Checks if option is a Validator instance.
     """
     TYPE = Validator

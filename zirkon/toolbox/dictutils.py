@@ -31,7 +31,21 @@ import collections
 
 
 def as_dict(dct, *, depth=-1, dict_class=dict):
-    """as_dict(dct, *, depth=-1, dict_class=dict) -> dict object
+    """Returns a dict with the same content of the dct mapping.
+
+       Parameters
+       ----------
+       dct: Mapping
+           a dict-like object (dict, OrderedDict, Section, ...)
+       depth: int, optional
+           the depth of the copy (< 0 means full copy)
+       dict_class: type, optional
+           the dict class to be used for the copy
+
+       Returns
+       -------
+       dict_class
+           the converted dict
     """
     stddct = dict_class(dct)
     dcts = [stddct]
@@ -50,7 +64,20 @@ def as_dict(dct, *, depth=-1, dict_class=dict):
 
 
 def compare_dicts(dct0, dct1):
-    """compare_dicts(dct0, dct1) -> True/False
+    """Compare two dictionaries. Converts the two dictionaries to standard dicts
+       before. Used to avoid differences due to key ordering.
+
+       Parameters
+       ----------
+       dct0: Mapping
+           a dict-like object (dict, OrderedDict, Section, ...)
+       dct1: Mapping
+           a dict-like object (dict, OrderedDict, Section, ...)
+
+       Returns
+       -------
+       bool
+           True if the two dicts have the same content
     """
     stddct0 = as_dict(dct0, depth=-1, dict_class=dict)
     stddct1 = as_dict(dct1, depth=-1, dict_class=dict)
@@ -58,7 +85,24 @@ def compare_dicts(dct0, dct1):
 
 
 def transform(dct, *, key_transform=None, value_transform=None, dict_class=None):
-    """transform(dct, key_transform=None, value_transform=None, dict_class=None) -> transformed dict"""
+    """Transforms a dict by applying functions to keys and values.
+
+       Parameters
+       ----------
+       dct: Mapping
+           a dict-like object (dict, OrderedDict, Section, ...)
+       key_transform: callable, optional
+           a function to transform keys
+       value_transform: callable, optional
+           a function to transform values
+       dict_class: type, optional
+           the dict class to be used for the copy
+
+       Returns
+       -------
+       dict_class
+           the converted dict
+    """
 
     if key_transform is None:
         key_transform = lambda key: key

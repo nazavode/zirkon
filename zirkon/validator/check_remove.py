@@ -28,8 +28,7 @@ from .check import Check
 
 
 class CheckRemove(Check):
-    """CheckRemove()
-       Remove option.
+    """Removes the option.
     """
 
     def check(self, option, section):

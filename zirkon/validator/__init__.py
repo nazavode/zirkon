@@ -81,14 +81,35 @@ def _setup_codecs():
     _text_serializer_module = getattr(serializer, 'text_serializer', None)
     if _text_serializer_module is not None:
         def _validator_text_encode(validator):
-            """_validator_text_encode(validator)
-               configobj/zirkon encoder for Validator instances
+            """Encodes validator for configobj/zirkon serializers.
+
+               Parameters
+               ----------
+               validator: Validator
+                   the validator to be encoded
+
+               Returns
+               -------
+               str
+                   the validator's representation
             """
             return repr(validator)
 
         def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
-            """_validator_text_decode(validator_name, arguments)
+            """Decodes validator from configobj/zirkon serializers.
                configobj/zirkon decoder for Validator instances
+
+               Parameters
+               ----------
+               type_name: str
+                   the type name
+               repr_data: str
+                   the validator's representation
+
+               Returns
+               -------
+               Validator
+                   the validator
             """
             globals_d = {}
             globals_d['ROOT'] = ROOT
@@ -97,22 +118,42 @@ def _setup_codecs():
             return unrepr(repr_data, globals_d)
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
-            class_=Validator,
+            class_type=Validator,
             encode=_validator_text_encode,
             decode=_validator_text_decode,
         )
 
         def _ov_error_text_encode(option_validation_error):
-            """_ov_error_text_encode(validator)
-               OptionValidationError encoder.
+            """Encodes OptionValidationError for configobj/zirkon serializers.
+
+               Parameters
+               ----------
+               option_validation_error: OptionValidationError
+                   the error
+
+               Returns
+               -------
+               str
+                   the errors's representation
             """
             return "{}({!r})".format(
                 type(option_validation_error).__name__,
                 str(option_validation_error))
 
         def _ov_error_text_decode(type_name, repr_data):
-            """_ov_error_text_encode(type_name, repr_data)
-               OptionValidationError decoder.
+            """Decodes OptionValidationError from configobj/zirkon serializers.
+
+               Parameters
+               ----------
+               type_name: str
+                   the type name
+               repr_data: str
+                   the errors's representation
+
+               Returns
+               -------
+               OptionValidationError
+                   the error
             """
             globals_d = {}
             option_validation_error_class = find_subclass(OptionValidationError, type_name, include_self=False)
@@ -124,7 +165,7 @@ def _setup_codecs():
             return unrepr(repr_data, globals_d)
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
-            class_=OptionValidationError,
+            class_type=OptionValidationError,
             encode=_ov_error_text_encode,
             decode=_ov_error_text_decode,
         )
@@ -132,33 +173,73 @@ def _setup_codecs():
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
     if _json_serializer_module is not None:
         def _validator_json_encode(validator):
-            """_validator_json_encode(validator)
-               JSON encoder for Validator instances
+            """Encodes validators for json serializer.
+
+               Parameters
+               ----------
+               validator: Validator
+                   the validator to be encoded
+
+               Returns
+               -------
+               str
+                   the validators's representation
             """
             return validator.actual_arguments.copy()
 
         def _validator_json_decode(validator_name, arguments):
-            """_validator_json_decode(validator_name, arguments)
-               JSON decoder for Validator instances
+            """Decodes OptionValidationError from configobj/zirkon serializers.
+
+               Parameters
+               ----------
+               validator_name: str
+                   the validator's name
+               arguments: str
+                   the validator's arguments
+
+               Returns
+               -------
+               Validator
+                   the error
             """
             validator_class = Validator.get_class(validator_name)
             return validator_class(**arguments)
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=Validator,
+            class_type=Validator,
             encode=_validator_json_encode,
             decode=_validator_json_decode,
         )
 
         def _ov_error_json_encode(option_validation_error):
-            """_ov_error_json_encode(validator)
-               OptionValidationError JSON encoder.
+            """Encodes OptionValidationErrors for json serializer.
+
+               Parameters
+               ----------
+               option_validation_error: OptionValidationError
+                   the error to be encoded
+
+               Returns
+               -------
+               str
+                   the errors's representation
             """
             return {'exception_args': option_validation_error.args}
 
         def _ov_error_json_decode(type_name, args):
-            """_ov_error_json_encode(type_name, repr_data)
-               OptionValidationError JSON decoder.
+            """Decodes OptionValidationError from configobj/zirkon serializers.
+
+               Parameters
+               ----------
+               type_name: str
+                   the type name
+               args: tuple
+                   the errors's args
+
+               Returns
+               -------
+               OptionValidationError
+                   the error
             """
             ov_error_subclass = find_subclass(OptionValidationError, type_name)
             if ov_error_subclass is None:  # pragma: no cover
@@ -166,7 +247,7 @@ def _setup_codecs():
             return ov_error_subclass(*args['exception_args'])
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=OptionValidationError,
+            class_type=OptionValidationError,
             encode=_ov_error_json_encode,
             decode=_ov_error_json_decode,
         )

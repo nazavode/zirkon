@@ -27,8 +27,16 @@ __all__ = [
 
 
 class Option(object):
-    """Option(name, value, *, defined=None)
-       Store option information: the option name, the value and if it has been defined.
+    """Stores option information: the option name, the value and if it has been defined.
+
+       Parameters
+       ----------
+       name: str
+           the option name
+       value: any
+           the option value
+       defined: bool
+           True if option is defined in config
     """
     def __init__(self, name, value, *, defined=True):
         self.name = name
@@ -36,14 +44,22 @@ class Option(object):
         self.defined = defined
 
     def is_defined(self):
-        """is_defined()
-           Returns defined attribute.
+        """Returns defined attribute.
+
+           Returns
+           -------
+           bool
+               the 'defined' attribute
         """
         return self.defined
 
     def copy(self):
-        """copy()
-           Return a copy of the Option object.
+        """Returns a copy of the Option object.
+
+           Returns
+           -------
+           Option
+               the copy
         """
         return self.__class__(name=self.name, value=self.value, defined=self.defined)
 

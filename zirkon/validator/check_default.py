@@ -32,10 +32,14 @@ from .option import Option
 
 
 class CheckDefault(CheckRequired):
-    """CheckDefault(default=UNDEFINED)
-       Check if option is defined; if not:
+    """Checks if option is defined; if not:
        * if default is UNDEFINED, behaves like CheckRequired;
        * if default is not UNDEFINED, set option.value to default.
+
+       Parameters
+       ----------
+       default: any, optional
+           the default value
     """
 
     def __init__(self, default=UNDEFINED):

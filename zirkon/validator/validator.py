@@ -30,8 +30,14 @@ from .option import Option
 
 
 class Validator(Registry):
-    """Validator(*, argument_store, **arguments)
-       Base class for validators.
+    r"""Base class for validators.
+
+        Parameters
+        ----------
+        argument_store: ArgumentStore, optional
+            the argument store
+        \*\*arguments: dict
+            the actual arguments
     """
     CHECK_COMPOSER = None
 
@@ -50,8 +56,19 @@ class Validator(Registry):
             check.self_validate(validator=self)
 
     def bind_arguments(self, argument_store, prefix=''):
-        """bind_arguments(argument_store, prefix='')
-           Binds actual arguments to the CHECK_COMPOSER instance.
+        """Binds actual arguments to the CHECK_COMPOSER instance.
+
+           Parameters
+           ----------
+           argument_store: ArgumentStore, optional
+               the argument store
+           prefix: str, optional
+               an argument prefix; defaults to ''
+
+           Returns
+           -------
+           Composer
+               the check composer
         """
         return self.CHECK_COMPOSER.partial(argument_store, prefix=prefix)
 
@@ -60,15 +77,39 @@ class Validator(Registry):
         return "{}({})".format(self.__class__.__name__, args)
 
     def validate(self, name, value, defined, section=None):
-        """validate(name, value, defined, section=None)
-           Validate a name/value/defined triplet.
+        """Validates a name/value/defined triplet.
+
+           Parameters
+           ----------
+           name: str
+               the option name
+           value: any
+               the option value
+           defined: bool
+               True if option is defined in config
+           section: Section, optional
+               the containing section
+
+           Returns
+           -------
+           bool
+               True if validation is successful
         """
         option = Option(name=name, defined=defined, value=value)
         return self.validate_option(option, section=section)
 
     def validate_option(self, option, section=None):
-        """validate_option(option)
-           Validate a Option object.
+        """Validates a Option object.
+
+           Parameters
+           ----------
+           option: Option
+               the option to be validated
+
+           Returns
+           -------
+           bool
+               True if validation is successful
         """
         for check in self.checks:
             check.check(option, section)

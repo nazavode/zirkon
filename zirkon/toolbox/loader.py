@@ -48,8 +48,19 @@ class LoaderError(Exception):
 
 
 def load_module_from_package(name, package):
-    """load_module_from_package(name, package) -> module
-    Load a module from the specified package. 'name' can contain dots.
+    """Loads a module from the specified package. 'name' can contain dots.
+
+       Parameters
+       ----------
+       name: str
+           the module name
+       package: package
+           the python package
+
+       Returns
+       -------
+       module
+           the loaded module
     """
     subpackage_names = name.split('.')
     module = package
@@ -103,12 +114,24 @@ def load_module(name, path=None):
 
        >>> m = load_module('zirkon.toolbox.loader', path=['.'])
 
+
+       Parameters
+       ----------
+       name: str
+           the module name [path/]absolute_module_name
+       path: str-tuple, optional
+           an optional list of directories to be added to the python path
+
+       Returns
+       -------
+       module
+           the loaded module
 """
 
     search_locations = []
 
     def _store_dir(dpath, search_locations):
-        """Store directory for search_locations."""
+        """Stores directory for search_locations."""
         dpath = os.path.normpath(os.path.realpath(os.path.abspath(dpath)))
         if dpath not in search_locations:
             search_locations.append(dpath)
@@ -169,6 +192,18 @@ def load(name, path=None):
        If set, the 'path' parameter is a list of directories to be used to search for
        the base package/module, exactly as in 'load_module'.
 
+       Parameters
+       ----------
+       name: str
+           the module or object name, with the form
+           [path/]absolute_module_name[:object_name]
+       path: str-tuple, optional
+           an optional list of directories to be added to the python path
+
+       Returns
+       -------
+       object
+           the loaded object
 """
     if ':' in name:
         module_name, obj_name = name.split(':', 1)

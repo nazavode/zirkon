@@ -114,12 +114,12 @@ class ConfigSection(Section):
                                         name=section_name, defaults=subdefaults)
 
     def set_defaults(self, **kwargs):
-        """Set default options and sections
+        r"""Set default options and sections
 
-           Parameters
-           ----------
-           \*\*kwargs
-               a list of key=value items
+            Parameters
+            ----------
+            \*\*kwargs
+                a list of key=value items
         """
         if self._has_defaults:
             for key, value in kwargs.items():

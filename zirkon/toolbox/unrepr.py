@@ -29,8 +29,7 @@ import ast
 
 
 def unrepr(string, globals_d=None):
-    """unrepr(string, globals_d=None) -> object
-       Returns the object whose representation is 'string'.
+    """Returns the object whose representation is 'string'.
 
        >>> for string in "1.05", "[2, 'a']", "3", "()":
        ...     obj = unrepr(string)
@@ -40,22 +39,34 @@ def unrepr(string, globals_d=None):
        3 int
        () tuple
        >>>
+
+       Parameters
+       ----------
+       string: str
+           the string to be parsed
+       globals_d: dict, optional
+           the globals dictionary for name lookup
+
+       Returns
+       -------
+       any
+           the expression's value
     """
 
     def py_ast_str(ast_body):
-        """py_ast_str"""
+        """Parses ast.Str objects"""
         return ast_body.s
 
     def py_ast_num(ast_body):
-        """py_ast_num"""
+        """Parses ast.Num objects"""
         return ast_body.n
 
     def py_ast_name_constant(ast_body):
-        """py_ast_name_constant"""
+        """Parses ast.NameConstant objects"""
         return ast_body.value
 
     def py_ast_list(ast_body):
-        """py_ast_list"""
+        """Parses ast.List objects"""
         elements = []
         for element in ast_body.elts:
             elements.append(py_ast_unrepr(element))
@@ -64,11 +75,11 @@ def unrepr(string, globals_d=None):
         return elements
 
     def py_ast_tuple(ast_body):
-        """py_ast_tuple"""
+        """Parses ast.Tuple objects"""
         return tuple(py_ast_list(ast_body))
 
     def py_ast_dict(ast_body):
-        """py_ast_dict"""
+        """Parses ast.Dict objects"""
         dct = {}
         for ast_key, ast_value in zip(ast_body.keys, ast_body.values):
             key = py_ast_unrepr(ast_key)
@@ -77,7 +88,7 @@ def unrepr(string, globals_d=None):
         return dct
 
     def py_ast_name(ast_body):
-        """py_ast_name"""
+        """Parses ast.Name objects"""
         if ast_body.id in globals_d:
             return globals_d[ast_body.id]
         else:
@@ -87,11 +98,11 @@ def unrepr(string, globals_d=None):
                 ast_body.id))
 
     def py_ast_index(ast_body):
-        """py_ast_index"""
+        """Parses ast.Index objects"""
         return py_ast_unrepr(ast_body.value)
 
     def py_ast_slice(ast_body):
-        """py_ast_slice"""
+        """Parses ast.Slice objects"""
         slist = []
         for key in 'lower', 'upper', 'step':
             value = getattr(ast_body, key)
@@ -101,13 +112,13 @@ def unrepr(string, globals_d=None):
         return slice(*slist)
 
     def py_ast_subscript(ast_body):
-        """py_ast_subscript"""
+        """Parses ast.Subscript objects"""
         v_element = py_ast_unrepr(ast_body.value)
         v_slice = py_ast_unrepr(ast_body.slice)
         return v_element[v_slice]
 
     def py_ast_unary_op(ast_body):
-        """py_ast_unary_op"""
+        """Parses ast.UnaryOp objects"""
         unary_op_d = {
             ast.UAdd: lambda x: +x,
             ast.USub: lambda x: -x,
@@ -122,7 +133,7 @@ def unrepr(string, globals_d=None):
             ast_op.__class__.__name__))
 
     def py_ast_bin_op(ast_body):
-        """py_ast_bin_op"""
+        """Parses ast.BinOp objects"""
         binary_op_d = {
             ast.Add: lambda x, y: x + y,
             ast.Sub: lambda x, y: x - y,
@@ -142,7 +153,7 @@ def unrepr(string, globals_d=None):
             ast_op.__class__.__name__))
 
     def py_ast_call(ast_body):
-        """py_ast_call"""
+        """Parses ast.Call objects"""
         ast_func = ast_body.func
         if not hasattr(ast_func, 'id'):
             raise SyntaxError("cannot unrepr string {!r}: col {}: invalid call: not a function".format(
@@ -197,7 +208,7 @@ def unrepr(string, globals_d=None):
         }
 
     def py_ast_unrepr(ast_body):
-        """py_ast_unrepr(ast_body) -> value"""
+        """Parses all ast objects."""
         for ast_class, function in py_ast_function_d.items():
             if isinstance(ast_body, ast_class):
                 return function(ast_body)

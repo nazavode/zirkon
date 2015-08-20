@@ -31,7 +31,20 @@ from .text_serializer import TextSerializer
 
 
 def _parse_mapping(line, line_number, filename):
-    """_parse_mapping(line, line_number, filename) -> mapping level, name"""
+    """Parses a section identifier [[... section_name ...]]
+
+       Parameters
+       ----------
+       line_number: int
+           the line number
+       filename: str
+           the file name
+
+       Returns
+       -------
+       tuple
+           a tuple containing level, section_name
+    """
 
     level = 0
     while line:
@@ -47,8 +60,8 @@ def _parse_mapping(line, line_number, filename):
 
 
 class ConfigObjSerializer(TextSerializer):
-    """ConfigObjSerializer()
-       Implementation of the ConfigObj serializer.
+    """ConfigObj serializer. It's a partial implementation of the
+       configobj serialization format.
     """
 
     @classmethod

@@ -29,8 +29,7 @@ from .error import UnexpectedOptionError
 
 
 class CheckComplain(Check):
-    """CheckComplain()
-       Complains about unexpected options by raising UnexpectedOptionErrors.
+    """Complains about unexpected options by raising UnexpectedOptionErrors.
     """
 
     def check(self, option, section):

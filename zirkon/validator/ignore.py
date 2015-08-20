@@ -30,7 +30,5 @@ from .validator import Validator
 
 
 class Ignore(Validator):
-    """Ignore()
-       Ignore option.
-    """
+    """Validator for unexpected options. Ignores the option."""
     CHECK_COMPOSER = Composer()

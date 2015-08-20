@@ -40,30 +40,26 @@ from .check_sequence import CheckList, CheckTuple
 
 
 class Bool(Validator):
-    """Bool()
-       Validator for a scalar bool option.
+    """Validator for a scalar bool option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool)
 
 
 class BoolChoice(Validator):
-    """BoolChoice()
-       Validator for a bool option option.
+    """Validator for a bool option option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckBool, CheckChoice)
 
 
 class BoolList(Sequence):
-    """BoolList()
-       Validator for a bool list option.
+    """Validator for a bool list option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckList, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Bool
 
 
 class BoolTuple(Sequence):
-    """BoolTuple()
-       Validator for a bool tuple option.
+    """Validator for a bool tuple option.
     """
     CHECK_COMPOSER = Composer(CheckDefault, CheckTuple, CheckMinLen, CheckMaxLen)
     ITEM_VALIDATOR_CLASS = Bool

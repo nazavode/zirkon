@@ -31,8 +31,12 @@ import inspect
 
 
 class ArgumentStore(object):
-    """ArgumentStore(arguments=None)
-       Dict-like object to store arguments and track their usage.
+    """Dict-like object to store arguments and track their usage.
+
+       Parameters
+       ----------
+       arguments: dict, optional
+           arguments
     """
 
     def __init__(self, arguments=None):
@@ -42,8 +46,12 @@ class ArgumentStore(object):
             self.update(arguments)
 
     def update(self, arguments):
-        """update(arguments)
-           Updates with new arguments.
+        """Updates with new arguments.
+
+           Parameters
+           ----------
+           arguments: dict
+               the arguments
         """
         if arguments:
             self._arguments.update(arguments)
@@ -59,27 +67,55 @@ class ArgumentStore(object):
         return key in self._arguments
 
     def get_used(self, argument_name):
-        """get_used(argument_name)
-           Gets 'used' status for 'argument_name'.
+        """Returns True if the argument has been used.
+
+           Parameters
+           ----------
+           argument_name: str
+               the name of the argument
+
+           Returns
+           -------
+           bool
+               True if the argument has been used
         """
         return self._used[argument_name]
 
     def set_used(self, argument_name, used=True):
-        """set_used(argument_name, used=True)
-           Sets 'used' status for 'argument_name'.
+        """Sets 'used' status for 'argument_name'.
+
+           Parameters
+           ----------
+           argument_name: str
+               the name of the argument
+           used: bool, optional
+               the usage status
         """
         self._used[argument_name] = used
 
     def get(self, argument_name):
-        """get(argument_name)
-           Gets arguments and tracks usage.
+        """Returns argument value and tracks usage.
+
+           Parameters
+           ----------
+           argument_name: str
+               the name of the argument
+
+           Returns
+           -------
+           any
+               the argument value
         """
         self._used[argument_name] = True
         return self._arguments[argument_name]
 
     def unused_arguments(self):
-        """unused_arguments()
-           Iterates over unused arguments.
+        """Iterates over unused arguments.
+
+           Returns
+           -------
+           iterator
+               iterator over unused argument names and values
         """
         for argument_name, argument_value in self._arguments.items():
             if not self._used[argument_name]:
@@ -88,12 +124,21 @@ class ArgumentStore(object):
     def items(self):
         """items()
            Iterates over arguments items().
+
+           Returns
+           -------
+           iterator
+               iterator over argument names and values
         """
         yield from self._arguments.items()
 
     def arguments(self):
-        """arguments()
-           Returns the internal _arguments dict.
+        """Returns the internal _arguments dict.
+
+           Returns
+           -------
+           dict
+               the internal argument dictionary
         """
         return self._arguments
 
@@ -104,8 +149,17 @@ class ArgumentStore(object):
             return self._arguments == argument_store
 
     def split(self, prefix):
-        """split(prefix)
-           Returns a new ArgumentStore containing arguments starting with 'prefix'.
+        """Returns a new ArgumentStore containing arguments starting with 'prefix'.
+
+           Parameters
+           ----------
+           prefix: str
+               a prefix for keys
+
+           Returns
+           -------
+           ArgumentStore
+               a new argument store
         """
         sub_arguments = {}
         for argument_name, argument_value in self._arguments.items():
@@ -115,8 +169,14 @@ class ArgumentStore(object):
         return self.__class__(sub_arguments)
 
     def merge(self, argument_store, prefix):
-        """merge(prefix)
-           Merges an ArgumentStore obtained with split(prefix).
+        """Merges an ArgumentStore obtained with split(prefix).
+
+           Parameters
+           ----------
+           argument_store: ArgumentStore
+               the argument store to be merged
+           prefix: str
+               the prefix used for argument_store
         """
         for sub_argument_name in argument_store.arguments():
             if argument_store.get_used(sub_argument_name):
@@ -129,27 +189,31 @@ class ArgumentStore(object):
 
 
 class Composer(object):
-    """Composer(*functions)
-       Function calls composer; given a list of functions, returns a callable
-       object whose __call__ method merges all the function's arguments.
-       For instance:
+    r"""Composes multiple function calls into a single call. Given a list of functions,
+         returns a callable object whose __call__ method merges all the function's arguments.
+         For instance:
 
-       >>> class Alpha(object):
-       ...     def __init__(self, x, y):
-       ...         self.x, self.y = x, y
-       ...     def __repr__(self):
-       ...         return "Alpha(x={}, y={})".format(self.x, self.y)
-       >>> def f_abc(b, c, a=100):
-       ...     return a + b + c
-       >>> def f_bxd(b, x, d):
-       ...     return [b, x, d]
-       >>> composer = Composer(Alpha, f_abc, f_bxd)
-       >>> actual_arguments, objects = composer(b=10, y=2, d=30, x=1, c=20)
-       >>> actual_arguments
-       OrderedDict([('x', 1), ('y', 2), ('b', 10), ('c', 20), ('d', 30)])
-       >>> objects
-       [Alpha(x=1, y=2), 130, [10, 1, 30]]
-       >>>
+         >>> class Alpha(object):
+         ...     def __init__(self, x, y):
+         ...         self.x, self.y = x, y
+         ...     def __repr__(self):
+         ...         return "Alpha(x={}, y={})".format(self.x, self.y)
+         >>> def f_abc(b, c, a=100):
+         ...     return a + b + c
+         >>> def f_bxd(b, x, d):
+         ...     return [b, x, d]
+         >>> composer = Composer(Alpha, f_abc, f_bxd)
+         >>> actual_arguments, objects = composer(b=10, y=2, d=30, x=1, c=20)
+         >>> actual_arguments
+         OrderedDict([('x', 1), ('y', 2), ('b', 10), ('c', 20), ('d', 30)])
+         >>> objects
+         [Alpha(x=1, y=2), 130, [10, 1, 30]]
+         >>>
+
+         Parameters
+         ----------
+         \*functions: tuple
+             tuple of callable objects
     """
     ParameterInfo = collections.namedtuple('ParameterInfo', ('has_default', ))
 
@@ -173,8 +237,12 @@ class Composer(object):
 
     @classmethod
     def verify_argument_store(cls, argument_store):
-        """verify_argument_store(argument_store)
-           Raises a TypeError in case of unused arguments.
+        """Raises a TypeError in case of unused arguments.
+
+           Parameters
+           ----------
+           argument_store: ArgumentStore
+               the argument store to be verified
         """
         unused_arguments = sorted(list(argument_store.unused_arguments()), key=lambda x: x[0])
         if unused_arguments:
@@ -183,10 +251,21 @@ class Composer(object):
             ))
 
     def partial(self, argument_store, prefix=''):
-        """partial(argument_store, prefix='')
-           Partial binding from argument_store with prefix.
+        """Partial binding from argument_store with prefix.
            If prefix is given, only arguments starting with prefix are selected,
            and copied to the functions' arguments without prefix.
+
+           Parameters
+           ----------
+           argument_store: ArgumentStore
+               the argument store
+           prefix: str, optional
+               an optional key prefix
+
+           Returns
+           -------
+           tuple
+               a tuple containing the actual arguments dict and the results list
         """
         actual_arguments = collections.OrderedDict()
         objects = []
@@ -206,7 +285,16 @@ class Composer(object):
 
 
 def compose(*functions):
-    """compose(*functions)
-       Returns a Composer for the given functions.
+    r"""Returns a Composer for the given functions.
+
+        Parameters
+        ----------
+        \*functions: tuple
+            tuple of callable objects
+
+        Returns
+        -------
+        Composer
+            the composer object
     """
     return Composer(*functions)

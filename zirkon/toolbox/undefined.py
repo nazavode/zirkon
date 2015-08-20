@@ -28,7 +28,8 @@ from .singleton import Singleton
 
 
 class UndefinedType(metaclass=Singleton):  # pylint: disable=R0903
-    """UndefinedType()
+    """UndefinedType singleton.
+       To be used instead of None as placeholder where None is an acceptable value.
     """
 
     def __repr__(self):

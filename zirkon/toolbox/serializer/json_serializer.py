@@ -33,8 +33,7 @@ _CLASS_NAME_KEY = "__class_name__"
 
 
 class JSONPluggableEncoder(json.JSONEncoder):
-    """JSONPluggableEncoder()
-       Implementation of JSON Pluggable encoder.
+    """Implementation of JSON Pluggable encoder.
     """
 
     def default(self, obj):  # pylint: disable=E0202
@@ -50,8 +49,17 @@ class JSONPluggableEncoder(json.JSONEncoder):
 
 
 def _object_pairs_hook(pairs):
-    """_object_pairs_hook(pairs)
-       Hook to manage a list of pairs (a dict serialization).
+    """Hook to manage a list of pairs (a dict serialization).
+
+       Parameters
+       ----------
+       pairs: list
+           a list of pais
+
+       Returns
+       -------
+       dict
+           encoded dictionary
     """
 
     dct = collections.OrderedDict(pairs)
@@ -65,8 +73,7 @@ def _object_pairs_hook(pairs):
 
 
 class JSONSerializer(Serializer):
-    """JSONSerializer()
-       Implementation of JSON serializer.
+    """Implementation of JSON serializer.
     """
     CODEC_CATALOG = _CODEC_CATALOG
 

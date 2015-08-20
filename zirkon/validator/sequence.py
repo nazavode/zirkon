@@ -29,9 +29,7 @@ from .validator import Validator
 
 
 class Sequence(Validator):
-    """Sequence(...)
-       Base class for sequence (list, tuple) validators.
-    """
+    """Base class for sequence (list, tuple) validators."""
     ITEM_VALIDATOR_CLASS = type(None)
 
     def bind_arguments(self, argument_store, prefix=''):

@@ -29,8 +29,7 @@ from .error import MissingRequiredOptionError
 
 
 class CheckRequired(Check):
-    """CheckRequired()
-       Check if a required option is available (no default).
+    """Checks if a required option is available (no default). Raises if not.
     """
 
     def check(self, option, section):

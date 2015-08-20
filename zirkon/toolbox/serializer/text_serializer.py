@@ -34,19 +34,40 @@ from ..unrepr import unrepr
 
 
 class TextSerializer(Serializer):
-    """TextSerializer()
-       Implementation of the ConfigObj serializer.
+    """Implementation of the Text abstract serializer.
     """
     CODEC_CATALOG = CodecCatalog()
     RE_FUNC = re.compile(r'\s*(?P<func_name>\w+)\(.*')
     INDENTATION = "    "
 
     def indentation(self, level):
-        """indentation(level) -> indentation string"""
+        """Returns the indentation for a given level
+
+           Parameters
+           ----------
+           level: int
+               the indentation level
+
+           Returns
+           -------
+           str
+               the indentation string
+        """
         return self.INDENTATION * level
 
     def encode_value(self, value):
-        """encode_value(key, value) -> encoded value"""
+        """Encodes a value to a string, using a codec or repr.
+
+           Parameters
+           ----------
+           value: any
+               the value to be encoded
+
+           Returns
+           -------
+           str
+               the string encoding
+        """
         value_type = type(value)
         codec = self.CODEC_CATALOG.get_by_class(value_type)
         if codec is None:
@@ -56,7 +77,26 @@ class TextSerializer(Serializer):
         return value
 
     def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable=W0613
-        """decode_value(line_number, filename, key, value) -> decoded value"""
+        r"""Decodes a value from a string, using a codec or unrepr.
+
+             Parameters
+             ----------
+             line_number: int
+                 the line number
+             filename: str
+                 the file name
+             key: str
+                 the key name
+             value: any
+                 the encoded value
+             \*value_type_names: tuple
+                 a list of type names to be used to find a codec
+
+             Returns
+             -------
+             any
+                 the decoded value
+        """
         if value_type_names:
             for value_type_name in value_type_names:
                 codec = self.CODEC_CATALOG.get_by_name(value_type_name)
@@ -75,7 +115,22 @@ class TextSerializer(Serializer):
                     line_number, filename, value, type(err).__name__, err))
 
     def impl_dump_key_value(self, level, key, value):
-        """impl_dump_key_value(level, key, value) -> line"""
+        """Returns the line for a the key/value pair.
+
+           Parameters
+           ----------
+           level: int
+               the nesting level
+           key: str
+               the key name
+           value: any
+               the key value
+
+           Returns
+           -------
+           str
+               the key=value line
+        """
         return "{i}{k} = {v}".format(
             i=self.indentation(level),
             k=key,
@@ -84,22 +139,66 @@ class TextSerializer(Serializer):
 
     @abc.abstractmethod
     def impl_dump_mapping_name(self, level, mapping_name):
-        """impl_dump_mapping_name(level, mapping_name) -> line"""
+        """Returns a line for a mapping name.
+
+           Parameters
+           ----------
+           level: int
+               the nesting level
+           mapping_name: str
+               the mapping name
+
+           Returns
+           -------
+           str
+               the mapping name line
+        """
         raise NotImplementedError
 
     def impl_dump_mapping(self, level, lines, mapping_name, mapping):
-        """impl_dump_mapping(...) -> mapping lines"""
+        """Generates and appends lines for a mapping.
+
+           Parameters
+           ----------
+           level: int
+               the nesting level
+           lines: list
+               the list of lines
+           mapping_name: str
+               the mapping name
+           mapping: str
+               the mapping
+        """
         lines.append(self.impl_dump_mapping_name(level=level, mapping_name=mapping_name))
         self.impl_dump_mapping_lines(level=level + 1, lines=lines, mapping=mapping)
 
     @abc.abstractmethod
     def impl_iter_mapping_items(self, mapping):
-        """impl_iter()"""
+        """Iterates over mapping items
+
+           Parameters
+           ----------
+           mapping: str
+               the mapping
+
+           Returns
+           -------
+           iterator
+               iterator over mapping items
+        """
         raise NotImplementedError
 
     def impl_dump_mapping_lines(self, level, lines, mapping):
-        """impl_dump_mapping(level, lines, mapping)
-           Writes lines for the 'mapping' serialization'
+        """Generates and appends lines for a mapping serialization
+
+           Parameters
+           ----------
+           level: int
+               the nesting level
+           lines: list
+               the list of lines
+           mapping: str
+               the mapping
         """
         for key, value in self.impl_iter_mapping_items(mapping):
             if isinstance(value, collections.Mapping):
@@ -120,7 +219,22 @@ class TextSerializer(Serializer):
             return ''
 
     def impl_parse_key_value(self, line, line_number, filename):
-        """impl_parse_key_value(line, line_number, filename) -> key, value"""
+        """Parses a key/value line
+
+           Parameters
+           ----------
+           line: str
+               the key/value line
+           line_number: int
+               the line number
+           filename: str
+               the file name
+
+           Returns
+           -------
+           tuple
+               (key, value)
+        """
         # key:
         l_kv = line.split('=', 1)
         if len(l_kv) < 2:
@@ -144,5 +258,20 @@ class TextSerializer(Serializer):
 
     @abc.abstractmethod
     def impl_from_string(self, dct_class, serialization, *, filename=None):
-        """impl_from_string(...)"""
+        """Implementation of the from_string method.
+
+           Parameters
+           ----------
+           dct_class: type
+               the dict class to be used
+           serialization: str
+               the serialization
+           filename: str
+               the file name
+
+           Returns
+           -------
+           any
+               the deserialized object
+        """
         raise NotImplementedError

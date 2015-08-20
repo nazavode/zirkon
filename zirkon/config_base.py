@@ -44,22 +44,22 @@ class ConfigValidationError(Exception):
 
 
 class ConfigBase(Section):
-    """ Config base class; adds to Section serialization/deserialization methods.
+    r""" Config base class; adds to Section serialization/deserialization methods.
 
-        Parameters
-        ----------
-        init: Mapping, optional
-            some initialization content
-        dictionary: Mapping, optional
-            the internal dictionary
-        schema: Schema, optional
-            the validation schema
-        validate: bool, optional
-            self validate during initialization;
-        interpolation: bool, optional
-            enables interpolation (defaults to True);
-        **section_options:
-            keyword arguments to be passed to the Section contructor
+         Parameters
+         ----------
+         init: Mapping, optional
+             some initialization content
+         dictionary: Mapping, optional
+             the internal dictionary
+         schema: Schema, optional
+             the validation schema
+         validate: bool, optional
+             self validate during initialization;
+         interpolation: bool, optional
+             enables interpolation (defaults to True);
+         \*\*section_options:
+             keyword arguments to be passed to the Section contructor
     """
 
     def __init__(self, init=None, *, dictionary=None, schema=None, validate=True,
@@ -356,7 +356,7 @@ def _setup_codecs():
             return eval(arguments['expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=W0123
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_=Deferred,
+            class_type=Deferred,
             encode=_deferred_encode,
             decode=_deferred_decode,
         )
@@ -395,7 +395,7 @@ def _setup_codecs():
             return unrepr(repr_data, {'SECTION': SECTION, 'ROOT': ROOT})
 
         _text_serializer_module.TextSerializer.codec_catalog().add_codec(
-            class_=str,
+            class_type=str,
             encode=_str_text_encode,
             decode=_str_text_decode,
         )

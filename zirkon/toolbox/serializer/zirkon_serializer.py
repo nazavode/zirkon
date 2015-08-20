@@ -31,7 +31,22 @@ from .text_serializer import TextSerializer
 
 
 def _parse_mapping(line, line_number, filename):
-    """_parse_mapping(line, line_number, filename) -> mapping_name"""
+    """Parses a section identifier [[... section_name ...]]
+
+       Parameters
+       ----------
+       line: str
+           the line
+       line_number: int
+           the line number
+       filename: str
+           the file name
+
+       Returns
+       -------
+       str
+           the mapping name
+    """
 
     if line[0] == '[' and line[-1] == ']':
         line = line[1:-1]
@@ -55,7 +70,7 @@ class _Stack(object):
         del self._stack[index]
 
     def get_frame_level(self, indentation, line_number, filename):
-        """get_frame_level(indentation, line_number, filename) -> indentation, mapping, level"""
+        """Returns the frame level"""
         for level, frame_info in enumerate(self._stack):
             if frame_info.indentation == indentation:
                 del self[level + 1:]
@@ -85,8 +100,7 @@ class _Stack(object):
 
 
 class ZirkonSerializer(TextSerializer):
-    """ZirkonSerializer()
-       Implementation of the Zirkon serializer.
+    """Implementation of the Zirkon serializer.
     """
     RE_INDENTATION_LINE = re.compile(r"(\s*)(.*)")
 

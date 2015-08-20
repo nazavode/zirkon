@@ -27,8 +27,7 @@ from .serializer import Serializer
 
 
 class PickleSerializer(Serializer):
-    """PickleSerializer()
-       Implementation of pickle serializer.
+    """Implementation of pickle serializer.
     """
 
     @classmethod

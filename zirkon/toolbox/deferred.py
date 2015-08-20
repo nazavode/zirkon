@@ -21,66 +21,13 @@ Implementation of the Deferred abstract base class for deferred evaluation of py
 
 __author__ = "Simone Campagna"
 __all__ = [
-    'Deferred',
-    'DBinaryOperator',
-    'DUnaryOperator',
-    'DName',
-    'DConst',
-    'DAbs',
-    'DPos',
-    'DNeg',
-    'DAdd',
-    'DSub',
-    'DMul',
-    'DTrueDiv',
-    'DFloorDiv',
-    'DMod',
-    'DDivMod',
-    'DPow',
-    'DEq',
-    'DNe',
-    'DLt',
-    'DLe',
-    'DGt',
-    'DGe',
-    'DAnd',
-    'DOr',
-    'DNot',
-    'DLen',
-    'DStr',
-    'DRepr',
-    'DContains',
-    'DGetattr',
-    'DGetitem',
-    'DCall',
+    'Deferred', 'DBinaryOperator', 'DUnaryOperator', 'DName', 'DConst', 'DAbs',
+    'DPos', 'DNeg', 'DAdd', 'DSub', 'DMul', 'DTrueDiv', 'DFloorDiv', 'DMod',
+    'DDivMod', 'DPow', 'DEq', 'DNe', 'DLt', 'DLe', 'DGt', 'DGe', 'DAnd', 'DOr',
+    'DNot', 'DLen', 'DStr', 'DRepr', 'DContains', 'DGetattr', 'DGetitem', 'DCall',
 ]
 
 import abc
-
-# lambda	Lambda Expression
-# or	Boolean OR
-# and	Boolean AND
-# not x	Boolean NOT
-# in, not in	Membership tests
-# is, is not	Identity tests
-# <, <=, >, >=, !=, ==	Comparisons
-# |	Bitwise OR
-# ^	Bitwise XOR
-# &	Bitwise AND
-# <<, >>	Shifts
-# +, -	Addition and subtraction
-# *, /, %	Multiplication, Division and Remainder
-# +x, -x	Positive, Negative
-# ~x	Bitwise NOT
-# **	Exponentiation
-# x.attribute	Attribute reference
-# x[index]	Subscription
-# x[index:index]	Slicing
-# f(arguments ...)	Function call
-# (expressions, ...)	Binding or tuple display
-# [expressions, ...]	List display
-# {key:datum, ...}	Dictionary display
-# `expressions, ...`	String conversion
 
 
 class Deferred(metaclass=abc.ABCMeta):
@@ -88,38 +35,14 @@ class Deferred(metaclass=abc.ABCMeta):
        Concrete classes must implement the evaluate(globals_d=None) method.
     """
     PRIORITY = {
-        'DConst': 100000,
-        'DName': 100000,
-        'DOr': 1,
-        'DAnd': 2,
-        'DNot': 3,
-        'DContains': 4,
+        'DConst': 100000, 'DName': 100000, 'DOr': 1, 'DAnd': 2, 'DNot': 3, 'DContains': 4,
         # 'DIs': 5,
-        'DLt': 6,
-        'DLe': 6,
-        'DGt': 6,
-        'DGe': 6,
-        'DEq': 6,
-        'DNe': 6,
-        # 'DBitwiseOr': 7,
-        # 'DBitwiseXOr': 8,
-        # 'DBitwiseAnd': 9,
-        # 'DLeftShift': 10,
-        # 'DRightShift': 10,
-        'DAdd': 11,
-        'DSub': 11,
-        'DMul': 12,
-        'DTrueDiv': 12,
-        'DFloorDiv': 12,
-        'DMod': 12,
-        'DDivMod': 12,
-        'DPos': 13,
-        'DNeg': 13,
+        'DLt': 6, 'DLe': 6, 'DGt': 6, 'DGe': 6, 'DEq': 6, 'DNe': 6,
+        # 'DBitwiseOr': 7, 'DBitwiseXOr': 8, 'DBitwiseAnd': 9, 'DLeftShift': 10, 'DRightShift': 10,
+        'DAdd': 11, 'DSub': 11, 'DMul': 12, 'DTrueDiv': 12, 'DFloorDiv': 12, 'DMod': 12,
+        'DDivMod': 12, 'DPos': 13, 'DNeg': 13,
         # 'DBitwiseNot': 14,
-        'DPow': 15,
-        'DCall': 16,
-        'DGetitem': 17,
-        'DGetattr': 18,
+        'DPow': 15, 'DCall': 16, 'DGetitem': 17, 'DGetattr': 18,
     }
     RIGHT_ASSOCIATIVITY = {
         'DPow': True
@@ -127,7 +50,18 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def evaluate(self, globals_d=None):
-        """evaluate(globals_d=None) -> value"""
+        """Evaluates the object using globals_d for name lookup.
+
+        Parameters
+        ----------
+        globals_d: dict, optional
+            the globals dictionary
+
+        Returns
+        -------
+        any
+            the evaluated value
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -135,12 +69,28 @@ class Deferred(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     def unparse(self):
-        """unparse() -> python expression representation"""
+        """Unparses the expression returning its python representation.
+           It correctly handles operator priority and associativity.
+
+           Returns
+           -------
+           str
+               the unparsed expression
+        """
         return self._impl_unparse_wrap(wrap=False)
 
     def _impl_unparse_wrap(self, wrap):
-        """_impl_unparse_wrap(wrap) -> python expression representation
-           If 'wrap' puts output in parenthesis.
+        """If 'wrap' puts output in parenthesis.
+
+           Parameters
+           ----------
+           wrap: bool
+               determines if enclosing braces are required
+
+           Returns
+           -------
+           str
+               the expression
         """
         expression = self._impl_unparse()
         if wrap:
@@ -150,22 +100,30 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _impl_unparse(self):
-        """_impl_unparse() -> python expression representation."""
-        raise NotImplementedError
+        """Implementation of the unparse method.
 
-    def _wrap(self, expression, wrap):  # pylint: disable=R0201
-        """wrap(expression, wrap) -> [wrapped] expression"""
+           Returns
+           -------
+           str
+               the expression
+        """
+        raise NotImplementedError
 
     @abc.abstractmethod
     def _impl_tree(self):
-        """_impl_tree() -> show object tree"""
+        """Implementation of the __str__ method. Returns an expression
+           showing the tree structure of the object.
+
+           Returns
+           -------
+           str
+               the tree expression
+        """
         raise NotImplementedError
 
-    # __str__:
     def __str__(self):
         return self._impl_tree()
 
-    # __repr__:
     def __repr__(self):
         return self.unparse()
 
@@ -251,22 +209,32 @@ class Deferred(metaclass=abc.ABCMeta):
     # def __contains__(self, other):
     #     return DContains(self, other)
 
-    # Call:
     def __call__(self, *p_args, **n_args):
         return DCall(functor=self, p_args=p_args, n_args=n_args)
 
-    # Get attribute:
     def __getattr__(self, attr_name):
         return DGetattr(self, attr_name)
 
-    # Get item:
     def __getitem__(self, item):
         return DGetitem(self, item)
 
     # utilities:
     @classmethod
     def _impl_evaluate_operand(cls, operand, globals_d):
-        """_impl_evaluate_operand(operand, globals_d) -> operand value"""
+        """Classmethod to evaluate an operand.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to evaluate (a Deferred object or other value)
+           globals_d: dict
+               the globals dictionary
+
+           Returns
+           -------
+           any
+               the evaluated operand
+        """
         if isinstance(operand, Deferred):
             return operand.evaluate(globals_d=globals_d)
         else:
@@ -274,7 +242,22 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @classmethod
     def _impl_unparse_lr_operand(cls, operand, wrap=None, right=None):
-        """_impl_unparse_operand(operand, wrap=None, right=None) -> operand value"""
+        """Classmethod to unparse an operand for a binary operator, handling associativity.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to unparse (a Deferred object or other value)
+           wrap: bool
+               if True the expression must be enclosed in braces
+           right: bool
+               if True right associativity is required
+
+           Returns
+           -------
+           str
+               the unparsed expression
+        """
         if isinstance(operand, Deferred):
             if wrap is None:
                 p_operand = operand._priority()  # pylint: disable=W0212
@@ -293,22 +276,72 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @classmethod
     def _impl_unparse_left_operand(cls, operand, wrap=None):
-        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        """Classmethod to unparse the left operand, handling associativity.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to unparse (a Deferred object or other value)
+           wrap: bool
+               if True the expression must be enclosed in braces
+
+           Returns
+           -------
+           str
+               the unparsed expression
+        """
         return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=False)
 
     @classmethod
     def _impl_unparse_right_operand(cls, operand, wrap=None):
-        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        """Classmethod to unparse the right operand, handling associativity.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to unparse (a Deferred object or other value)
+           wrap: bool
+               if True the expression must be enclosed in braces
+
+           Returns
+           -------
+           str
+               the unparsed expression
+        """
         return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=True)
 
     @classmethod
     def _impl_unparse_operand(cls, operand, wrap=None):
-        """_impl_unparse_left_operand(operand, wrap=None) -> operand value"""
+        """Classmethod to unparse an operand.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to unparse (a Deferred object or other value)
+           wrap: bool
+               if True the expression must be enclosed in braces
+
+           Returns
+           -------
+           str
+               the unparsed expression
+        """
         return cls._impl_unparse_lr_operand(operand, wrap=wrap, right=None)
 
     @classmethod
     def _impl_tree_operand(cls, operand):
-        """_impl_tree_operand(operand) -> operand tree representation"""
+        """Returns the 'tree' representation for an operand.
+
+           Parameters
+           ----------
+           operand: any
+               the operand to unparse (a Deferred object or other value)
+
+           Returns
+           -------
+           str
+               the tree expression
+        """
         if isinstance(operand, Deferred):
             return operand._impl_tree()  # pylint: disable=W0212
         else:
@@ -316,17 +349,35 @@ class Deferred(metaclass=abc.ABCMeta):
 
     @classmethod
     def _priority(cls):
-        """_priority() -> priority"""
+        """Returns the class priority
+
+           Returns
+           -------
+           int
+               the class priority
+        """
         return cls.PRIORITY.get(cls.__name__, 1000)
 
     @classmethod
     def _right_associativity(cls):
-        """_right_associativity() -> right_associativity"""
+        """Returns True if class is right associative
+
+           Returns
+           -------
+           bool
+               True if right associative
+        """
         return cls.RIGHT_ASSOCIATIVITY.get(cls.__name__, False)
 
 
 class DConst(Deferred):
-    """Deferred const expression."""
+    """Deferred const expression. Evaluates to a const value.
+
+       Parameters
+       ----------
+       value: any
+           the const value
+    """
 
     def __init__(self, value):
         self.value = value
@@ -345,7 +396,13 @@ class DConst(Deferred):
 
 
 class DName(Deferred):
-    """Deferred name lookup."""
+    """Deferred name lookup. Evaluates to the value referred by 'name'
+
+       Parameters
+       ----------
+       name: str
+           the name
+    """
 
     def __init__(self, name, globals_d=None):
         self.name = name
@@ -377,7 +434,17 @@ class DName(Deferred):
 
 
 class DCall(Deferred):
-    """Deferred object call."""
+    """Deferred object call.
+
+       Parameters
+       ----------
+       functor: callable
+           the object to be called
+       p_args: tuple
+           functor's positional arguments
+       n_args: dict
+           functor's keyword arguments
+    """
 
     def __init__(self, functor, p_args=None, n_args=None):
         super().__init__()
@@ -416,7 +483,13 @@ class DCall(Deferred):
 
 
 class DUnaryOperator(Deferred):
-    """Abstract base class for deferred unary operators."""
+    """Abstract base class for deferred unary operators.
+
+       Parameters
+       ----------
+       operand: any
+           the operand
+    """
 
     def __init__(self, operand):
         self.operand = operand
@@ -433,7 +506,18 @@ class DUnaryOperator(Deferred):
 
     @abc.abstractmethod
     def _impl_unary_operation(self, value):
-        """_impl_unary_operation(value) -> result"""
+        """Returns the unary operation
+
+        Parameters
+        ----------
+        value: any
+            the evaluated operand
+
+        Returns
+        -------
+        any
+            the operator's result
+        """
         raise NotImplementedError
 
 
@@ -508,7 +592,15 @@ class DRepr(DUnaryOperator):
 
 
 class DBinaryOperator(Deferred):
-    """Abstract base class for deferred binary operators."""
+    """Abstract base class for deferred binary operators.
+
+       Parameters
+       ----------
+       left_operand: any
+           the left operand
+       right_operand: any
+           the right operand
+    """
     BINOP_SYMBOL = None
 
     def __init__(self, left_operand, right_operand):
@@ -522,7 +614,20 @@ class DBinaryOperator(Deferred):
 
     @abc.abstractmethod
     def _impl_binary_operation(self, left_value, right_value):
-        """_impl_binary_operation(left_value, right_value) -> result"""
+        """Returns the binary operation result.
+
+           Parameters
+           ----------
+           left_value: any
+               the evaluated left operand
+           right_value: any
+               the evaluated right operand
+
+           Returns
+           -------
+           any
+               the result
+        """
         raise NotImplementedError
 
     def __reduce__(self):

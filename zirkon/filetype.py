@@ -241,14 +241,14 @@ def search_paths():
 
 
 def discover(*directories, standard_paths=True):
-    """Discover FileTypes in directories.
+    r"""Discover FileTypes in directories.
 
-       Parameters
-       ----------
-       \*directories: str
+        Parameters
+        ----------
+        \*directories: str
            each directory can be a pattern or tuple (pattern, config_classes)
-       standard_paths: bool, optional
-           if True, add standard search_paths
+        standard_paths: bool, optional
+            if True, add standard search_paths
     """
     directory_d = collections.OrderedDict()
     if standard_paths:

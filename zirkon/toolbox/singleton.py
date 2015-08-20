@@ -35,7 +35,14 @@ __all__ = [
 
 
 class Singleton(type):
-    """Singleton metaclass
+    r"""Singleton metaclass. All derived classes will be singletons.
+
+        Parameters
+        ----------
+        \*args: tuple
+            positional arguments
+        \*kwargs: dict
+            keyword arguments
     """
     _instances = {}
 

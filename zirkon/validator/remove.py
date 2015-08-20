@@ -31,7 +31,5 @@ from .validator import Validator
 
 
 class Remove(Validator):
-    """Remove()
-       Ignore option.
-    """
+    """Validator for unexpected options.  Removes the option."""
     CHECK_COMPOSER = Composer(CheckRemove)

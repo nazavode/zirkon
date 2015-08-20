@@ -38,86 +38,84 @@ __all__ = [
 
 
 class OptionValidationError(Exception):
-    """OptionValidationError()
-    """
+    """OptionValidationError"""
 
     @classmethod
     def build(cls, option, message):
-        """build(option, message) -> exception instance
-           Build an exception based on the option value.
+        """Builds an exception based on the option value.
+
+           Parameters
+           ----------
+           option: Option
+               the offending option
+           message: str
+               the error message
+
+           Returns
+           -------
+           cls
+               the exception
         """
         return cls("{}: {}".format(option, message))
 
 
 class InvalidContentError(OptionValidationError):
-    """InvalidContentError()
-    """
+    """InvalidContentError - option content is invalid"""
     pass
 
 
 class InvalidTypeError(OptionValidationError):
-    """InvalidTypeError()
-    """
+    """InvalidTypeError - option type is invalid"""
     pass
 
 
 class InvalidValueError(OptionValidationError):
-    """InvalidValueError()
-    """
+    """InvalidValueError - option value is invalid"""
     pass
 
 
 class MissingRequiredOptionError(InvalidContentError):
-    """MissingRequiredOptionError()
-    """
+    """MissingRequiredOptionError - required option is missing"""
     pass
 
 
 class UnexpectedSectionError(InvalidContentError):
-    """UnexpectedSectionError()
-    """
+    """UnexpectedSectionError - an unexpected section is found"""
     pass
 
 
 class UnexpectedOptionError(InvalidContentError):
-    """UnexpectedOptionError()
-    """
+    """UnexpectedOptionError - an unexpected option is found"""
     pass
 
 
 class MinValueError(InvalidValueError):
-    """MinValueError()
-    """
+    """MinValueError - value is lower than allowed min"""
     pass
 
 
 class MaxValueError(InvalidValueError):
-    """MaxValueError()
-    """
+    """MaxValueError - value is greater than allowed max"""
     pass
 
 
 class InvalidChoiceError(InvalidValueError):
-    """InvalidChoiceError()
-    """
+    """InvalidChoiceError - value is not an acceptable choice"""
     pass
 
 
 class InvalidLengthError(OptionValidationError):
-    """InvalidLengthError()
-    """
+    """InvalidLengthError - value has an invalid length"""
     pass
 
 
 class MinLengthError(InvalidLengthError):
-    """MinLengthError()
-    """
+    """MinLengthError - value length is lower than allowed min_len"""
     pass
 
 
 class MaxLengthError(InvalidLengthError):
-    """MaxLengthError()
-    """
+    """MaxLengthError - value length is greater than allowed max_len"""
     pass
 
 

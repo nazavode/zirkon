@@ -37,9 +37,7 @@ from .option import Option
 
 
 class CheckRange(Check):  # pylint: disable=W0223
-    """CheckRange(value)
-       Base class for CheckMin, CheckMax.
-    """
+    """Base class for CheckMin, CheckMax, CheckMinLen, CheckMaxLen."""
 
     ATTRIBUTE_NAME = None
 
@@ -52,8 +50,12 @@ class CheckRange(Check):  # pylint: disable=W0223
 
 
 class CheckMin(CheckRange):
-    """CheckMin(min=None)
-       If min is not None, check if value is >= min.
+    """Checks if value is >= min.
+
+       Parameters
+       ----------
+       min: any, optional
+           the min value
     """
     ATTRIBUTE_NAME = 'min'
 
@@ -72,8 +74,12 @@ class CheckMin(CheckRange):
 
 
 class CheckMax(CheckRange):
-    """CheckMax(max=None)
-       If max is not None, check if value is <= max.
+    """Checks if value is <= max.
+
+       Parameters
+       ----------
+       max: any, optional
+           the max value
     """
     ATTRIBUTE_NAME = 'max'
 
@@ -92,8 +98,12 @@ class CheckMax(CheckRange):
 
 
 class CheckMinLen(Check):
-    """CheckMinLen(min_len=None)
-       If min_len is not None, check if len of value is >= min_len.
+    """Checks if value length is >= min_len.
+
+       Parameters
+       ----------
+       min_len: any, optional
+           the min length
     """
 
     def __init__(self, min_len=None):
@@ -113,8 +123,12 @@ class CheckMinLen(Check):
 
 
 class CheckMaxLen(Check):
-    """CheckMaxLen(max_len=None)
-       If max_len is not None, check if len of value is <= max_len.
+    """Checks if value length is >= max_len.
+
+       Parameters
+       ----------
+       max_len: any, optional
+           the max length
     """
 
     def __init__(self, max_len=None):

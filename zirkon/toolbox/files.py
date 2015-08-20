@@ -25,8 +25,12 @@ import os
 
 
 def createdir(filename):
-    """create_dir(filename)
-       Create the filename directory if it does not exist
+    """Creates the directory containing filename if it does not exist.
+
+       Parameters
+       ----------
+       filename: str
+           a file path
     """
     dirname, filename = os.path.split(filename)
     if dirname and not os.path.exists(dirname):

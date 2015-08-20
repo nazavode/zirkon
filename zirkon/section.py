@@ -540,21 +540,21 @@ def has_section_options(section):
 
 
 def get_section_value(config, *keys):
-    """Returns the value for a tuple of keys.
-       get_section_value(config, k0, k1, k2) is equivalent to
-       config[k0][k1][k2]
+    r"""Returns the value for a tuple of keys.
+        get_section_value(config, k0, k1, k2) is equivalent to
+        config[k0][k1][k2]
 
-       Parameters
-       ----------
-       config: Section
-           the config object
-       \*keys: tuple
-           the keys for successive gets
+        Parameters
+        ----------
+        config: Section
+            the config object
+        \*keys: tuple
+            the keys for successive gets
 
-       Returns
-       -------
-       any
-           the value
+        Returns
+        -------
+        any
+            the value
     """
     result = config
     for key in keys:

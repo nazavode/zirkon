@@ -30,13 +30,20 @@ from ..catalog import Catalog
 
 
 class CodecCatalog(Catalog):
-    """CodecCatalog(default)
-       Catalog for codecs.
+    """Catalog for codecs.
     """
-    Codec = collections.namedtuple('Codec', ('class_', 'encode', 'decode'))
+    Codec = collections.namedtuple('Codec', ('class_type', 'encode', 'decode'))
 
-    def add_codec(self, class_, encode, decode):
-        """add_codec(class_, encode, decode)
-           Add encode/decode information for class_.
+    def add_codec(self, class_type, encode, decode):
+        """Adds encode/decode information for class_type.
+
+           Parameters
+           ----------
+           class_type: type
+               the class to register
+           encode: callable
+               the encoding function
+           decode: callable
+               the decoding function
         """
-        self.register(class_, self.Codec(class_=class_, encode=encode, decode=decode))
+        self.register(class_type, self.Codec(class_type=class_type, encode=encode, decode=decode))

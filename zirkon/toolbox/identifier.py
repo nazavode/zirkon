@@ -28,8 +28,18 @@ import re
 
 
 def is_valid_identifier(string):
-    """is_valid_identifier(string) -> True/False
-       Checks if 'string' is a valid identifier.
+    """Checks if 'string' is a valid identifier (it could be
+       used for a python identifier).
+
+       Parameters
+       ----------
+       string: str
+           the identifier to be checked
+
+       Returns
+       -------
+       bool
+           True if identifier is valid
     """
     re_valid_key = re.compile(r"^[a-zA-Z_]\w*$")
     if not isinstance(string, str):

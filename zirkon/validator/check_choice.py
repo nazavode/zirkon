@@ -30,8 +30,12 @@ from .error import InvalidChoiceError
 
 
 class CheckChoice(CheckType):
-    """CheckChoice(choices)
-       Check if option.value is in 'choices'.
+    """Check if option.value is in 'choices'.
+
+       Parameters
+       ----------
+       choices: tuple
+           the set of accepted values
     """
     def __init__(self, choices):
         self.choices = choices

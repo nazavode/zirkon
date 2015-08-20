@@ -30,8 +30,7 @@ from ..toolbox.deferred import Deferred
 
 
 class Check(metaclass=abc.ABCMeta):
-    """Check()
-       Abstract base class for cheks. Checks must implement
+    """Abstract base class for cheks. Checks must implement
        check(option, section) method.
     """
 
@@ -42,23 +41,56 @@ class Check(metaclass=abc.ABCMeta):
     def check(self, option, section):
         """check(option, section)
            Run option check (can change option.value, option.defined)
+
+           Parameters
+           ----------
+           option: Option
+               the option to be checked
+           section: Section
+               the containing section
         """
         raise NotImplementedError
 
     def has_actual_value(self, value):  # pylint: disable=R0201
-        """has_actual_value(value)
-           Return False if value is a Deferred instance
+        """Returns True if value is not a Deferred instance.
+
+           Parameters
+           ----------
+           value: any
+               the value
+
+           Returns
+           -------
+           bool
+               True if value is immediately available (i.e. it is not a Deferred).
         """
         return not isinstance(value, Deferred)
 
     def self_validate(self, validator):
-        """self_validate(validator)
-           Use validator to validate check's attributes.
+        """Uses validator to validate check's attributes.
+
+           Parameters
+           ----------
+           validator: Validator
+               the validator containing this check
         """
         pass
 
     def get_value(self, value, section):  # pylint: disable=R0201
-        """get_value(value, section) -> value"""
+        """Returns an evaluated value
+
+           Parameters
+           ----------
+           value: any
+               the original value
+           section: Section
+               the containing section
+
+           Returns
+           -------
+           any
+               the evaluated value
+        """
         if section is not None:
             value = section.evaluate_option_value(value)
         return value

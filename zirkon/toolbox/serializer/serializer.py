@@ -30,40 +30,80 @@ from .codec_catalog import CodecCatalog
 
 
 class Serializer(Registry, metaclass=abc.ABCMeta):
-    """Serializer()
-       Abstract base class for serializers. Serializers must implement
+    """Abstract base class for serializers. Serializers must implement
        to_string(obj) and from_string(serialization).
     """
     CODEC_CATALOG = CodecCatalog()
 
     @classmethod
     def codec_catalog(cls):
-        """codec_catalog() -> class' codec catalog"""
+        """Returns the codec's catalog.
+
+           Returns
+           -------
+           CodecCatalog
+               the codec's catalog
+        """
         return cls.CODEC_CATALOG
 
     @classmethod
     def is_binary(cls):
-        """is_binary() -> bool
-           Return True if the serialization is binary.
+        """Returns True if the serialization is binary.
+
+           Returns
+           -------
+           bool
+               True if serialization is binary
         """
         return False
 
     @abc.abstractmethod
     def to_string(self, obj):
-        """to_string(obj) -> str
-           Dump the serialization for 'obj'.
+        """Returns the string serialization for 'obj'.
+
+           Parameters
+           ----------
+           obj: any
+               the object to be serialized
+
+           Returns
+           -------
+           str
+               the obj's serialization
         """
         raise NotImplementedError
 
     def to_stream(self, obj, stream):
-        """to_stream(obj, stream)
-           Write the serialization for 'obj' to stream 'stream'.
+        """Writes the serialization for 'obj' to file 'stream'.
+
+           Parameters
+           ----------
+           obj: any
+               the object to be serialized
+           stream: file
+               an open file
+
+           Returns
+           -------
+           int
+               the number of written bytes
         """
         return stream.write(self.to_string(obj))
 
     def to_file(self, obj, filename):
-        """to_file(obj, filename)
-           Write the serialization for 'obj' to file 'filename'.
+        """Writes the serialization for 'obj' to file 'filename'.
+
+           Parameters
+           ----------
+           obj: any
+               the object to be serialized
+           filename: str
+               the file name
+
+           Returns
+           -------
+           int
+               the number of written bytes
         """
         createdir(filename)
         mode = 'w'
@@ -74,14 +114,36 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def from_string(self, serialization, *, filename=None):
-        """from_string(serialization, *, filename=None) -> obj
-           Load a Config from string 'serialization'.
+        """Loads an object from string 'serialization'.
+
+           Parameters
+           ----------
+           serialziation: str
+               the serialization
+           filename: str, optional
+               the file name (only for error traceback)
+
+           Returns
+           -------
+           any
+               the deserialized object
         """
         raise NotImplementedError
 
     def from_stream(self, stream, *, filename=None):
-        """from_stream(stream, *, filename=None) -> obj
-           Load a Config from stream 'stream'.
+        """Loads an object from open file 'stream'.
+
+           Parameters
+           ----------
+           stream: file
+               an open file
+           filename: str, optional
+               the file name (only for error traceback)
+
+           Returns
+           -------
+           any
+               the deserialized object
         """
         if filename is None:
             if hasattr(stream, 'name'):
@@ -92,8 +154,17 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
                                 filename=filename)
 
     def from_file(self, filename):
-        """from_file(filename) -> obj
-           Load a Config from file 'filename'.
+        """Loads an object from file 'filename'.
+
+           Parameters
+           ----------
+           file: str
+               the file name
+
+           Returns
+           -------
+           any
+               the deserialized object
         """
         createdir(filename)
         mode = 'r'

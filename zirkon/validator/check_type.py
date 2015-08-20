@@ -29,8 +29,7 @@ from .error import InvalidTypeError
 
 
 class CheckType(Check):
-    """CheckType()
-       Check if option has type 'TYPE' or 'SECONDARY_TYPES'.
+    """Checks if option has type 'TYPE' or 'SECONDARY_TYPES'.
        If isinstance(value, SECONDARY_TYPES) then value is converted to 'TYPE'.
     """
     TYPE = type(None)

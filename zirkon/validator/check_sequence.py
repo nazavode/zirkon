@@ -30,20 +30,17 @@ from .check_type import CheckType
 
 
 class CheckSequenceType(CheckType):
-    """CheckSequenceType()
-       Base class for CheckList, CheckTuple.
+    """Base class for CheckList, CheckTuple.
     """
 
 
 class CheckList(CheckSequenceType):
-    """CheckList()
-       Check if option is a list.
+    """Checks if option is a list.
     """
     TYPE = list
 
 
 class CheckTuple(CheckSequenceType):
-    """CheckList()
-       Check if option is a tuple.
+    """Checks if option is a tuple.
     """
     TYPE = tuple
