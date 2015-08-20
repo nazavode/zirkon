@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.filetype
-===============
-Utility function for guessing file type.
+Utility function for guessing config file type, searching config files, ...
 """
 
 __author__ = "Simone Campagna"

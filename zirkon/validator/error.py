@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.error
-======================
-OptionValidationError classes
+Implementation of the OptionValidationError classes.
 """
 
 __author__ = "Simone Campagna"

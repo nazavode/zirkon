@@ -16,9 +16,8 @@
 #
 
 """\
-zirkon.toolbox.serializer.configobj_serializer
-==============================================
-Implementation of the ConfigObj Serializer
+Implementation of the 'configobj' Serializer. This is a partial implementation
+of the configobj format, see http://www.voidspace.org.uk/python/configobj.html
 """
 
 __author__ = "Simone Campagna"

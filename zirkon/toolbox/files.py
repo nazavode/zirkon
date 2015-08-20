@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.files
-====================
-File-related utility functions
+File-related utility functions.
 """
 
 __author__ = "Simone Campagna"

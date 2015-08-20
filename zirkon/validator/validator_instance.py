@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.validator_instance
-===================================
-Implementation of the ValidatorInstance class
+Implementation of the ValidatorInstance validator class.
 """
 
 __author__ = "Simone Campagna"

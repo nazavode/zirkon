@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.serializer.pickle_serializer
-===========================================
-Implementation of the pickle serializer
+Implementation of the 'pickle' serializer.
 """
 
 __author__ = "Simone Campagna"

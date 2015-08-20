@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_required
-===============================
-Implementation of the CheckRequired class
+Implementation of the CheckRequired check class.
 """
 
 __author__ = "Simone Campagna"

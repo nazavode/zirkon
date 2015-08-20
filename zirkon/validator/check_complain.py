@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_complain
-===============================
-Implementation of the CheckComplain class
+Implementation of the CheckComplain check class.
 """
 
 __author__ = "Simone Campagna"

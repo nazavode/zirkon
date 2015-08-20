@@ -16,7 +16,7 @@
 #
 
 """
-The config version
+The config version:
 
 >>> print(VERSION_INFO)
 VersionInfo(major=1, minor=0, patch=4)

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.serializer.zirkon_serializer
-==============================================
-Implementation of the Zirkon Serializer
+Implementation of the 'zirkon' Serializer.
 """
 
 __author__ = "Simone Campagna"

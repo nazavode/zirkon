@@ -25,7 +25,7 @@ import pytest
 
 from common.fixtures import string_io
 
-from zirkon.toolbox.flatmap import FlatMap
+from zirkon.flatmap import FlatMap
 
 from zirkon.config import Config
 

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.ignore
-=======================
-Implementation of the Ignore class
+Implementation of the Ignore validator class.
 """
 
 __author__ = "Simone Campagna"

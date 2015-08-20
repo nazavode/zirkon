@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.serializer.text_serializer
-=========================================
-Implementation of the TextSerializer base class for text serializers
+Implementation of the TextSerializer base class for text serializers.
 """
 
 __author__ = "Simone Campagna"

@@ -16,8 +16,7 @@
 #
 
 """
-toolbox.identifier
-==================
+Utility to check identifiers.
 """
 
 __author__ = "Simone Campagna"

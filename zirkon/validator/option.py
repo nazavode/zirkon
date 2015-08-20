@@ -16,9 +16,8 @@
 #
 
 """\
-zirkon.validator.option
-=======================
-Implementation of the Option class
+Implementation of the Option class. It is used to store information about an option:
+the name, the value, and if it is defined.
 """
 
 __author__ = "Simone Campagna"

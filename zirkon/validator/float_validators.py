@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.float_validators
-=================================
-Implementation of the float validator classes
+Implementation of the Float validator classes.
 """
 
 __author__ = "Simone Campagna"

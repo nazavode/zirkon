@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.utils
-============
-Utilities.
+Some utilities for config objects.
 """
 
 __author__ = "Simone Campagna"

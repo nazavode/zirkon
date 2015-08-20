@@ -16,8 +16,7 @@
 #
 
 """\
-zirkon.deferred_object
-======================
+Definition of the deferred objects used by zirkon (ROOT and SECTION).
 """
 
 __author__ = "Simone Campagna"

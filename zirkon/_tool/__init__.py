@@ -16,9 +16,7 @@
 #
 
 """
-zirkon._tool
-============
-Simple command line interface
+Simple command line interface to read/validate/write config files.
 """
 
 __author__ = "Simone Campagna"

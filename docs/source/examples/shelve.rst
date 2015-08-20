@@ -12,7 +12,7 @@ This example shows how to add persistency to the configuration data; all the inf
  >>> import shelve
  >>> import tempfile
  >>> from zirkon.config import Config
- >>> from zirkon.toolbox.flatmap import FlatMap
+ >>> from zirkon.flatmap import FlatMap
 
  >>> with tempfile.TemporaryDirectory() as tdir:
  ...     tfile = os.path.join(tdir, 'x.shelf')

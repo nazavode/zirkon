@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.section
-==============
-Implementation of the Section class
+Implementation of the ConfigSection class.
 """
 
 __author__ = "Simone Campagna"

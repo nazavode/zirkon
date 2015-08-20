@@ -16,8 +16,6 @@
 #
 
 """
-toolbox.dictutils
-=================
 Utility function for dictionaries.
 """
 

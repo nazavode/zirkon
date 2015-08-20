@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_sequence
-===============================
-Implementation of the CheckList, CheckTuple classes
+Implementation of the CheckList, CheckTuple check classes.
 """
 
 __author__ = "Simone Campagna"

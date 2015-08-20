@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.toolbox
-==============
-Utilities
+A collection of utilities for internal usage.
 """
 
 __author__ = "Simone Campagna"

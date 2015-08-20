@@ -16,9 +16,9 @@
 #
 
 """
-zirkon.defaults_section
-=======================
-Implementation of the DefaultsSection class
+Implementation of the DefaultsSection class, used to store defaults in Config.
+The referencing() method is a context manager used to temporarily set the
+reference root for the DefaultsSection object to the ConfigSection instance.
 """
 
 __author__ = "Simone Campagna"

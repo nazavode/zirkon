@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.undefined
-========================
-Implementation of the UNDEFINED singleton
+Implementation of the UNDEFINED singleton.
 """
 
 __author__ = "Simone Campagna"

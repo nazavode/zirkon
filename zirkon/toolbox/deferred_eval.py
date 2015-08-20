@@ -16,8 +16,6 @@
 #
 
 """\
-zirkon.toolbox.deferred_eval
-============================
 The DeferredEval class implements a deferred evaluation of string
 expressions.
 

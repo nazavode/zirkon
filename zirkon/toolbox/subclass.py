@@ -16,8 +16,8 @@
 #
 
 """
-zirkon.toolbox.subclass
-=======================
+The subclass module contains functions to find all subclasses of
+a given class (indirect subclasses too).
 """
 
 __author__ = "Simone Campagna"

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.int_validators
-===============================
-Implementation of the int validator classes
+Implementation of the Int validator classes.
 """
 
 __author__ = "Simone Campagna"

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.serializer.json_serializer
-=========================================
-Implementation of the JSON Serializer
+Implementation of the 'json' Serializer.
 """
 
 __author__ = "Simone Campagna"

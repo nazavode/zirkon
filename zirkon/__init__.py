@@ -16,9 +16,7 @@
 #
 
 """
-config
-======
-Configuration management
+Configuration library.
 """
 
 __author__ = "Simone Campagna"

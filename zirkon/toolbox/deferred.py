@@ -16,8 +16,6 @@
 #
 
 """\
-zirkon.toolbox.deferred
-=======================
 Implementation of the Deferred abstract base class for deferred evaluation of python expressions.
 """
 

@@ -16,8 +16,7 @@
 #
 
 """\
-zirkon.config_base
-==================
+Implementation of the ConfigBase mixin class, adding serialization methods.
 """
 
 __author__ = "Simone Campagna"

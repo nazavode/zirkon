@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.sequence
-=========================
-Implementation of the Sequence class
+Implementation of the Sequence validator class.
 """
 
 __author__ = "Simone Campagna"

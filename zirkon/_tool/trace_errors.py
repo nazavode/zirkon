@@ -16,9 +16,7 @@
 #
 
 """
-zirkon._tool.trace_errors
-===========================
-Context manager for exception handling
+Context manager for exception handling.
 """
 
 __author__ = "Simone Campagna"

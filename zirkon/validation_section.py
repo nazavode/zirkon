@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.validation_section
-=========================
-Implementation of the ValidationSection class
+Implementation of the ValidationSection class, used to store validation errors.
 """
 
 __author__ = "Simone Campagna"

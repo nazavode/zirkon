@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.toolbox.serializer.serializer
-====================================
-Implementation of the abstract serializer class
+Implementation of the abstract Serializer class.
 """
 
 __author__ = "Simone Campagna"

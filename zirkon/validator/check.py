@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check
-======================
-Implementation of the Check base class
+Implementation of the Check base class.
 """
 
 __author__ = "Simone Campagna"

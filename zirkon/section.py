@@ -16,9 +16,36 @@
 #
 
 """
-zirkon.section
-==============
-Implementation of the Section class
+Implementation of the Section class.
+
+>>> section = Section()
+>>> section["x_value"] = 10.1
+>>> section["y_value"] = 20.2
+>>> section["data"] = {"alpha": 20}
+>>> section["data"]["name"] = "first experiment"
+>>> section["z_value"] = 30.3
+>>> section["velocity"] = {}
+>>> section["velocity"]["filename"] = "vel.dat"
+>>> section["velocity"]["type"] = "RAW"
+>>> section.dump()
+x_value = 10.1
+y_value = 20.2
+[data]
+    alpha = 20
+    name = 'first experiment'
+z_value = 30.3
+[velocity]
+    filename = 'vel.dat'
+    type = 'RAW'
+>>> del section['data']
+>>> section.dump()
+x_value = 10.1
+y_value = 20.2
+z_value = 30.3
+[velocity]
+    filename = 'vel.dat'
+    type = 'RAW'
+>>>
 """
 
 __author__ = "Simone Campagna"
@@ -45,38 +72,6 @@ class Section(collections.abc.Mapping):
        Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
-
-       >>> section = Section()
-       >>> section['x_value'] = 10.1
-       >>> section['y_value'] = 20.2
-       >>> section['data'] = collections.OrderedDict((
-       ...     ('alpha', 20),
-       ...     ('name', 'first experiment'),
-       ... ))
-       >>> section['z_value'] = 30.3
-       >>> section['velocity'] = collections.OrderedDict((
-       ...     ('filename', 'vel.dat'),
-       ...     ('type', 'RAW'),
-       ... ))
-       >>> section.dump()
-       x_value = 10.1
-       y_value = 20.2
-       [data]
-           alpha = 20
-           name = 'first experiment'
-       z_value = 30.3
-       [velocity]
-           filename = 'vel.dat'
-           type = 'RAW'
-       >>> del section['data']
-       >>> section.dump()
-       x_value = 10.1
-       y_value = 20.2
-       z_value = 30.3
-       [velocity]
-           filename = 'vel.dat'
-           type = 'RAW'
-       >>>
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))

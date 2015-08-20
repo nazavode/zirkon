@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.bool_validators
-================================
-Implementation of the Bool classes
+Implementation of the Bool validator classes.
 """
 
 __author__ = "Simone Campagna"

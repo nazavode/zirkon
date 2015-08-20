@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.toolbox.serializer
-=========================
-Serializer classes
+Serializer classes.
 """
 
 __author__ = "Simone Campagna"

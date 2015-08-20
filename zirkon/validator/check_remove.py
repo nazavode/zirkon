@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_remove
-==============================
-Implementation of the CheckRemove class
+Implementation of the CheckRemove check class.
 """
 
 __author__ = "Simone Campagna"

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_choice
-=============================
-Implementation of the CheckChoice class
+Implementation of the CheckChoice check class.
 """
 
 __author__ = "Simone Campagna"

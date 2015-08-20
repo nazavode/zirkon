@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.remove
-=======================
-Implementation of the Remove class
+Implementation of the Remove validator class.
 """
 
 __author__ = "Simone Campagna"

@@ -47,7 +47,7 @@ import tempfile
 
 import pytest
 
-from zirkon.toolbox.flatmap import FlatMap
+from zirkon.flatmap import FlatMap
 from zirkon.section import Section
 from zirkon.config import Config
 from zirkon.schema import Schema

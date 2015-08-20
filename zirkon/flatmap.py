@@ -16,9 +16,8 @@
 #
 
 """
-toolbox.flatmap
-===============
-Implementation of the FlatMap class
+Implementation of the FlatMap class. This class implements a nested dictionary
+interface over a flat dictionary.
 """
 
 __author__ = "Simone Campagna"
@@ -26,7 +25,7 @@ __author__ = "Simone Campagna"
 import collections
 import collections.abc
 
-from .identifier import is_valid_identifier
+from .toolbox.identifier import is_valid_identifier
 
 
 class FlatMap(collections.abc.Mapping):

@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_scalar
-=============================
-Implementation of the CheckScalarType classes
+Implementation of the CheckScalarType check classes.
 """
 
 __author__ = "Simone Campagna"

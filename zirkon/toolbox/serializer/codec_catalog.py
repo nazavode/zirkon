@@ -16,8 +16,6 @@
 #
 
 """\
-zirkon.toolbox.serializer.codec_catalog
-=======================================
 Catalog for class encoders/decoders.
 """
 

@@ -16,8 +16,38 @@
 #
 
 """\
-zirkon.config
-=============
+Implementation of the Config class.
+
+>>> config = Config()
+>>> config["x_value"] = 10.1
+>>> config["y_value"] = 20.2
+>>> config["data"] = {}
+>>> config["data"]["alpha"] = 20
+>>> config["data"]["name"] = "first experiment"
+>>> config["z_value"] = 30.3
+>>> config["velocity"] = {}
+>>> config["velocity"]["filename"] = "vel.dat"
+>>> config["velocity"]["type"] = "RAW"
+>>> config.dump()
+x_value = 10.1
+y_value = 20.2
+[data]
+    alpha = 20
+    name = 'first experiment'
+z_value = 30.3
+[velocity]
+    filename = 'vel.dat'
+    type = 'RAW'
+>>> del config['data']
+>>> config.dump()
+x_value = 10.1
+y_value = 20.2
+z_value = 30.3
+[velocity]
+    filename = 'vel.dat'
+    type = 'RAW'
+>>>
+
 """
 
 __author__ = "Simone Campagna"
@@ -37,39 +67,6 @@ from .deferred_object import ROOT, SECTION
 class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
     """Config(init=None, *, dictionary=None, defaults=True, schema=None, validate=True, interpolation=True)
        Config class.
-
-       >>> import collections
-       >>> config = Config()
-       >>> config['x_value'] = 10.1
-       >>> config['y_value'] = 20.2
-       >>> config['data'] = collections.OrderedDict((
-       ...     ('alpha', 20),
-       ...     ('name', 'first experiment'),
-       ... ))
-       >>> config['z_value'] = 30.3
-       >>> config['velocity'] = collections.OrderedDict((
-       ...     ('filename', 'vel.dat'),
-       ...     ('type', 'RAW'),
-       ... ))
-       >>> config.dump()
-       x_value = 10.1
-       y_value = 20.2
-       [data]
-           alpha = 20
-           name = 'first experiment'
-       z_value = 30.3
-       [velocity]
-           filename = 'vel.dat'
-           type = 'RAW'
-       >>> del config['data']
-       >>> config.dump()
-       x_value = 10.1
-       y_value = 20.2
-       z_value = 30.3
-       [velocity]
-           filename = 'vel.dat'
-           type = 'RAW'
-       >>>
     """
 
     def __init__(self, init=None, *, dictionary=None, defaults=True,

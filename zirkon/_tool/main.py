@@ -16,9 +16,7 @@
 #
 
 """
-zirkon._tool.main
-=================
-Main Zirkon tool program.
+Main 'zirkon' tool program.
 """
 
 __author__ = "Simone Campagna"

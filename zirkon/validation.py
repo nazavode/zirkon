@@ -16,8 +16,7 @@
 #
 
 """\
-zirkon.validation
-=================
+Implementation of the Validation class.
 """
 
 __author__ = "Simone Campagna"

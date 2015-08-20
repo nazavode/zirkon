@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.str_validators
-===============================
-Implementation of the str validator classes
+Implementation of the Str validator classes.
 """
 
 __author__ = "Simone Campagna"

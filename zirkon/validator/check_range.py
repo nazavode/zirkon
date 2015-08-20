@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_range
-============================
-Implementation of the CheckMin and CheckMax classes
+Implementation of the CheckMin, CheckMax, CheckMinLen, CheckMaxLen check classes.
 """
 
 __author__ = "Simone Campagna"

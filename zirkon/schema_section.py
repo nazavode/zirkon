@@ -16,9 +16,7 @@
 #
 
 """
-zirkon.schema_section
-=====================
-Implementation of the SchemaSection class
+Implementation of the SchemaSection class, implementing the validate method.
 """
 
 __author__ = "Simone Campagna"

@@ -48,7 +48,7 @@ Zirkon configuration data are internally stored on a dict-like object, by defaul
  >>> with tempfile.TemporaryDirectory() as tdir:
  ...     tfile = os.path.join(tdir, 'x.shelf')
  ...     shelf = shelve.open(tfile)
- ...     from zirkon.toolbox.flatmap import FlatMap
+ ...     from zirkon.flatmap import FlatMap
  ...     flatshelf = FlatMap(dictionary=shelf)
  ...     config = Config(dictionary=flatshelf)
  ...     config['sub'] = {}

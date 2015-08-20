@@ -16,9 +16,8 @@
 #
 
 """
-zirkon.toolbox.registry
-=======================
-Implementation of a Registry base class
+Implementation of a Registry base class, providing methods to find
+subclasses by name.
 """
 
 __author__ = "Simone Campagna"

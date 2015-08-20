@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_type
-===========================
-Implementation of the CheckType class
+Implementation of the CheckType check class.
 """
 
 __author__ = "Simone Campagna"

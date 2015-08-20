@@ -16,9 +16,7 @@
 #
 
 """\
-zirkon.validator.check_default
-==============================
-Implementation of the CheckDefault class
+Implementation of the CheckDefault check class.
 """
 
 __author__ = "Simone Campagna"

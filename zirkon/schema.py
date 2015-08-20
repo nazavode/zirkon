@@ -16,8 +16,7 @@
 #
 
 """\
-zirkon.schema
-=============
+Schema class.
 """
 
 __author__ = "Simone Campagna"

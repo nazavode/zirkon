@@ -16,8 +16,6 @@
 #
 
 """\
-zirkon.toolbox.unrepr
-=====================
 Implementation of the 'unrepr' function, which does unrepr of
 python builtin types (int, str, float, bool, list, tuple).
 """
