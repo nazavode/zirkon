@@ -30,12 +30,12 @@ from .identifier import is_valid_identifier
 
 
 class FlatMap(collections.abc.Mapping):
-    """FlatMap(init=None, *, dictionary=None, prefix='')
+    """FlatMap(dictionary, *, init=None, ='')
        FlatMap implements a standard mapping using a flattened internal
        representation. The internal storage is provided by a standard dictionary
        (dict, OrderedDict).
 
-       >>> flatmap = FlatMap()
+       >>> flatmap = FlatMap(collections.OrderedDict())
        >>> flatmap['a'] = 10
        >>> flatmap['sub'] = {}
        >>> flatmap['sub']['x'] = 1
@@ -55,7 +55,7 @@ class FlatMap(collections.abc.Mapping):
     DOT = '.'
     SUBMAP_PLACEHOLDER = None
 
-    def __init__(self, init=None, *, dictionary=None, prefix=''):
+    def __init__(self, dictionary, *, init=None, prefix=''):
         if dictionary is None:
             dictionary = self.dictionary_factory()
         self.dictionary = dictionary
@@ -256,7 +256,7 @@ class FlatMap(collections.abc.Mapping):
         if hasattr(self.dictionary, 'copy'):
             return self.__class__(dictionary=self.dictionary.copy())
         else:
-            return self.__class__(init=self.dictionary)
+            return self.__class__(self.dictionary_factory(), init=self.dictionary)
 
     def as_dict(self, *, dict_class=collections.OrderedDict):
         """as_dict(self, *, dict_class=collections.OrderedDict) -> dict

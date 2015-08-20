@@ -62,7 +62,7 @@ def protocol(request):
 def string_io():
     return io.StringIO()
 
-_dictionary_classes = [dict, collections.OrderedDict, type(None), FlatMap]
+_dictionary_classes = [dict, collections.OrderedDict, type(None), lambda: FlatMap(collections.OrderedDict())]
 @pytest.fixture(params=_dictionary_classes, ids=[cc.__name__ for cc in _dictionary_classes])
 def generic_dictionary(request):
     dictionary_class = request.param

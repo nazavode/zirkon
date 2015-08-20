@@ -58,7 +58,7 @@ def flatten(d, prefix=''):
 
 @pytest.fixture
 def flatmap(content):
-    return FlatMap(init=content)
+    return FlatMap(collections.OrderedDict(), init=content)
 
 _key_errors = [
     (10, TypeError),
@@ -76,20 +76,20 @@ def iterattribute(request):
     return request.param
 
 def test_FlatMap_create():
-    flatmap = FlatMap()
+    flatmap = FlatMap(collections.OrderedDict())
     assert len(flatmap) == 0
     assert isinstance(flatmap.dictionary, collections.OrderedDict)
     assert len(flatmap.dictionary) == 0
 
 def test_FlatMap_create_init_flat(flat_content):
-    flatmap = FlatMap(init=flat_content)
+    flatmap = FlatMap(collections.OrderedDict(), init=flat_content)
     assert len(flatmap) == len(flat_content)
     assert flatmap.dictionary == flat_content
     assert flatmap.dictionary is not flat_content
     assert isinstance(flatmap['a'], int)
 
 def test_FlatMap_create_init(content):
-    flatmap = FlatMap(init=content)
+    flatmap = FlatMap(collections.OrderedDict(), init=content)
     assert len(flatmap) == len(content)
     assert flatmap.dictionary != content
     flattened_content = flatten(content)
@@ -101,7 +101,7 @@ def test_FlatMap_create_init(content):
     assert flatmap.prefix != flatmap['sub'].prefix
 
 def test_FlatMap_create_init_pos(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     assert len(flatmap) == len(content)
     assert flatmap.dictionary != content
     flattened_content = flatten(content)
@@ -113,14 +113,14 @@ def test_FlatMap_create_init_pos(content):
     assert flatmap.prefix != flatmap['sub'].prefix
 
 def test_FlatMap_create_dictionary_flat(flat_content):
-    flatmap = FlatMap(dictionary=flat_content)
+    flatmap = FlatMap(flat_content)
     assert len(flatmap) == len(flat_content)
     assert flatmap.dictionary == flat_content
     assert flatmap.dictionary is flat_content
     assert isinstance(flatmap['a'], int)
 
 def test_FlatMap_get(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     value = flatmap.get('a', 123)
     assert value == 10
     value = flatmap.get('A', 123)
@@ -130,10 +130,10 @@ def test_FlatMap_get(content):
     assert value.dictionary == flatmap.dictionary
     assert value.dictionary is flatmap.dictionary
     assert value.prefix != flatmap.prefix
-    assert value == FlatMap(init=content['sub'])
+    assert value == FlatMap(None, init=content['sub'])
 
 def test_FlatMap_set(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     flatmap['b'] = 100
     flatmap['sub'] = {'z': 888}
     assert flatmap == collections.OrderedDict([
@@ -146,7 +146,7 @@ def test_FlatMap_set(content):
     ])
 
 def test_FlatMap_set_par_err(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     with pytest.raises(ValueError) as exc_info:
         flatmap['b'] = {}
     assert str(exc_info.value) == "cannot replace key b with submap"
@@ -155,36 +155,36 @@ def test_FlatMap_set_par_err(content):
     assert str(exc_info.value) == "cannot replace key sub.x with submap"
 
 def test_FlatMap_set_sub_err(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     with pytest.raises(ValueError) as exc_info:
         flatmap['sub'] = 'alpha'
     assert str(exc_info.value) == "cannot replace submap sub with key"
 
 def test_FlatMap_has_key(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     assert flatmap.has_key('a')
     assert flatmap.has_key('sub')
     assert not flatmap.has_key('d')
 
 def test_FlatMap_same_dict(content):
-    flatmap = FlatMap(content)
-    flatmap2 = FlatMap(dictionary=flatmap.dictionary)
+    flatmap = FlatMap(None, init=content)
+    flatmap2 = FlatMap(flatmap.dictionary)
     assert flatmap2 == flatmap
 
 def test_FlatMap_same_dict_prefix(content):
-    flatmap = FlatMap(content)
-    flatmap2 = FlatMap(dictionary=flatmap.dictionary, prefix='sub.')
+    flatmap = FlatMap(None, init=content)
+    flatmap2 = FlatMap(flatmap.dictionary, prefix='sub.')
     assert flatmap2 != flatmap
     assert flatmap2 == flatmap['sub']
 
 def test_FlatMap_clear(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     flatmap.clear()
     assert len(flatmap) == 0
     assert len(flatmap.dictionary) == 0
 
 def test_FlatMap_sub_clear(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     lf = len(flatmap)
     ld = len(flatmap.dictionary)
     lfs = len(flatmap['sub'])
@@ -194,7 +194,7 @@ def test_FlatMap_sub_clear(content):
     assert len(flatmap['sub'].dictionary) == len(flatmap.dictionary)
 
 def test_FlatMap_key_type_err(content, key_error):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     key, error = key_error
     with pytest.raises(error):
         flatmap[key] = 1
@@ -208,7 +208,7 @@ def test_FlatMap_key_type_err(content, key_error):
         flatmap.update({key: 'anything'})
 
 def test_FlatMap_key_err(content, key_error):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     key, error = key_error
     with pytest.raises(error):
         a = flatmap[key]
@@ -220,27 +220,27 @@ def test_FlatMap_key_err(content, key_error):
         flatmap.update({key: 'anything'})
 
 def test_FlatMap_keys(flat_content, iterattribute):
-    flatmap = FlatMap(flat_content)
+    flatmap = FlatMap(None, init=flat_content)
     l0 = list(getattr(flatmap, iterattribute)())
     l1 = list(getattr(flat_content, iterattribute)())
     assert l0 == l1
 
 def test_FlatMap_copy(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     flatmap2 = flatmap.copy()
     assert flatmap2 == flatmap
     
 def test_FlatMap_copy(content):
-    flatmap = FlatMap(content)
+    flatmap = FlatMap(None, init=content)
     dct = flatmap.as_dict()
     assert dct == content
     
 def test_FlatMap_eq_ne(content):
-    flatmap0 = FlatMap(content)
-    flatmape = FlatMap(content.copy())
-    flatmap1 = FlatMap(content.copy())
-    flatmap2 = FlatMap(content.copy())
-    flatmap3 = FlatMap(content.copy())
+    flatmap0 = FlatMap(None, init=content)
+    flatmape = FlatMap(None, init=content.copy())
+    flatmap1 = FlatMap(None, init=content.copy())
+    flatmap2 = FlatMap(None, init=content.copy())
+    flatmap3 = FlatMap(None, init=content.copy())
     flatmap1['x'] = 10001
     flatmap2['sub']['x'] = 'alpha'
     del flatmap3['sub']['x']
@@ -253,7 +253,7 @@ def test_FlatMap_eq_ne(content):
     assert flatmap3 != flatmap0
 
 def test_FlatMap_bool(content):
-    flatmap = FlatMap()
+    flatmap = FlatMap(None)
     assert not flatmap
     flatmap['x'] = 0
     assert flatmap

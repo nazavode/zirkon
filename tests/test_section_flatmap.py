@@ -58,13 +58,13 @@ c = 30
 """
 
 def test_Section_create(content, string_io):
-    section = Section(dictionary=FlatMap(), init=content)
+    section = Section(dictionary=FlatMap(collections.OrderedDict()), init=content)
     section.dump(stream=string_io)
     assert string_io.getvalue() == SECTION_DUMP
 
 def test_Section_2(content):
-    section = Section(dictionary=FlatMap(), init=content)
-    section2 = Section(dictionary=FlatMap(), init=content)
+    section = Section(dictionary=FlatMap(collections.OrderedDict()), init=content)
+    section2 = Section(dictionary=FlatMap(collections.OrderedDict()), init=content)
     s_io = string_io()
     section.dump(stream=s_io)
     assert s_io.getvalue() == SECTION_DUMP
