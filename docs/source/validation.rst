@@ -1,15 +1,32 @@
 .. _intro:
 
-==================
- The Schema class
-==================
+===================
+ Zirkon validation
+===================
 
-The *Schema* class is a *Config* subclass, adding methods to validate a config. Moreover, it accepts only *Validator* instances as values.
+The Schema class
+================
 
-A *Validator* is used to validate a key/value; all validators check for a specific type value; if the value type does not match, an *InvalidTypeError* exception is produces.
+The *Schema* class is a *Config* subclass containing the ``validate`` method to validate a config. It accepts only *Validator* instances as values; *Validators* are used to validate the value of an option.
+In casse of errors, *Validators* raise a specific *OptionValidationError* exception. By default, the ``Schema.validate`` method collects all these xceptions and puts it in a *Validation* object (another *Config* subclass accepting *OptionValidationError* values).
+
+Most of the validators check for a specific value type; if the type does not match, an *InvalidTypeError* exception is produced. They can additionally perform other checks.
+
+A validator can
+
+* add an option to the config;
+* remove an option from the config;
+* change an option value.
+
+
+Standard validators
+===================
+
+This is the list of predefided validators:
 
  +------------+---------------------+------------------+
  |Validator   |Basic validation     |Accepted Arguments|
+ |name        |                     |                  |
  +------------+---------------------+------------------+
  |Int         |An integer value     |* default         |
  |            |                     |* min             |
@@ -93,19 +110,19 @@ A *Validator* is used to validate a key/value; all validators check for a specif
  |            |of prefedifed choices|                  |
  +------------+---------------------+------------------+
 
-The explanation of the arguments is:
+The explanation of the accepted arguments is:
 
-- *default*: if provided, it  sets a default value for the value; if the corresponding key is missing from the validated section, the default is added. If a key is missing from the validated section and the corresponding *Validator* does not define a default, a *MissingRequiredOptionError* exception is produced;
-- *min*, *max*: if provided, it sets a minimum/maximum value for the value; if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
-- *min_len*, *max_len*: if provided, it sets a minimum/maximum length for the value (sequences or strings); if the corresponding value does not match, a *MinValueError*/*MaxValueError* exception is produced;
+- *default*: if provided, it  sets a default value for the option; if the key is missing from the validated config, the option is added with *default* as value. If a key is missing from the validated config and the corresponding *Validator* does not define a default, a *MissingRequiredOptionError* exception is produced;
+- *min*, *max*: if provided, it sets a minimum/maximum value for the value; if the option value does not match, a *MinValueError*/*MaxValueError* exception is produced;
+- *min_len*, *max_len*: if provided, it sets a minimum/maximum length for the value (sequences or strings); if the corresponding option value does not match, a *MinLengthError*/*MaxLengthError* exception is produced;
 - *item_min*, *item_max*, *item_min_len*, *item_max_len*: the same as *min*, *max*, *min_len* and *max_len*, but they are applied to all the sequence items (for List and Tuple validators only).
-- **choices**: only for Choice validators; it is mandatory and defines the set of accepted values. If the value does not match, an InvalidChoiceError is produced.
+- *choices*: only for the Choice validators; it is mandatory and defines the set of accepted values. If the option value is not a valid choice, an InvalidChoiceError is produced.
 
-A validator can also change the section content; for instance, 
+All these validators can change the option value; for instance:
 
 - each validator can set the default value;
-- the floating point validators accept integer values, but they are converted to *floats*;
-- the boolean validators accept integer values, but they are converted to *bools*;
+- the floating point validators accept integer values, but they are converted to *float*;
+- the boolean validators accept integer values, but they are converted to *bool*.
 
 For instance:
 
@@ -125,7 +142,8 @@ This schema requires that the *filenames* value is a list of strings with at lea
 
 
 Unexpected options
-------------------
+==================
+
 The *Schema* class accepts an *unexpected_option_validator* argument to be used to validate all the options found in the *config* but not in the *schema*. Any validator is acceptable, anyway three validators are especially thought for this purpose:
 
  +-------------------+---------------------------------------+

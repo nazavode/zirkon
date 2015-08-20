@@ -16,8 +16,8 @@
 #
 
 """\
-sizrkon.validation
-==================
+zirkon.validation
+=================
 """
 
 __author__ = "Simone Campagna"

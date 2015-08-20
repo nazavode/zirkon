@@ -14,7 +14,7 @@ What is Zirkon
 .. sidebar:: Requirements
     :subtitle: Zirkon requires only
 
-    - Python 3.4
+    - Python >= 3.4
 
 Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation and value interpolation.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.

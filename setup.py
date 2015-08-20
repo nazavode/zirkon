@@ -69,8 +69,7 @@ if __name__ == "__main__":
     data_files = []
     for data_dirname, patterns in [('requirements', ('*.txt', )),
                                    ('docs/source', ('conf.py', '*.rst')),
-                                   ('docs/source/getting-started', ('*.rst',)),
-                                   ('docs/source/userguide', ('*.rst',)),
+                                   ('docs/source/examples', ('*.rst',)),
                                    ('docs/source/img', ('*.png',)),
                                    ('.', ('tox.ini', 'pylint.ini', 'flake8.ini',)),
                                   ]:

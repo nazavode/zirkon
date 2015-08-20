@@ -158,6 +158,8 @@ Since a *default* value has been provided to the ``Int`` *Validator*, it is acce
  10
  >>>
 
+The :ref:`validation` guide lists all the svailable validators and their arguments.
+
 Validation errors
 -----------------
 

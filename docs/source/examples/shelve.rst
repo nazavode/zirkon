@@ -4,23 +4,29 @@
  Using a shelve
 ================
 
-This example shows how to add dynamic persistency to the configuration data; all the information is immediately registered on a persistent database. This is done by using a ``shelve.Shelf`` as internal dictionary.
+This example shows how to add persistency to the configuration data; all the information is immediately registered on a persistent database. This is done by using a ``shelve.Shelf`` as internal dictionary.
 
 
+ >>> from collections import OrderedDict
  >>> import os
  >>> import shelve
  >>> import tempfile
+ >>> from zirkon.config import Config
+ >>> from zirkon.toolbox.flatmap import FlatMap
+
  >>> with tempfile.TemporaryDirectory() as tdir:
  ...     tfile = os.path.join(tdir, 'x.shelf')
- ...     shelf = shelve.open(tfile)
- ...     from zirkon.toolbox.flatmap import FlatMap
- ...     flatshelf = FlatMap(dictionary=shelf)
- ...     config = Config(dictionary=flatshelf)
- ...     config['sub'] = {}
- ...     config['sub']['filename'] = "x.dat"
- ...     config['sub']['data'] = {'max': 100}
- ...     config['sub']['alpha'] = 1.05
- ...     print(config['sub']['data']['max'])
+ ...     with shelve.open(tfile) as shelf:
+ ...         config = Config(dictionary=FlatMap(shelf))
+ ...         config['sub'] = {}
+ ...         config['sub']['filename'] = "x.dat"
+ ...         config['sub']['data'] = {'max': 100}
+ ...         config['sub']['alpha'] = 1.05
+ ...     # the shelf has been closed
+ ...     # reopen the shelf:
+ ...     with shelve.open(tfile) as shelf:
+ ...         config = Config(dictionary=FlatMap(shelf))
+ ...         print(config['sub']['data']['max'])
  100
  >>>
 

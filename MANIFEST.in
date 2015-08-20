@@ -1,8 +1,7 @@
 include requirements/*.txt
 include docs/source/conf.py
 include docs/source/*.rst
-include docs/source/getting-started/*.rst
-include docs/source/userguide/*.rst
+include docs/source/examples/*.rst
 include docs/source/img/*.png
 include tox.ini
 include pylint.ini

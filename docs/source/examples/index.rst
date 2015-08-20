@@ -1,5 +1,5 @@
 ===========
- Userguide
+ Examples
 ===========
 
 :Release: |version|
