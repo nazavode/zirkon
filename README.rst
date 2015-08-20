@@ -4,19 +4,27 @@ A python configuration library. Zirkon requires python >= 3.4.
 
 .. image:: https://travis-ci.org/simone-campagna/zirkon.svg?branch=master
     :target: https://travis-ci.org/simone-campagna/zirkon
+    :alt: Build status
+
+.. image:: https://readthedocs.org/projects/zirkon/badge/?version=latest
+    :target: https://readthedocs.org/projects/zirkon/?badge=latest
+    :alt: Documentation status
 
 .. image:: https://coveralls.io/repos/simone-campagna/zirkon/badge.svg?branch=master&service=github
-  :target: https://coveralls.io/github/simone-campagna/zirkon?branch=master
+    :target: https://coveralls.io/github/simone-campagna/zirkon?branch=master
+    :alt: Coverage report
 
 .. image:: https://codeclimate.com/github/simone-campagna/zirkon/badges/gpa.svg
-   :target: https://codeclimate.com/github/simone-campagna/zirkon
-   :alt: Code Climate
+    :target: https://codeclimate.com/github/simone-campagna/zirkon
+    :alt: Code Climate
 
 .. image:: https://badge.fury.io/py/zirkon.svg
     :target: http://badge.fury.io/py/zirkon
+    :alt: PyPI version
 
 .. image:: https://badge.fury.io/gh/simone-campagna%2Fzirkon.svg
     :target: http://badge.fury.io/gh/simone-campagna%2Fzirkon
+    :alt: Github version
 
 What is zirkon
 --------------
