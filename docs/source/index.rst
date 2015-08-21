@@ -18,6 +18,7 @@ Zirkon requires python version 3.4.
     first-steps
     validation
     examples/index
+    tool
 
 The zirkon package
 ------------------
