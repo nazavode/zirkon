@@ -26,52 +26,15 @@ A python configuration library. Zirkon requires python >= 3.4.
     :target: http://badge.fury.io/gh/simone-campagna%2Fzirkon
     :alt: Github version
 
+.. image:: https://img.shields.io/badge/license-Apache2.0-blue.svg
+    :target: http://opensource.org/licenses/Apache2.0
+    :alt: License
+
+
 What is zirkon
 --------------
 
 Zirkon is a python library to handle configuration data. It behaves like a dictionary, and supports nested sections:
-
- >>> from zirkon.config import Config
- >>> config = Config()
- >>> config['num'] = 10
- >>> config['mode'] = 'xy'
- >>> config['sub'] = {'enable': True}
- >>> config['sub']['x'] = 1.5
- >>> config['sub']['y'] = -1.5
- >>> config['name'] = 'alpha'
- >>> config['w'] = 5
- >>> config.dump()
- num = 10
- mode = 'xy'
- [sub]
-     enable = True
-     x = 1.5
-     y = -1.5
- name = 'alpha'
- w = 5
-
-
-
- >>> from zirkon.config import Config
- >>> config = Config()
- >>> config['num'] = 10
- >>> config['mode'] = 'xy'
- >>> config['sub'] = {'enable': True}
- >>> config['sub']['x'] = 1.5
- >>> config['sub']['y'] = -1.5
- >>> config['name'] = 'alpha'
- >>> config['w'] = 5
- >>> config.dump()
- num = 10
- mode = 'xy'
- [sub]
-     enable = True
-     x = 1.5
-     y = -1.5
- name = 'alpha'
- w = 5
-
-
 
  >>> from zirkon.config import Config
  >>> config = Config()
