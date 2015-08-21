@@ -16,7 +16,7 @@ What is Zirkon
 
     - Python >= 3.4
 
-Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation and macros.
+Zirkon is a python library to manage configuration information. It implements multiple `serialization protocols`_, generic `validation`_, `default values`_ and `macros`_.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
@@ -64,10 +64,12 @@ It is possible to explicitly set this internal dictionary:
  >>> dct
  {'x': 1}
 
-Multiple file serializations
-----------------------------
+.. _serialization protocols:
 
-Zirkon supports multiple serialization methods; currently four are
+Multiple serialization protocols
+--------------------------------
+
+Zirkon supports multiple serialization protocols; currently four are
 available:
 
  +---------+--------+---------------------------------------------------------------+
@@ -75,8 +77,8 @@ available:
  +=========+========+===============================================================+
  |zirkon   |text    |the native protocol; it implements a nested INI file           |
  +---------+--------+---------------------------------------------------------------+
- |configobj|raw     |partially compatible with ConfigObj using the ``unrepr`` option|
- |         |        |see http://www.voidspace.org.uk/python/configobj.html          |
+ |configobj|raw     |partially compatible with ConfigObj format using the ``unrepr``|
+ |         |        |option, see http://www.voidspace.org.uk/python/configobj.html  |
  +---------+--------+---------------------------------------------------------------+
  |json     |text    |JSON serialization                                             |
  +---------+--------+---------------------------------------------------------------+
@@ -106,6 +108,8 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirko
  x = 10
  [subsection]
      y = 'alpha'
+
+.. _validation:
 
 Validation
 ----------
@@ -138,10 +142,12 @@ Since the validator for *y* sets a default value and the key is missing from con
 
 There list of available Validators can be easily extended.
 
-Defaults
---------
+.. _default values:
 
-Zirkon supports default values; these values are stored in a separated space, not in the dictionary, and they are not serialized; nevertheless they can be accessed as normal values:
+Default values
+--------------
+
+Zirkon supports default values. Defaults are stored in a separated space, not in the dictionary, and they are not serialized; nevertheless they can be accessed as normal values:
 
  >>> defaults = {'x': 1.0, 'y': 2.0}
  >>> config = Config(defaults=defaults)
@@ -186,6 +192,8 @@ It is possible to disable defaults by simply setting defaults to *None*:
  t = 789
 
 In this case the default value set during the validation is stored in the dictionary as a standard value.
+
+.. _macros:
 
 Macros
 ------
