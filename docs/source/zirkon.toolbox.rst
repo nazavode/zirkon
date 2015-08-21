@@ -15,12 +15,12 @@ Submodules
 
    zirkon.toolbox.catalog
    zirkon.toolbox.compose
-   zirkon.toolbox.deferred
    zirkon.toolbox.deferred_eval
    zirkon.toolbox.dictutils
    zirkon.toolbox.files
    zirkon.toolbox.identifier
    zirkon.toolbox.loader
+   zirkon.toolbox.macro
    zirkon.toolbox.registry
    zirkon.toolbox.singleton
    zirkon.toolbox.subclass

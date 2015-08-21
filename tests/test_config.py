@@ -586,23 +586,23 @@ def test_Config_sub_setdef():
         config['sub'].defaults = {'a': 200}
     assert config['sub']['a'] == 100
 
-def test_Config_err_disabled_interpolation():
-    config = Config(interpolation=False)
+def test_Config_err_disabled_macros():
+    config = Config(macros=False)
     config['x'] = 10
     config['sub'] = {'sub': {}}
     with pytest.raises(ValueError) as exc_info:
         config['y'] = ROOT['x'] + 1
-    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: macros are not enabled"
     with pytest.raises(ValueError) as exc_info:
         config['sub']['sub']['y'] = ROOT['x'] + 1
-    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
-    config.interpolation = True
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: macros are not enabled"
+    config.macros = True
     config['sub']['sub']['y'] = ROOT['x'] + 1
     assert config['sub']['sub']['y'] == 11
-    config.interpolation = False
+    config.macros = False
     with pytest.raises(ValueError) as exc_info:
         c = config['sub']['sub']['y']
-    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: interpolation is not enabled"
+    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: macros are not enabled"
 
 def test_Config_change_defaults():
     config1 = Config(defaults=True)

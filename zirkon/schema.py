@@ -60,7 +60,7 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
 
     """
     def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None, self_validate=True):
-        super().__init__(dictionary=dictionary, init=init, interpolation=True,
+        super().__init__(dictionary=dictionary, init=init, macros=True,
                          unexpected_option_validator=unexpected_option_validator)
         if self_validate:
             schema_validator = self._subsection_class()(dictionary=None,

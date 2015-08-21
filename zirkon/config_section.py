@@ -61,8 +61,8 @@ class ConfigSection(Section):
            the parent Section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
        defaults: bool, optional
            enables defaults
 
@@ -74,17 +74,17 @@ class ConfigSection(Section):
            the parent Section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
-                 defaults=True, interpolation=True):
+                 defaults=True, macros=True):
         self._set_defaults(defaults)
         super().__init__(init=init, dictionary=dictionary, parent=parent,
-                         name=name, interpolation=interpolation)
+                         name=name, macros=macros)
 
     def _set_defaults(self, value):
         """Set defaults attribute
@@ -134,7 +134,7 @@ class ConfigSection(Section):
         else:
             subdefaults = None
         return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        interpolation=self.interpolation,
+                                        macros=self.macros,
                                         name=section_name, defaults=subdefaults)
 
     def set_defaults(self, **kwargs):

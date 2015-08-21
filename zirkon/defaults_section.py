@@ -59,8 +59,8 @@ class DefaultsSection(Section):
            the parent Section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
        reference_root: Section, optional
            the reference root
 
@@ -73,16 +73,16 @@ class DefaultsSection(Section):
            the parent Section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
        reference_root: Section, optional
            the reference root
     """
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
-                 interpolation=True, reference_root=None):
+                 macros=True, reference_root=None):
         self.reference_root = reference_root
         super().__init__(init=init, dictionary=dictionary, parent=parent,
-                         interpolation=interpolation, name=name)
+                         macros=macros, name=name)
 
     @classmethod
     def _subsection_class(cls):
@@ -90,7 +90,7 @@ class DefaultsSection(Section):
 
     def _subsection(self, section_name, dictionary):
         return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        interpolation=self.interpolation,
+                                        macros=self.macros,
                                         name=section_name, reference_root=self.get_reference_root())
 
     @contextlib.contextmanager

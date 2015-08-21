@@ -58,8 +58,8 @@ class ConfigBase(Section):
              the validation schema
          validate: bool, optional
              self validate during initialization;
-         interpolation: bool, optional
-             enables interpolation (defaults to True);
+         macros: bool, optional
+             enables macros (defaults to True);
          \*\*section_options:
              keyword arguments to be passed to the Section contructor
 
@@ -69,14 +69,14 @@ class ConfigBase(Section):
              the internal dictionary
          schema: Schema, optional
              the validation schema
-         interpolation: bool, optional
-             enables interpolation (defaults to True);
+         macros: bool, optional
+             enables macros (defaults to True);
     """
 
     def __init__(self, init=None, *, dictionary=None, schema=None, validate=True,
-                 interpolation=True, **section_options):
+                 macros=True, **section_options):
         super().__init__(dictionary=dictionary, init=init,
-                         interpolation=interpolation, **section_options)
+                         macros=macros, **section_options)
         self.set_schema(schema=schema, validate=validate)
 
     def set_schema(self, schema, *, validate=True):
