@@ -38,6 +38,15 @@ class Validator(Registry):
             the argument store
         \*\*arguments: dict
             the actual arguments
+
+        Attributes
+        ----------
+        argument_store: ArgumentStore, optional
+            the argument store
+        actual_arguments: OrderedDict
+            the actual arguments
+        checks: Composer
+            the checks composer
     """
     CHECK_COMPOSER = None
 
@@ -67,8 +76,8 @@ class Validator(Registry):
 
            Returns
            -------
-           Composer
-               the check composer
+           tuple
+               a 2-tuple containing (actual_arguments, check_composer)
         """
         return self.CHECK_COMPOSER.partial(argument_store, prefix=prefix)
 

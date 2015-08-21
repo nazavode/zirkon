@@ -48,6 +48,11 @@ class Check(metaclass=abc.ABCMeta):
                the option to be checked
            section: Section
                the containing section
+
+           Raises
+           ------
+           OptionValidationError
+               validation error
         """
         raise NotImplementedError
 

@@ -239,6 +239,11 @@ class Composer(object):
     def verify_argument_store(cls, argument_store):
         """Raises a TypeError in case of unused arguments.
 
+           Raises
+           ------
+           TypeError
+               unexpected arguments
+
            Parameters
            ----------
            argument_store: ArgumentStore
@@ -261,6 +266,11 @@ class Composer(object):
                the argument store
            prefix: str, optional
                an optional key prefix
+
+           Raises
+           ------
+           TypeError
+               missing required argument
 
            Returns
            -------

@@ -80,7 +80,15 @@ def get_config_class(config):
        config: any
            a config object, config class or config class name
 
-       Returns:
+       Raises
+       ------
+       TypeError
+           unsupported config class
+       ValueError
+           unsupported config class name, invalid object
+
+       Returns
+       -------
        ConfigBase
            the requested config class
     """
@@ -156,8 +164,13 @@ def guess(filepath, *, config_classes=None, protocols=None):
        protocols: tuple, optional
            a tuple of protocols to restrict search
 
-       Returns
-       -------
+       Raises
+       ------
+       ValueError
+           invalid class/invalid protocol
+
+       Yields
+       ------
        FileType
            the guessed filetype
     """
@@ -208,10 +221,16 @@ def classify(directory, config_classes=None, protocols=None):
        protocols: tuple, optional
            a tuple of protocols to restrict search
 
-       Returns
-       -------
-       iterator
-           iterator over found FileTypes
+       Raises
+       ------
+       ValueError
+           invalid class/invalid protocol
+
+
+       Yields
+       ------
+       FileType
+           the found filetype object
     """
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
@@ -226,10 +245,11 @@ def classify(directory, config_classes=None, protocols=None):
 def search_paths():
     """Returns the standard search paths
 
-       Returns
-       -------
-       iterator
-           iterates over (search_paths, classes)
+       Yields
+       ------
+       tuple
+           a 2-tuple containing (directory, config_classes), where config_classes is
+           a tuple of Config classes
     """
     yield os.getcwd(), _CONFIG_CLASSES
     if 'ZIRKON_CONFIG_PATH' in os.environ:
@@ -249,6 +269,11 @@ def discover(*directories, standard_paths=True):
            each directory can be a pattern or tuple (pattern, config_classes)
         standard_paths: bool, optional
             if True, add standard search_paths
+
+        Yields
+        ------
+        FileType
+            the found filetype objects
     """
     directory_d = collections.OrderedDict()
     if standard_paths:
@@ -283,10 +308,16 @@ def search_rootname(rootname, *, config_classes=None, protocols=None):
        protocols: tuple, optional
            a tuple of protocols to restrict search
 
-       Returns
-       -------
-       iterator
-           iterator over found FileTypes
+       Raises
+       ------
+       ValueError
+           invalid class/invalid protocol
+
+
+       Yields
+       ------
+       FileType
+           the found filetype objects
     """
     config_classes = _set_config_classes(config_classes)
     protocols = _set_protocols(protocols)
@@ -325,10 +356,10 @@ def search_filetype(filetype):
        protocols: tuple, optional
            a tuple of protocols to restrict search
 
-       Returns
-       -------
-       iterator
-           iterator over found FileTypes
+       Yields
+       ------
+       FileType
+           the found filetype objects
     """
     if filetype.config_class is None:
         config_classes = None

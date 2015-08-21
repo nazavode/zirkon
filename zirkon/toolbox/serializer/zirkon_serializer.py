@@ -42,6 +42,11 @@ def _parse_mapping(line, line_number, filename):
        filename: str
            the file name
 
+       Raises
+       -------
+       ValueError
+           unparsable line
+
        Returns
        -------
        str

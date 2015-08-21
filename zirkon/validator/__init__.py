@@ -150,6 +150,11 @@ def _setup_codecs():
                repr_data: str
                    the errors's representation
 
+               Raises
+               ------
+               NameError
+                   class not found
+
                Returns
                -------
                OptionValidationError
@@ -235,6 +240,12 @@ def _setup_codecs():
                    the type name
                args: tuple
                    the errors's args
+
+               Raises
+               ------
+               NameError
+                   class not found
+
 
                Returns
                -------

@@ -149,10 +149,10 @@ class Registry(object):
            include_abstract: bool, optional
                if True, includes also "abstract" classes
 
-           Returns
-           -------
-           iterator
-               iterator over class tags
+           Yields
+           ------
+           str
+               the found class tags
         """
         for class_tag in cls.class_dict(include_self=include_self,
                                         include_abstract=include_abstract):

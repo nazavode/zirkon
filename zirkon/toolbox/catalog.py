@@ -40,6 +40,14 @@ class Catalog(object):
        default_factory: callable
            the function providing default values when a match cannot be found
            (defaults to 'lambda: None')
+
+       Attributes
+       ----------
+       default_factory: callable
+           the function providing default values when a match cannot be found
+           (defaults to 'lambda: None')
+       class_info: OrderedDict
+           the class info dictionary
     """
 
     def __init__(self, default_factory=lambda: None):

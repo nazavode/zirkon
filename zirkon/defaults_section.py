@@ -62,6 +62,19 @@ class DefaultsSection(Section):
        reference_root: Section, optional
            the reference root
 
+
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent Section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
+       reference_root: Section, optional
+           the reference root
     """
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
                  interpolation=True, reference_root=None):
@@ -87,10 +100,10 @@ class DefaultsSection(Section):
            section: ConfigSection
                a section to be temporarily used as reference_root
 
-           Returns
-           -------
-           context-manager
-               the context manager for temporary substitution of reference_root
+           Yields
+           ------
+           self
+               the defaults section itself
         """
         saved_reference_root = self.reference_root
         reference_root = section.get_reference_root()

@@ -56,6 +56,11 @@ class CheckMin(CheckRange):
        ----------
        min: any, optional
            the min value
+
+       Attributes
+       ----------
+       min: any, optional
+           the min value
     """
     ATTRIBUTE_NAME = 'min'
 
@@ -77,6 +82,11 @@ class CheckMax(CheckRange):
     """Checks if value is <= max.
 
        Parameters
+       ----------
+       max: any, optional
+           the max value
+
+       Attributes
        ----------
        max: any, optional
            the max value
@@ -104,6 +114,11 @@ class CheckMinLen(Check):
        ----------
        min_len: any, optional
            the min length
+
+       Attributes
+       ----------
+       min_len: any, optional
+           the min length
     """
 
     def __init__(self, min_len=None):
@@ -126,6 +141,11 @@ class CheckMaxLen(Check):
     """Checks if value length is >= max_len.
 
        Parameters
+       ----------
+       max_len: any, optional
+           the max length
+
+       Attributes
        ----------
        max_len: any, optional
            the max length

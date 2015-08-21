@@ -40,10 +40,10 @@ def subclasses(class_type, *, include_self=False, filter=None):  # pylint: disab
        include_abstract: bool, optional
            if True, includes also "abstract" classes
 
-       Returns
-       -------
-       iterator
-           iterator over subclasses
+       Yields
+       ------
+       type
+           the found subclasses
     """
     if include_self:
         if filter is None or filter(class_type):

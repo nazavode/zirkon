@@ -41,6 +41,19 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
        unexpected_option_validator: Validator, optional
            the validator to be used for unexpected options
        self_validate: bool, optional
+
+       Raises
+       ------
+       OptionValidationError
+           on self-validation error
+
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       unexpected_option_validator: Validator, optional
+           the validator to be used for unexpected options
+       self_validate: bool, optional
            enables self validation in construction
 
     """

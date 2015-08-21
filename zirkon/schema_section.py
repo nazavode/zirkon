@@ -112,6 +112,18 @@ class SchemaSection(Section):
        unexpected_option_validator: Validator, optional
            the Validator to be used for unexpected options
 
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
+       unexpected_option_validator: Validator, optional
+           the Validator to be used for unexpected options
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
@@ -151,6 +163,11 @@ class SchemaSection(Section):
            ----------
            validator: Validator
                the validator to be used for unexpected options
+
+           Raises
+           ------
+           TypeError
+               not a validator
         """
         if validator is None:
             validator = Complain()
@@ -170,6 +187,11 @@ class SchemaSection(Section):
                the Validation object to be used, or None
            raise_on_error: bool, optional
                if True, the first error is raised.
+
+           Raises
+           ------
+           OptionValidationError
+               option validation error
 
            Returns
            -------
@@ -197,6 +219,11 @@ class SchemaSection(Section):
                if True, the first error is raised.
            parent_fqname: str, optional
                the fully qualified name (with dots) of the parent
+
+           Raises
+           ------
+           OptionValidationError
+               option validation error
         """
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
         self.impl_validate_options(section=section, validation_section=validation_section, **args)
@@ -215,6 +242,11 @@ class SchemaSection(Section):
                if True, the first error is raised.
            parent_fqname: str, optional
                the fully qualified name (with dots) of the parent
+
+           Raises
+           ------
+           OptionValidationError
+               option validation error
         """
         # expected subsections:
         expected_subsection_names = set()
@@ -265,6 +297,11 @@ class SchemaSection(Section):
                if True, the first error is raised.
            parent_fqname: str, optional
                the fully qualified name (with dots) of the parent
+
+           Raises
+           ------
+           OptionValidationError
+               option validation error
         """
         # expected options:
         expected_option_names = set()

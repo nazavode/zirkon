@@ -46,6 +46,13 @@ class DNameCall(DName):
        globals_d: dict, optional
            the globals dictionary
 
+       Attributes
+       ----------
+       name: str
+           the name of the function
+       globals_d: dict, optional
+           the globals dictionary
+
     """
     def evaluate(self, globals_d=None):
         return super().evaluate(globals_d=globals_d)()

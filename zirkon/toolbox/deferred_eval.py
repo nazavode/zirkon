@@ -52,6 +52,13 @@ class DeferredEval(object):  # pylint: disable=R0903
            the expression to be evaluated
        globals_d: dict, optional
            the globals dictionary for name lookup
+
+       Attributes
+       ----------
+       expression: str
+           the expression to be evaluated
+       globals_d: dict, optional
+           the globals dictionary for name lookup
     """
 
     def __init__(self, expression, globals_d=None):
@@ -123,6 +130,11 @@ def _setup_codecs():  # pragma: no cover
                    the name of the class
                arguments: dict
                    the arguments dict
+
+               Raises
+               -------
+               NameError
+                   class not found
 
                Returns
                -------

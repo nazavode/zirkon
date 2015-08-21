@@ -84,6 +84,17 @@ class Section(collections.abc.Mapping):
            the Section name
        interpolation: bool, optional
            enables interpolation
+
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
@@ -157,6 +168,11 @@ class Section(collections.abc.Mapping):
            value: any
                the option value
 
+           Raises
+           ------
+           ValueError
+               cannot evaluate (interpolation is disabled)
+
            Returns
            -------
            any
@@ -181,6 +197,12 @@ class Section(collections.abc.Mapping):
                the key
            value: any
                the value
+
+           Raises
+           ------
+           ValueError
+               invalid value type/invalid item type
+
         """
         if isinstance(value, self.SUPPORTED_SCALAR_TYPES):
             pass
@@ -262,6 +284,11 @@ class Section(collections.abc.Mapping):
            default: any
                the value to be used as default
 
+           Raises
+           ------
+           KeyError
+               not an option
+
            Returns
            -------
            any
@@ -281,6 +308,11 @@ class Section(collections.abc.Mapping):
                the section name
            default: any
                the value to be used as default
+
+           Raises
+           ------
+           KeyError
+               not a section
 
            Returns
            -------
@@ -360,10 +392,10 @@ class Section(collections.abc.Mapping):
     def options(self):
         """Iterator over option items.
 
-           Returns
-           -------
-           iterator
-               iterator over (option_name, option_value)
+           Yields
+           ------
+           tuple
+               a 2-tuple containing (key, value)
         """
         for key, value in self.items():
             if not isinstance(value, collections.Mapping):
@@ -372,10 +404,10 @@ class Section(collections.abc.Mapping):
     def sections(self):
         """Iterator over section items.
 
-           Returns
-           -------
-           iterator
-               iterator over (section_name, section_value)
+           Yields
+           ------
+           tuple
+               a 2-tuple containing (key, value)
         """
         for key, value in self.items():
             if isinstance(value, collections.Mapping):
@@ -488,10 +520,13 @@ def iter_section_options(section):
        section: Section
            a section object
 
-       Returns
-       -------
-       iterator
-           iterator over (rootname, option_name, option_value)
+       Yields
+       ------
+       tuple
+           a 3-tuple containing (rootname, option_name, option_value), where
+           rootname is the list of the names of the sections containing the
+           option (i.e. for option config["s0"]["s1"]["s2"]["opt0"] =1.2 yields
+           (("s0", "s1", "s2"), "opt0", 1.2)
     """
     sections = [((), section)]
     while sections:

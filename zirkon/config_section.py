@@ -63,6 +63,17 @@ class ConfigSection(Section):
            enables interpolation
        defaults: bool, optional
            enables defaults
+
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       parent: Section, optional
+           the parent Section
+       name: str, optional
+           the Section name
+       interpolation: bool, optional
+           enables interpolation
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
@@ -74,7 +85,18 @@ class ConfigSection(Section):
                          name=name, interpolation=interpolation)
 
     def _set_defaults(self, value):
-        """Set defaults attribute"""
+        """Set defaults attribute
+
+           Parameters
+           ----------
+           value: any
+               the defaults value to be set
+
+           Raises
+           ------
+           TypeError
+               invalid defaults object
+        """
         if value is False or value is None:
             defaults = None
         elif isinstance(value, DefaultsSection):

@@ -35,6 +35,13 @@ class Option(object):
            the option name
        value: any
            the option value
+
+       Attributes
+       ----------
+       name: str
+           the option name
+       value: any
+           the option value
        defined: bool
            True if option is defined in config
     """

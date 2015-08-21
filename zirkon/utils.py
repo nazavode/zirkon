@@ -74,6 +74,12 @@ def create_template_from_schema(schema, *, config=None):
        -------
        Config
            the filled config object
+
+       Raises
+       ------
+       ValueError
+           invalid schema
+
     """
     if config is None:
         config = Config()
@@ -151,6 +157,11 @@ def get_key(config, key):
        key: str, tuple
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
 
+       Raises
+       ------
+       KeyError
+           key not found
+
        Returns
        -------
        any
@@ -187,6 +198,11 @@ def set_key(config, key, value, *, parents=False):
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
        parents: bool, optional
            if True, creates missing intermediate sections
+
+       Raises
+       ------
+       KeyError
+           key not found
     """
     key_tuple = _get_key_tuple(key)
     if len(key_tuple) == 0:
@@ -225,6 +241,11 @@ def del_key(config, key, *, ignore_errors=False):
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
        ignore_errors: bool, optional
            if True, ignore errors about missing intermediate sections
+
+       Raises
+       ------
+       KeyError
+           key not found
     """
     key_tuple = _get_key_tuple(key)
     if len(key_tuple) == 0:

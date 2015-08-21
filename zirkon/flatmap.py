@@ -59,6 +59,12 @@ class FlatMap(collections.abc.Mapping):
        prefix: str, optional
            an initial prefix for keys
 
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       prefix: str, optional
+           an initial prefix for keys
     """
     DOT = '.'
     SUBMAP_PLACEHOLDER = None
@@ -103,6 +109,13 @@ class FlatMap(collections.abc.Mapping):
            ----------
            rel_key: str
                the relative key
+
+           Raises
+           ------
+           TypeError
+               invlid key type
+           ValueError
+               invalid identifier
         """
         if not isinstance(rel_key, str):
             raise TypeError("invalid key {}{} of type {}: {} keys must be strings".format(
@@ -175,6 +188,11 @@ class FlatMap(collections.abc.Mapping):
 
     def _iter_keys(self):
         """Iterates over (abs_key, rel_key)
+
+           Yields
+           ------
+           tuple
+               a 2-tuple containing (absolute key, relative key)
         """
         for abs_key in self.dictionary.keys():
             if abs_key.startswith(self.prefix):

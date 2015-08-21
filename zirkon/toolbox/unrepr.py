@@ -47,6 +47,11 @@ def unrepr(string, globals_d=None):
        globals_d: dict, optional
            the globals dictionary for name lookup
 
+       Raises
+       ------
+       SyntaxError
+           invalid expression
+
        Returns
        -------
        any

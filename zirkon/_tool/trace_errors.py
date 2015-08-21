@@ -29,7 +29,26 @@ import sys
 
 
 class TraceErrors(object):  # pylint: disable=R0903
-    """Context manager to trace errors"""
+    """Context manager to trace errors.
+
+       Parameters
+       ----------
+       debug_mode: bool, optional
+           enables traceback (defaults to False)
+       exceptions: tuple, optional
+           exceptions to trace (defaults to None, meaning all exceptions)
+       stream: file, optional
+           file for trace output (defaults to sys.stderr)
+
+       Attributes
+       ----------
+       debug_mode: bool, optional
+           enables traceback (defaults to False)
+       exceptions: tuple, optional
+           exceptions to trace (defaults to None, meaning all exceptions)
+       stream: file, optional
+           file for trace output (defaults to sys.stderr)
+    """
 
     def __init__(self, debug_mode=False, exceptions=None, stream=sys.stderr):
         self._debug_mode = debug_mode
@@ -56,7 +75,20 @@ class TraceErrors(object):  # pylint: disable=R0903
 
 
 def trace_errors(debug_mode=False, exceptions=None, stream=sys.stderr):
-    """trace_errors(debug_mode=False, exceptions=None, stream=sys.stderr)
-       Context manager to enable/disable errors traceback.
+    """Context manager to enable/disable errors traceback.
+
+       Parameters
+       ----------
+       debug_mode: bool, optional
+           enables traceback (defaults to False)
+       exceptions: tuple, optional
+           exceptions to trace (defaults to None, meaning all exceptions)
+       stream: file, optional
+           file for trace output (defaults to sys.stderr)
+
+       Returns
+       -------
+       TraceErrors
+           the context manager
     """
     return TraceErrors(debug_mode=debug_mode, exceptions=exceptions, stream=stream)

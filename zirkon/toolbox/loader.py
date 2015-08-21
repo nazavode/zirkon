@@ -57,6 +57,11 @@ def load_module_from_package(name, package):
        package: package
            the python package
 
+       Raises
+       ------
+       LoadError
+           cannot load module
+
        Returns
        -------
        module
@@ -121,6 +126,12 @@ def load_module(name, path=None):
            the module name [path/]absolute_module_name
        path: str-tuple, optional
            an optional list of directories to be added to the python path
+
+       Raises
+       ------
+       LoadError
+           cannot load package
+
 
        Returns
        -------
@@ -199,6 +210,12 @@ def load(name, path=None):
            [path/]absolute_module_name[:object_name]
        path: str-tuple, optional
            an optional list of directories to be added to the python path
+
+       Raises
+       ------
+       LoadError
+           cannot load object
+
 
        Returns
        -------

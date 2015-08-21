@@ -79,23 +79,28 @@ class TextSerializer(Serializer):
     def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable=W0613
         r"""Decodes a value from a string, using a codec or unrepr.
 
-             Parameters
-             ----------
-             line_number: int
-                 the line number
-             filename: str
-                 the file name
-             key: str
-                 the key name
-             value: any
-                 the encoded value
-             \*value_type_names: tuple
-                 a list of type names to be used to find a codec
+            Parameters
+            ----------
+            line_number: int
+                the line number
+            filename: str
+                the file name
+            key: str
+                the key name
+            value: any
+                the encoded value
+            \*value_type_names: tuple
+                a list of type names to be used to find a codec
 
-             Returns
-             -------
-             any
-                 the decoded value
+            Raises
+            ------
+            ValueError
+                decode error
+
+            Returns
+            -------
+            any
+                the decoded value
         """
         if value_type_names:
             for value_type_name in value_type_names:
@@ -229,6 +234,11 @@ class TextSerializer(Serializer):
                the line number
            filename: str
                the file name
+
+           Raises
+           ------
+           ValueError
+               unparsable line
 
            Returns
            -------

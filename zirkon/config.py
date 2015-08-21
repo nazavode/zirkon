@@ -81,6 +81,15 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
            the validation schema
        validate: bool, optional
            self validate during construction
+
+       Attributes
+       ----------
+       dictionary: Mapping, optional
+           the internal dictionary
+       interpolation: bool, optional
+           enables interpolation
+       schema: Schema, optional
+           the validation schema
     """
 
     def __init__(self, init=None, *, dictionary=None, defaults=True,

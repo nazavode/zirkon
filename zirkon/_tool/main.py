@@ -47,14 +47,37 @@ _DEFAULTS['False'] = lambda: False
 
 
 class _IoManager(object):
-    """_IoManager: read/write zirkon config objects"""
+    """_IoManager: read/write zirkon config objects
+
+       Parameters
+       ----------
+       printer: function
+           the printer function
+       logger: logging.Logger
+           the logger
+
+       Attributes
+       ----------
+       printer: function
+           the printer function
+       logger: logging.Logger
+           the logger
+    """
 
     def __init__(self, printer, logger):
         self.printer = printer
         self.logger = logger
 
     def read_obj(self, obj, filetype):
-        """read_obj(obj, filetype)"""
+        """Reads an object from file.
+
+           Parameters
+           ----------
+           obj: ConfigBase
+               the object to be read
+           filetype: FileType
+               the input file
+        """
         if filetype:
             config_class_name = get_config_class_name(filetype.config_class)
             filepath = filetype.filepath
@@ -68,14 +91,35 @@ class _IoManager(object):
             obj.read(filepath, protocol=protocol)
 
     def dump_obj(self, obj, *, protocol="zirkon", print_function=None):
-        """dump_obj(obj, *, protocol="zirkon", print_function=None)"""
+        """Dumps an object.
+
+           Parameters
+           ----------
+           obj: ConfigBase
+               the object to be dumped
+           protocol: str
+               the serialization protocol
+           print_function: function, optional
+               the print function
+        """
+
         if print_function is None:  # pragma: no cover
             print_function = self.printer
         for line in obj.to_string(protocol=protocol).split('\n'):
             print_function(line)
 
     def write_obj(self, obj, filetype, overwrite=False):
-        """write_obj(obj, input_filepath=None, overwrite=False)"""
+        """Writes an object to file.
+
+           Parameters
+           ----------
+           obj: ConfigBase
+               the object to be written
+           filetype: FileType
+               the input file
+           overwrite: bool, optional
+               enables overwriting output file (defaults to False)
+        """
         filepath = filetype.filepath
         config_class_name = get_config_class_name(filetype.config_class)
         protocol = filetype.protocol
@@ -95,7 +139,20 @@ class _IoManager(object):
 
 
 def tabulate_filetypes(filetypes, header=True):
-    """tabulate_filetypes(filetypes, header=True)"""
+    """tabulate_filetypes(filetypes, header=True)
+
+       Parameters
+       ----------
+       filetypes: list
+           a list of FileType objects
+       header: bool, optional
+           include an header (defaults to True)
+
+       Yields
+       ------
+       str
+           all the output lines
+    """
     files = []
     for filetype in filetypes:
         files.append((filetype.filepath, filetype.config_class.__name__, filetype.protocol))
@@ -117,7 +174,19 @@ def tabulate_filetypes(filetypes, header=True):
 
 
 def list_files(printer, header=True, *, config_dirs, schema_dirs):
-    """list_files(printer, header=True, *, config_dirs, schema_dirs)"""
+    """Lists files.
+
+       Parameters
+       ----------
+       printer: function
+           the printer function
+       header: bool, optional
+           adds an header line (defaults to True)
+       config_dirs: tuple
+           list of config directories
+       schema_dirs: tuple
+           list of schema directories
+    """
     paths = []
     for config_dir in config_dirs:
         paths.append((config_dir, (Config,)))
@@ -129,7 +198,20 @@ def list_files(printer, header=True, *, config_dirs, schema_dirs):
 
 
 def _create_logger(stream, verbose_level):
-    """_create_logger() -> logger"""
+    """Creates a logger.
+
+       Parameters
+       ----------
+       stream: file
+           the logger's stream
+       verbose_level: int
+           the initial verbose level
+
+       Returns
+       -------
+       Logger
+           the logger
+    """
     logger = logging.getLogger("ZIRKON-LOG")
     if verbose_level == 0:
         log_level = logging.ERROR
@@ -148,13 +230,40 @@ def _create_logger(stream, verbose_level):
 
 
 def _die(logger, message, exit_code=1):
-    """_die(logger, message, exit_code=1)"""
+    """Logs an error message and terminates the program.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       message: str
+           the error message
+       exit_code: int, optional
+           the exit code (defaults to 1)
+    """
     logger.error(message)
     sys.exit(exit_code)
 
 
 def _filetype(logger, filearg, config_class=None, protocol=None):
-    """_filetype(...)"""
+    """Converts a string from command line to filetype.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+       config_class: ConfigBase, optional
+           the expected config class (defaults to None)
+       protocol: str, optional
+           the expected protocol (defaults to None)
+
+       Returns
+       -------
+       FileType
+           the FileType object
+    """
     if filearg is None:
         return None
     tokens = filearg.rsplit(':', 2)
@@ -187,7 +296,22 @@ def _filetype(logger, filearg, config_class=None, protocol=None):
 
 
 def _input_filetype(logger, filearg, config_class=None):
-    """_input_filetype(...)"""
+    """Converts a string from command line to an input filetype.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+       config_class: ConfigBase, optional
+           the expected config class (defaults to None)
+
+       Returns
+       -------
+       FileType
+           the FileType object
+    """
     if filearg is None:
         return None
     filetype = _filetype(logger, filearg, config_class=config_class)
@@ -213,22 +337,69 @@ def _input_filetype(logger, filearg, config_class=None):
 
 
 def _input_schema_filetype(logger, filearg):
-    """_input_schema_filetype(...)"""
+    """Converts a string from command line to an input schema filetype.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+
+       Returns
+       -------
+       FileType
+           the FileType object
+    """
     return _input_filetype(logger, filearg, config_class=Schema)
 
 
 def _output_filetype(logger, filearg):
-    """_output_filetype(...)"""
+    """Converts a string from command line to an output filetype.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+
+       Returns
+       -------
+       FileType
+           the FileType object
+    """
     return _filetype(logger, filearg)
 
 
 def _validation_filetype(logger, filearg):
-    """_validation_filetype(...)"""
+    """Converts a string from command line to an output validation filetype.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+
+       Returns
+       -------
+       FileType
+           the FileType object
+    """
     return _filetype(logger, filearg, config_class=Validation)
 
 
 def _validate_args(logger, args):
-    """_validate_args(logger, args)"""
+    """Validates args.
+
+       Parameters
+       ----------
+       logger: Logger
+           the logger
+       filearg: str
+           the command line string
+    """
     input_filetype = args.input_filetype
     schema_filetype = args.schema_filetype
     output_filetype = args.output_filetype
@@ -266,7 +437,16 @@ def _validate_args(logger, args):
 
 
 def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
-    """main_parse_args(...)
+    """Parses command line arguments.
+
+       Parameters
+       ----------
+       log_stream: file, optional
+           the log file (defaults to sys.stderr)
+       out_stream: file, optional
+           the output file (defaults to sys.stdout)
+       argv: list, optional
+           the command line arguments (defaults to None, meaning sys.args[1:])
     """
     if argv is None:  # pragma: no cover
         argv = sys.argv[1:]
@@ -419,8 +599,16 @@ Environment variables
 
 
 def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
-    """main(...)
-       Zirkon tool main program.
+    """Runs the main program.
+
+       Parameters
+       ----------
+       log_stream: file, optional
+           the log file (defaults to sys.stderr)
+       out_stream: file, optional
+           the output file (defaults to sys.stdout)
+       argv: list, optional
+           the command line arguments (defaults to None, meaning sys.args[1:])
     """
 
     args, logger, printer = main_parse_args(
