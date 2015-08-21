@@ -26,6 +26,10 @@ A python configuration library. Zirkon requires python >= 3.4.
     :target: http://badge.fury.io/gh/simone-campagna%2Fzirkon
     :alt: Github version
 
+.. image:: https://img.shields.io/github/license/mashape/apistatus.svg
+    :target: https://github.com/simone-campagna/zirkon
+    :alt: License
+
 What is zirkon
 --------------
 
