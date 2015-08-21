@@ -173,20 +173,20 @@ def tabulate_filetypes(filetypes, header=True):
         yield fmt.format(*row, lengths=lengths)
 
 
-def list_files(printer, header=True, *, config_dirs, schema_dirs):
+def list_files(params, *, config_dirs, schema_dirs):
     """Lists files.
 
        Parameters
        ----------
-       printer: function
-           the printer function
-       header: bool, optional
-           adds an header line (defaults to True)
+       params: dict
+           common params
        config_dirs: tuple
            list of config directories
        schema_dirs: tuple
            list of schema directories
     """
+    printer = params["printer"]
+    header = params.get("header", True)
     paths = []
     for config_dir in config_dirs:
         paths.append((config_dir, (Config,)))
@@ -195,6 +195,85 @@ def list_files(printer, header=True, *, config_dirs, schema_dirs):
     filetypes = discover(*paths, standard_paths=True)
     for line in tabulate_filetypes(filetypes, header=header):
         printer(line)
+
+
+def read_config(params, *, defaults, input_filetype, schema_filetype,
+                output_filetype, validation_filetype):
+    """Reads a config file.
+
+       Parameters
+       ----------
+       params: dict
+           common parameters
+       defaults: bool
+           enable defaults
+       input_filetype: FileType
+           input filetype
+       schema_filetype: FileType
+           schema filetype
+       output_filetype: FileType
+           output filetype
+       validation_filetype: FileType
+           validation filetype
+    """
+    printer = params["printer"]
+    logger = params["logger"]
+    default_output_protocol = params["default_protocol"]
+    io_manager = _IoManager(printer=printer, logger=logger)
+
+    defaults_factory = _DEFAULTS[defaults]
+
+    with trace_errors(params["debug"]):
+        schema = None
+        if schema_filetype:
+            schema = Schema()
+            io_manager.read_obj(schema, schema_filetype)
+
+        default_output_protocol = input_filetype.protocol
+        config_class = input_filetype.config_class
+        config_args = {}
+        if issubclass(config_class, Config):
+            config_args['defaults'] = defaults_factory()
+        config = config_class(**config_args)
+        io_manager.read_obj(config, input_filetype)
+        if schema is not None:
+            validation = schema.validate(config)
+            if validation_filetype is not None:
+                io_manager.write_obj(validation, validation_filetype, overwrite=params["force"])
+            if validation and validation_filetype is None:
+                logger.warning("validation failed for config %s:", input_filetype.filepath)
+                io_manager.dump_obj(validation, print_function=logger.warning)
+
+        if output_filetype is None:
+            io_manager.dump_obj(config, protocol=default_output_protocol)
+        else:
+            io_manager.write_obj(config, output_filetype, overwrite=params["force"])
+
+
+def create_config(params, *, schema_filetype, output_filetype):
+    """Creates a config file from a schema.
+
+       Parameters
+       ----------
+       params: dict
+           common parameters
+       schema_filetype: FileType
+           schema filetype
+       output_filetype: FileType
+           output filetype
+    """
+    printer = params["printer"]
+    logger = params["logger"]
+    default_output_protocol = params["default_protocol"]
+    io_manager = _IoManager(printer=printer, logger=logger)
+    schema = Schema()
+    io_manager.read_obj(schema, schema_filetype)
+    config = Config()
+    create_template_from_schema(schema=schema, config=config)
+    if output_filetype is None:
+        io_manager.dump_obj(config, protocol=default_output_protocol)
+    else:
+        io_manager.write_obj(config, output_filetype, overwrite=params["force"])
 
 
 def _create_logger(stream, verbose_level):
@@ -400,10 +479,10 @@ def _validate_args(logger, args):
        filearg: str
            the command line string
     """
-    input_filetype = args.input_filetype
-    schema_filetype = args.schema_filetype
-    output_filetype = args.output_filetype
-    validation_filetype = args.validation_filetype
+    input_filetype = getattr(args, "input_filetype", None)
+    schema_filetype = getattr(args, "schema_filetype", None)
+    output_filetype = getattr(args, "output_filetype", None)
+    validation_filetype = getattr(args, "validation_filetype", None)
     ref_protocol = None
     ref_config_class = None
     if input_filetype is not None:
@@ -431,12 +510,9 @@ def _validate_args(logger, args):
     if validation_filetype is not None:
         if validation_filetype.protocol is None and ref_protocol is not None:
             args.validation_filetype = validation_filetype._replace(protocol=ref_protocol)
-    if args.create_template:
-        if schema_filetype is None:
-            _die(logger, "missing required argument --schema/-s")
 
 
-def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
+def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):  # pylint: disable=R0914
     """Parses command line arguments.
 
        Parameters
@@ -451,13 +527,46 @@ def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     if argv is None:  # pragma: no cover
         argv = sys.argv[1:]
 
-    default_config_dirs = []
-    default_schema_dirs = []
     default_verbose_level = 1
-    default_defaults = 'False'
 
     config_class_names = [get_config_class_name(config_class) for config_class in get_config_classes()]
-    description = """\
+
+    parser_args = dict(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    common_parser = argparse.ArgumentParser(
+        add_help=False,
+        **parser_args)
+
+    common_parser.add_argument("--verbose", "-v",
+                               dest="verbose_level",
+                               action="count",
+                               default=default_verbose_level,
+                               help="increase verbosity")
+
+    common_parser.add_argument("--quiet", "-q",
+                               dest="verbose_level",
+                               action="store_const",
+                               const=0,
+                               default=default_verbose_level,
+                               help="quiet mode (only errors are shown)")
+
+    common_parser.add_argument("--debug",
+                               action="store_true",
+                               default=False,
+                               help="debug mode")
+
+    common_parser.add_argument("--force", "-f",
+                               action="store_true",
+                               default=False,
+                               help="force overwriting existing output files")
+
+    common_parser.add_argument("--version",
+                               action="version",
+                               version="%(prog)s {}".format(VERSION),
+                               help="show version")
+
+    top_level_description = """\
 Zirkon tool - read/write/validate config files.
 
 The FILE values can be specified with the following syntax:
@@ -479,122 +588,126 @@ Environment variables
 """.format(protocols=', '.join(get_protocols()),
            config_classes=', '.join(config_class_names))
 
-    parser = argparse.ArgumentParser(
-        description=description,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+    top_level_parser = argparse.ArgumentParser(
+        "zirkon",
+        parents=(common_parser,),
+        description=top_level_description,
+        **parser_args)
 
-    input_group = parser.add_mutually_exclusive_group()
+    subparsers = top_level_parser.add_subparsers()
 
-    input_group.add_argument("--list", "-l",
-                             action="store_true",
-                             default=False,
-                             help="list available files")
+    list_parser = subparsers.add_parser(
+        "list",
+        parents=(common_parser,),
+        description="""Lists all the available config and schema files.""",
+        **parser_args)
 
-    input_group.add_argument("--input", "-i",
-                             dest="input_filetype",
-                             metavar="FILE",
-                             default=None,
-                             type=str,
-                             help="input file")
+    list_parser.set_defaults(
+        function=list_files,
+        function_args=("config_dirs", "schema_dirs"))
 
-    input_group.add_argument("--create-template", "-t",
-                             action="store_true",
-                             default=False,
-                             help="create a template from schema")
+    read_parser = subparsers.add_parser(
+        "read",
+        parents=(common_parser,),
+        description="""Reads a config file.""",
+        **parser_args)
 
-    parser.add_argument("--output", "-o",
-                        dest="output_filetype",
-                        metavar="OC",
-                        default=None,
-                        type=str,
-                        help="output file")
+    read_parser.set_defaults(
+        function=read_config,
+        function_args=("defaults", "input_filetype", "schema_filetype",
+                       "output_filetype", "validation_filetype"))
 
-    parser.add_argument("--schema", "-s",
-                        dest="schema_filetype",
-                        metavar="FILE",
-                        default=None,
-                        type=str,
-                        help="schema input file")
+    create_parser = subparsers.add_parser(
+        "create",
+        parents=(common_parser,),
+        description="""Creates a config file from a schema.""",
+        **parser_args)
 
-    parser.add_argument("--validation", "-V",
-                        dest="validation_filetype",
-                        metavar="FILE",
-                        default=None,
-                        type=str,
-                        help="validation output file")
+    create_parser.set_defaults(
+        function=create_config,
+        function_args=("schema_filetype", "output_filetype"))
 
-    parser.add_argument("--config-dir", "-cd",
-                        dest="config_dirs",
-                        metavar="CD",
-                        action="append",
-                        default=default_config_dirs,
-                        type=str,
-                        help="add config dir")
+    for parser in (read_parser,):
+        parser.add_argument("--input", "-i",
+                            dest="input_filetype",
+                            metavar="IC",
+                            default=None,
+                            required=True,
+                            type=str,
+                            help="input file")
 
-    parser.add_argument("--schema-dir", "-sd",
-                        dest="schema_dirs",
-                        metavar="SD",
-                        action="append",
-                        default=default_schema_dirs,
-                        type=str,
-                        help="add config dir")
+    schema_required = {}
+    schema_required[read_parser] = False
+    schema_required[create_parser] = True
 
-    parser.add_argument("--defaults", "-d",
-                        metavar="D",
-                        choices=tuple(_DEFAULTS.keys()),
-                        default=default_defaults,
-                        help="set defaults mode")
+    for parser in read_parser, create_parser:
+        parser.add_argument("--defaults", "-d",
+                            metavar="D",
+                            choices=tuple(_DEFAULTS.keys()),
+                            default='False',
+                            help="set defaults mode")
 
-    parser.add_argument("--verbose", "-v",
-                        dest="verbose_level",
-                        action="count",
-                        default=default_verbose_level,
-                        help="increase verbosity")
+        parser.add_argument("--output", "-o",
+                            dest="output_filetype",
+                            metavar="OC",
+                            default=None,
+                            type=str,
+                            help="output file")
 
-    parser.add_argument("--quiet", "-q",
-                        dest="verbose_level",
-                        action="store_const",
-                        const=0,
-                        default=default_verbose_level,
-                        help="quiet mode (only errors are shown)")
+        parser.add_argument("--schema", "-s",
+                            dest="schema_filetype",
+                            metavar="FILE",
+                            default=None,
+                            required=schema_required[parser],
+                            type=str,
+                            help="schema input file")
 
-    parser.add_argument("--debug",
-                        action="store_true",
-                        default=False,
-                        help="debug mode")
+    for parser in (read_parser,):
+        parser.add_argument("--validation", "-V",
+                            dest="validation_filetype",
+                            metavar="FILE",
+                            default=None,
+                            type=str,
+                            help="validation output file")
 
-    parser.add_argument("--force", "-f",
-                        action="store_true",
-                        default=False,
-                        help="force overwriting existing output files")
+    for parser in list_parser, read_parser, create_parser:
+        parser.add_argument("--config-dir", "-cd",
+                            dest="config_dirs",
+                            metavar="CD",
+                            action="append",
+                            default=[],
+                            type=str,
+                            help="add config dir")
 
-    parser.add_argument("--version",
-                        action="version",
-                        version="%(prog)s {}".format(VERSION),
-                        help="show version")
+        parser.add_argument("--schema-dir", "-sd",
+                            dest="schema_dirs",
+                            metavar="SD",
+                            action="append",
+                            default=[],
+                            type=str,
+                            help="add config dir")
 
-    args = parser.parse_args(argv)
+    args = top_level_parser.parse_args(argv)
 
     logger = _create_logger(log_stream, args.verbose_level)
     printer = lambda x: print(x, file=out_stream, flush=True)
 
-    input_filetype = _input_filetype(logger, args.input_filetype)
-    args.input_filetype = input_filetype
+    converter_d = {
+        "input_filetype": _input_filetype,
+        "schema_filetype": _input_schema_filetype,
+        "output_filetype": _output_filetype,
+        "validation_filetype": _validation_filetype,
+    }
 
-    schema_filetype = _input_schema_filetype(logger, args.schema_filetype)
-    args.schema_filetype = schema_filetype
-
-    output_filetype = _output_filetype(logger, args.output_filetype)
-    args.output_filetype = output_filetype
-
-    validation_filetype = _validation_filetype(logger, args.validation_filetype)
-    args.validation_filetype = validation_filetype
+    for key, converter in converter_d.items():
+        if hasattr(args, key):
+            setattr(args, key, converter(logger=logger, filearg=getattr(args, key)))
 
     _validate_args(logger, args)
-    logger.debug("input_filetype:      %s", args.input_filetype)
-    logger.debug("schema_filetype:     %s", args.schema_filetype)
-    logger.debug("output_filetype:     %s", args.output_filetype)
-    logger.debug("validation_filetype: %s", args.validation_filetype)
+
+    for key, _ in converter_d.items():
+        if hasattr(args, key):
+            logger.debug("%(20)s: %s", key, getattr(args, key))
     return args, logger, printer
 
 
@@ -614,43 +727,16 @@ def main(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):
     args, logger, printer = main_parse_args(
         log_stream=log_stream, out_stream=out_stream, argv=argv)
 
-    if args.list:
-        list_files(printer, config_dirs=args.config_dirs, schema_dirs=args.schema_dirs)
-        return
+    function = args.function
+    function_args = {}
+    for function_arg in args.function_args:
+        function_args[function_arg] = getattr(args, function_arg)
 
-    io_manager = _IoManager(printer=printer, logger=logger)
+    params = {}
+    params["printer"] = printer
+    params["logger"] = logger
+    params["default_protocol"] = "zirkon"
+    for key in "force", "debug":
+        params[key] = getattr(args, key)
 
-    defaults_factory = _DEFAULTS[args.defaults]
-
-    with trace_errors(args.debug):
-        schema = None
-        default_output_protocol = "zirkon"
-        if args.schema_filetype:
-            schema = Schema()
-            io_manager.read_obj(schema, args.schema_filetype)
-
-        config = None
-        if args.input_filetype:
-            default_output_protocol = args.input_filetype.protocol
-            config_class = args.input_filetype.config_class
-            config_args = {}
-            if issubclass(config_class, Config):
-                config_args['defaults'] = defaults_factory()
-            config = config_class(**config_args)
-            io_manager.read_obj(config, args.input_filetype)
-            if schema is not None:
-                validation = schema.validate(config)
-                if args.validation_filetype is not None:
-                    io_manager.write_obj(validation, args.validation_filetype, overwrite=args.force)
-                if validation and args.validation_filetype is None:
-                    logger.warning("validation failed for config %s:", args.input_filetype.filepath)
-                    io_manager.dump_obj(validation, print_function=logger.warning)
-        elif args.create_template:
-            config = Config()
-            create_template_from_schema(schema=schema, config=config)
-
-        if config is not None:
-            if args.output_filetype is None:
-                io_manager.dump_obj(config, protocol=default_output_protocol)
-            else:
-                io_manager.write_obj(config, args.output_filetype, overwrite=args.force)
+    return function(params=params, **function_args)

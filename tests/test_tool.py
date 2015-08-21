@@ -129,9 +129,11 @@ n = 10
 """)
     return fls
 
-def run(args):
-    log_stream = string_io()
-    out_stream = string_io()
+def run(args, log_stream=None, out_stream=None):
+    if log_stream is None:
+        log_stream = string_io()
+    if out_stream is None:
+        out_stream = string_io()
     print(args)
     main(
         log_stream=log_stream,
@@ -156,13 +158,18 @@ DEBUG    validation_filetype: None
 """
 
 def test_main_verbose_level(verbose_level):
-    args = []
+    args = ["read"]
     if verbose_level == 0:
         args.append('-q')
     elif verbose_level > 1:
         args.append('-' + ('v' * (verbose_level - 1)))
-    log_stream, out_stream = run(args)
-    assert log_stream.getvalue() == _VLOG[verbose_level]
+    args.extend(('-i', "non-existent-path.zirkon"))
+    log_stream=string_io()
+    out_stream=string_io()
+    with pytest.raises(SystemExit) as exc_info:
+        run(args, log_stream=log_stream, out_stream=out_stream)
+    assert str(exc_info.value) == "1"
+    assert log_stream.getvalue() == "ERROR    invalid value non-existent-path.zirkon: input file not found\n"
     assert out_stream.getvalue() == ""
 
 
@@ -175,7 +182,7 @@ def test_main_overwrite_mode(files, overwrite):
     with files.tmp(oname):
         with open(files[oname], "w"):
             pass
-        args = ['-i', files['x.zirkon'], '-o', files[oname]]
+        args = ["read", '-i', files['x.zirkon'], '-o', files[oname]]
         if overwrite:
             args.append("-f")
 
@@ -187,6 +194,33 @@ def test_main_overwrite_mode(files, overwrite):
                 assert out_stream.getvalue() == ""
                 assert log_stream.getvalue() == "ERROR    cannot overwrite existing file {!r}\n".format(files[oname])
 
+def test_main_create_template(files, string_io):
+    o_name = "x-template.zirkon"
+    s_name = "x.zirkon-schema"
+    with files.tmp(o_name):
+        o_file = files[o_name]
+        s_file = files[s_name]
+
+        assert not os.path.exists(files[o_name])
+
+        args = ["create", "-s", s_file, "-o", o_file]
+        log_stream, out_stream = run(args)
+
+        config = Config()
+        config.read(o_file, protocol="zirkon")
+        config.dump(string_io)
+        assert string_io.getvalue() == """\
+a = '# Int()'
+b = '# Float()'
+c = ROOT['a'] * ROOT['b']
+[sub]
+    name = '# Str(min_len=1)'
+    x = '# Float(min=0.0)'
+    y = '# Float(min=0.0)'
+    [fun0]
+        enable = '# Bool()'
+        value = '# Float()'
+"""
 
 @pytest.fixture(params=['x-def-le.zirkon', 'x-def-ee.zirkon'])
 def x_def_name(request):
@@ -194,7 +228,7 @@ def x_def_name(request):
 
 def test_main_deferred(files, x_def_name, defaults):
     i_file = files[x_def_name]
-    args = ["-i", i_file, "-o", ":zirkon"]
+    args = ["read", "-i", i_file, "-o", ":zirkon"]
     if defaults is not None:
         args.append("--defaults={!r}".format(defaults))
     log_stream, out_stream = run(args)
@@ -257,7 +291,7 @@ def test_main_list(files):
     for fname, fpath in files.items():
         fpaths.append(fpath)
     
-    log_stream, out_stream = run(["--list"])
+    log_stream, out_stream = run(["list"])
 
     out_fpaths = {}
     for count, line in enumerate(out_stream.getvalue().split('\n')):
@@ -290,7 +324,7 @@ def test_main_read_write(files, i_name_protocol, o_name_protocol, s_name_protoco
         if v_name:
             assert not os.path.exists(files[v_name])
 
-        args = ["-i", i_file_arg, "-o", o_file_arg]
+        args = ["read", "-i", i_file_arg, "-o", o_file_arg]
         if s_name is not None:
             args.extend(["-s", s_name + s_hints])
             if v_name is not None:
