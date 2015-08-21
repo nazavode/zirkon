@@ -182,3 +182,8 @@ def test_item_options(parameters):
         with pytest.raises(MaxValueError):
             v = iv.validate(name='alpha', defined=True, value=parameters.vseq(m=6))
 
+def test_float_list_item_convert():
+    validator = FloatList()
+    value = validator.validate(name='a', value=[1,], defined=True)
+    assert isinstance(value[0], float)
+    assert not isinstance(value[0], int)

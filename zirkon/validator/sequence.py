@@ -52,7 +52,7 @@ class Sequence(Validator):
                 item_option = Option(name=item_name, value=item_value, defined=True)
                 validated_item_value = self.item_validator.validate_option(item_option)
                 validated_item_values.append(validated_item_value)
-                if item_value != validated_item_value:
+                if item_value is not validated_item_value:
                     changed = True
             if changed:
                 sequence_type = type(option.value)
