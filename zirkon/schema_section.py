@@ -40,7 +40,7 @@ from .validator.error import OptionValidationError, \
 
 def _reset_option_default(*, section, option, option_name):
     """Check if the option value is from defaults; if so, it is removed.
-       This is to force re-evaluation of deferred expressions in validator default.
+       This is to force re-evaluation of macros in validator default.
     """
     section_defaults = section
     if isinstance(section, ConfigSection):

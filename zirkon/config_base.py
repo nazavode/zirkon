@@ -31,7 +31,7 @@ __all__ = [
 from .section import Section
 from .toolbox.serializer import Serializer
 from .toolbox.unrepr import unrepr
-from .deferred_object import ROOT, SECTION
+from .macros import ROOT, SECTION
 
 
 class ConfigValidationError(Exception):
@@ -361,39 +361,39 @@ class ConfigBase(Section):
 
 
 from .toolbox import serializer
-from .toolbox.deferred import Deferred
+from .toolbox.macro import Macro
 from .toolbox.subclass import find_subclass
 
 
-# deferred_expression codecs:
+# macro codecs:
 def _setup_codecs():
     """_setup_codecs()
        Setup codecs for validators.
     """
     _json_serializer_module = getattr(serializer, 'json_serializer', None)
     if _json_serializer_module is not None:
-        def _deferred_encode(deferred_object):
-            """Encodes a Deferred object to json.
+        def _macro_encode(macro_object):
+            """Encodes a Macro object to json.
 
                Parameters
                ----------
-               deferred_object: Deferred
-                   the deferred object
+               macro_object: Macro
+                   the macro object
 
                Returns
                -------
                dict
                    the encoded dictionary
             """
-            return {'expression': deferred_object.unparse()}
+            return {'macro_expression': macro_object.unparse()}
 
-        def _deferred_decode(deferred_class_name, arguments):
-            """Decodes a Deferred object from JSON.
+        def _macro_decode(macro_class_name, arguments):
+            """Decodes a Macro object from JSON.
 
                Parameters
                ----------
-               deferred_class_name: str
-                   the deferred class name
+               macro_class_name: str
+                   the macro class name
                arguments: dict
                    the encoded dict
 
@@ -404,18 +404,18 @@ def _setup_codecs():
 
                Returns
                -------
-               Deferred
+               Macro
                    the decoded object
             """
-            deferred_class = find_subclass(Deferred, deferred_class_name, include_self=True)
-            if deferred_class is None:
-                raise NameError("undefined Deferred class {}".format(deferred_class_name))
-            return eval(arguments['expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=W0123
+            macro_class = find_subclass(Macro, macro_class_name, include_self=True)
+            if macro_class is None:
+                raise NameError("undefined Macro class {}".format(macro_class_name))
+            return eval(arguments['macro_expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=W0123
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
-            class_type=Deferred,
-            encode=_deferred_encode,
-            decode=_deferred_decode,
+            class_type=Macro,
+            encode=_macro_encode,
+            decode=_macro_decode,
         )
 
     _text_serializer_module = getattr(serializer, 'text_serializer', None)

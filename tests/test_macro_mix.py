@@ -6,8 +6,8 @@ import pickle
 
 import pytest
 
-from zirkon.toolbox.deferred import \
-    DName, DConst, DCall, DContains
+from zirkon.toolbox.macro import \
+    MName, MConst, MCall, MContains
 
 Param = collections.namedtuple('Param', ('de', 'expression', 'globals_d'))
 
@@ -21,10 +21,10 @@ y_20 = 20
 y_10 = 10
 
 
-MYFUN = DName("myfun")
-X = DConst(10)
-Y = DName('y')
-Z = DConst(4)
+MYFUN = MName("myfun")
+X = MConst(10)
+Y = MName('y')
+Z = MConst(4)
 
 Param = collections.namedtuple('Param', ('globals_d', 'expression'))
 _data = [
@@ -36,12 +36,12 @@ _data = [
 def param(request):
     return request.param
 
-def test_DCall(param):
+def test_MCall(param):
     p_args = (X,)
     n_args = collections.OrderedDict()
     n_args['c'] = Z
     n_args['b'] = Y
-    de = DCall(MYFUN, p_args, n_args)
+    de = MCall(MYFUN, p_args, n_args)
     expression = param.expression
     globals_d = param.globals_d
     assert de.unparse() == expression
@@ -50,9 +50,9 @@ def test_DCall(param):
 
 ParamString = collections.namedtuple('ParamString', ('expression', 'string'))
 _data = [
-    ParamString(expression=(Y + -X) * -15, string="DMul(DAdd(DName('y'), DNeg(DConst(10))), -15)"),
-    ParamString(expression=Y(X), string='DCall(y, (10,), {})'),
-    ParamString(expression=(DName('y', {'y': 10}) + -X) * -15, string="DMul(DAdd(DName('y', {'y': 10}), DNeg(DConst(10))), -15)"),
+    ParamString(expression=(Y + -X) * -15, string="MMul(MAdd(MName('y'), MNeg(MConst(10))), -15)"),
+    ParamString(expression=Y(X), string='MCall(y, (10,), {})'),
+    ParamString(expression=(MName('y', {'y': 10}) + -X) * -15, string="MMul(MAdd(MName('y', {'y': 10}), MNeg(MConst(10))), -15)"),
 ]
 
 @pytest.fixture(params=_data, ids=list(enumerate(_data)))
@@ -64,8 +64,8 @@ def test_str(pstring):
 
 def test_contains():
     l = [1, 2, 3]
-    L = DName('l')
-    d = DContains(X, L)
+    L = MName('l')
+    d = MContains(X, L)
     print(type(X), type(L))
     print(type(d))
     dv = d.evaluate({'l': l})
@@ -82,7 +82,7 @@ _data = [
     X + Y,
     -X + Y,
     X(Y),
-    DName('fff'),
+    MName('fff'),
 ]
 
 @pytest.fixture(params=_data, ids=list(enumerate(_data)))

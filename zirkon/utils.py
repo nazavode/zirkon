@@ -24,7 +24,7 @@ __copyright__ = 'Copyright (c) 2015 Simone Campagna'
 __license__ = 'Apache License Version 2.0'
 __all__ = [
     'create_template_from_schema',
-    'replace_deferred',
+    'replace_macros',
     'get_key',
     'set_key',
     'del_key',
@@ -101,8 +101,8 @@ def create_template_from_schema(schema, *, config=None):
     return config
 
 
-def replace_deferred(config):
-    """Replaces all deferred expressions with their current value.
+def replace_macros(config):
+    """Replaces all macros with their current value.
        Parameters
        ----------
        config: Config, optional
@@ -110,13 +110,13 @@ def replace_deferred(config):
     """
     for key, value in config.items():
         if isinstance(value, collections.Mapping):
-            replace_deferred(value)
+            replace_macros(value)
         else:
             value = config[key]
             config[key] = value
     if isinstance(config, ConfigSection) and config.defaults is not None:
         with config.defaults.referencing(config):
-            replace_deferred(config.defaults)
+            replace_macros(config.defaults)
 
 
 def _get_key_tuple(key):

@@ -63,7 +63,7 @@ import collections
 import collections.abc
 import sys
 
-from .toolbox.deferred import Deferred
+from .toolbox.macro import Macro
 from .toolbox.dictutils import as_dict
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.serializer import Serializer
@@ -153,7 +153,7 @@ class Section(collections.abc.Mapping):
         return collections.OrderedDict()
 
     def get_reference_root(self):
-        """Returns the reference_root to be used for evaluation of deferred expressions.
+        """Returns the reference_root to be used for evaluation of macros.
 
            Returns
            -------
@@ -180,7 +180,7 @@ class Section(collections.abc.Mapping):
            any
                the evaluated value
         """
-        if isinstance(value, Deferred):
+        if isinstance(value, Macro):
             if self.interpolation:
                 reference_root = self.get_reference_root()
                 section_getter = lambda: get_section_value(reference_root, *self.fqname)
@@ -249,7 +249,7 @@ class Section(collections.abc.Mapping):
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
-            if isinstance(value, Deferred):
+            if isinstance(value, Macro):
                 if not self.interpolation:
                     raise ValueError("cannot set {}={}: interpolation is not enabled".format(
                         key, value.unparse()))
@@ -456,7 +456,7 @@ class Section(collections.abc.Mapping):
            defaults: bool, optional
                if True copy also default values
            evaluate: bool, optional
-               if True evaluate deferred expressions
+               if True evaluate macros
         """
         result = dict_class()
         subsection_class = self._subsection_class()

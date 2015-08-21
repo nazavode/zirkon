@@ -35,10 +35,10 @@ from .section import Section
 
 class DefaultsSection(Section):
     """A Section to store defaults for ConfigSection.
-       The reference_root attribute is used for evaluation of deferred expressions;
+       The reference_root attribute is used for evaluation of macros;
        it must be set through the 'referencing' context manager method:
 
-       >>> from zirkon.deferred_object import ROOT
+       >>> from zirkon.macros import ROOT
        >>> defaults = DefaultsSection({'x': ROOT['n'] + 2})
        >>> section1 = Section({'n': 10})
        >>> section2 = Section({'n': 30})

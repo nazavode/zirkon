@@ -63,7 +63,7 @@ __all__ = [
 
 from .config_base import ConfigBase, ConfigValidationError
 from .config_section import ConfigSection
-from .deferred_object import ROOT, SECTION
+from .macros import ROOT, SECTION
 
 
 class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011

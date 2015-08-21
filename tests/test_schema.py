@@ -119,7 +119,7 @@ def test_Schema_get_serializer_zirkon():
     assert isinstance(Schema.get_serializer("zirkon"), ZirkonSerializer)
 
 @pytest.fixture
-def deferred_schema():
+def macro_schema():
     schema = Schema()
     schema['a'] = Int()
     schema['b'] = Int()
@@ -130,7 +130,7 @@ def deferred_schema():
     return schema
 
 @pytest.fixture
-def deferred_config(defaultsvalue):
+def macro_config(defaultsvalue):
     config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['b'] = 20
@@ -140,43 +140,43 @@ def deferred_config(defaultsvalue):
     config['sub']['e'] = -100
     return config
 
-def test_Schema_deferred_pass(deferred_schema, deferred_config):
-    deferred_schema.validate(deferred_config)
-    assert deferred_config['c'] == 10
-    assert deferred_config['sub']['e'] == -100
+def test_Schema_macro_pass(macro_schema, macro_config):
+    macro_schema.validate(macro_config)
+    assert macro_config['c'] == 10
+    assert macro_config['sub']['e'] == -100
 
-def test_Schema_deferred_default(deferred_schema, deferred_config):
-    del deferred_config['sub']['e']
-    deferred_schema.validate(deferred_config)
-    assert deferred_config['c'] == 10
-    assert deferred_config['sub']['e'] == 48
-    deferred_config['b'] = -10
-    del deferred_config['sub']['e']
+def test_Schema_macro_default(macro_schema, macro_config):
+    del macro_config['sub']['e']
+    macro_schema.validate(macro_config)
+    assert macro_config['c'] == 10
+    assert macro_config['sub']['e'] == 48
+    macro_config['b'] = -10
+    del macro_config['sub']['e']
     print("==== start")
-    deferred_schema.validate(deferred_config)
+    macro_schema.validate(macro_config)
     print("==== stop")
-    assert deferred_config['sub']['e'] == 18
-    #if deferred_config.defaults() is None:
-    #    assert deferred_config['sub']['e'] == 18
+    assert macro_config['sub']['e'] == 18
+    #if macro_config.defaults() is None:
+    #    assert macro_config['sub']['e'] == 18
     #else:
-    #    assert deferred_config['sub']['e'] == 48
+    #    assert macro_config['sub']['e'] == 48
 
-def test_Schema_deferred_err_option(deferred_schema, deferred_config):
-    deferred_config['c'] = 15
+def test_Schema_macro_err_option(macro_schema, macro_config):
+    macro_config['c'] = 15
     with pytest.raises(InvalidChoiceError) as exc_info:
-        deferred_schema.validate(deferred_config, raise_on_error=True)
+        macro_schema.validate(macro_config, raise_on_error=True)
     assert str(exc_info.value) == "c=15: 15 is not a valid choice; valid choices are: (10, 20)"
 
-def test_Schema_deferred_err_min(deferred_schema, deferred_config):
-    deferred_config['a'] = 19
-    deferred_config['c'] = deferred_config['b']
+def test_Schema_macro_err_min(macro_schema, macro_config):
+    macro_config['a'] = 19
+    macro_config['c'] = macro_config['b']
     with pytest.raises(MinValueError) as exc_info:
-        deferred_schema.validate(deferred_config, raise_on_error=True)
+        macro_schema.validate(macro_config, raise_on_error=True)
     assert str(exc_info.value) == "sub.d=18: value is lower than min 19"
 
-def test_Schema_deferred_err_max(deferred_schema, deferred_config):
-    deferred_config['b'] = 13
-    deferred_config['c'] = deferred_config['a']
+def test_Schema_macro_err_max(macro_schema, macro_config):
+    macro_config['b'] = 13
+    macro_config['c'] = macro_config['a']
     with pytest.raises(MaxValueError) as exc_info:
-        deferred_schema.validate(deferred_config, raise_on_error=True)
+        macro_schema.validate(macro_config, raise_on_error=True)
     assert str(exc_info.value) == "sub.d=18: value is greater than max 13"

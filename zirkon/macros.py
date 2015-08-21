@@ -16,7 +16,7 @@
 #
 
 """\
-Definition of the deferred objects used by zirkon (ROOT and SECTION).
+Definition of the macro objects used by zirkon (ROOT and SECTION).
 """
 
 __author__ = "Simone Campagna"
@@ -28,13 +28,13 @@ __all__ = [
 ]
 
 
-from .toolbox.deferred import DName
+from .toolbox.macro import MName
 
 
-class DNameCall(DName):
-    """Deferred name lookup and function call: DNameCall('foo') evaluates to 'foo()'.
+class MNameCall(MName):
+    """Macro for name lookup and function call: MNameCall('foo') evaluates to 'foo()'.
 
-       >>> dprop = DNameCall('foo')
+       >>> dprop = MNameCall('foo')
        >>> foo_function = lambda: 123
        >>> dprop.evaluate({'foo': foo_function})
        123
@@ -60,5 +60,5 @@ class DNameCall(DName):
         return super().evaluate(globals_d=globals_d)()
 
 
-SECTION = DNameCall('SECTION')
-ROOT = DName('ROOT')
+SECTION = MNameCall('SECTION')
+ROOT = MName('ROOT')
