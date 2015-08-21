@@ -20,7 +20,8 @@ Some utilities for config objects.
 """
 
 __author__ = "Simone Campagna"
-
+__copyright__ = 'Copyright (c) 2015 Simone Campagna'
+__license__ = 'Apache License Version 2.0'
 __all__ = [
     'create_template_from_schema',
     'replace_deferred',

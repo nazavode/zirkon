@@ -19,14 +19,16 @@
 The config version:
 
 >>> print(VERSION_INFO)
-VersionInfo(major=1, minor=0, patch=5)
+VersionInfo(major=1, minor=0, patch=6)
 >>> print(VERSION)
-1.0.5
+1.0.6
 >>>
 
 """
 
 __author__ = "Simone Campagna"
+__copyright__ = 'Copyright (c) 2015 Simone Campagna'
+__license__ = 'Apache License Version 2.0'
 __all__ = [
     'VersionInfo',
     'VERSION_INFO',
@@ -41,7 +43,7 @@ VersionInfo = collections.namedtuple('VersionInfo', (
     'patch',
 ))
 
-VERSION_INFO = VersionInfo(major=1, minor=0, patch=5)
+VERSION_INFO = VersionInfo(major=1, minor=0, patch=6)
 
 VERSION = '.'.join(str(v) for v in VERSION_INFO)
 

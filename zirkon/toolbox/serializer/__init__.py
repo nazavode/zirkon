@@ -20,7 +20,8 @@ Serializer classes.
 """
 
 __author__ = "Simone Campagna"
-
+__copyright__ = 'Copyright (c) 2015 Simone Campagna'
+__license__ = 'Apache License Version 2.0'
 __all__ = ['Serializer']
 
 from .serializer import Serializer

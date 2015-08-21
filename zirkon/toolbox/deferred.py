@@ -20,6 +20,8 @@ Implementation of the Deferred abstract base class for deferred evaluation of py
 """
 
 __author__ = "Simone Campagna"
+__copyright__ = 'Copyright (c) 2015 Simone Campagna'
+__license__ = 'Apache License Version 2.0'
 __all__ = [
     'Deferred', 'DBinaryOperator', 'DUnaryOperator', 'DName', 'DConst', 'DAbs',
     'DPos', 'DNeg', 'DAdd', 'DSub', 'DMul', 'DTrueDiv', 'DFloorDiv', 'DMod',

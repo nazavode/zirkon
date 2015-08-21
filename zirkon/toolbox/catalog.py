@@ -21,6 +21,8 @@ about classes. It provides methods to find the best match for any class.
 """
 
 __author__ = "Simone Campagna"
+__copyright__ = 'Copyright (c) 2015 Simone Campagna'
+__license__ = 'Apache License Version 2.0'
 __all__ = [
     'Catalog',
 ]
