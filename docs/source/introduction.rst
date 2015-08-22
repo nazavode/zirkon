@@ -16,7 +16,7 @@ What is Zirkon
 
     - Python >= 3.4
 
-Zirkon is a python library to manage configuration information. It implements multiple `serialization protocols`_, generic `validation`_, `default values`_ and `macros`_.
+Zirkon is a python library to manage configuration information. It implements `multiple serialization protocols`_, `option validation`_, `default values`_ and `macros`_.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
@@ -85,6 +85,8 @@ available:
  |pickle   |text    |pickle serialization                                           |
  +---------+--------+---------------------------------------------------------------+
 
+For a description of the serialization format, see :ref:`serialization formats`.
+
 Some examples:
 
  >>> config = Config()
@@ -109,7 +111,7 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirko
  [subsection]
      y = 'alpha'
 
-.. _validation:
+.. _option validation:
 
 Validation
 ----------

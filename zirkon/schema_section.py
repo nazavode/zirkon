@@ -59,33 +59,6 @@ def _reset_option_default(*, section, option, option_name):
     return section_defaults
 
 
-def _validate_option(*, validator, section, validation_section,
-                     option_name, raise_on_error, option):
-    """Validates an option and uses the validation result to
-       eventually change the option value.
-       Used to implement SchemaSection.impl_validate(...) method.
-    """
-    section_defaults = _reset_option_default(section=section, option=option, option_name=option_name)
-    prev_defined = option.defined
-    prev_value = option.value
-    try:
-        validator.validate_option(option, section)
-    except OptionValidationError as err:
-        validation_section[option_name] = err
-        if raise_on_error:
-            raise
-    else:
-        if not option.defined:
-            if prev_defined:
-                del section[option_name]
-        else:
-            if option.value is not prev_value:
-                if prev_defined:
-                    section[option_name] = option.value
-                else:
-                    section_defaults[option_name] = option.value
-
-
 class SchemaSection(Section):
     """ A Section class to perform validation. All values must be Validator
        instances.
@@ -113,6 +86,9 @@ class SchemaSection(Section):
            enables macros
        unexpected_option_validator: Validator, optional
            the Validator to be used for unexpected options
+       use_defaults: bool, optional
+           if True, adds default values to defaults
+           (defaults to True)
 
        Attributes
        ----------
@@ -126,14 +102,18 @@ class SchemaSection(Section):
            enables macros
        unexpected_option_validator: Validator, optional
            the Validator to be used for unexpected options
+       use_defaults: bool, optional
+           if True, adds default values to defaults
+           (defaults to True)
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
 
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
-                 macros=True, unexpected_option_validator=None):
+                 macros=True, unexpected_option_validator=None, use_defaults=True):
         self._unexpected_option_validator = None
         self.unexpected_option_validator = unexpected_option_validator
+        self.use_defaults = use_defaults
         super().__init__(dictionary=dictionary, init=init, parent=parent,
                          macros=macros, name=name)
 
@@ -144,7 +124,8 @@ class SchemaSection(Section):
     def _subsection(self, section_name, dictionary):
         return self._subsection_class()(dictionary=dictionary, name=section_name,
                                         macros=self.macros,
-                                        unexpected_option_validator=self.unexpected_option_validator)
+                                        unexpected_option_validator=self.unexpected_option_validator,
+                                        use_defaults=self.use_defaults)
 
     @property
     def unexpected_option_validator(self):
@@ -321,7 +302,7 @@ class SchemaSection(Section):
                     value = None
                     defined = False
                 option = Option(name=fqname, value=value, defined=defined)
-                _validate_option(
+                self._validate_option(
                     validator=validator,
                     section=section,
                     validation_section=validation_section,
@@ -334,10 +315,38 @@ class SchemaSection(Section):
                 validator = self.unexpected_option_validator
                 fqname = parent_fqname + option_name
                 option = Option(name=fqname, value=option_value, defined=True)
-                _validate_option(
+                self._validate_option(
                     validator=validator,
                     validation_section=validation_section,
                     section=section,
                     option_name=option_name,
                     option=option,
                     raise_on_error=raise_on_error)
+
+    def _validate_option(self, *, validator, section, validation_section,
+                         option_name, raise_on_error, option):
+        """Validates an option and uses the validation result to
+           eventually change the option value.
+           Used to implement SchemaSection.impl_validate(...) method.
+        """
+        section_defaults = _reset_option_default(section=section, option=option, option_name=option_name)
+        prev_defined = option.defined
+        prev_value = option.value
+        try:
+            validator.validate_option(option, section)
+        except OptionValidationError as err:
+            validation_section[option_name] = err
+            if raise_on_error:
+                raise
+        else:
+            if not option.defined:
+                if prev_defined:
+                    del section[option_name]
+            else:
+                if option.value is not prev_value:
+                    if prev_defined or not self.use_defaults:
+                        section[option_name] = option.value
+                    else:
+                        section_defaults[option_name] = option.value
+
+

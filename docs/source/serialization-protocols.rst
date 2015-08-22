@@ -66,17 +66,33 @@ The configobj protocol is compatible with the *ConfigObj* format using the ``unr
 
   .. code-block:: python
 
+     x = 10
      [params]
          a = 1.02
          [[sub]]
              y = 4
          b = 3.3
          coeffs = [-0.5, 0.5]
+     name = "alpha"
 
 In the last example:
 
+* option ``x`` belongs to root section (``config["x"]``)
 * option ``a`` belongs to subsection *params* (``config["params"]["a"]``, ...)
-* options ``y``, ``b`` and ``coeffs`` belong to subsection *sub* (``config["params"]["sub"]["y"]``, ...), in spite of indentation.
+* options ``y``, ``b``, ``coeffs`` and ``name`` all belongs to subsection *sub* (``config["params"]["sub"]["y"]``, ...), in spite of indentation.
+
+So, the *configobj* example above is equivalent to:
+
+  .. code-block:: python
+
+     x = 10
+     [params]
+         a = 1.02
+         [sub]
+             y = 4
+             b = 3.3
+             coeffs = [-0.5, 0.5]
+             name = 'alpha'
 
 
 The *json* protocol
