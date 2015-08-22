@@ -149,3 +149,5 @@ The 'coeffs' validator requires a float list whose length is at least 'num', whe
  >>> config['num'] = 8
  >>> schema.validate(config).dump()
  coeffs = MinLengthError('coeffs=[]: length 0 is lower than min_len 8')
+
+See the full documentation at http://zirkon.readthedocs.org/en/latest/.
