@@ -110,124 +110,12 @@ Zirkon supports validation through a *Schema* object. A *Schema* is a *Config* w
  >>> print(config['coeffs'])
  [1.0, 1.0, 1.0]
 
-Notice that two values have been added to
-
- >>> from zirkon.schema import Schema
- >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
- >>> schema = Schema()
- >>> schema['num'] = Int(min=0)
- >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
- >>> schema['sub'] = {}
- >>> schema['sub']['enable'] = Bool()
- >>> schema['sub']['x'] = Float(min=0.0)
- >>> schema['sub']['y'] = Float(min=0.0)
- >>> schema['name'] = Str()
- >>> schema['min_value'] = Int(default=100)
- >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
- >>> validation = schema.validate(config)
- >>> validation.dump()
- w = UnexpectedOptionError('w=5: unexpected option')
- [sub]
-     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
- >>> print(config['min_value'])
- 100
- >>> print(config['coeffs'])
- [1.0, 1.0, 1.0]
-
-Notice that two values have been added to
-
- >>> from zirkon.schema import Schema
- >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
- >>> schema = Schema()
- >>> schema['num'] = Int(min=0)
- >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
- >>> schema['sub'] = {}
- >>> schema['sub']['enable'] = Bool()
- >>> schema['sub']['x'] = Float(min=0.0)
- >>> schema['sub']['y'] = Float(min=0.0)
- >>> schema['name'] = Str()
- >>> schema['min_value'] = Int(default=100)
- >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
- >>> validation = schema.validate(config)
- >>> validation.dump()
- w = UnexpectedOptionError('w=5: unexpected option')
- [sub]
-     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
- >>> print(config['min_value'])
- 100
- >>> print(config['coeffs'])
- [1.0, 1.0, 1.0]
-
-Notice that two values have been added to
-
- >>> from zirkon.schema import Schema
- >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
- >>> schema = Schema()
- >>> schema['num'] = Int(min=0)
- >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
- >>> schema['sub'] = {}
- >>> schema['sub']['enable'] = Bool()
- >>> schema['sub']['x'] = Float(min=0.0)
- >>> schema['sub']['y'] = Float(min=0.0)
- >>> schema['name'] = Str()
- >>> schema['min_value'] = Int(default=100)
- >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
- >>> validation = schema.validate(config)
- >>> validation.dump()
- w = UnexpectedOptionError('w=5: unexpected option')
- [sub]
-     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
- >>> print(config['min_value'])
- 100
- >>> print(config['coeffs'])
- [1.0, 1.0, 1.0]
-
-Notice that two values have been added to
-
- >>> from zirkon.schema import Schema
- >>> from zirkon.validator import Int, Str, StrChoice, Float, Bool, FloatList
- >>> schema = Schema()
- >>> schema['num'] = Int(min=0)
- >>> schema['mode'] = StrChoice(choices=("xy", "yx", "xx"))
- >>> schema['sub'] = {}
- >>> schema['sub']['enable'] = Bool()
- >>> schema['sub']['x'] = Float(min=0.0)
- >>> schema['sub']['y'] = Float(min=0.0)
- >>> schema['name'] = Str()
- >>> schema['min_value'] = Int(default=100)
- >>> schema['coeffs'] = FloatList(min_len=1, default=[1.0, 1.0, 1.0])
- >>> validation = schema.validate(config)
- >>> validation.dump()
- w = UnexpectedOptionError('w=5: unexpected option')
- [sub]
-     y = MinValueError('sub.y=-1.5: value is lower than min 0.0')
- >>> print(config['min_value'])
- 100
- >>> print(config['coeffs'])
- [1.0, 1.0, 1.0]
-
 Notice that two values have been added to *config*, due to the defaults defined in the *schema*.
 
-Interpolation
--------------
+Macros
+------
 
-Zirkon supports value interpolation: *config* values can be influenced by other values:
-
- >>> from zirkon.config import ROOT
- >>> config = Config()
- >>> config['x'] = 2
- >>> config['y'] = ROOT['x'] * 4
- >>> print(config['y'])
- 8
- >>> config['x'] = 10
- >>> print(config['y'])
- 40
- >>> config.dump()
- x = 10
- y = ROOT['x'] * 4
- >>>
-
-The value of *y* is tied to *x* by means of the expression
+Zirkon supports macros: new *config* values can be defined as an expression involving other values:
 
  >>> from zirkon.config import ROOT
  >>> config = Config()
@@ -243,23 +131,7 @@ The value of *y* is tied to *x* by means of the expression
  y = ROOT['x'] * 4
  >>>
 
-The value of *y* is tied to *x* by means of the expression
-
- >>> from zirkon.config import ROOT
- >>> config = Config()
- >>> config['x'] = 2
- >>> config['y'] = ROOT['x'] * 4
- >>> print(config['y'])
- 8
- >>> config['x'] = 10
- >>> print(config['y'])
- 40
- >>> config.dump()
- x = 10
- y = ROOT['x'] * 4
- >>>
-
-The value of *y* is tied to *x* by means of the expression ``ROOT['x'] * 4``.
+The value of *y* is tied to *x* by means of the macro expression ``ROOT['x'] * 4``.
 
 This can be used also in *Validators*:
 
