@@ -1,4 +1,4 @@
-.. _intro:
+.. _validation:
 
 ===================
  Zirkon validation
@@ -22,7 +22,7 @@ A validator can
 Standard validators
 ===================
 
-This is the list of predefided validators:
+There are many predefided validators; this is the list of integer validators:
 
  +------------+---------------------+------------------+
  |Validator   |Basic validation     |Accepted Arguments|
@@ -48,6 +48,13 @@ This is the list of predefided validators:
  |            |contained in a set   |* default         |
  |            |of prefedifed choices|                  |
  +------------+---------------------+------------------+
+
+The list of floating point validators:
+
+ +------------+---------------------+------------------+
+ |Validator   |Basic validation     |Accepted Arguments|
+ |name        |                     |                  |
+ +------------+---------------------+------------------+
  |Float       |A floating point     |* default         |
  |            |value                |* min             |
  |            |                     |* max             |
@@ -69,6 +76,13 @@ This is the list of predefided validators:
  |            |a set of             |                  |
  |            |prefedifed choices   |                  |
  +------------+---------------------+------------------+
+
+The list of string validators:
+
+ +------------+---------------------+------------------+
+ |Validator   |Basic validation     |Accepted Arguments|
+ |name        |                     |                  |
+ +------------+---------------------+------------------+
  |Str         |A string             |* default         |
  |            |                     |* min_len         |
  |            |                     |* max_len         |
@@ -88,6 +102,13 @@ This is the list of predefided validators:
  |StrChoice   |A string             |* **choices**     |
  |            |contained in a set   |* default         |
  |            |of prefedifed choices|                  |
+ +------------+---------------------+------------------+
+
+The list of boolean validators:
+
+ +------------+---------------------+------------------+
+ |Validator   |Basic validation     |Accepted Arguments|
+ |name        |                     |                  |
  +------------+---------------------+------------------+
  |Bool        |A boolean value      |* default         |
  |            |                     |* min             |
