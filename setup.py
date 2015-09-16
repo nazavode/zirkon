@@ -65,19 +65,19 @@ if __name__ == "__main__":
                 rdirpath = os.path.relpath(dirpath, DIRNAME)
                 packages.append(os.path.normpath(rdirpath).replace(os.sep, '.'))
     
-    # search requirement files
-    data_files = []
-    for data_dirname, patterns in [('requirements', ('*.txt', )),
-                                   ('docs/source', ('conf.py', '*.rst')),
-                                   ('docs/source/examples', ('*.rst',)),
-                                   ('docs/source/img', ('*.png',)),
-                                   ('.', ('tox.ini', 'pylint.ini', 'flake8.ini',)),
-                                  ]:
-        files = []
-        for pattern in patterns:
-            for fpath in glob.glob(os.path.join(DIRNAME, data_dirname, pattern)):
-                files.append(os.path.relpath(fpath, DIRNAME))
-        data_files.append((data_dirname, files))
+#    # search requirement files
+#    data_files = []
+#    for data_dirname, patterns in [('requirements', ('*.txt', )),
+#                                   ('docs/source', ('conf.py', '*.rst')),
+#                                   ('docs/source/examples', ('*.rst',)),
+#                                   ('docs/source/img', ('*.png',)),
+#                                   ('.', ('tox.ini', 'pylint.ini', 'flake8.ini',)),
+#                                  ]:
+#        files = []
+#        for pattern in patterns:
+#            for fpath in glob.glob(os.path.join(DIRNAME, data_dirname, pattern)):
+#                files.append(os.path.relpath(fpath, DIRNAME))
+#        data_files.append((data_dirname, files))
     
     setup(
         name="zirkon",
@@ -88,7 +88,7 @@ if __name__ == "__main__":
         author_email="simone.campagna11@gmail.com",
         install_requires=read_requirements('install'),
         package_data={},
-        data_files=data_files,
+        #data_files=data_files,
         url="https://github.com/simone-campagna/zirkon",
         download_url = 'https://github.com/simone-campagna/zirkon/archive/{}.tar.gz'.format(version),
         packages=packages,
