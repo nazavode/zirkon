@@ -19,7 +19,7 @@
 The config version:
 
 >>> print(VERSION_INFO)
-VersionInfo(major=1, minor=0, patch=6)
+VersionInfo(major=1, minor=0, patch=7)
 >>> print(VERSION)
 1.0.7
 >>>

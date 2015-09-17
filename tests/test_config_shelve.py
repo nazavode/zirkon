@@ -67,8 +67,13 @@ x = 10
         config2_stream = string_io()
         config2.dump(stream=config2_stream)
         config2_dump = config2_stream.getvalue()
-        print(config_dump)
-        print("---")
-        print(config2_dump)
         assert config2_dump == config_dump
+
+def test_Config_on_shelf_mutable(tmpdir):
+    with shelve.open(os.path.join(tmpdir.strpath, 'x_mutable.shelve')) as shelf:
+        flatshelf = FlatMap(dictionary=shelf)
+        config = Config(dictionary=flatshelf)
+        config['a'] = [1, 2]
+        config['a'].append(3)
+        assert config['a'] == [1, 2]
     
