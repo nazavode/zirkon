@@ -17,6 +17,15 @@
 
 """\
 Implementation of the UNDEFINED singleton.
+
+>>> x = UNDEFINED
+>>> x is UNDEFINED
+True
+>>> y = UndefinedType()
+>>> y is UNDEFINED
+True
+>>>
+
 """
 
 __author__ = "Simone Campagna"
