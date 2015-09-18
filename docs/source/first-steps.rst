@@ -1,4 +1,4 @@
-.. _intro-first-steps:
+.. _first-steps:
 
 =============
  First steps
@@ -324,6 +324,19 @@ Anyway, if defaults are disabled, the *set_defaults* still works, and it behaves
  >>> config.dump()
  a = 1
 
+Schema and defaults
+-------------------
+
+By default, during validation default values are added to the config's *defaults*. This can be disabled using the *schema* parameter ``use_defaults=False``:
+
+ >>> schema = Schema(use_defaults=False)
+ >>> schema["x"] = Int(default=10)
+ >>> config = Config()
+ >>> validation = schema.validate(config)
+ >>> config.dump()
+ x = 10
+
+In this case, the ``x = 10`` option has been added as standard option, and is so serialized.
 
 .. rubric:: Footnotes
 

@@ -42,6 +42,9 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
            the internal dictionary
        unexpected_option_validator: Validator, optional
            the validator to be used for unexpected options
+       use_defaults: bool, optional
+           if True, adds default values to defaults
+           (defaults to True)
        self_validate: bool, optional
 
        Raises
@@ -55,13 +58,18 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
            the internal dictionary
        unexpected_option_validator: Validator, optional
            the validator to be used for unexpected options
+       use_defaults: bool, optional
+           if True, adds default values to defaults
+           (defaults to True)
        self_validate: bool, optional
            enables self validation in construction
 
     """
-    def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None, self_validate=True):
-        super().__init__(dictionary=dictionary, init=init, interpolation=True,
-                         unexpected_option_validator=unexpected_option_validator)
+    def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None,
+                 use_defaults=True, self_validate=True):
+        super().__init__(dictionary=dictionary, init=init, macros=True,
+                         unexpected_option_validator=unexpected_option_validator,
+                         use_defaults=use_defaults)
         if self_validate:
             schema_validator = self._subsection_class()(dictionary=None,
                                                         unexpected_option_validator=ValidatorInstance())

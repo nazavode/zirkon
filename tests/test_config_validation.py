@@ -125,9 +125,9 @@ def test_Config_self_validate_error_dump(string_io, config):
     frequencies = MinLengthError('parameters.frequencies=[5.0]: length 1 is lower than min_len 2')
 """
     
-def test_Config_err_disabled_interpolation_on_validation():
+def test_Config_err_disabled_macros_on_validation():
     from zirkon.config import ROOT
-    config = Config(interpolation=False)
+    config = Config(macros=False)
     schema = Schema()
     schema['x'] = Int()
     schema['y'] = Int(min=ROOT['x'] + 2)
@@ -135,4 +135,34 @@ def test_Config_err_disabled_interpolation_on_validation():
     config['y'] = 5
     with pytest.raises(ValueError) as exc_info:
         validation = schema.validate(config)
-    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 2: interpolation is not enabled"
+    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 2: macros are not enabled"
+
+@pytest.fixture(params=[True, False])
+def use_defaults(request):
+    return request.param
+
+def test_Config_use_defaults_False(string_io, use_defaults):
+    config = Config()
+    schema = Schema(use_defaults=use_defaults)
+    schema['x'] = Int(default=10)
+    schema['sub'] = {'y': Int(default=20)}
+    schema['sub']['sub'] = {'z': Int(default=30)}
+    validation = schema.validate(config)
+    assert config['x'] == 10
+    assert config['sub']['y'] == 20
+    assert config['sub']['sub']['z'] == 30
+    assert not validation
+    config.dump(string_io)
+    if use_defaults:
+        assert string_io.getvalue() == """\
+[sub]
+    [sub]
+"""
+    else:
+        assert string_io.getvalue() == """\
+x = 10
+[sub]
+    y = 20
+    [sub]
+        z = 30
+"""

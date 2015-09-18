@@ -18,9 +18,9 @@ Submodules
    zirkon.config_base
    zirkon.config_section
    zirkon.defaults_section
-   zirkon.deferred_object
    zirkon.filetype
    zirkon.flatmap
+   zirkon.macros
    zirkon.schema
    zirkon.schema_section
    zirkon.section

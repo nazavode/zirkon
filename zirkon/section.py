@@ -63,7 +63,7 @@ import collections
 import collections.abc
 import sys
 
-from .toolbox.deferred import Deferred
+from .toolbox.macro import Macro
 from .toolbox.dictutils import as_dict
 from .toolbox.identifier import is_valid_identifier
 from .toolbox.serializer import Serializer
@@ -84,8 +84,8 @@ class Section(collections.abc.Mapping):
            the parent section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
 
        Attributes
        ----------
@@ -95,14 +95,14 @@ class Section(collections.abc.Mapping):
            the parent section
        name: str, optional
            the Section name
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
-    def __init__(self, init=None, *, dictionary=None, parent=None, name=None, interpolation=True):
-        self.interpolation = interpolation
+    def __init__(self, init=None, *, dictionary=None, parent=None, name=None, macros=True):
+        self.macros = macros
         if dictionary is None:
             dictionary = self._dictionary_factory()
         self.dictionary = dictionary
@@ -138,7 +138,7 @@ class Section(collections.abc.Mapping):
                a subsection_class instance
         """
         return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        interpolation=self.interpolation,
+                                        macros=self.macros,
                                         name=section_name)
 
     @classmethod
@@ -153,7 +153,7 @@ class Section(collections.abc.Mapping):
         return collections.OrderedDict()
 
     def get_reference_root(self):
-        """Returns the reference_root to be used for evaluation of deferred expressions.
+        """Returns the reference_root to be used for evaluation of macros.
 
            Returns
            -------
@@ -173,20 +173,20 @@ class Section(collections.abc.Mapping):
            Raises
            ------
            ValueError
-               cannot evaluate (interpolation is disabled)
+               cannot evaluate (macros are disabled)
 
            Returns
            -------
            any
                the evaluated value
         """
-        if isinstance(value, Deferred):
-            if self.interpolation:
+        if isinstance(value, Macro):
+            if self.macros:
                 reference_root = self.get_reference_root()
                 section_getter = lambda: get_section_value(reference_root, *self.fqname)
                 value = value.evaluate({'SECTION': section_getter, 'ROOT': reference_root})
             else:
-                raise ValueError("cannot evaluate {}: interpolation is not enabled".format(
+                raise ValueError("cannot evaluate {}: macros are not enabled".format(
                     value.unparse()))
         return value
 
@@ -249,9 +249,9 @@ class Section(collections.abc.Mapping):
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
-            if isinstance(value, Deferred):
-                if not self.interpolation:
-                    raise ValueError("cannot set {}={}: interpolation is not enabled".format(
+            if isinstance(value, Macro):
+                if not self.macros:
+                    raise ValueError("cannot set {}={}: macros are not enabled".format(
                         key, value.unparse()))
             else:
                 self._check_option(key=key, value=value)
@@ -456,7 +456,7 @@ class Section(collections.abc.Mapping):
            defaults: bool, optional
                if True copy also default values
            evaluate: bool, optional
-               if True evaluate deferred expressions
+               if True evaluate macros
         """
         result = dict_class()
         subsection_class = self._subsection_class()

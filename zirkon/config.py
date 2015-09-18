@@ -63,7 +63,7 @@ __all__ = [
 
 from .config_base import ConfigBase, ConfigValidationError
 from .config_section import ConfigSection
-from .deferred_object import ROOT, SECTION
+from .macros import ROOT, SECTION
 
 
 class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
@@ -77,8 +77,8 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
            the internal dictionary
        defaults: bool, optional
            enables defaults
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
        schema: Schema, optional
            the validation schema
        validate: bool, optional
@@ -88,16 +88,16 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
        ----------
        dictionary: Mapping, optional
            the internal dictionary
-       interpolation: bool, optional
-           enables interpolation
+       macros: bool, optional
+           enables macros
        schema: Schema, optional
            the validation schema
     """
 
     def __init__(self, init=None, *, dictionary=None, defaults=True,
-                 interpolation=True, schema=None, validate=True):
+                 macros=True, schema=None, validate=True):
         super().__init__(dictionary=dictionary, init=init, defaults=defaults,
-                         interpolation=interpolation, schema=schema, validate=validate)
+                         macros=macros, schema=schema, validate=validate)
 
     @ConfigSection.defaults.setter
     def defaults(self, value):  # pylint: disable=W0221

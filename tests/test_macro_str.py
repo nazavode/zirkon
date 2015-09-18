@@ -4,10 +4,10 @@ import collections
 
 import pytest
 
-from zirkon.toolbox.deferred import \
-    Deferred, \
-    DRepr, DStr, DAnd, DOr, DNot, \
-    DConst, DLen
+from zirkon.toolbox.macro import \
+    Macro, \
+    MRepr, MStr, MAnd, MOr, MNot, \
+    MConst, MLen
 
 
 
@@ -18,10 +18,10 @@ def sval1(request):
     return request.param
 
 _unary_str_operator = collections.OrderedDict()
-_unary_str_operator['Len'] = DLen
-_unary_str_operator['Str'] = DStr
-_unary_str_operator['Repr'] = DRepr
-_unary_str_operator['Not'] = DNot
+_unary_str_operator['Len'] = MLen
+_unary_str_operator['Str'] = MStr
+_unary_str_operator['Repr'] = MRepr
+_unary_str_operator['Not'] = MNot
 @pytest.fixture(ids=tuple(_unary_str_operator.keys()), params=tuple(_unary_str_operator.values()))
 def sop1(request):
     return request.param
@@ -61,30 +61,30 @@ def smethod0(request):
 ###############################
 ## str unary:
 def test_str_unary(sop1, sval1):
-    e = sop1(DConst(sval1))
-    assert isinstance(e, Deferred)
+    e = sop1(MConst(sval1))
+    assert isinstance(e, Macro)
     assert e.evaluate() == sop1(sval1)
     
 ## str binary:
 def test_str_binary_vl(sop2, sval2):
     l, r = sval2
-    e = sop2(DConst(l), r)
+    e = sop2(MConst(l), r)
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vr(sop2, sval2):
     l, r = sval2
-    e = sop2(l, DConst(r))
+    e = sop2(l, MConst(r))
     assert e.evaluate() == sop2(l, r)
     
 def test_str_binary_vlr(sop2, sval2):
     l, r = sval2
-    e = sop2(DConst(l), DConst(r))
+    e = sop2(MConst(l), MConst(r))
     assert e.evaluate() == sop2(l, r)
 
 ###############################
 def test_str_method0(smethod0, sval1):
     vm = getattr(sval1, smethod0)
-    e = DConst(sval1)
+    e = MConst(sval1)
     em = getattr(e, smethod0)
     assert vm is not em
     emv = em().evaluate()
@@ -93,6 +93,6 @@ def test_str_method0(smethod0, sval1):
 def test_str_method_join():
     s = ', '
     l = ['a', ' b ', 'cde', '12']
-    e = DConst(s)
+    e = MConst(s)
     em = e.join(l)
     assert s.join(l) == em.evaluate()

@@ -27,8 +27,7 @@ from common.fixtures import string_io
 from zirkon.schema import Schema
 from zirkon.config import ROOT, SECTION, Config
 from zirkon.validator import Int, Float, Str
-from zirkon.toolbox.deferred import Deferred
-from zirkon.utils import create_template_from_schema, replace_deferred, \
+from zirkon.utils import create_template_from_schema, replace_macros, \
     get_key, set_key, del_key
 
 def test_create_template_from_schema(string_io):
@@ -75,7 +74,7 @@ m0 = 3
 m1 = ROOT['m0'] + 1
 """
 
-def test_replace_deferred():
+def test_replace_macros():
     a_value = 10
     c_value = 5
     x_value = 4
@@ -115,7 +114,7 @@ def test_replace_deferred():
     verify(config1, a_value, c_value, x_value, z_value)
     verify(config2, a_value, c_value, x_value, z_value)
 
-    replace_deferred(config2)
+    replace_macros(config2)
 
     new_a_value1 = 67
     config1['a'] = new_a_value1
@@ -123,7 +122,7 @@ def test_replace_deferred():
     verify(config1, new_a_value1, c_value, x_value, z_value)
     verify(config2, new_a_value1, c_value, x_value, z_value, def_a_value=a_value)
 
-    replace_deferred(config1)
+    replace_macros(config1)
 
     new_a_value2 = 67
     config1['a'] = new_a_value2

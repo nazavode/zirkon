@@ -16,6 +16,7 @@ Zirkon requires python version 3.4.
 
     introduction
     first-steps
+    serialization-protocols
     validation
     examples/index
     tool

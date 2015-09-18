@@ -226,7 +226,7 @@ c = ROOT['a'] * ROOT['b']
 def x_def_name(request):
     return request.param
 
-def test_main_deferred(files, x_def_name, defaults):
+def test_main_macro(files, x_def_name, defaults):
     i_file = files[x_def_name]
     args = ["read", "-i", i_file, "-o", ":zirkon"]
     if defaults is not None:

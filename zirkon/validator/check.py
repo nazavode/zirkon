@@ -28,7 +28,7 @@ __all__ = [
 
 import abc
 
-from ..toolbox.deferred import Deferred
+from ..toolbox.macro import Macro
 
 
 class Check(metaclass=abc.ABCMeta):
@@ -59,7 +59,7 @@ class Check(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     def has_actual_value(self, value):  # pylint: disable=R0201
-        """Returns True if value is not a Deferred instance.
+        """Returns True if value is not a Macro instance.
 
            Parameters
            ----------
@@ -69,9 +69,9 @@ class Check(metaclass=abc.ABCMeta):
            Returns
            -------
            bool
-               True if value is immediately available (i.e. it is not a Deferred).
+               True if value is immediately available (i.e. it is not a Macro).
         """
-        return not isinstance(value, Deferred)
+        return not isinstance(value, Macro)
 
     def self_validate(self, validator):
         """Uses validator to validate check's attributes.

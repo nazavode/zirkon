@@ -16,38 +16,39 @@
 #
 
 """\
-Implementation of the Deferred abstract base class for deferred evaluation of python expressions.
+Implementation of the Macro abstract base class for evaluation of Macros. A Macro is
+a python expression whose binding and evaluation can be deferred.
 """
 
 __author__ = "Simone Campagna"
 __copyright__ = 'Copyright (c) 2015 Simone Campagna'
 __license__ = 'Apache License Version 2.0'
 __all__ = [
-    'Deferred', 'DBinaryOperator', 'DUnaryOperator', 'DName', 'DConst', 'DAbs',
-    'DPos', 'DNeg', 'DAdd', 'DSub', 'DMul', 'DTrueDiv', 'DFloorDiv', 'DMod',
-    'DDivMod', 'DPow', 'DEq', 'DNe', 'DLt', 'DLe', 'DGt', 'DGe', 'DAnd', 'DOr',
-    'DNot', 'DLen', 'DStr', 'DRepr', 'DContains', 'DGetattr', 'DGetitem', 'DCall',
+    'Macro', 'MBinaryOperator', 'MUnaryOperator', 'MName', 'MConst', 'MAbs',
+    'MPos', 'MNeg', 'MAdd', 'MSub', 'MMul', 'MTrueDiv', 'MFloorDiv', 'MMod',
+    'MDivMod', 'MPow', 'MEq', 'MNe', 'MLt', 'MLe', 'MGt', 'MGe', 'MAnd', 'MOr',
+    'MNot', 'MLen', 'MStr', 'MRepr', 'MContains', 'MGetattr', 'MGetitem', 'MCall',
 ]
 
 import abc
 
 
-class Deferred(metaclass=abc.ABCMeta):
+class Macro(metaclass=abc.ABCMeta):
     """Abstract base class to compose generic expressions.
        Concrete classes must implement the evaluate(globals_d=None) method.
     """
     PRIORITY = {
-        'DConst': 100000, 'DName': 100000, 'DOr': 1, 'DAnd': 2, 'DNot': 3, 'DContains': 4,
-        # 'DIs': 5,
-        'DLt': 6, 'DLe': 6, 'DGt': 6, 'DGe': 6, 'DEq': 6, 'DNe': 6,
-        # 'DBitwiseOr': 7, 'DBitwiseXOr': 8, 'DBitwiseAnd': 9, 'DLeftShift': 10, 'DRightShift': 10,
-        'DAdd': 11, 'DSub': 11, 'DMul': 12, 'DTrueDiv': 12, 'DFloorDiv': 12, 'DMod': 12,
-        'DDivMod': 12, 'DPos': 13, 'DNeg': 13,
-        # 'DBitwiseNot': 14,
-        'DPow': 15, 'DCall': 16, 'DGetitem': 17, 'DGetattr': 18,
+        'MConst': 100000, 'MName': 100000, 'MOr': 1, 'MAnd': 2, 'MNot': 3, 'MContains': 4,
+        # 'MIs': 5,
+        'MLt': 6, 'MLe': 6, 'MGt': 6, 'MGe': 6, 'MEq': 6, 'MNe': 6,
+        # 'MBitwiseOr': 7, 'MBitwiseXOr': 8, 'MBitwiseAnd': 9, 'MLeftShift': 10, 'MRightShift': 10,
+        'MAdd': 11, 'MSub': 11, 'MMul': 12, 'MTrueDiv': 12, 'MFloorDiv': 12, 'MMod': 12,
+        'MDivMod': 12, 'MPos': 13, 'MNeg': 13,
+        # 'MBitwiseNot': 14,
+        'MPow': 15, 'MCall': 16, 'MGetitem': 17, 'MGetattr': 18,
     }
     RIGHT_ASSOCIATIVITY = {
-        'DPow': True
+        'MPow': True
     }
 
     @abc.abstractmethod
@@ -136,94 +137,94 @@ class Deferred(metaclass=abc.ABCMeta):
 
     # unary mathematical operators:
     def __abs__(self):
-        return DAbs(self)
+        return MAbs(self)
 
     def __pos__(self):
-        return DPos(self)
+        return MPos(self)
 
     def __neg__(self):
-        return DNeg(self)
+        return MNeg(self)
 
     # binary mathematical operators:
     def __add__(self, other):
-        return DAdd(self, other)
+        return MAdd(self, other)
 
     def __radd__(self, other):
-        return DAdd(other, self)
+        return MAdd(other, self)
 
     def __sub__(self, other):
-        return DSub(self, other)
+        return MSub(self, other)
 
     def __rsub__(self, other):
-        return DSub(other, self)
+        return MSub(other, self)
 
     def __mul__(self, other):
-        return DMul(self, other)
+        return MMul(self, other)
 
     def __rmul__(self, other):
-        return DMul(other, self)
+        return MMul(other, self)
 
     def __truediv__(self, other):
-        return DTrueDiv(self, other)
+        return MTrueDiv(self, other)
 
     def __rtruediv__(self, other):
-        return DTrueDiv(other, self)
+        return MTrueDiv(other, self)
 
     def __floordiv__(self, other):
-        return DFloorDiv(self, other)
+        return MFloorDiv(self, other)
 
     def __rfloordiv__(self, other):
-        return DFloorDiv(other, self)
+        return MFloorDiv(other, self)
 
     def __mod__(self, other):
-        return DMod(self, other)
+        return MMod(self, other)
 
     def __rmod__(self, other):
-        return DMod(other, self)
+        return MMod(other, self)
 
     def __divmod__(self, other):
-        return DDivMod(self, other)
+        return MDivMod(self, other)
 
     def __rdivmod__(self, other):
-        return DDivMod(other, self)
+        return MDivMod(other, self)
 
     def __pow__(self, other):
-        return DPow(self, other)
+        return MPow(self, other)
 
     def __rpow__(self, other):
-        return DPow(other, self)
+        return MPow(other, self)
 
     # binary comparison operators:
     def __eq__(self, other):
-        return DEq(self, other)
+        return MEq(self, other)
 
     def __ne__(self, other):
-        return DNe(self, other)
+        return MNe(self, other)
 
     def __lt__(self, other):
-        return DLt(self, other)
+        return MLt(self, other)
 
     def __le__(self, other):
-        return DLe(self, other)
+        return MLe(self, other)
 
     def __gt__(self, other):
-        return DGt(self, other)
+        return MGt(self, other)
 
     def __ge__(self, other):
-        return DGe(self, other)
+        return MGe(self, other)
 
     # cannot work: immediately converted to bool
     # def __contains__(self, other):
-    #     return DContains(self, other)
+    #     return MContains(self, other)
 
     def __call__(self, *p_args, **n_args):
-        return DCall(functor=self, p_args=p_args, n_args=n_args)
+        return MCall(functor=self, p_args=p_args, n_args=n_args)
 
     def __getattr__(self, attr_name):
-        return DGetattr(self, attr_name)
+        return MGetattr(self, attr_name)
 
     def __getitem__(self, item):
-        return DGetitem(self, item)
+        return MGetitem(self, item)
 
     # utilities:
     @classmethod
@@ -233,7 +234,7 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to evaluate (a Deferred object or other value)
+               the operand to evaluate (a Macro object or other value)
            globals_d: dict
                the globals dictionary
 
@@ -242,7 +243,7 @@ class Deferred(metaclass=abc.ABCMeta):
            any
                the evaluated operand
         """
-        if isinstance(operand, Deferred):
+        if isinstance(operand, Macro):
             return operand.evaluate(globals_d=globals_d)
         else:
             return operand
@@ -254,7 +255,7 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to unparse (a Deferred object or other value)
+               the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
            right: bool
@@ -265,7 +266,7 @@ class Deferred(metaclass=abc.ABCMeta):
            str
                the unparsed expression
         """
-        if isinstance(operand, Deferred):
+        if isinstance(operand, Macro):
             if wrap is None:
                 p_operand = operand._priority()  # pylint: disable=W0212
                 p_cls = cls._priority()
@@ -288,7 +289,7 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to unparse (a Deferred object or other value)
+               the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
 
@@ -306,7 +307,7 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to unparse (a Deferred object or other value)
+               the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
 
@@ -324,7 +325,7 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to unparse (a Deferred object or other value)
+               the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
 
@@ -342,14 +343,14 @@ class Deferred(metaclass=abc.ABCMeta):
            Parameters
            ----------
            operand: any
-               the operand to unparse (a Deferred object or other value)
+               the operand to unparse (a Macro object or other value)
 
            Returns
            -------
            str
                the tree expression
         """
-        if isinstance(operand, Deferred):
+        if isinstance(operand, Macro):
             return operand._impl_tree()  # pylint: disable=W0212
         else:
             return repr(operand)
@@ -377,8 +378,8 @@ class Deferred(metaclass=abc.ABCMeta):
         return cls.RIGHT_ASSOCIATIVITY.get(cls.__name__, False)
 
 
-class DConst(Deferred):
-    """Deferred const expression. Evaluates to a const value.
+class MConst(Macro):
+    """Macro const expression. Evaluates to a const value.
 
        Parameters
        ----------
@@ -407,8 +408,8 @@ class DConst(Deferred):
         return self._impl_unparse_operand(self.value)
 
 
-class DName(Deferred):
-    """Deferred name lookup. Evaluates to the value referred by 'name'
+class MName(Macro):
+    """Macro name lookup. Evaluates to the value referred by 'name'
 
        Parameters
        ----------
@@ -454,8 +455,8 @@ class DName(Deferred):
         return self.name
 
 
-class DCall(Deferred):
-    """Deferred object call.
+class MCall(Macro):
+    """Macro object call.
 
        Parameters
        ----------
@@ -512,8 +513,8 @@ class DCall(Deferred):
         return "{}({})".format(self._impl_unparse_operand(self.functor), ', '.join(l_args))
 
 
-class DUnaryOperator(Deferred):
-    """Abstract base class for deferred unary operators.
+class MUnaryOperator(Macro):
+    """Abstract base class for macro unary operators.
 
        Parameters
        ----------
@@ -556,8 +557,8 @@ class DUnaryOperator(Deferred):
         raise NotImplementedError
 
 
-class DAbs(DUnaryOperator):
-    """Deferred 'abs()' function."""
+class MAbs(MUnaryOperator):
+    """Macro 'abs()' function."""
 
     def _impl_unary_operation(self, value):
         return abs(value)
@@ -566,8 +567,8 @@ class DAbs(DUnaryOperator):
         return "abs({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
-class DPos(DUnaryOperator):
-    """Deferred '+' unary operator."""
+class MPos(MUnaryOperator):
+    """Macro '+' unary operator."""
 
     def _impl_unary_operation(self, value):
         return +value
@@ -576,8 +577,8 @@ class DPos(DUnaryOperator):
         return "+{}".format(self._impl_unparse_operand(self.operand))
 
 
-class DNeg(DUnaryOperator):
-    """Deferred '-' unary operator."""
+class MNeg(MUnaryOperator):
+    """Macro '-' unary operator."""
 
     def _impl_unary_operation(self, value):
         return -value
@@ -586,8 +587,8 @@ class DNeg(DUnaryOperator):
         return "-{}".format(self._impl_unparse_operand(self.operand))
 
 
-class DNot(DUnaryOperator):
-    """Deferred 'not' unary operator."""
+class MNot(MUnaryOperator):
+    """Macro 'not' unary operator."""
 
     def _impl_unary_operation(self, value):
         return not value
@@ -596,8 +597,8 @@ class DNot(DUnaryOperator):
         return "not {}".format(self._impl_unparse_operand(self.operand))
 
 
-class DLen(DUnaryOperator):
-    """Deferred 'len' function."""
+class MLen(MUnaryOperator):
+    """Macro 'len' function."""
 
     def _impl_unary_operation(self, value):
         return len(value)
@@ -606,8 +607,8 @@ class DLen(DUnaryOperator):
         return "len({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
-class DStr(DUnaryOperator):
-    """Deferred 'str' function."""
+class MStr(MUnaryOperator):
+    """Macro 'str' function."""
 
     def _impl_unary_operation(self, value):
         return str(value)
@@ -616,8 +617,8 @@ class DStr(DUnaryOperator):
         return "str({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
-class DRepr(DUnaryOperator):
-    """Deferred 'repr' function."""
+class MRepr(MUnaryOperator):
+    """Macro 'repr' function."""
 
     def _impl_unary_operation(self, value):
         return repr(value)
@@ -626,8 +627,8 @@ class DRepr(DUnaryOperator):
         return "repr({})".format(self._impl_unparse_operand(self.operand, wrap=False))
 
 
-class DBinaryOperator(Deferred):
-    """Abstract base class for deferred binary operators.
+class MBinaryOperator(Macro):
+    """Abstract base class for macro binary operators.
 
        Parameters
        ----------
@@ -688,56 +689,56 @@ class DBinaryOperator(Deferred):
             self._impl_unparse_right_operand(self.right_operand))
 
 
-class DAdd(DBinaryOperator):
-    """Deferred '+' binary operator."""
+class MAdd(MBinaryOperator):
+    """Macro '+' binary operator."""
     BINOP_SYMBOL = '+'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value + right_value
 
 
-class DMul(DBinaryOperator):
-    """Deferred '*' binary operator."""
+class MMul(MBinaryOperator):
+    """Macro '*' binary operator."""
     BINOP_SYMBOL = '*'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value * right_value
 
 
-class DSub(DBinaryOperator):
-    """Deferred '-' binary operator."""
+class MSub(MBinaryOperator):
+    """Macro '-' binary operator."""
     BINOP_SYMBOL = '-'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value - right_value
 
 
-class DTrueDiv(DBinaryOperator):
-    """Deferred '/' binary operator."""
+class MTrueDiv(MBinaryOperator):
+    """Macro '/' binary operator."""
     BINOP_SYMBOL = '/'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value / right_value
 
 
-class DFloorDiv(DBinaryOperator):
-    """Deferred '//' binary operator."""
+class MFloorDiv(MBinaryOperator):
+    """Macro '//' binary operator."""
     BINOP_SYMBOL = '//'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value // right_value
 
 
-class DMod(DBinaryOperator):
-    """Deferred '%' binary operator."""
+class MMod(MBinaryOperator):
+    """Macro '%' binary operator."""
     BINOP_SYMBOL = '%'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value % right_value
 
 
-class DDivMod(DBinaryOperator):
-    """Deferred 'divmod' function."""
+class MDivMod(MBinaryOperator):
+    """Macro 'divmod' function."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return divmod(left_value, right_value)
@@ -748,64 +749,64 @@ class DDivMod(DBinaryOperator):
             self._impl_unparse_right_operand(self.right_operand, wrap=False))
 
 
-class DPow(DBinaryOperator):
-    """Deferred '**' binary operator."""
+class MPow(MBinaryOperator):
+    """Macro '**' binary operator."""
     BINOP_SYMBOL = '**'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value ** right_value
 
 
-class DEq(DBinaryOperator):
-    """Deferred '==' binary operator."""
+class MEq(MBinaryOperator):
+    """Macro '==' binary operator."""
     BINOP_SYMBOL = '=='
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value == right_value
 
 
-class DNe(DBinaryOperator):
-    """Deferred '!=' binary operator."""
+class MNe(MBinaryOperator):
+    """Macro '!=' binary operator."""
     BINOP_SYMBOL = '!='
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value != right_value
 
 
-class DLt(DBinaryOperator):
-    """Deferred '<' binary operator."""
+class MLt(MBinaryOperator):
+    """Macro '<' binary operator."""
     BINOP_SYMBOL = '<'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value < right_value
 
 
-class DLe(DBinaryOperator):
-    """Deferred '<=' binary operator."""
+class MLe(MBinaryOperator):
+    """Macro '<=' binary operator."""
     BINOP_SYMBOL = '<='
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value <= right_value
 
 
-class DGt(DBinaryOperator):
-    """Deferred '>' binary operator."""
+class MGt(MBinaryOperator):
+    """Macro '>' binary operator."""
     BINOP_SYMBOL = '>'
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value > right_value
 
 
-class DGe(DBinaryOperator):
-    """Deferred '>=' binary operator."""
+class MGe(MBinaryOperator):
+    """Macro '>=' binary operator."""
     BINOP_SYMBOL = '>='
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value >= right_value
 
 
-class DAnd(DBinaryOperator):
-    """Deferred 'and' binary operator."""
+class MAnd(MBinaryOperator):
+    """Macro 'and' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value and right_value
@@ -816,15 +817,15 @@ class DAnd(DBinaryOperator):
             self._impl_unparse_right_operand(self.right_operand))
 
 
-class DOr(DBinaryOperator):
-    """Deferred 'or' binary operator."""
+class MOr(MBinaryOperator):
+    """Macro 'or' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value or right_value
 
 
-class DGetattr(DUnaryOperator):
-    """Deferred 'getattr' function."""
+class MGetattr(MUnaryOperator):
+    """Macro 'getattr' function."""
     def __init__(self, operand, attr_name):
         super().__init__(operand)
         self.attr_name = attr_name
@@ -838,8 +839,8 @@ class DGetattr(DUnaryOperator):
         return fmt.format(operand, self.attr_name)
 
 
-class DGetitem(DBinaryOperator):
-    """Deferred 'getitem' function."""
+class MGetitem(MBinaryOperator):
+    """Macro 'getitem' function."""
 
     def _impl_binary_operation(self, left, right):
         return left[right]
@@ -851,8 +852,8 @@ class DGetitem(DBinaryOperator):
         return fmt.format(left, right)
 
 
-class DContains(DBinaryOperator):
-    """Deferred 'in' binary operator."""
+class MContains(MBinaryOperator):
+    """Macro 'in' binary operator."""
 
     def _impl_binary_operation(self, left_value, right_value):
         return left_value in right_value

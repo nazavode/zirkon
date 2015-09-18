@@ -35,7 +35,7 @@ from common.fixtures import dictionary, \
     SIMPLE_CONFIG_CONFIGOBJ_SERIALIZATION, \
     SIMPLE_CONFIG_ZIRKON_SERIALIZATION
 
-from zirkon.toolbox.deferred import Deferred
+from zirkon.toolbox.macro import Macro
 from zirkon.toolbox.dictutils import compare_dicts, as_dict
 from zirkon.section import Section
 from zirkon.defaults_section import DefaultsSection
@@ -127,7 +127,7 @@ def test_Config_get_serializer_configobj():
 def test_Config_get_serializer_pickle():
     assert isinstance(Config.get_serializer("pickle"), PickleSerializer)
 
-def test_Config_deferred(defaultsvalue):
+def test_Config_macro(defaultsvalue):
     config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['b'] = 20
@@ -148,7 +148,7 @@ def test_Config_deferred(defaultsvalue):
     assert config['c'] == 400
     assert config['options']['e'] == 127
 
-def test_Config_deferred_error(defaultsvalue):
+def test_Config_macro_error(defaultsvalue):
     config = Config(defaults=defaultsvalue)
     config['a'] = 10
     config['c'] = SECTION['a'] * SECTION['b']
@@ -512,12 +512,12 @@ def defconfig(defaultsvalue):
     config['sub']['sub']['n2'] = ROOT['n'] * ROOT['sub']['n1']
     return config
 
-def test_Config_deferred_protocol(defconfig, protocol):
+def test_Config_macro_protocol(defconfig, protocol):
     s_defconfig = defconfig.to_string(protocol=protocol)
     defconfig_reloaded = Config.from_string(s_defconfig, protocol=protocol)
     assert defconfig_reloaded == defconfig
 
-def test_Config_deferred_dump(defconfig):
+def test_Config_macro_dump(defconfig):
     s_defconfig = defconfig.to_string(protocol="zirkon")
     assert s_defconfig == """\
 n = 10
@@ -528,12 +528,12 @@ n = 10
         n2 = ROOT['n'] * ROOT['sub']['n1']
 """
 
-def test_Config_deferred_copy(defconfig):
+def test_Config_macro_copy(defconfig):
     config = defconfig.copy()
-    assert isinstance(defconfig.dictionary['sub']['n1'], Deferred)
-    assert isinstance(config.dictionary['sub']['n1'], Deferred)
+    assert isinstance(defconfig.dictionary['sub']['n1'], Macro)
+    assert isinstance(config.dictionary['sub']['n1'], Macro)
     
-def test_Config_deferred_defaults(defconfig):
+def test_Config_macro_defaults(defconfig):
     defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     assert defconfig['a'] == 7
     assert defconfig['sub']['b'] == 3
@@ -547,13 +547,13 @@ def test_Config_deferred_defaults(defconfig):
     assert config['a'] == 107
     assert config['sub']['b'] == 103
      
-def test_Config_deferred_as_dict_evaluate_False(defconfig):
+def test_Config_macro_as_dict_evaluate_False(defconfig):
     defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     dct = defconfig.as_dict(evaluate=False)
-    assert isinstance(dct['sub']['n1'], Deferred)
-    assert isinstance(dct['sub']['b'], Deferred)
+    assert isinstance(dct['sub']['n1'], Macro)
+    assert isinstance(dct['sub']['b'], Macro)
 
-def test_Config_deferred_as_dict(defconfig):
+def test_Config_macro_as_dict(defconfig):
     defconfig.set_defaults(a=ROOT['n'] - 3, sub={'b': ROOT['n'] - 7})
     dct = defconfig.as_dict()
     assert isinstance(dct['sub']['n1'], int)
@@ -586,23 +586,23 @@ def test_Config_sub_setdef():
         config['sub'].defaults = {'a': 200}
     assert config['sub']['a'] == 100
 
-def test_Config_err_disabled_interpolation():
-    config = Config(interpolation=False)
+def test_Config_err_disabled_macros():
+    config = Config(macros=False)
     config['x'] = 10
     config['sub'] = {'sub': {}}
     with pytest.raises(ValueError) as exc_info:
         config['y'] = ROOT['x'] + 1
-    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: macros are not enabled"
     with pytest.raises(ValueError) as exc_info:
         config['sub']['sub']['y'] = ROOT['x'] + 1
-    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: interpolation is not enabled"
-    config.interpolation = True
+    assert str(exc_info.value) == "cannot set y=ROOT['x'] + 1: macros are not enabled"
+    config.macros = True
     config['sub']['sub']['y'] = ROOT['x'] + 1
     assert config['sub']['sub']['y'] == 11
-    config.interpolation = False
+    config.macros = False
     with pytest.raises(ValueError) as exc_info:
         c = config['sub']['sub']['y']
-    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: interpolation is not enabled"
+    assert str(exc_info.value) == "cannot evaluate ROOT['x'] + 1: macros are not enabled"
 
 def test_Config_change_defaults():
     config1 = Config(defaults=True)

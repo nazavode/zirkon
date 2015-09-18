@@ -48,7 +48,7 @@ __all__ = [
 ]
 
 from ..toolbox import serializer
-from ..deferred_object import ROOT, SECTION
+from ..macros import ROOT, SECTION
 
 from .validator import Validator
 

@@ -16,7 +16,7 @@ What is Zirkon
 
     - Python >= 3.4
 
-Zirkon is a python library to manage configuration information. It implements multiple serialization protocols, generic validation and value interpolation.
+Zirkon is a python library to manage configuration information. It implements `multiple serialization protocols`_, `option validation`_, `default values`_ and `macros`_.
 Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
 
 
@@ -64,10 +64,12 @@ It is possible to explicitly set this internal dictionary:
  >>> dct
  {'x': 1}
 
-Multiple file serializations
-----------------------------
+.. _serialization protocols:
 
-Zirkon supports multiple serialization methods; currently four are
+Multiple serialization protocols
+--------------------------------
+
+Zirkon supports multiple serialization protocols; currently four are
 available:
 
  +---------+--------+---------------------------------------------------------------+
@@ -75,13 +77,15 @@ available:
  +=========+========+===============================================================+
  |zirkon   |text    |the native protocol; it implements a nested INI file           |
  +---------+--------+---------------------------------------------------------------+
- |configobj|raw     |partially compatible with ConfigObj using the ``unrepr`` option|
- |         |        |see http://www.voidspace.org.uk/python/configobj.html          |
+ |configobj|raw     |partially compatible with ConfigObj format using the ``unrepr``|
+ |         |        |option, see http://www.voidspace.org.uk/python/configobj.html  |
  +---------+--------+---------------------------------------------------------------+
  |json     |text    |JSON serialization                                             |
  +---------+--------+---------------------------------------------------------------+
  |pickle   |text    |pickle serialization                                           |
  +---------+--------+---------------------------------------------------------------+
+
+For a description of the serialization format, see :ref:`serialization formats`.
 
 Some examples:
 
@@ -106,6 +110,8 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirko
  x = 10
  [subsection]
      y = 'alpha'
+
+.. _option validation:
 
 Validation
 ----------
@@ -138,10 +144,12 @@ Since the validator for *y* sets a default value and the key is missing from con
 
 There list of available Validators can be easily extended.
 
-Defaults
---------
+.. _default values:
 
-Zirkon supports default values; these values are stored in a separated space, not in the dictionary, and they are not serialized; nevertheless they can be accessed as normal values:
+Default values
+--------------
+
+Zirkon supports default values. Defaults are stored in a separated space, not in the dictionary, and they are not serialized; nevertheless they can be accessed as normal values:
 
  >>> defaults = {'x': 1.0, 'y': 2.0}
  >>> config = Config(defaults=defaults)
@@ -187,17 +195,19 @@ It is possible to disable defaults by simply setting defaults to *None*:
 
 In this case the default value set during the validation is stored in the dictionary as a standard value.
 
-Value interpolation
--------------------
+.. _macros:
 
-Zirkon supports an advanced version of value interpolation: it is possible to set new options by means of complex expressions involving other option values. For instance:
+Macros
+------
+
+Zirkon supports an advanced version of value interpolation: it is possible to set new options by means of macro expressions involving other option values. For instance:
 
  >>> from zirkon.config import ROOT
  >>> config = Config()
  >>> config['x'] = 2
  >>> config['y'] = ROOT['x'] * 4
 
-Here ``ROOT`` is a reference to the *config* itself. Notice that the expression ``ROOT['x'] * 4`` is not immediately evaluated: it will be evaluated when the *y* value is accessed:
+Here ``ROOT`` is a reference to the *config* itself. Notice that the macro expression ``ROOT['x'] * 4`` is not immediately evaluated: it will be evaluated each time *y* is accessed:
 
  >>> print(config['y'])
  8
@@ -207,7 +217,6 @@ Here ``ROOT`` is a reference to the *config* itself. Notice that the expression 
  >>> config.dump()
  x = 10
  y = ROOT['x'] * 4
- >>>
 
 Using this feature, values can be set as functions of other values.
 
@@ -238,6 +247,6 @@ So validation parameters can be tied to particular values found in the validated
         >>> schema['N'] = Int(min=1, max=3)
         >>> schema['coefficients'] = FloatTuple(min_len=ROOT['N'], max_len=ROOT['N'])
         
-Value interpolation can be disabled by setting ``interpolation=False``:
+Macros can be disabled by setting ``macros=False``:
 
- >>> config = Config(interpolation=False)
+ >>> config = Config(macros=False)
