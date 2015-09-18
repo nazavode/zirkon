@@ -355,3 +355,10 @@ epub_exclude_files = ['search.html']
 #
 #def setup(app):
 #    app.connect("autodoc-skip-member", skip)
+
+import sphinx_rtd_theme
+
+html_theme = "sphinx_rtd_theme"
+
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
