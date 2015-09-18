@@ -34,6 +34,7 @@ from .toolbox.deferred import DName
 class DNameCall(DName):
     """Deferred name lookup and function call: DNameCall('foo') evaluates to 'foo()'.
 
+       >>> from zirkon.deferred_object import DNameCall
        >>> dprop = DNameCall('foo')
        >>> foo_function = lambda: 123
        >>> dprop.evaluate({'foo': foo_function})

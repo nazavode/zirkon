@@ -1,6 +1,10 @@
 zirkon.validator package
 ========================
 
+.. testsetup::
+
+    from zirkon.validator import *
+
 Submodules
 ----------
 

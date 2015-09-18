@@ -88,11 +88,11 @@ Some examples:
  >>> config = Config()
  >>> config["x"] = 10
  >>> config["subsection"] = {"y": "alpha"}
- >>> print(config.to_string(protocol="zirkon"))
+ >>> print(config.to_string(protocol="zirkon"), end='')
  x = 10
  [subsection]
      y = 'alpha'
- >>> print(config.to_string(protocol="json"))
+ >>> print(config.to_string(protocol="json"), end='')
  {
      "x": 10,
      "subsection": {

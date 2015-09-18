@@ -39,6 +39,7 @@ class DefaultsSection(Section):
        it must be set through the 'referencing' context manager method:
 
        >>> from zirkon.deferred_object import ROOT
+       >>> from zirkon.section import Section
        >>> defaults = DefaultsSection({'x': ROOT['n'] + 2})
        >>> section1 = Section({'n': 10})
        >>> section2 = Section({'n': 30})

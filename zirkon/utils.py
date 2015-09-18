@@ -138,6 +138,7 @@ def get_key(config, key):
        * a dot-separated list of keys, or
        * a tuple of keys.
 
+       >>> from zirkon.config import Config
        >>> config = Config()
        >>> config["x"] = 10
        >>> config["sub"] = {"y": 20}

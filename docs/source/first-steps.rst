@@ -81,12 +81,12 @@ Storing/loading the Config
 It is possible to store/load the *Config* object to/from strings, streams or files. All the store/load functions accept a ``protocol`` argument, which is the name of an available serialization protocol:
 
  >>> s_config = config.to_string(protocol="configobj")
- >>> print(s_config)
+ >>> print("{}".format(s_config), end='')
  a = 10
  l = [1, 2, 'x']
  [sub]
-    [[subsub]]
-        a = 1
+     [[subsub]]
+         a = 1
  >>> config2 = config.from_string(s_config, protocol="configobj")
  >>> print(config2 == config)
  True
@@ -111,8 +111,8 @@ Finally, the ``dump(stream=None, protocol="zirkon")`` method is based on ``to_st
  a = 10
  l = [1, 2, 'x']
  [sub]
-    [subsub]
-        a = 1
+     [subsub]
+         a = 1
  >>>
 
 The list of available serialization protocols is:

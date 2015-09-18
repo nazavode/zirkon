@@ -1,6 +1,10 @@
 zirkon.toolbox package
 ======================
 
+.. testsetup::
+
+    from zirkon.toolbox import *
+
 Subpackages
 -----------
 

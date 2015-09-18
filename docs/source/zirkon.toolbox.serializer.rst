@@ -1,6 +1,10 @@
 zirkon.toolbox.serializer package
 =================================
 
+.. testsetup::
+
+    from zirkon.toolbox.serializer import *
+
 Submodules
 ----------
 

@@ -1,6 +1,10 @@
 zirkon.toolbox.serializer.configobj_serializer module
 =====================================================
 
+.. testsetup::
+
+    from zirkon.toolbox.serializer.configobj_serializer import *
+
 .. automodule:: zirkon.toolbox.serializer.configobj_serializer
     :members:
     :undoc-members:

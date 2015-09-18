@@ -1,6 +1,10 @@
 zirkon.toolbox.serializer.text_serializer module
 ================================================
 
+.. testsetup::
+
+    from zirkon.toolbox.serializer.text_serializer import *
+
 .. automodule:: zirkon.toolbox.serializer.text_serializer
     :members:
     :undoc-members:

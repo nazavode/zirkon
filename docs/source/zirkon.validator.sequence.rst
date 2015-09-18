@@ -1,6 +1,10 @@
 zirkon.validator.sequence module
 ================================
 
+.. testsetup::
+
+    from zirkon.validator.sequence import *
+
 .. automodule:: zirkon.validator.sequence
     :members:
     :undoc-members:
