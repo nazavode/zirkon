@@ -8,7 +8,7 @@
     :local:
     :depth: 1
 
-The ``zirkon`` tool is a simple command line interface allowing to search, read, validate and write config files.
+The *zirkon* tool is a simple command line interface allowing to search, read, validate and write config files.
 
 Config/schema relative paths are searched:
 

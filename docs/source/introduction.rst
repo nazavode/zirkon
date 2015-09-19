@@ -1,5 +1,27 @@
 .. _intro-introduction:
 
+.. py:currentmodule:: zirkon.config
+
+.. |Config| replace:: :py:class:`Config`
+
+.. py:currentmodule:: zirkon.schema
+
+.. |Schema| replace:: :py:class:`Schema`
+
+.. py:currentmodule:: zirkon.validator.validator
+
+.. |Validator| replace:: :py:class:`Validator`
+
+.. py:currentmodule:: zirkon.validator.error
+
+.. |OptionValidationError| replace:: :py:class:`OptionValidationError`
+
+.. _ConfigObj: http://www.voidspace.org.uk/python/configobj.html
+
+.. |ConfigObj| replace:: ConfigObj_
+
+.. |OrderedDict| replace:: :py:class:`OrderedDict`
+
 ========================
  Introduction to Zirkon
 ========================
@@ -17,8 +39,7 @@ What is Zirkon
     - Python >= 3.4
 
 Zirkon is a python library to manage configuration information. It implements `multiple serialization protocols`_, `option validation`_, `default values`_ and `macros`_.
-Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a ``shelve.Shelf``.
-
+Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a :py:mod:`shelve`.
 
 Zirkon features
 ===============
@@ -26,7 +47,7 @@ Zirkon features
 Simplicity
 ----------
 
-Zirkon Config objects behaves like traditional mappings:
+Zirkon |Config| objects behaves like traditional mappings:
 
  >>> from zirkon.config import Config
  >>> config = Config()
@@ -41,6 +62,7 @@ When a dictionary is added, it becomes a subsection:
  alpha
 
 Subsections can be nested at any level:
+
  >>> config['subsection'] = {'sub2': {'sub3': {'a' : 3}}}
  >>> print(config['subsection']['sub2']['sub3']['a'])
  3
@@ -48,8 +70,8 @@ Subsections can be nested at any level:
 Flexibility
 -----------
 
-Zirkon Config objects internally store information in a dict-like
-object, by default ad OrderedDict:
+Zirkon |Config| objects internally store information in a dict-like
+object, by default an |OrderedDict|:
 
  >>> config = Config({'x': 1})
  >>> config['y'] = 2
@@ -72,18 +94,18 @@ Multiple serialization protocols
 Zirkon supports multiple serialization protocols; currently four are
 available:
 
- +---------+--------+---------------------------------------------------------------+
- |Protocol |text/raw|description                                                    |
- +=========+========+===============================================================+
- |zirkon   |text    |the native protocol; it implements a nested INI file           |
- +---------+--------+---------------------------------------------------------------+
- |configobj|raw     |partially compatible with ConfigObj format using the ``unrepr``|
- |         |        |option, see http://www.voidspace.org.uk/python/configobj.html  |
- +---------+--------+---------------------------------------------------------------+
- |json     |text    |JSON serialization                                             |
- +---------+--------+---------------------------------------------------------------+
- |pickle   |text    |pickle serialization                                           |
- +---------+--------+---------------------------------------------------------------+
+ +---------+--------+-----------------------------------------------------------------+
+ |Protocol |text/raw|description                                                      |
+ +=========+========+=================================================================+
+ |zirkon   |text    |the native protocol; it implements a nested INI file             |
+ +---------+--------+-----------------------------------------------------------------+
+ |configobj|raw     |partially compatible with |ConfigObj| format using the           |
+ |         |        |``unrepr`` option                                                |
+ +---------+--------+-----------------------------------------------------------------+
+ |json     |text    |JSON serialization                                               |
+ +---------+--------+-----------------------------------------------------------------+
+ |pickle   |text    |pickle serialization                                             |
+ +---------+--------+-----------------------------------------------------------------+
 
 For a description of the serialization format, see :ref:`serialization formats`.
 
@@ -104,7 +126,7 @@ Some examples:
      }
  }
 
-The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirkon")``:
+The :py:meth:`Config.dump()` method is a shorthand for :py:meth:`Config.to_stream(sys.stdout, protocol="zirkon")`:
 
  >>> config.dump()
  x = 10
@@ -116,8 +138,8 @@ The ``dump()`` method is a shorthand for ``to_stream(sys.stdout, protocol="zirko
 Validation
 ----------
     
-Zirkon allows to define a Schema for the validation of Config objects. A Schema
-is simply a special Config having Validators as values:
+Zirkon allows to define a |Schema| for the validation of |Config| objects. A Schema
+is simply a special Config having |Validator| objects as values:
 
  >>> from zirkon.schema import Schema
  >>> from zirkon.validator import Int, Str, Float
@@ -128,7 +150,7 @@ is simply a special Config having Validators as values:
  >>> schema['subsection']['y'] = Str(min_len=6)
  >>> schema['subsection']['w'] = Float()
 
-The validation result itself is a Config object having OptionValidationErrors
+The validation result itself is a Config object having |OptionValidationError| objects
 as values:
 
  >>> validation = schema.validate(config)
@@ -142,7 +164,7 @@ Since the validator for *y* sets a default value and the key is missing from con
  >>> print(config['y'])
  2
 
-There list of available Validators can be easily extended.
+There list of available validators can be easily extended.
 
 .. _default values:
 

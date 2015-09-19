@@ -1,5 +1,48 @@
 .. _first-steps:
 
+
+.. py:currentmodule:: zirkon.config
+
+.. |Config| replace:: :py:class:`Config`
+
+.. py:currentmodule:: zirkon.schema
+
+.. |Schema| replace:: :py:class:`Schema`
+
+.. py:currentmodule:: zirkon.validation
+
+.. |Validation| replace:: :py:class:`Validation`
+
+.. |ConfigValidationError| replace:: :py:class:`ConfigValidationError`
+
+.. py:currentmodule:: zirkon.validator.validator
+
+.. |Validator| replace:: :py:class:`Validator`
+
+.. py:currentmodule:: zirkon.validator.error
+
+.. |OptionValidationError| replace:: :py:class:`OptionValidationError`
+
+.. |UnexpectedOptionError| replace:: :py:class:`UnexpectedOptionError`
+
+.. py:currentmodule:: zirkon.validator.int_validators
+
+.. |Int| replace:: :py:class:`Int`
+
+.. py:currentmodule:: zirkon.validator.complain
+
+.. |Complain| replace:: :py:class:`Complain`
+
+.. py:currentmodule:: zirkon.validator.ignore
+
+.. |Ignore| replace:: :py:class:`Ignore`
+
+.. py:currentmodule:: zirkon.validator.remove
+
+.. |Remove| replace:: :py:class:`Remove`
+
+.. |OrderedDict| replace:: :py:class:`OrderedDict`
+
 =============
  First steps
 =============
@@ -11,7 +54,7 @@
 Creating a Config
 =================
 
-Creating a *Config* object is easy:
+Creating a |Config| object is easy:
 
  >>> from zirkon.config import Config
  >>> config = Config()
@@ -22,7 +65,7 @@ An initializer mapping can be passed:
  >>> config.dump()
  a = 10
 
-All the configuration data are kept in a newly created *OrderedDict*:
+All the configuration data are kept in a newly created |OrderedDict|:
 
  >>> config.dictionary
  OrderedDict([('a', 10)])
@@ -47,7 +90,7 @@ This dictionary can be passed during construction; in this case, all the diction
 Accessing the Config content
 ============================
 
-The *Config* is a dict-like object, with some restrictions:
+The |Config| is a dict-like object, with some restrictions:
 * keys must be strings representing valid python identifiers (for instance, ``10``, ``c.x``, ``9c`` are all invalid keys)
 * values can be
 
@@ -78,7 +121,7 @@ The actual type of the dictionary is not significant [#fn0]_: the subsection is 
 Storing/loading the Config
 ==========================
 
-It is possible to store/load the *Config* object to/from strings, streams or files. All the store/load functions accept a ``protocol`` argument, which is the name of an available serialization protocol:
+It is possible to store/load the |Config| object to/from strings, streams or files. All the store/load functions accept a :py:attr:`protocol` argument, which is the name of an available serialization protocol:
 
  >>> s_config = config.to_string(protocol="configobj")
  >>> print("{}".format(s_config), end='')
@@ -92,7 +135,7 @@ It is possible to store/load the *Config* object to/from strings, streams or fil
  True
  >>>
 
-The ``to_stream``, ``from_stream`` methods allow serialization to/from a stream; the ``to_file``, ``from_file`` methods allow serialization to/from a file. The ``write`` and ``read`` methods behaves like ``to_file``, ``from_file``.
+The :py:meth:`Config.to_stream`, :py:meth:`Config.from_stream` methods allow serialization to/from a stream; the :py:meth:`Config.to_file`, :py:meth:`Config.from_file` methods allow serialization to/from a file. The :py:meth:`Config.write` and :py:meth:`Config.read` methods behaves like :py:meth:`Config.to_file`, :py:meth:`Config.from_file`.
 
  >>> import tempfile
  >>> with tempfile.NamedTemporaryFile() as fstream:
@@ -105,7 +148,7 @@ The ``to_stream``, ``from_stream`` methods allow serialization to/from a stream;
  >>> print(config3 == config)
  True
 
-Finally, the ``dump(stream=None, protocol="zirkon")`` method is based on ``to_stream`` (if ``stream`` is ``None``, it is set to ``sys.stdout``).
+Finally, the :py:meth:`Config.dump(stream=None, protocol="zirkon")` method is based on :py:meth:`Config.to_stream` (if :py:attr:`stream` is *None*, it is set to *sys.stdout*).
 
  >>> config.dump()
  a = 10
@@ -130,7 +173,7 @@ The list of available serialization protocols is:
 Creating a Schema
 =================
 
-The *Schema* class is a special *Config* whose values can only be *Validator* objects. A *Validator* object is used to validate a key/value pair. There are many predefined *Validator* classes; each class can accept some attributes. For instance:
+The |Schema| class is a special |Config| whose values can only be |Validator| objects. A Validator object is used to validate a key/value pair. There are many predefined Validator classes; each class can accept some attributes. For instance:
 
  >>> from zirkon.schema import Schema
  >>> from zirkon.validator import Int
@@ -138,7 +181,7 @@ The *Schema* class is a special *Config* whose values can only be *Validator* ob
  >>> schema['a'] = Int(default=10, min=3, max=100)
  >>>
  
-These *Schema.validate(config, raise_on_error=False)* method can be used to validate a *Config* object. In this example, ``schema`` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a ``Validation`` object, i.e. a special *Config* accepting only *ValidationError* instances as values (these are exceptions representing a specific validation error for a key):
+These :py:meth:`Schema.validate(config, raise_on_error=False)` method can be used to validate a Config object. In this example, :py:attr:`schema` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a |Validation| object, i.e. a special Config accepting only |OptionValidationError| instances as values (these are exceptions representing a specific validation error for a key):
 
  >>> config = Config()
  >>> config['a'] = 23
@@ -148,9 +191,9 @@ These *Schema.validate(config, raise_on_error=False)* method can be used to vali
  23
  >>>
 
-In this case all is fine, since, *config* has a valid integer value for *a*.
+In this case all is fine, since, ``config`` has a valid integer value for *a*.
 
-Since a *default* value has been provided to the ``Int`` *Validator*, it is acceptable that ``config`` do not have the *a* key: in this case, it is added with the default value *10*:
+Since a *default* value has been provided to the |Int| validator*, it is acceptable that ``config`` do not have the *a* key: in this case, it is added with the default value *10*:
 
  >>> config = Config()
  >>> validation = schema.validate(config)
@@ -164,7 +207,7 @@ The :ref:`validation` guide lists all the svailable validators and their argumen
 Validation errors
 -----------------
 
-By default, validation errors are not raised: they are stored on the ``Validation`` object:
+By default, validation errors are not raised: they are stored on the |Validation| object:
 
  >>> config = Config()
  >>> config['a'] = "abc"
@@ -175,7 +218,7 @@ By default, validation errors are not raised: they are stored on the ``Validatio
  a = 'abc'
  >>>
 
-The ``Schema.validate`` method accepts the *raise_on_error* boolean attribute, which is *False* by default; if *True*, the first validation error is raised.
+The :py:meth:`Schema.validate` method accepts the :py:attr:`raise_on_error` boolean attribute, which is *False* by default; if *True*, the first validation error is raised.
 
  >>> from zirkon.validator.error import InvalidTypeError
  >>> try:
@@ -196,7 +239,7 @@ Dealing with unexpected options
 
 The *unexpected_option_validator* *Schema* attribute can be set to specify how to threat unexpected options, i.e. options found in the *config* and not defined in the *schema*. It is possible to change this validator; interesting alternatives are:
 
-* ``zirkon.validator.Complain``: this is the default: an ``UnexpectedOptionError`` validation error is produced:
+* |Complain|: this is the default: an |UnexpectedOptionError| validation error is produced:
 
      >>> config = Config()
      >>> config['u'] = 0.35
@@ -213,7 +256,7 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      0.35
      >>>
 
-* ``zirkon.validator.Ignore``: the unexpected option is ignored and left in the config;
+* |Ignore|: the unexpected option is ignored and left in the config;
 
      >>> from zirkon.validator import Ignore
      >>> schema.unexpected_option_validator = Ignore()
@@ -226,7 +269,7 @@ The *unexpected_option_validator* *Schema* attribute can be set to specify how t
      0.35
      >>>
 
-* ``zirkon.validator.Remove``: the unexpected option is removed;
+* |Remove|: the unexpected option is removed;
 
      >>> from zirkon.validator import Remove
      >>> schema.unexpected_option_validator = Remove()
@@ -244,7 +287,7 @@ Anyway, any othe validator can be used.
 The Config schema attibute
 ==========================
 
-A *Config* instance can be initialized with a schema attribute; the schema is then used for automatic validation during load/store, or when requested:
+A |Config| instance can be initialized with a schema attribute; the schema is then used for automatic validation during load/store, or when requested:
 
  >>> schema = Schema()
  >>> schema['x'] = Int(min=30)
@@ -258,7 +301,7 @@ A *Config* instance can be initialized with a schema attribute; the schema is th
  x = MinValueError('x=10: value is lower than min 30')
  y = MaxValueError('y=10: value is greater than max 2')
 
-The ``self_validate`` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a *ConfigValidationError* exception is raised. This exception has a ``validation`` attribute containing all the validation errors:
+The :py:meth:`Config.self_validate` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a |ConfigValidationError| exception is raised. This exception has a :py:attr:`validation` attribute containing all the validation errors:
  
  >>> from zirkon.config import ConfigValidationError
  >>> try:
@@ -277,7 +320,7 @@ The Config defaults
 The *defaults* is a separate, memory-only storage for default values. It's main purpose is to contain default values set by validation; normally it's preferrable to explicitly store in config files only required values, since defaults depend on the schema and are already stored in it.
 Defaults can be used also for dependent values, i.e. options whose value depend on other options through some expression like ``ROOT["x"] * ROOT["y"]``; it's worthelss to store this values, since they must be computed at any access.
 
-The ``defaults`` argument of the *Config* class can be used to pass a specific defaults object; it can be another config, or any mapping. It can also be shared between configs:
+The :py:attr:`defaults` argument of the |Config| class can be used to pass a specific defaults object; it can be another config, or any mapping. It can also be shared between configs:
 
  >>> from zirkon.config import ROOT
  >>> defaults = Config()
@@ -292,7 +335,7 @@ The ``defaults`` argument of the *Config* class can be used to pass a specific d
  >>> config2["y"]
  70
 
-The *set_defaults* method can be used to add default options or sections:
+The :py:meth:`Config.set_defaults` method can be used to add default options or sections:
 
  >>> config = Config()
  >>> config['z'] = 100
@@ -311,13 +354,13 @@ Defaults can be retrieved:
  [sub]
      x = 1
 
-The *set_defaults* method is a shorthand for explicitly adding options to the ``defaults`` attribute:
+The :py:meth:`Config.set_defaults` method is a shorthand for explicitly adding options to the :py:attr:`defaults` attribute:
 
  >>> config.defaults["g"] = 9.8
  >>> config["g"]
  9.8
 
-Anyway, if defaults are disabled, the *set_defaults* still works, and it behaves like normal key setting:
+Anyway, if defaults are disabled, the :py:meth:`Config.set_defaults` still works, and it behaves like normal key setting:
 
  >>> config = Config(defaults=None)
  >>> config.set_defaults(a=1)
@@ -327,7 +370,7 @@ Anyway, if defaults are disabled, the *set_defaults* still works, and it behaves
 Schema and defaults
 -------------------
 
-By default, during validation default values are added to the config's *defaults*. This can be disabled using the *schema* parameter ``use_defaults=False``:
+By default, during validation default values are added to the config's *defaults*. This can be disabled using the schema parameter ``use_defaults=False``:
 
  >>> schema = Schema(use_defaults=False)
  >>> schema["x"] = Int(default=10)
@@ -340,4 +383,4 @@ In this case, the ``x = 10`` option has been added as standard option, and is so
 
 .. rubric:: Footnotes
 
-.. [#fn0] Nevertheless, consider that the internal dictionary is by default an *OrderedDict*, so, if the subsection content is added using a standard unordered *dict*, its ordering is abritrary.
+.. [#fn0] Nevertheless, consider that the internal dictionary is by default an |OrderedDict|, so, if the subsection content is added using a standard unordered *dict*, its ordering is abritrary.

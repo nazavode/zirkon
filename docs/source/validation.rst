@@ -1,8 +1,8 @@
 .. _validation:
 
-===================
- Zirkon validation
-===================
+============
+ Validation
+============
 
 The Schema class
 ================
