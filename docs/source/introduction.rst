@@ -39,7 +39,7 @@ What is Zirkon
     - Python >= 3.4
 
 Zirkon is a python library to manage configuration information. It implements `multiple serialization protocols`_, `option validation`_, `default values`_ and `macros`_.
-Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a :py:mod:`shelve`.
+Moreover, it has been designed to fully delegate the management of the configuration data to an external dictionary-like object, so that it is possible, for instance, to use a persistent dictionary like a :mod:`shelve <python:shelve>`.
 
 Zirkon features
 ===============
@@ -49,7 +49,7 @@ Simplicity
 
 Zirkon |Config| objects behaves like traditional mappings:
 
- >>> from zirkon.config import Config
+ >>> from zirkon import Config
  >>> config = Config()
  >>> config['x'] = 10
  >>> config['y'] = 20
@@ -86,7 +86,7 @@ It is possible to explicitly set this internal dictionary:
  >>> dct
  {'x': 1}
 
-.. _serialization protocols:
+.. _multiple serialization protocols:
 
 Multiple serialization protocols
 --------------------------------
@@ -107,7 +107,7 @@ available:
  |pickle   |text    |pickle serialization                                             |
  +---------+--------+-----------------------------------------------------------------+
 
-For a description of the serialization format, see :ref:`serialization formats`.
+For a description of the serialization protocol, see `serialization protocols <serialization-protocols.html>`_.
 
 Some examples:
 
@@ -141,7 +141,7 @@ Validation
 Zirkon allows to define a |Schema| for the validation of |Config| objects. A Schema
 is simply a special Config having |Validator| objects as values:
 
- >>> from zirkon.schema import Schema
+ >>> from zirkon import Schema
  >>> from zirkon.validator import Int, Str, Float
  >>> schema = Schema()
  >>> schema['x'] = Int(min=1)
@@ -224,7 +224,7 @@ Macros
 
 Zirkon supports an advanced version of value interpolation: it is possible to set new options by means of macro expressions involving other option values. For instance:
 
- >>> from zirkon.config import ROOT
+ >>> from zirkon import ROOT
  >>> config = Config()
  >>> config['x'] = 2
  >>> config['y'] = ROOT['x'] * 4

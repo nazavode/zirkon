@@ -19,9 +19,9 @@
 The config version:
 
 >>> print(VERSION_INFO)
-VersionInfo(major=1, minor=0, patch=8)
+VersionInfo(major=1, minor=0, patch=9)
 >>> print(VERSION)
-1.0.8
+1.0.9
 >>>
 
 """
@@ -43,7 +43,7 @@ VersionInfo = collections.namedtuple('VersionInfo', (
     'patch',
 ))
 
-VERSION_INFO = VersionInfo(major=1, minor=0, patch=8)
+VERSION_INFO = VersionInfo(major=1, minor=0, patch=9)
 
 VERSION = '.'.join(str(v) for v in VERSION_INFO)
 

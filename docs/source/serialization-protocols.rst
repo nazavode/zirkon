@@ -1,12 +1,12 @@
-.. _serialization formats:
+.. _serialization protocols:
 
 .. _ConfigObj: http://www.voidspace.org.uk/python/configobj.html
 
 .. |ConfigObj| replace:: ConfigObj_
 
-=======================
- Serialization formats
-=======================
+=========================
+ Serialization protocols
+=========================
 
 .. contents::
     :local:
@@ -57,7 +57,7 @@ In the last example:
 The *configobj* protocol
 ========================
 
-The configobj protocol is compatible with the |ConfigObj| format using the ``unrepr`` option.
+The configobj protocol is compatible with the |ConfigObj| protocol using the ``unrepr`` option.
 
 * options are serialized as ``key = value``, where value is the representation of the pyton object
 

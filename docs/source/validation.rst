@@ -147,14 +147,14 @@ All these validators can change the option value; for instance:
 
 For instance:
 
- >>> from zirkon.schema import Schema
+ >>> from zirkon import Schema
  >>> from zirkon.validator import StrList
  >>> schema = Schema()
  >>> schema['filenames'] = StrList(min_len=3, item_min_len=2)
 
 This schema requires that the *filenames* value is a list of strings with at least 3 items; the minimum length of the items is 2.
 
- >>> from zirkon.config import Config
+ >>> from zirkon import Config
  >>> config = Config()
  >>> config['filenames'] = ['a.dat', 'b.dat', 'c', 'd.dat']
  >>> validation = schema.validate(config)

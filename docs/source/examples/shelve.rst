@@ -36,7 +36,7 @@ This example shows how to add persistency to the configuration data; all the inf
 The following example shows how to use a shelf as container for the config's data:
 
  >>> from collections import OrderedDict
- >>> from zirkon.config import Config
+ >>> from zirkon import Config
  >>> from zirkon.flatmap import FlatMap
 
  >>> with tempfile.TemporaryDirectory() as tdir:

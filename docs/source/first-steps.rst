@@ -56,7 +56,7 @@ Creating a Config
 
 Creating a |Config| object is easy:
 
- >>> from zirkon.config import Config
+ >>> from zirkon import Config
  >>> config = Config()
 
 An initializer mapping can be passed:
@@ -73,7 +73,7 @@ All the configuration data are kept in a newly created |OrderedDict|:
 This dictionary can be passed during construction; in this case, all the dictionary content is loaded:
 
  >>> import collections
- >>> from zirkon.config import Config
+ >>> from zirkon import Config
  >>> dictionary = collections.OrderedDict()
  >>> dictionary['x'] = 10
  >>> dictionary['y'] = 10
@@ -175,7 +175,7 @@ Creating a Schema
 
 The |Schema| class is a special |Config| whose values can only be |Validator| objects. A Validator object is used to validate a key/value pair. There are many predefined Validator classes; each class can accept some attributes. For instance:
 
- >>> from zirkon.schema import Schema
+ >>> from zirkon import Schema
  >>> from zirkon.validator import Int
  >>> schema = Schema()
  >>> schema['a'] = Int(default=10, min=3, max=100)
@@ -303,7 +303,7 @@ A |Config| instance can be initialized with a schema attribute; the schema is th
 
 The :py:meth:`Config.self_validate` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a |ConfigValidationError| exception is raised. This exception has a :py:attr:`validation` attribute containing all the validation errors:
  
- >>> from zirkon.config import ConfigValidationError
+ >>> from zirkon import ConfigValidationError
  >>> try:
  ...     config.dump()
  ... except ConfigValidationError as err:
@@ -322,7 +322,7 @@ Defaults can be used also for dependent values, i.e. options whose value depend 
 
 The :py:attr:`defaults` argument of the |Config| class can be used to pass a specific defaults object; it can be another config, or any mapping. It can also be shared between configs:
 
- >>> from zirkon.config import ROOT
+ >>> from zirkon import ROOT
  >>> defaults = Config()
  >>> defaults["y"] = ROOT["x"] * 10
 
