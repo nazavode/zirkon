@@ -1,6 +1,8 @@
 zirkon.schema module
 ====================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.schema import *

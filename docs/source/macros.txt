@@ -1,0 +1,27 @@
+.. |Config| replace:: :py:class:`Config <zirkon.Config>`
+
+.. |Schema| replace:: :py:class:`Schema <zirkon.Schema>`
+
+.. |Validation| replace:: :py:class:`Validation <zirkon.Validation>`
+
+.. |ConfigValidationError| replace:: :py:class:`ConfigValidationError <zirkon.ConfigValidationError>`
+
+.. |Validator| replace:: :py:class:`Validator <zirkon.validator.Validator>`
+
+.. |OptionValidationError| replace:: :py:class:`OptionValidationError <zirkon.validator.OptionValidationError>`
+.. |UnexpectedOptionError| replace:: :py:class:`UnexpectedValidationError <zirkon.validator.UnexpectedOptionError>`
+
+.. |Int| replace:: :py:class:`Int <zirkon.validator.Int>`
+.. |Float| replace:: :py:class:`Float <zirkon.validator.Float`
+.. |Str| replace:: :py:class:`Str <zirkon.validator.Str>`
+.. |Bool| replace:: :py:class:`Bool <zirkon.validator.Bool>`
+.. |Complain| replace:: :py:class:`Complain <zirkon.validator.Complain>`
+.. |Ignore| replace:: :py:class:`Ignore <zirkon.validator.Ignore>`
+.. |Remove| replace:: :py:class:`Remove <zirkon.validator.Remove>`
+
+.. _ConfigObj: http://www.voidspace.org.uk/python/configobj.html
+
+.. |ConfigObj| replace:: ConfigObj_
+
+.. |OrderedDict| replace:: :py:class:`OrderedDict <python:collections.OrderedDict>`
+

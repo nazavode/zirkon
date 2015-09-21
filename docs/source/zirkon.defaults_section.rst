@@ -1,6 +1,8 @@
 zirkon.defaults_section module
 ==============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.defaults_section import *

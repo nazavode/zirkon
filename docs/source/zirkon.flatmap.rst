@@ -1,6 +1,8 @@
 zirkon.flatmap module
 =====================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.flatmap import *

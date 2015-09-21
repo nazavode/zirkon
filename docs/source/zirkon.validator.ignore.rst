@@ -1,6 +1,8 @@
 zirkon.validator.ignore module
 ==============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.ignore import *

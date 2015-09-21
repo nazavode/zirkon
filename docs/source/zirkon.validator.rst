@@ -1,6 +1,8 @@
 zirkon.validator package
 ========================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator import *

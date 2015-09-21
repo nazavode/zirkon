@@ -1,6 +1,8 @@
 zirkon.toolbox.deferred_eval module
 ===================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.deferred_eval import *

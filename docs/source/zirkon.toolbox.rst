@@ -1,6 +1,8 @@
 zirkon.toolbox package
 ======================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox import *

@@ -1,6 +1,8 @@
 zirkon.toolbox.serializer.codec_catalog module
 ==============================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.serializer.codec_catalog import *

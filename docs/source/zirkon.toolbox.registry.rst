@@ -1,6 +1,8 @@
 zirkon.toolbox.registry module
 ==============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.registry import *

@@ -1,6 +1,8 @@
 zirkon.toolbox.serializer.serializer module
 ===========================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.serializer.serializer import *

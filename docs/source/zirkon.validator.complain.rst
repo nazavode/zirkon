@@ -1,6 +1,8 @@
 zirkon.validator.complain module
 ================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.complain import *

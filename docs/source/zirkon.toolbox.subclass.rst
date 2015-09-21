@@ -1,6 +1,8 @@
 zirkon.toolbox.subclass module
 ==============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.subclass import *

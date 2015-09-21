@@ -1,47 +1,6 @@
 .. _first-steps:
 
-
-.. py:currentmodule:: zirkon.config
-
-.. |Config| replace:: :py:class:`Config`
-
-.. py:currentmodule:: zirkon.schema
-
-.. |Schema| replace:: :py:class:`Schema`
-
-.. py:currentmodule:: zirkon.validation
-
-.. |Validation| replace:: :py:class:`Validation`
-
-.. |ConfigValidationError| replace:: :py:class:`ConfigValidationError`
-
-.. py:currentmodule:: zirkon.validator.validator
-
-.. |Validator| replace:: :py:class:`Validator`
-
-.. py:currentmodule:: zirkon.validator.error
-
-.. |OptionValidationError| replace:: :py:class:`OptionValidationError`
-
-.. |UnexpectedOptionError| replace:: :py:class:`UnexpectedOptionError`
-
-.. py:currentmodule:: zirkon.validator.int_validators
-
-.. |Int| replace:: :py:class:`Int`
-
-.. py:currentmodule:: zirkon.validator.complain
-
-.. |Complain| replace:: :py:class:`Complain`
-
-.. py:currentmodule:: zirkon.validator.ignore
-
-.. |Ignore| replace:: :py:class:`Ignore`
-
-.. py:currentmodule:: zirkon.validator.remove
-
-.. |Remove| replace:: :py:class:`Remove`
-
-.. |OrderedDict| replace:: :py:class:`OrderedDict`
+.. include:: macros.txt
 
 =============
  First steps

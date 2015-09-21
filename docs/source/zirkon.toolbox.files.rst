@@ -1,6 +1,8 @@
 zirkon.toolbox.files module
 ===========================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.files import *

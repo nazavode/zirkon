@@ -1,26 +1,6 @@
 .. _intro-introduction:
 
-.. py:currentmodule:: zirkon.config
-
-.. |Config| replace:: :py:class:`Config`
-
-.. py:currentmodule:: zirkon.schema
-
-.. |Schema| replace:: :py:class:`Schema`
-
-.. py:currentmodule:: zirkon.validator.validator
-
-.. |Validator| replace:: :py:class:`Validator`
-
-.. py:currentmodule:: zirkon.validator.error
-
-.. |OptionValidationError| replace:: :py:class:`OptionValidationError`
-
-.. _ConfigObj: http://www.voidspace.org.uk/python/configobj.html
-
-.. |ConfigObj| replace:: ConfigObj_
-
-.. |OrderedDict| replace:: :py:class:`OrderedDict`
+.. include:: macros.txt
 
 ========================
  Introduction to Zirkon

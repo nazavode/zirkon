@@ -1,6 +1,8 @@
 zirkon.validator.sequence module
 ================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.sequence import *

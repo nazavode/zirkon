@@ -1,6 +1,8 @@
 zirkon.validator.option module
 ==============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.option import *

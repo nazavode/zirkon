@@ -1,6 +1,8 @@
 zirkon.macros module
 ====================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.macros import *

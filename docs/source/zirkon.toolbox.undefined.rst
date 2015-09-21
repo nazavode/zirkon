@@ -1,6 +1,8 @@
 zirkon.toolbox.undefined module
 ===============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.undefined import *

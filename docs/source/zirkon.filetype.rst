@@ -1,6 +1,8 @@
 zirkon.filetype module
 ======================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.filetype import *

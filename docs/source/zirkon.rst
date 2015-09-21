@@ -1,6 +1,8 @@
 zirkon package
 ==============
 
+.. include:: macros.txt
+
 Subpackages
 -----------
 

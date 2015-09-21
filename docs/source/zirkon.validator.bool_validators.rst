@@ -1,6 +1,8 @@
 zirkon.validator.bool_validators module
 =======================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.bool_validators import *

@@ -1,6 +1,8 @@
 zirkon.toolbox.serializer.configobj_serializer module
 =====================================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.serializer.configobj_serializer import *

@@ -1,6 +1,8 @@
 zirkon.toolbox.identifier module
 ================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.identifier import *

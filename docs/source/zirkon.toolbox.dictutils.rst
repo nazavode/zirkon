@@ -1,6 +1,8 @@
 zirkon.toolbox.dictutils module
 ===============================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.toolbox.dictutils import *

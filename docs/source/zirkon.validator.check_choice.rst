@@ -1,6 +1,8 @@
 zirkon.validator.check_choice module
 ====================================
 
+.. include:: macros.txt
+
 .. testsetup::
 
     from zirkon.validator.check_choice import *
