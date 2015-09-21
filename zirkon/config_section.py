@@ -106,7 +106,13 @@ class ConfigSection(Section):
 
     @property
     def defaults(self):
-        """defaults getter"""
+        """Returns the defaults value.
+
+        Returns
+        -------
+        |DefaultsSection|
+            the defaults section
+        """
         return self._defaults
 
     @classmethod

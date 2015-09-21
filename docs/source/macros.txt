@@ -8,6 +8,8 @@
 
 .. |Section| replace:: :py:class:`Section <zirkon.section.Section>`
 
+.. |DefaultsSection| replace:: :py:class:`DefaultsSection <zirkon.defaults_section.DefaultsSection>`
+
 .. |Validator| replace:: :py:class:`Validator <zirkon.validator.Validator>`
 
 .. |OptionValidationError| replace:: :py:class:`OptionValidationError <zirkon.validator.OptionValidationError>`
