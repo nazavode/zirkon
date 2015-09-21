@@ -54,7 +54,7 @@ class ConfigBase(Section):
              some initialization content
          dictionary: Mapping, optional
              the internal dictionary
-         schema: Schema, optional
+         schema: zirkon.Schema, optional
              the validation schema
          validate: bool, optional
              self validate during initialization;
@@ -67,7 +67,7 @@ class ConfigBase(Section):
          ----------
          dictionary: Mapping, optional
              the internal dictionary
-         schema: Schema, optional
+         schema: zirkon.Schema, optional
              the validation schema
          macros: bool, optional
              enables macros (defaults to True);
@@ -84,7 +84,7 @@ class ConfigBase(Section):
 
            Parameters
            ----------
-           schema: Schema
+           schema: zirkon.Schema
                the schema to be used for self-validation
                (can be None to disable self-validation)
            validate: bool
@@ -92,7 +92,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validation.OptionValidationError
                option validation error
         """
         self.schema = schema
@@ -109,13 +109,13 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
 
            Returns
            -------
-           Validation
-               the Validation object containing all the found errors.
+           zirkon.Validation
+               the zirkon.Validation object containing all the found errors.
                If 'raise_on_errors' is True, it contains at most one error.
         """
         if self.schema is not None:
@@ -141,7 +141,7 @@ class ConfigBase(Section):
 
            Returns
            -------
-           Serializer
+           zirkon.toolbox.serializer.Serializer
                the serializer instance.
         """
         serializer_class = Serializer.get_class(protocol)
@@ -164,7 +164,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
 
            Returns
@@ -333,7 +333,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
         """
         self.clear()

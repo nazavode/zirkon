@@ -45,6 +45,19 @@ __all__ = [
     'Ignore',
     'Remove',
     'Complain',
+    'OptionValidationError',
+    'InvalidContentError',
+    'MissingRequiredOptionError',
+    'UnexpectedSectionError',
+    'UnexpectedOptionError',
+    'InvalidTypeError',
+    'InvalidValueError',
+    'MinValueError',
+    'MaxValueError',
+    'InvalidChoiceError',
+    'InvalidLengthError',
+    'MinLengthError',
+    'MaxLengthError',
 ]
 
 from ..toolbox import serializer
@@ -72,7 +85,22 @@ from .remove import Remove
 from ..toolbox.unrepr import unrepr
 from ..toolbox.subclass import find_subclass
 
-from .error import OptionValidationError
+from .error import \
+    OptionValidationError, \
+    OptionValidationError, \
+    InvalidContentError, \
+    MissingRequiredOptionError, \
+    UnexpectedSectionError, \
+    UnexpectedOptionError, \
+    InvalidTypeError, \
+    InvalidValueError, \
+    MinValueError, \
+    MaxValueError, \
+    InvalidChoiceError, \
+    InvalidLengthError, \
+    MinLengthError, \
+    MaxLengthError
+
 
 
 # Validator codecs:

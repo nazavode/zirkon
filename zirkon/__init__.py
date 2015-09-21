@@ -26,6 +26,7 @@ __license__ = 'Apache License Version 2.0'
 __all__ = [
     'Config',
     'Schema',
+    'Validation',
     'ConfigValidationError',
     'SECTION',
     'ROOT',
@@ -33,3 +34,4 @@ __all__ = [
 
 from .config import Config, ConfigValidationError, SECTION, ROOT
 from .schema import Schema
+from .validation import Validation

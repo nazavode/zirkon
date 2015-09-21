@@ -79,7 +79,7 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
            enables defaults
        macros: bool, optional
            enables macros
-       schema: Schema, optional
+       schema: zirkon.Schema, optional
            the validation schema
        validate: bool, optional
            self validate during construction
@@ -90,7 +90,7 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
            the internal dictionary
        macros: bool, optional
            enables macros
-       schema: Schema, optional
+       schema: zirkon.Schema, optional
            the validation schema
     """
 

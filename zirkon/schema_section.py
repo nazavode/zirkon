@@ -60,7 +60,7 @@ def _reset_option_default(*, section, option, option_name):
 
 
 class SchemaSection(Section):
-    """ A Section class to perform validation. All values must be Validator
+    """A section class to perform validation. All values must be Validator
        instances.
 
        The 'unexpected_option_validator' is used to validate unexpected
@@ -78,14 +78,14 @@ class SchemaSection(Section):
            some initial content
        dictionary: Mapping, optional
            the internal dictionary
-       parent: Section, optional
+       parent: zirkon.Section, optional
            the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
        unexpected_option_validator: Validator, optional
-           the Validator to be used for unexpected options
+           the zirkon.validator.Validator to be used for unexpected options
        use_defaults: bool, optional
            if True, adds default values to defaults
            (defaults to True)
@@ -94,14 +94,14 @@ class SchemaSection(Section):
        ----------
        dictionary: Mapping, optional
            the internal dictionary
-       parent: Section, optional
+       parent: zirkon.Section, optional
            the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
        unexpected_option_validator: Validator, optional
-           the Validator to be used for unexpected options
+           the zirkon.validator.Validator to be used for unexpected options
        use_defaults: bool, optional
            if True, adds default values to defaults
            (defaults to True)
@@ -133,7 +133,7 @@ class SchemaSection(Section):
 
            Returns
            -------
-           Validator
+           zirkon.validator.Validator
                the current validator for unexpected options
         """
         return self._unexpected_option_validator
@@ -144,7 +144,7 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           validator: Validator
+           validator: zirkon.validator.Validator
                the validator to be used for unexpected options
 
            Raises
@@ -164,10 +164,10 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           section: Section
+           section: zirkon.Section
                the section to be validated
-           validation: Validation, optional
-               the Validation object to be used, or None
+           validation: zirkon.Validation, optional
+               the validation object to be used, or None
            raise_on_error: bool, optional
                if True, the first error is raised.
 
@@ -178,7 +178,7 @@ class SchemaSection(Section):
 
            Returns
            -------
-           Validation
+           zirkon.Validation
                the validation result
         """
         if validation is None:
@@ -194,9 +194,9 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           section: Section
+           section: zirkon.Section
                the section to be validated
-           validation_section: ValidationSection, optional
+           validation_section: zirkon.validation_section.ValidationSection, optional
                the ValidationSection object to be used, or None
            raise_on_error: bool, optional
                if True, the first error is raised.
@@ -205,7 +205,7 @@ class SchemaSection(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
         """
         args = dict(raise_on_error=raise_on_error, parent_fqname=parent_fqname)
@@ -217,9 +217,9 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           section: Section
+           section: zirkon.Section
                the section to be validated
-           validation_section: ValidationSection, optional
+           validation_section: zirkon.validation_section.ValidationSection, optional
                the ValidationSection object to be used, or None
            raise_on_error: bool, optional
                if True, the first error is raised.
@@ -228,7 +228,7 @@ class SchemaSection(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
         """
         # expected subsections:
@@ -272,9 +272,9 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           section: Section
+           section: zirkon.Section
                the section to be validated
-           validation_section: ValidationSection, optional
+           validation_section: zirkon.validation_section.ValidationSection, optional
                the ValidationSection object to be used, or None
            raise_on_error: bool, optional
                if True, the first error is raised.
@@ -283,7 +283,7 @@ class SchemaSection(Section):
 
            Raises
            ------
-           OptionValidationError
+           zirkon.validator.OptionValidationError
                option validation error
         """
         # expected options:

@@ -66,14 +66,14 @@ def create_template_from_schema(schema, *, config=None):
 
        Parameters
        ----------
-       schema: Schema
+       schema: zirkon.Schema
            the validating schema
-       config: Config, optional
+       config: zirkon.Config, optional
            the config object to be filled in
 
        Returns
        -------
-       Config
+       zirkon.Config
            the filled config object
 
        Raises
@@ -105,7 +105,7 @@ def replace_macros(config):
     """Replaces all macros with their current value.
        Parameters
        ----------
-       config: Config, optional
+       config: zirkon.Config, optional
            the config object
     """
     for key, value in config.items():
@@ -154,7 +154,7 @@ def get_key(config, key):
 
        Parameters
        ----------
-       config: Config, optional
+       config: zirkon.Config, optional
            the config object
        key: str, tuple
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
@@ -194,7 +194,7 @@ def set_key(config, key, value, *, parents=False):
 
        Parameters
        ----------
-       config: Config, optional
+       config: zirkon.Config, optional
            the config object
        key: str, tuple
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
@@ -237,7 +237,7 @@ def del_key(config, key, *, ignore_errors=False):
 
        Parameters
        ----------
-       config: Config, optional
+       config: zirkon.Config, optional
            the config object
        key: str, tuple
            a string like "k0.k1..." or a tuple ("k0", "k1", ...)
