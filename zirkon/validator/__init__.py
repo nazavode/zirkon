@@ -24,6 +24,7 @@ __copyright__ = 'Copyright (c) 2015 Simone Campagna'
 __license__ = 'Apache License Version 2.0'
 
 __all__ = [
+    # validators:
     'Validator',
     'Int',
     'IntList',
@@ -45,19 +46,11 @@ __all__ = [
     'Ignore',
     'Remove',
     'Complain',
-    'OptionValidationError',
-    'InvalidContentError',
-    'MissingRequiredOptionError',
-    'UnexpectedSectionError',
-    'UnexpectedOptionError',
-    'InvalidTypeError',
-    'InvalidValueError',
-    'MinValueError',
-    'MaxValueError',
-    'InvalidChoiceError',
-    'InvalidLengthError',
-    'MinLengthError',
-    'MaxLengthError',
+    # errors:
+    'OptionValidationError', 'InvalidContentError', 'MissingRequiredOptionError',
+    'UnexpectedSectionError', 'UnexpectedOptionError', 'InvalidTypeError',
+    'InvalidValueError', 'MinValueError', 'MaxValueError', 'InvalidChoiceError',
+    'InvalidLengthError', 'MinLengthError', 'MaxLengthError',
 ]
 
 from ..toolbox import serializer
@@ -87,7 +80,6 @@ from ..toolbox.subclass import find_subclass
 
 from .error import \
     OptionValidationError, \
-    OptionValidationError, \
     InvalidContentError, \
     MissingRequiredOptionError, \
     UnexpectedSectionError, \
@@ -100,7 +92,6 @@ from .error import \
     InvalidLengthError, \
     MinLengthError, \
     MaxLengthError
-
 
 
 # Validator codecs:
