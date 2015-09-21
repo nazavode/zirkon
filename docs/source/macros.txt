@@ -6,10 +6,14 @@
 
 .. |ConfigValidationError| replace:: :py:class:`ConfigValidationError <zirkon.ConfigValidationError>`
 
+.. |Section| replace:: :py:class:`Section <zirkon.section.Section>`
+
 .. |Validator| replace:: :py:class:`Validator <zirkon.validator.Validator>`
 
 .. |OptionValidationError| replace:: :py:class:`OptionValidationError <zirkon.validator.OptionValidationError>`
 .. |UnexpectedOptionError| replace:: :py:class:`UnexpectedValidationError <zirkon.validator.UnexpectedOptionError>`
+
+.. |Option| replace:: :py:class:`Option <zirkon.validator.option.Option>`
 
 .. |Int| replace:: :py:class:`Int <zirkon.validator.Int>`
 .. |Float| replace:: :py:class:`Float <zirkon.validator.Float`
@@ -20,8 +24,9 @@
 .. |Remove| replace:: :py:class:`Remove <zirkon.validator.Remove>`
 
 .. _ConfigObj: http://www.voidspace.org.uk/python/configobj.html
-
 .. |ConfigObj| replace:: ConfigObj_
 
 .. |OrderedDict| replace:: :py:class:`OrderedDict <python:collections.OrderedDict>`
+.. |Mapping| replace:: :py:class:`Mapping <python:collections.abc.Mapping>`
 
+.. |any| replace:: any type

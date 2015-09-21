@@ -56,12 +56,12 @@ class CheckMin(CheckRange):
 
        Parameters
        ----------
-       min: any, optional
+       min: |any|, optional
            the min value
 
        Attributes
        ----------
-       min: any, optional
+       min: |any|, optional
            the min value
     """
     ATTRIBUTE_NAME = 'min'
@@ -85,12 +85,12 @@ class CheckMax(CheckRange):
 
        Parameters
        ----------
-       max: any, optional
+       max: |any|, optional
            the max value
 
        Attributes
        ----------
-       max: any, optional
+       max: |any|, optional
            the max value
     """
     ATTRIBUTE_NAME = 'max'
@@ -114,12 +114,12 @@ class CheckMinLen(Check):
 
        Parameters
        ----------
-       min_len: any, optional
+       min_len: |any|, optional
            the min length
 
        Attributes
        ----------
-       min_len: any, optional
+       min_len: |any|, optional
            the min length
     """
 
@@ -144,12 +144,12 @@ class CheckMaxLen(Check):
 
        Parameters
        ----------
-       max_len: any, optional
+       max_len: |any|, optional
            the max length
 
        Attributes
        ----------
-       max_len: any, optional
+       max_len: |any|, optional
            the max length
     """
 

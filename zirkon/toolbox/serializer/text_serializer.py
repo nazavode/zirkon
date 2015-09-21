@@ -62,7 +62,7 @@ class TextSerializer(Serializer):
 
            Parameters
            ----------
-           value: any
+           value: |any|
                the value to be encoded
 
            Returns
@@ -89,7 +89,7 @@ class TextSerializer(Serializer):
                 the file name
             key: str
                 the key name
-            value: any
+            value: |any|
                 the encoded value
             \*value_type_names: tuple
                 a list of type names to be used to find a codec
@@ -101,7 +101,7 @@ class TextSerializer(Serializer):
 
             Returns
             -------
-            any
+            |any|
                 the decoded value
         """
         if value_type_names:
@@ -130,7 +130,7 @@ class TextSerializer(Serializer):
                the nesting level
            key: str
                the key name
-           value: any
+           value: |any|
                the key value
 
            Returns
@@ -283,7 +283,7 @@ class TextSerializer(Serializer):
 
            Returns
            -------
-           any
+           |any|
                the deserialized object
         """
         raise NotImplementedError

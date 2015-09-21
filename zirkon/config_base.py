@@ -50,11 +50,11 @@ class ConfigBase(Section):
 
          Parameters
          ----------
-         init: Mapping, optional
+         init: |Mapping|, optional
              some initialization content
-         dictionary: Mapping, optional
+         dictionary: |Mapping|, optional
              the internal dictionary
-         schema: zirkon.Schema, optional
+         schema: |Schema|, optional
              the validation schema
          validate: bool, optional
              self validate during initialization;
@@ -65,9 +65,9 @@ class ConfigBase(Section):
 
          Attributes
          ----------
-         dictionary: Mapping, optional
+         dictionary: |Mapping|, optional
              the internal dictionary
-         schema: zirkon.Schema, optional
+         schema: |Schema|, optional
              the validation schema
          macros: bool, optional
              enables macros (defaults to True);
@@ -84,7 +84,7 @@ class ConfigBase(Section):
 
            Parameters
            ----------
-           schema: zirkon.Schema
+           schema: |Schema|
                the schema to be used for self-validation
                (can be None to disable self-validation)
            validate: bool
@@ -92,7 +92,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           zirkon.validation.OptionValidationError
+           |OptionValidationError|
                option validation error
         """
         self.schema = schema
@@ -109,13 +109,13 @@ class ConfigBase(Section):
 
            Raises
            ------
-           zirkon.validator.OptionValidationError
+           |OptionValidationError|
                option validation error
 
            Returns
            -------
-           zirkon.Validation
-               the zirkon.Validation object containing all the found errors.
+           |Validation|
+               the validation object containing all the found errors.
                If 'raise_on_errors' is True, it contains at most one error.
         """
         if self.schema is not None:
@@ -164,7 +164,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           zirkon.validator.OptionValidationError
+           |OptionValidationError|
                option validation error
 
            Returns
@@ -191,7 +191,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           |OptionValidationError|
                option validation error
 
         """
@@ -214,7 +214,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           |OptionValidationError|
                option validation error
 
         """
@@ -333,7 +333,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           zirkon.validator.OptionValidationError
+           |OptionValidationError|
                option validation error
         """
         self.clear()
@@ -354,7 +354,7 @@ class ConfigBase(Section):
 
            Raises
            ------
-           OptionValidationError
+           |OptionValidationError|
                option validation error
         """
         self.to_file(filename, protocol)

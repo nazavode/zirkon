@@ -94,11 +94,11 @@ class Validator(Registry):
            ----------
            name: str
                the option name
-           value: any
+           value: |any|
                the option value
            defined: bool
                True if option is defined in config
-           section: Section, optional
+           section: |Section|, optional
                the containing section
 
            Returns
@@ -114,7 +114,7 @@ class Validator(Registry):
 
            Parameters
            ----------
-           option: Option
+           option: |Option|
                the option to be validated
 
            Returns

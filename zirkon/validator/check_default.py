@@ -40,12 +40,12 @@ class CheckDefault(CheckRequired):
 
        Parameters
        ----------
-       default: any, optional
+       default: |any|, optional
            the default value
 
        Attributes
        ----------
-       default: any, optional
+       default: |any|, optional
            the default value
     """
 

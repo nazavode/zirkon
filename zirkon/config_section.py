@@ -53,14 +53,14 @@ class ConfigSection(Section):
 
        Parameters
        ----------
-       init: Mapping, optional
+       init: |Mapping|, optional
            some initial content
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
-       parent: Section, optional
-           the parent Section
+       parent: |Section|, optional
+           the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
        defaults: bool, optional
@@ -68,12 +68,12 @@ class ConfigSection(Section):
 
        Attributes
        ----------
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
-       parent: Section, optional
-           the parent Section
+       parent: |Section|, optional
+           the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
     """
@@ -91,7 +91,7 @@ class ConfigSection(Section):
 
            Parameters
            ----------
-           value: any
+           value: |any|
                the defaults value to be set
 
            Raises

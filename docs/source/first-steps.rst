@@ -94,7 +94,7 @@ It is possible to store/load the |Config| object to/from strings, streams or fil
  True
  >>>
 
-The :py:meth:`Config.to_stream`, :py:meth:`Config.from_stream` methods allow serialization to/from a stream; the :py:meth:`Config.to_file`, :py:meth:`Config.from_file` methods allow serialization to/from a file. The :py:meth:`Config.write` and :py:meth:`Config.read` methods behaves like :py:meth:`Config.to_file`, :py:meth:`Config.from_file`.
+The :py:meth:`zirkon.Config.to_stream`, :py:meth:`zirkon.Config.from_stream` methods allow serialization to/from a stream; the :py:meth:`zirkon.Config.to_file`, :py:meth:`zirkon.Config.from_file` methods allow serialization to/from a file. The :py:meth:`zirkon.Config.write` and :py:meth:`zirkon.Config.read` methods behaves like :py:meth:`zirkon.Config.to_file`, :py:meth:`zirkon.Config.from_file`.
 
  >>> import tempfile
  >>> with tempfile.NamedTemporaryFile() as fstream:
@@ -107,7 +107,7 @@ The :py:meth:`Config.to_stream`, :py:meth:`Config.from_stream` methods allow ser
  >>> print(config3 == config)
  True
 
-Finally, the :py:meth:`Config.dump(stream=None, protocol="zirkon")` method is based on :py:meth:`Config.to_stream` (if :py:attr:`stream` is *None*, it is set to *sys.stdout*).
+Finally, the :py:meth:`zirkon.Config.dump(stream=None, protocol="zirkon")` method is based on :py:meth:`zirkon.Config.to_stream` (if :py:attr:`stream` is *None*, it is set to *sys.stdout*).
 
  >>> config.dump()
  a = 10
@@ -140,7 +140,7 @@ The |Schema| class is a special |Config| whose values can only be |Validator| ob
  >>> schema['a'] = Int(default=10, min=3, max=100)
  >>>
  
-These :py:meth:`Schema.validate(config, raise_on_error=False)` method can be used to validate a Config object. In this example, :py:attr:`schema` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a |Validation| object, i.e. a special Config accepting only |OptionValidationError| instances as values (these are exceptions representing a specific validation error for a key):
+These :py:meth:`zirkon.Schema.validate(config, raise_on_error=False)` method can be used to validate a Config object. In this example, :py:attr:`schema` simply requires that ``config['a']`` is an integer in the range *[3...100]*. The result is a |Validation| object, i.e. a special Config accepting only |OptionValidationError| instances as values (these are exceptions representing a specific validation error for a key):
 
  >>> config = Config()
  >>> config['a'] = 23
@@ -177,7 +177,7 @@ By default, validation errors are not raised: they are stored on the |Validation
  a = 'abc'
  >>>
 
-The :py:meth:`Schema.validate` method accepts the :py:attr:`raise_on_error` boolean attribute, which is *False* by default; if *True*, the first validation error is raised.
+The :py:meth:`zirkon.Schema.validate` method accepts the :py:attr:`raise_on_error` boolean attribute, which is *False* by default; if *True*, the first validation error is raised.
 
  >>> from zirkon.validator.error import InvalidTypeError
  >>> try:
@@ -260,7 +260,7 @@ A |Config| instance can be initialized with a schema attribute; the schema is th
  x = MinValueError('x=10: value is lower than min 30')
  y = MaxValueError('y=10: value is greater than max 2')
 
-The :py:meth:`Config.self_validate` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a |ConfigValidationError| exception is raised. This exception has a :py:attr:`validation` attribute containing all the validation errors:
+The :py:meth:`zirkon.Config.self_validate` method is automatically called by all the *store/load* methods, with ``raise_on_error=True``; in case of errors, a |ConfigValidationError| exception is raised. This exception has a :py:attr:`validation` attribute containing all the validation errors:
  
  >>> from zirkon import ConfigValidationError
  >>> try:
@@ -294,7 +294,7 @@ The :py:attr:`defaults` argument of the |Config| class can be used to pass a spe
  >>> config2["y"]
  70
 
-The :py:meth:`Config.set_defaults` method can be used to add default options or sections:
+The :py:meth:`zirkon.Config.set_defaults` method can be used to add default options or sections:
 
  >>> config = Config()
  >>> config['z'] = 100
@@ -313,13 +313,13 @@ Defaults can be retrieved:
  [sub]
      x = 1
 
-The :py:meth:`Config.set_defaults` method is a shorthand for explicitly adding options to the :py:attr:`defaults` attribute:
+The :py:meth:`zirkon.Config.set_defaults` method is a shorthand for explicitly adding options to the :py:attr:`defaults` attribute:
 
  >>> config.defaults["g"] = 9.8
  >>> config["g"]
  9.8
 
-Anyway, if defaults are disabled, the :py:meth:`Config.set_defaults` still works, and it behaves like normal key setting:
+Anyway, if defaults are disabled, the :py:meth:`zirkon.Config.set_defaults` still works, and it behaves like normal key setting:
 
  >>> config = Config(defaults=None)
  >>> config.set_defaults(a=1)

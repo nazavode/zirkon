@@ -71,26 +71,26 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
 
        Parameters
        ----------
-       init: Mapping, optional
+       init: |Mapping|, optional
            some initial content
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
        defaults: bool, optional
            enables defaults
        macros: bool, optional
            enables macros
-       schema: zirkon.Schema, optional
+       schema: |Schema|, optional
            the validation schema
        validate: bool, optional
            self validate during construction
 
        Attributes
        ----------
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
        macros: bool, optional
            enables macros
-       schema: zirkon.Schema, optional
+       schema: |Schema|, optional
            the validation schema
     """
 

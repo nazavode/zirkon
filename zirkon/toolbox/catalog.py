@@ -65,7 +65,7 @@ class Catalog(object):
            ----------
            class_type: type
                the class to be registered
-           info: any
+           info: |any|
                the information to be registered
         """
         self.class_info[class_type] = info
@@ -82,7 +82,7 @@ class Catalog(object):
 
            Returns
            -------
-           any
+           |any|
                the requested info, or None
         """
         if isinstance(class_or_name, str):
@@ -102,7 +102,7 @@ class Catalog(object):
 
            Returns
            -------
-           any
+           |any|
                the requested info, or None
         """
         if class_type in self.class_info:
@@ -130,7 +130,7 @@ class Catalog(object):
 
            Returns
            -------
-           any
+           |any|
                the requested info, or None
         """
         for class_type, info in self.class_info.items():

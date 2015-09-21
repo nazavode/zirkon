@@ -46,14 +46,14 @@ class Check(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           option: zirkon.validator.Option
+           option: |Option|
                the option to be checked
-           section: zirkon.Section
+           section: |Section|
                the containing section
 
            Raises
            ------
-           zirkon.validator.OptionValidationError
+           |OptionValidationError|
                validation error
         """
         raise NotImplementedError
@@ -63,7 +63,7 @@ class Check(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           value: any
+           value: |any|
                the value
 
            Returns
@@ -88,14 +88,14 @@ class Check(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           value: any
+           value: |any|
                the original value
-           section: zirkon.Section
+           section: |Section|
                the containing section
 
            Returns
            -------
-           any
+           |any|
                the evaluated value
         """
         if section is not None:

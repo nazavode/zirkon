@@ -35,7 +35,7 @@ def as_dict(dct, *, depth=-1, dict_class=dict):
 
        Parameters
        ----------
-       dct: Mapping
+       dct: |Mapping|
            a dict-like object (dict, OrderedDict, Section, ...)
        depth: int, optional
            the depth of the copy (< 0 means full copy)
@@ -69,9 +69,9 @@ def compare_dicts(dct0, dct1):
 
        Parameters
        ----------
-       dct0: Mapping
+       dct0: |Mapping|
            a dict-like object (dict, OrderedDict, Section, ...)
-       dct1: Mapping
+       dct1: |Mapping|
            a dict-like object (dict, OrderedDict, Section, ...)
 
        Returns
@@ -89,7 +89,7 @@ def transform(dct, *, key_transform=None, value_transform=None, dict_class=None)
 
        Parameters
        ----------
-       dct: Mapping
+       dct: |Mapping|
            a dict-like object (dict, OrderedDict, Section, ...)
        key_transform: callable, optional
            a function to transform keys

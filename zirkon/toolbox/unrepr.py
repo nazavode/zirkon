@@ -56,7 +56,7 @@ def unrepr(string, globals_d=None):
 
        Returns
        -------
-       any
+       |any|
            the expression's value
     """
 

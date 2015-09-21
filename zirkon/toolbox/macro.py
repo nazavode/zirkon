@@ -67,7 +67,7 @@ class Macro(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        any
+        |any|
             the evaluated value
         """
         raise NotImplementedError
@@ -233,14 +233,14 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to evaluate (a Macro object or other value)
            globals_d: dict
                the globals dictionary
 
            Returns
            -------
-           any
+           |any|
                the evaluated operand
         """
         if isinstance(operand, Macro):
@@ -254,7 +254,7 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
@@ -288,7 +288,7 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
@@ -306,7 +306,7 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
@@ -324,7 +324,7 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to unparse (a Macro object or other value)
            wrap: bool
                if True the expression must be enclosed in braces
@@ -342,7 +342,7 @@ class Macro(metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           operand: any
+           operand: |any|
                the operand to unparse (a Macro object or other value)
 
            Returns
@@ -383,12 +383,12 @@ class MConst(Macro):
 
        Parameters
        ----------
-       value: any
+       value: |any|
            the const value
 
        Attributes
        ----------
-       value: any
+       value: |any|
            the const value
     """
 
@@ -518,12 +518,12 @@ class MUnaryOperator(Macro):
 
        Parameters
        ----------
-       operand: any
+       operand: |any|
            the operand
 
        Attributes
        ----------
-       operand: any
+       operand: |any|
            the operand
     """
 
@@ -546,12 +546,12 @@ class MUnaryOperator(Macro):
 
         Parameters
         ----------
-        value: any
+        value: |any|
             the evaluated operand
 
         Returns
         -------
-        any
+        |any|
             the operator's result
         """
         raise NotImplementedError
@@ -632,16 +632,16 @@ class MBinaryOperator(Macro):
 
        Parameters
        ----------
-       left_operand: any
+       left_operand: |any|
            the left operand
-       right_operand: any
+       right_operand: |any|
            the right operand
 
        Attributes
        ----------
-       left_operand: any
+       left_operand: |any|
            the left operand
-       right_operand: any
+       right_operand: |any|
            the right operand
     """
     BINOP_SYMBOL = None
@@ -661,14 +661,14 @@ class MBinaryOperator(Macro):
 
            Parameters
            ----------
-           left_value: any
+           left_value: |any|
                the evaluated left operand
-           right_value: any
+           right_value: |any|
                the evaluated right operand
 
            Returns
            -------
-           any
+           |any|
                the result
         """
         raise NotImplementedError

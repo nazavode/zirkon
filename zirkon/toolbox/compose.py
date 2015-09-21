@@ -105,7 +105,7 @@ class ArgumentStore(object):
 
            Returns
            -------
-           any
+           |any|
                the argument value
         """
         self._used[argument_name] = True

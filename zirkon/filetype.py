@@ -79,7 +79,7 @@ def get_config_class(config):
 
        Parameters
        ----------
-       config: any
+       config: |any|
            a config object, config class or config class name
 
        Raises

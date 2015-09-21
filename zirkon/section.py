@@ -76,25 +76,25 @@ class Section(collections.abc.Mapping):
 
        Parameters
        ----------
-       init: Mapping, optional
+       init: |Mapping|, optional
            some initial content
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
-       parent: Section, optional
+       parent: |Section|, optional
            the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
 
        Attributes
        ----------
-       dictionary: Mapping, optional
+       dictionary: |Mapping|, optional
            the internal dictionary
-       parent: Section, optional
+       parent: |Section|, optional
            the parent section
        name: str, optional
-           the Section name
+           the section name
        macros: bool, optional
            enables macros
     """
@@ -120,7 +120,7 @@ class Section(collections.abc.Mapping):
 
     @classmethod
     def _subsection_class(cls):
-        """Returns the class to be used for subsections (it must be derived from Section)
+        """Returns the class to be used for subsections (it must be derived from |Section|)
 
            Returns
            -------
@@ -147,7 +147,7 @@ class Section(collections.abc.Mapping):
 
            Returns
            -------
-           Mapping
+           |Mapping|
                a dictionary
         """
         return collections.OrderedDict()
@@ -157,7 +157,7 @@ class Section(collections.abc.Mapping):
 
            Returns
            -------
-           Section
+           |Section|
                the reference_root
         """
         return self.root
@@ -167,7 +167,7 @@ class Section(collections.abc.Mapping):
 
            Parameters
            ----------
-           value: any
+           value: |any|
                the option value
 
            Raises
@@ -177,7 +177,7 @@ class Section(collections.abc.Mapping):
 
            Returns
            -------
-           any
+           |any|
                the evaluated value
         """
         if isinstance(value, Macro):
@@ -197,7 +197,7 @@ class Section(collections.abc.Mapping):
            ----------
            key: str
                the key
-           value: any
+           value: |any|
                the value
 
            Raises
@@ -283,7 +283,7 @@ class Section(collections.abc.Mapping):
            ----------
            option_name: str
                the option name
-           default: any
+           default: |any|
                the value to be used as default
 
            Raises
@@ -293,7 +293,7 @@ class Section(collections.abc.Mapping):
 
            Returns
            -------
-           any
+           |any|
                the option value, or None
         """
         value = self.get(option_name, default)
@@ -308,7 +308,7 @@ class Section(collections.abc.Mapping):
            ----------
            section_name: str
                the section name
-           default: any
+           default: |any|
                the value to be used as default
 
            Raises
@@ -318,7 +318,7 @@ class Section(collections.abc.Mapping):
 
            Returns
            -------
-           any
+           |any|
                the section, or None
         """
         value = self.get(section_name, default)
@@ -440,7 +440,7 @@ class Section(collections.abc.Mapping):
 
            Parameters
            ----------
-           dictionary: Mapping
+           dictionary: |Mapping|
                the dictionary
         """
         for key, value in dictionary.items():
@@ -519,7 +519,7 @@ def iter_section_options(section):
 
        Parameters
        ----------
-       section: Section
+       section: |Section|
            a section object
 
        Yields
@@ -527,8 +527,8 @@ def iter_section_options(section):
        tuple
            a 3-tuple containing (rootname, option_name, option_value), where
            rootname is the list of the names of the sections containing the
-           option (i.e. for option config["s0"]["s1"]["s2"]["opt0"] =1.2 yields
-           (("s0", "s1", "s2"), "opt0", 1.2)
+           option (i.e. for ``option config["s0"]["s1"]["s2"]["opt0"] = 1.2``
+           yields ``(("s0", "s1", "s2"), "opt0", 1.2)``
     """
     sections = [((), section)]
     while sections:
@@ -547,7 +547,7 @@ def count_section_options(section):
 
        Parameters
        ----------
-       section: Section
+       section: |Section|
            a section object
 
        Returns
@@ -563,7 +563,7 @@ def has_section_options(section):
 
        Parameters
        ----------
-       section: Section
+       section: |Section|
            a section object
 
        Returns
@@ -583,14 +583,14 @@ def get_section_value(config, *keys):
 
         Parameters
         ----------
-        config: Section
+        config: |Section|
             the config object
-        \*keys: tuple
+        \*keys:
             the keys for successive gets
 
         Returns
         -------
-        any
+        |any|
             the value
     """
     result = config

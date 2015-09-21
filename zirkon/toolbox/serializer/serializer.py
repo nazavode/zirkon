@@ -68,7 +68,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           obj: any
+           obj: |any|
                the object to be serialized
 
            Returns
@@ -83,7 +83,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           obj: any
+           obj: |any|
                the object to be serialized
            stream: file
                an open file
@@ -100,7 +100,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Parameters
            ----------
-           obj: any
+           obj: |any|
                the object to be serialized
            filename: str
                the file name
@@ -130,7 +130,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Returns
            -------
-           any
+           |any|
                the deserialized object
         """
         raise NotImplementedError
@@ -147,7 +147,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Returns
            -------
-           any
+           |any|
                the deserialized object
         """
         if filename is None:
@@ -168,7 +168,7 @@ class Serializer(Registry, metaclass=abc.ABCMeta):
 
            Returns
            -------
-           any
+           |any|
                the deserialized object
         """
         createdir(filename)
