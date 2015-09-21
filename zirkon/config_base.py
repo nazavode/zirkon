@@ -62,22 +62,24 @@ class ConfigBase(Section):
              enables macros (defaults to True);
          \*\*section_options:
              keyword arguments to be passed to the Section contructor
-
-         Attributes
-         ----------
-         dictionary: |Mapping|, optional
-             the internal dictionary
-         schema: |Schema|, optional
-             the validation schema
-         macros: bool, optional
-             enables macros (defaults to True);
     """
 
     def __init__(self, init=None, *, dictionary=None, schema=None, validate=True,
                  macros=True, **section_options):
         super().__init__(dictionary=dictionary, init=init,
                          macros=macros, **section_options)
+        self._schema = None
         self.set_schema(schema=schema, validate=validate)
+
+    @property
+    def schema(self):
+        """Gets the schema attribute"""
+        return self._schema
+
+    @schema.setter
+    def schema(self, schema):
+        """Sets the schema attribute"""
+        return self.set_schema(schema)
 
     def set_schema(self, schema, *, validate=True):
         """Sets the validation schema
@@ -95,7 +97,7 @@ class ConfigBase(Section):
            |OptionValidationError|
                option validation error
         """
-        self.schema = schema
+        self._schema = schema
         if validate:
             self.self_validate(raise_on_error=True)
 
@@ -118,8 +120,8 @@ class ConfigBase(Section):
                the validation object containing all the found errors.
                If 'raise_on_errors' is True, it contains at most one error.
         """
-        if self.schema is not None:
-            validation = self.schema.validate(self, raise_on_error=False)
+        if self._schema is not None:
+            validation = self._schema.validate(self, raise_on_error=False)
             if raise_on_error and validation:
                 raise ConfigValidationError(validation=validation)
             else:

@@ -51,19 +51,6 @@ class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I
        ------
        OptionValidationError
            on self-validation error
-
-       Attributes
-       ----------
-       dictionary: Mapping, optional
-           the internal dictionary
-       unexpected_option_validator: Validator, optional
-           the validator to be used for unexpected options
-       use_defaults: bool, optional
-           if True, adds default values to defaults
-           (defaults to True)
-       self_validate: bool, optional
-           enables self validation in construction
-
     """
     def __init__(self, init=None, *, dictionary=None, unexpected_option_validator=None,
                  use_defaults=True, self_validate=True):

@@ -64,26 +64,23 @@ class DefaultsSection(Section):
            enables macros
        reference_root: Section, optional
            the reference root
-
-
-       Attributes
-       ----------
-       dictionary: Mapping, optional
-           the internal dictionary
-       parent: Section, optional
-           the parent Section
-       name: str, optional
-           the Section name
-       macros: bool, optional
-           enables macros
-       reference_root: Section, optional
-           the reference root
     """
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None,
                  macros=True, reference_root=None):
-        self.reference_root = reference_root
+        self._reference_root = reference_root
         super().__init__(init=init, dictionary=dictionary, parent=parent,
                          macros=macros, name=name)
+
+    @property
+    def reference_root(self):
+        """Returns a reference to the internal reference_root attribute
+
+        Returns
+        -------
+        |Section|
+            the reference root section
+        """
+        return self._reference_root
 
     @classmethod
     def _subsection_class(cls):
@@ -108,11 +105,11 @@ class DefaultsSection(Section):
            self
                the defaults section itself
         """
-        saved_reference_root = self.reference_root
+        saved_reference_root = self._reference_root
         reference_root = section.get_reference_root()
-        self.reference_root = reference_root
+        self._reference_root = reference_root
         yield self
-        self.reference_root = saved_reference_root
+        self._reference_root = saved_reference_root
 
     def get_reference_root(self):
-        return self.reference_root
+        return self._reference_root

@@ -42,11 +42,6 @@ class CheckDefault(CheckRequired):
        ----------
        default: |any|, optional
            the default value
-
-       Attributes
-       ----------
-       default: |any|, optional
-           the default value
     """
 
     def __init__(self, default=UNDEFINED):

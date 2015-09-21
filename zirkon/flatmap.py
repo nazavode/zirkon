@@ -63,13 +63,6 @@ class FlatMap(collections.abc.Mapping):
            some initialization content
        prefix: str, optional
            an initial prefix for keys
-
-       Attributes
-       ----------
-       dictionary: Mapping, optional
-           the internal dictionary
-       prefix: str, optional
-           an initial prefix for keys
     """
     DOT = '.'
     SUBMAP_PLACEHOLDER = None
@@ -77,14 +70,41 @@ class FlatMap(collections.abc.Mapping):
     def __init__(self, dictionary, *, init=None, prefix=''):
         if dictionary is None:
             dictionary = self.dictionary_factory()
-        self.dictionary = dictionary
-        self.prefix = prefix
+        self._dictionary = dictionary
+        self._prefix = prefix
         if init:
             self.update(init)
+
+    @property
+    def dictionary(self):
+        """Returns a reference to the flattened dictionary
+
+        Returns
+        -------
+        |Mapping|
+            the flattened dictionary
+        """
+        return self._dictionary
+
+    @property
+    def prefix(self):
+        """Returns a reference to the internal prefix
+
+        Returns
+        -------
+        str
+            a prefix string
+        """
+        return self._prefix
 
     @classmethod
     def dictionary_factory(cls):
         """Factory for new dictionaries.
+
+        Returns
+        -------
+        |Mapping|
+            a new dictionary
         """
         return collections.OrderedDict()
 
@@ -105,7 +125,7 @@ class FlatMap(collections.abc.Mapping):
         """
         if check:
             self.check_rel_key(rel_key)
-        return self.prefix + rel_key
+        return self._prefix + rel_key
 
     def check_rel_key(self, rel_key):
         """Checks if 'rel_key' is correctly formed (== a valid python identifier). Raises in case on errors.
@@ -124,20 +144,20 @@ class FlatMap(collections.abc.Mapping):
         """
         if not isinstance(rel_key, str):
             raise TypeError("invalid key {}{} of type {}: {} keys must be strings".format(
-                self.prefix,
+                self._prefix,
                 rel_key,
                 type(rel_key).__name__,
                 type(self).__name__,
             ))
         if self.DOT in rel_key:
             raise ValueError("invalid key {}{}: cannot contain {!r}".format(
-                self.prefix,
+                self._prefix,
                 rel_key,
                 self.DOT,
             ))
         if not is_valid_identifier(rel_key):
             raise ValueError("invalid key {}{}: invalid format".format(
-                self.prefix,
+                self._prefix,
                 rel_key,
             ))
 
@@ -199,9 +219,9 @@ class FlatMap(collections.abc.Mapping):
            tuple
                a 2-tuple containing (absolute key, relative key)
         """
-        for abs_key in self.dictionary.keys():
-            if abs_key.startswith(self.prefix):
-                rel_key = abs_key[len(self.prefix):]
+        for abs_key in self._dictionary.keys():
+            if abs_key.startswith(self._prefix):
+                rel_key = abs_key[len(self._prefix):]
                 if rel_key:
                     yield abs_key, rel_key
 
@@ -229,48 +249,48 @@ class FlatMap(collections.abc.Mapping):
            FlatMap
                the submap instance
         """
-        return self.submap_class()(dictionary=self.dictionary, prefix=prefix)
+        return self.submap_class()(dictionary=self._dictionary, prefix=prefix)
 
     def __getitem__(self, key):
         abs_key = self.get_abs_key(key)
-        if abs_key in self.dictionary:
-            return self.dictionary[abs_key]
+        if abs_key in self._dictionary:
+            return self._dictionary[abs_key]
         else:
             submap_prefix = self.get_submap_prefix(abs_key)
-            if submap_prefix in self.dictionary:
+            if submap_prefix in self._dictionary:
                 return self.submap(prefix=submap_prefix)
-        raise KeyError("undefined key {}{}".format(self.prefix, key))
+        raise KeyError("undefined key {}{}".format(self._prefix, key))
 
     def __setitem__(self, key, value):
         abs_key = self.get_abs_key(key)
         submap_prefix = self.get_submap_prefix(abs_key)
         if isinstance(value, collections.Mapping):
-            if abs_key in self.dictionary:
-                raise ValueError("cannot replace key {}{} with submap".format(self.prefix, key))
-            if submap_prefix in self.dictionary:
+            if abs_key in self._dictionary:
+                raise ValueError("cannot replace key {}{} with submap".format(self._prefix, key))
+            if submap_prefix in self._dictionary:
                 # clear all submap's keys
                 self[key].clear()
             submap = self.submap(prefix=submap_prefix)
-            self.dictionary[submap_prefix] = self.SUBMAP_PLACEHOLDER
+            self._dictionary[submap_prefix] = self.SUBMAP_PLACEHOLDER
             for sub_key, sub_value in value.items():
                 submap[sub_key] = sub_value
         else:
-            if submap_prefix in self.dictionary:
-                raise ValueError("cannot replace submap {}{} with key".format(self.prefix, key))
-            self.dictionary[abs_key] = value
+            if submap_prefix in self._dictionary:
+                raise ValueError("cannot replace submap {}{} with key".format(self._prefix, key))
+            self._dictionary[abs_key] = value
 
     def __delitem__(self, key):
         abs_key = self.get_abs_key(key)
-        if abs_key in self.dictionary:
-            del self.dictionary[abs_key]
+        if abs_key in self._dictionary:
+            del self._dictionary[abs_key]
             return
         submap_prefix = self.get_submap_prefix(abs_key)
-        if submap_prefix in self.dictionary:
+        if submap_prefix in self._dictionary:
             submap = self[key]
             submap.clear()
-            del self.dictionary[submap.prefix]
+            del self._dictionary[submap.prefix]
             return
-        raise KeyError(self.prefix + key, "missing key/submap{}{}".format(self.prefix, key))
+        raise KeyError(self._prefix + key, "missing key/submap{}{}".format(self._prefix, key))
 
     def has_key(self, key):
         """Returns True if key/submap named 'key' is found.
@@ -286,10 +306,10 @@ class FlatMap(collections.abc.Mapping):
                True if key is in the flatmap
         """
         abs_key = self.get_abs_key(key)
-        if abs_key in self.dictionary:
+        if abs_key in self._dictionary:
             return True
         submap_prefix = self.get_submap_prefix(abs_key)
-        if submap_prefix in self.dictionary:
+        if submap_prefix in self._dictionary:
             return True
         return False
 
@@ -297,22 +317,22 @@ class FlatMap(collections.abc.Mapping):
         """Clears all the dictionary content.
         """
         for abs_key, _ in self._iter_keys():
-            if len(abs_key) > len(self.prefix):
-                del self.dictionary[abs_key]
+            if len(abs_key) > len(self._prefix):
+                del self._dictionary[abs_key]
 
     def get(self, key, default=None):
         abs_key = self.get_abs_key(key)
-        if abs_key in self.dictionary:
-            return self.dictionary[abs_key]
+        if abs_key in self._dictionary:
+            return self._dictionary[abs_key]
         else:
             submap_prefix = self.get_submap_prefix(abs_key)
-            if submap_prefix in self.dictionary:
+            if submap_prefix in self._dictionary:
                 return self.submap(prefix=submap_prefix)
         return default
 
     def __contains__(self, key):
         abs_key = self.get_abs_key(key)
-        return abs_key in self.dictionary or self.get_submap_prefix(abs_key) in self.dictionary
+        return abs_key in self._dictionary or self.get_submap_prefix(abs_key) in self._dictionary
 
     def __len__(self):
         count = 0
@@ -328,7 +348,7 @@ class FlatMap(collections.abc.Mapping):
                 if submap_name is not None:
                     yield submap_name, self.submap(prefix=abs_key)
                 else:
-                    yield rel_key, self.dictionary[abs_key]
+                    yield rel_key, self._dictionary[abs_key]
 
     def keys(self):
         for rel_key, _ in self.items():
@@ -345,10 +365,10 @@ class FlatMap(collections.abc.Mapping):
     def copy(self):
         """Returns a deep copy of the FlatMap instance.
         """
-        if hasattr(self.dictionary, 'copy'):
-            return self.__class__(dictionary=self.dictionary.copy())
+        if hasattr(self._dictionary, 'copy'):
+            return self.__class__(dictionary=self._dictionary.copy())
         else:
-            return self.__class__(self.dictionary_factory(), init=self.dictionary)
+            return self.__class__(self.dictionary_factory(), init=self._dictionary)
 
     def as_dict(self, *, dict_class=collections.OrderedDict):
         """Returns a dict with all the flatmap's content
@@ -384,7 +404,7 @@ class FlatMap(collections.abc.Mapping):
             self[key] = value
 
     def __repr__(self):
-        return "{}(dictionary={!r}, prefix={!r})".format(self.__class__.__name__, self.dictionary, self.prefix)
+        return "{}(dictionary={!r}, prefix={!r})".format(self.__class__.__name__, self._dictionary, self._prefix)
 
     def __str__(self):
         map_data = []
@@ -399,8 +419,8 @@ class FlatMap(collections.abc.Mapping):
 
     def __eq__(self, dictionary):
         submap_class = self.submap_class()
-        if isinstance(dictionary, submap_class) and dictionary.dictionary is self.dictionary:
-            return dictionary.prefix == self.prefix
+        if isinstance(dictionary, submap_class) and dictionary.dictionary is self._dictionary:
+            return dictionary.prefix == self._prefix
         else:
             # compare self vs dictionary
             for s_key, s_value in self.items():

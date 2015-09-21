@@ -385,11 +385,6 @@ class MConst(Macro):
        ----------
        value: |any|
            the const value
-
-       Attributes
-       ----------
-       value: |any|
-           the const value
     """
 
     def __init__(self, value):
@@ -412,13 +407,6 @@ class MName(Macro):
     """Macro name lookup. Evaluates to the value referred by 'name'
 
        Parameters
-       ----------
-       name: str
-           the name
-       globals_d: dict, optional
-           the globals dictionary (defaults to None)
-
-       Attributes
        ----------
        name: str
            the name
@@ -459,15 +447,6 @@ class MCall(Macro):
     """Macro object call.
 
        Parameters
-       ----------
-       functor: callable
-           the object to be called
-       p_args: tuple
-           functor's positional arguments
-       n_args: dict
-           functor's keyword arguments
-
-       Attributes
        ----------
        functor: callable
            the object to be called
@@ -517,11 +496,6 @@ class MUnaryOperator(Macro):
     """Abstract base class for macro unary operators.
 
        Parameters
-       ----------
-       operand: |any|
-           the operand
-
-       Attributes
        ----------
        operand: |any|
            the operand
@@ -631,13 +605,6 @@ class MBinaryOperator(Macro):
     """Abstract base class for macro binary operators.
 
        Parameters
-       ----------
-       left_operand: |any|
-           the left operand
-       right_operand: |any|
-           the right operand
-
-       Attributes
        ----------
        left_operand: |any|
            the left operand

@@ -42,7 +42,7 @@ class Option(object):
        ----------
        name: str
            the option name
-       value: |any|
+       value: any type
            the option value
        defined: bool
            True if option is defined in config

@@ -55,12 +55,6 @@ class DeferredEval(object):  # pylint: disable=R0903
        globals_d: dict, optional
            the globals dictionary for name lookup
 
-       Attributes
-       ----------
-       expression: str
-           the expression to be evaluated
-       globals_d: dict, optional
-           the globals dictionary for name lookup
     """
 
     def __init__(self, expression, globals_d=None):

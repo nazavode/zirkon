@@ -58,11 +58,6 @@ class CheckMin(CheckRange):
        ----------
        min: |any|, optional
            the min value
-
-       Attributes
-       ----------
-       min: |any|, optional
-           the min value
     """
     ATTRIBUTE_NAME = 'min'
 

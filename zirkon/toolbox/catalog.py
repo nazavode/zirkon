@@ -53,10 +53,32 @@ class Catalog(object):
     """
 
     def __init__(self, default_factory=lambda: None):
-        self.class_info = collections.OrderedDict()
+        self._class_info = collections.OrderedDict()
         self._cache = {}
         self._name_cache = {}
-        self.default_factory = default_factory
+        self._default_factory = default_factory
+
+    @property
+    def class_info(self):
+        """Returns a reference to the class info dictionary.
+
+        Returns
+        -------
+        |Mapping|
+            the class info dictionary
+        """
+        return self._class_info
+
+    @property
+    def default_factory(self):
+        """Returns a reference to the default factory.
+
+        Returns
+        -------
+        function
+            the default factory
+        """
+        return self._default_factory
 
     def register(self, class_type, info):
         """Register a new class.
@@ -68,7 +90,7 @@ class Catalog(object):
            info: |any|
                the information to be registered
         """
-        self.class_info[class_type] = info
+        self._class_info[class_type] = info
 
     def get(self, class_or_name, exact=False):
         """Returns registered info for a class or class name 'class_or_name'.
@@ -105,8 +127,8 @@ class Catalog(object):
            |any|
                the requested info, or None
         """
-        if class_type in self.class_info:
-            return self.class_info[class_type]
+        if class_type in self._class_info:
+            return self._class_info[class_type]
         else:
             if not exact:
                 if class_type in self._cache:
@@ -115,8 +137,8 @@ class Catalog(object):
                     best_distance, best_match = self._get_best_match(class_type)
                     self._cache[class_type] = best_distance, best_match
                 if best_distance is not None:
-                    return self.class_info[best_match]
-            return self.default_factory()
+                    return self._class_info[best_match]
+            return self._default_factory()
 
     def get_by_name(self, class_name, exact=False):
         """Returns info for a class named 'class_name'. If 'exact' returns only exact matches.
@@ -133,11 +155,11 @@ class Catalog(object):
            |any|
                the requested info, or None
         """
-        for class_type, info in self.class_info.items():
+        for class_type, info in self._class_info.items():
             if class_type.__name__ == class_name:
                 return info
         if exact:
-            return self.default_factory()
+            return self._default_factory()
         else:
             if class_name in self._name_cache:
                 class_type = self._name_cache[class_name]
@@ -145,7 +167,7 @@ class Catalog(object):
                 class_type = self._get_subclass_by_name(class_name)
                 self._name_cache[class_name] = class_type
             if class_type is None:
-                return self.default_factory()
+                return self._default_factory()
             else:
                 return self.get_by_class(class_type, exact=exact)
 
@@ -162,7 +184,7 @@ class Catalog(object):
            type
                the requested class, or None if not found
         """
-        for class_type in self.class_info.keys():
+        for class_type in self._class_info.keys():
             for subclass in subclasses(class_type, include_self=False):
                 if subclass.__name__ == class_name:
                     return subclass
@@ -184,7 +206,7 @@ class Catalog(object):
         """
         best_match, best_distance = None, None
         for distance, base_class in enumerate(class_type.__mro__):
-            for registered_class in self.class_info.keys():
+            for registered_class in self._class_info.keys():
                 if base_class is registered_class:
                     if best_distance is None or best_distance > distance:
                         best_match, best_distance = registered_class, distance

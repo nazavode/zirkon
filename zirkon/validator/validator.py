@@ -40,15 +40,6 @@ class Validator(Registry):
             the argument store
         \*\*arguments: dict
             the actual arguments
-
-        Attributes
-        ----------
-        argument_store: ArgumentStore, optional
-            the argument store
-        actual_arguments: OrderedDict
-            the actual arguments
-        checks: Composer
-            the checks composer
     """
     CHECK_COMPOSER = None
 

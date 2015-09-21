@@ -89,22 +89,6 @@ class SchemaSection(Section):
        use_defaults: bool, optional
            if True, adds default values to defaults
            (defaults to True)
-
-       Attributes
-       ----------
-       dictionary: Mapping, optional
-           the internal dictionary
-       parent: zirkon.Section, optional
-           the parent section
-       name: str, optional
-           the section name
-       macros: bool, optional
-           enables macros
-       unexpected_option_validator: Validator, optional
-           the zirkon.validator.Validator to be used for unexpected options
-       use_defaults: bool, optional
-           if True, adds default values to defaults
-           (defaults to True)
     """
     SUPPORTED_LIST_TYPES = ()
     SUPPORTED_SCALAR_TYPES = (Validator, )
@@ -113,9 +97,32 @@ class SchemaSection(Section):
                  macros=True, unexpected_option_validator=None, use_defaults=True):
         self._unexpected_option_validator = None
         self.unexpected_option_validator = unexpected_option_validator
+        self._use_defaults = None
         self.use_defaults = use_defaults
         super().__init__(dictionary=dictionary, init=init, parent=parent,
                          macros=macros, name=name)
+
+    @property
+    def use_defaults(self):
+        """Returns True if defaults are enabled.
+
+        Returns
+        -------
+        bool
+            True if defaults are enabled
+        """
+        return self._use_defaults
+
+    @use_defaults.setter
+    def use_defaults(self, value):
+        """Enables/disables defaults.
+
+        Parameters
+        ----------
+        value: bool
+            if True, defaults are enabled
+        """
+        self._use_defaults = bool(value)
 
     @classmethod
     def _subsection_class(cls):
@@ -124,8 +131,8 @@ class SchemaSection(Section):
     def _subsection(self, section_name, dictionary):
         return self._subsection_class()(dictionary=dictionary, name=section_name,
                                         macros=self.macros,
-                                        unexpected_option_validator=self.unexpected_option_validator,
-                                        use_defaults=self.use_defaults)
+                                        unexpected_option_validator=self._unexpected_option_validator,
+                                        use_defaults=self._use_defaults)
 
     @property
     def unexpected_option_validator(self):
@@ -133,7 +140,7 @@ class SchemaSection(Section):
 
            Returns
            -------
-           zirkon.validator.Validator
+           |Validator|
                the current validator for unexpected options
         """
         return self._unexpected_option_validator
@@ -144,7 +151,7 @@ class SchemaSection(Section):
 
            Parameters
            ----------
-           validator: zirkon.validator.Validator
+           validator: |Validator|
                the validator to be used for unexpected options
 
            Raises
@@ -257,7 +264,7 @@ class SchemaSection(Section):
             if subsection_name not in expected_subsection_names:
                 subsection_fqname = parent_fqname + subsection_name + '.'
                 schema_subsection = self._subsection_class()(
-                    unexpected_option_validator=self.unexpected_option_validator)
+                    unexpected_option_validator=self._unexpected_option_validator)
                 sub_validation_section = ValidationSection()
                 schema_subsection.impl_validate(
                     section[subsection_name],
@@ -312,7 +319,7 @@ class SchemaSection(Section):
         # unexpected options:
         for option_name, option_value in list(section.options()):
             if option_name not in expected_option_names:
-                validator = self.unexpected_option_validator
+                validator = self._unexpected_option_validator
                 fqname = parent_fqname + option_name
                 option = Option(name=fqname, value=option_value, defined=True)
                 self._validate_option(
@@ -344,7 +351,7 @@ class SchemaSection(Section):
                     del section[option_name]
             else:
                 if option.value is not prev_value:
-                    if prev_defined or not self.use_defaults:
+                    if prev_defined or not self._use_defaults:
                         section[option_name] = option.value
                     else:
                         section_defaults[option_name] = option.value

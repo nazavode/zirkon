@@ -69,7 +69,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.serializer import Serializer
 
 
-class Section(collections.abc.Mapping):
+class Section(collections.abc.Mapping):  # pylint: disable=R0904
     """Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -86,37 +86,93 @@ class Section(collections.abc.Mapping):
            the section name
        macros: bool, optional
            enables macros
-
-       Attributes
-       ----------
-       dictionary: |Mapping|, optional
-           the internal dictionary
-       parent: |Section|, optional
-           the parent section
-       name: str, optional
-           the section name
-       macros: bool, optional
-           enables macros
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
 
     def __init__(self, init=None, *, dictionary=None, parent=None, name=None, macros=True):
+        self._macros = None
         self.macros = macros
         if dictionary is None:
             dictionary = self._dictionary_factory()
-        self.dictionary = dictionary
+        self._dictionary = dictionary
         if parent is None:
-            self.parent = self
-            self.root = self
-            self.fqname = ()
+            self._parent = self
+            self._root = self
+            self._fqname = ()
         else:
-            self.parent = parent
-            self.root = self.parent.root
-            self.fqname = self.parent.fqname + (name,)
+            self._parent = parent
+            self._root = self._parent.root
+            self._fqname = self._parent.fqname + (name,)
         # the reference root for ROOT and SECTION:
         if init:
             self.update(init)
+
+    @property
+    def dictionary(self):
+        """Returns a reference to the internal dictionary
+
+        Returns
+        -------
+        |Mapping|
+            the internal dictionary
+        """
+        return self._dictionary
+
+    @property
+    def parent(self):
+        """Returns a reference to the parent section
+
+        Returns
+        -------
+        |Section|
+            the parent section
+        """
+        return self._parent
+
+    @property
+    def root(self):
+        """Returns a reference to the parent root
+
+        Returns
+        -------
+        |Section|
+            the root section
+        """
+        return self._parent
+
+    @property
+    def fqname(self):
+        """Returns a reference to the internal fully qualified name
+
+        Returns
+        -------
+        tuple
+            a tuple of strings
+        """
+        return self._fqname
+
+    @property
+    def macros(self):
+        """Returns True if macros are enabled
+
+        Returns
+        -------
+        bool
+            enabled/disabled
+        """
+        return self._macros
+
+    @macros.setter
+    def macros(self, value):
+        """Enables/disables macros
+
+        Parameters
+        ----------
+        value: bool
+            enabled/disabled
+        """
+        self._macros = bool(value)
 
     @classmethod
     def _subsection_class(cls):
@@ -138,7 +194,7 @@ class Section(collections.abc.Mapping):
                a subsection_class instance
         """
         return self._subsection_class()(dictionary=dictionary, parent=self,
-                                        macros=self.macros,
+                                        macros=self._macros,
                                         name=section_name)
 
     @classmethod
@@ -160,7 +216,7 @@ class Section(collections.abc.Mapping):
            |Section|
                the reference_root
         """
-        return self.root
+        return self._root
 
     def evaluate_option_value(self, value):
         """Evaluates an option's value.
@@ -181,9 +237,9 @@ class Section(collections.abc.Mapping):
                the evaluated value
         """
         if isinstance(value, Macro):
-            if self.macros:
+            if self._macros:
                 reference_root = self.get_reference_root()
-                section_getter = lambda: get_section_value(reference_root, *self.fqname)
+                section_getter = lambda: get_section_value(reference_root, *self._fqname)
                 value = value.evaluate({'SECTION': section_getter, 'ROOT': reference_root})
             else:
                 raise ValueError("cannot evaluate {}: macros are not enabled".format(
@@ -227,7 +283,7 @@ class Section(collections.abc.Mapping):
             ))
 
     def __getitem__(self, key):
-        value = self.dictionary[key]
+        value = self._dictionary[key]
         if isinstance(value, collections.Mapping):
             return self._subsection(section_name=key, dictionary=value)
         else:
@@ -243,32 +299,32 @@ class Section(collections.abc.Mapping):
         if isinstance(value, collections.Mapping):
             if self.has_option(key):
                 raise TypeError("option {} cannot be replaced with a section".format(key))
-            self.dictionary[key] = self._dictionary_factory()
-            section = self._subsection(section_name=key, dictionary=self.dictionary[key])
+            self._dictionary[key] = self._dictionary_factory()
+            section = self._subsection(section_name=key, dictionary=self._dictionary[key])
             section.update(value)
         else:
             if self.has_section(key):
                 raise TypeError("section {} cannot be replaced with an option".format(key))
             if isinstance(value, Macro):
-                if not self.macros:
+                if not self._macros:
                     raise ValueError("cannot set {}={}: macros are not enabled".format(
                         key, value.unparse()))
             else:
                 self._check_option(key=key, value=value)
-            self.dictionary[key] = value
+            self._dictionary[key] = value
 
     def __delitem__(self, key):
-        del self.dictionary[key]
+        del self._dictionary[key]
 
     def clear(self):
         """Clears all the section's content.
         """
-        self.dictionary.clear()
+        self._dictionary.clear()
 
     def copy(self):
         """Returns a deep copy of the section.
         """
-        return self._subsection_class()(dictionary=self.dictionary.copy())
+        return self._subsection_class()(dictionary=self._dictionary.copy())
 
     def get(self, key, default=None):
         if key in self:
@@ -327,7 +383,7 @@ class Section(collections.abc.Mapping):
         return value
 
     def __contains__(self, key):
-        return key in self.dictionary
+        return key in self._dictionary
 
     def has_key(self, key):
         """Returns True if option or section exists.
@@ -357,8 +413,8 @@ class Section(collections.abc.Mapping):
            bool
                True if option exists
         """
-        return option_name in self.dictionary and \
-            not isinstance(self.dictionary[option_name], collections.Mapping)
+        return option_name in self._dictionary and \
+            not isinstance(self._dictionary[option_name], collections.Mapping)
 
     def has_section(self, section_name):
         """Returns True if section exists.
@@ -373,8 +429,8 @@ class Section(collections.abc.Mapping):
            bool
                True if section exists
         """
-        return section_name in self.dictionary and \
-            isinstance(self.dictionary[section_name], collections.Mapping)
+        return section_name in self._dictionary and \
+            isinstance(self._dictionary[section_name], collections.Mapping)
 
     def add_section(self, section_name):
         """Adds a new section and return it.
@@ -416,7 +472,7 @@ class Section(collections.abc.Mapping):
                 yield key, value
 
     def items(self):
-        for key, value in self.dictionary.items():
+        for key, value in self._dictionary.items():
             if isinstance(value, collections.Mapping):
                 value = self._subsection(section_name=key, dictionary=value)
             yield key, value
@@ -430,7 +486,7 @@ class Section(collections.abc.Mapping):
             yield value
 
     def __len__(self):
-        return len(self.dictionary)
+        return len(self._dictionary)
 
     def __iter__(self):
         yield from self.keys()
@@ -471,7 +527,7 @@ class Section(collections.abc.Mapping):
         return result
 
     def __repr__(self):
-        return "{}(dictionary={!r})".format(self.__class__.__name__, self.dictionary)
+        return "{}(dictionary={!r})".format(self.__class__.__name__, self._dictionary)
 
     def __str__(self):
         section_data = []

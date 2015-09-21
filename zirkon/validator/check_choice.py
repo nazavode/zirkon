@@ -38,11 +38,6 @@ class CheckChoice(CheckType):
        ----------
        choices: tuple
            the set of accepted values
-
-       Attributes
-       ----------
-       choices: tuple
-           the set of accepted values
     """
     def __init__(self, choices):
         self.choices = choices

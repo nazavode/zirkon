@@ -65,17 +65,6 @@ class ConfigSection(Section):
            enables macros
        defaults: bool, optional
            enables defaults
-
-       Attributes
-       ----------
-       dictionary: |Mapping|, optional
-           the internal dictionary
-       parent: |Section|, optional
-           the parent section
-       name: str, optional
-           the section name
-       macros: bool, optional
-           enables macros
     """
     SUPPORTED_SEQUENCE_TYPES = (list, tuple)
     SUPPORTED_SCALAR_TYPES = (int, float, bool, str, type(None))
