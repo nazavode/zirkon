@@ -30,6 +30,7 @@ A python configuration library. Zirkon requires python >= 3.4.
     :target: http://opensource.org/licenses/Apache2.0
     :alt: License
 
+See the full documentation at http://zirkon.readthedocs.org.
 
 What is zirkon
 --------------
@@ -150,4 +151,3 @@ The 'coeffs' validator requires a float list whose length is at least 'num', whe
  >>> schema.validate(config).dump()
  coeffs = MinLengthError('coeffs=[]: length 0 is lower than min_len 8')
 
-See the full documentation at http://zirkon.readthedocs.org.
