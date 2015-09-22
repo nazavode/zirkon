@@ -37,6 +37,7 @@ __all__ = [
     'LoaderError',
 ]
 
+import collections
 import importlib
 import importlib.machinery
 import importlib.util
@@ -202,6 +203,17 @@ def load(name, path=None):
        load
        >>>
 
+       If 'object_name' is '*', the function behaves like 'from module import *', and
+       a dictionary with the full module content is returned:
+
+       >>> obj_dict = load('zirkon.toolbox.loader:*')
+       >>> for obj_name, obj in obj_dict.items():
+       ...     print(obj_name)
+       load_module_from_package
+       load_module
+       load
+       LoaderError
+
        If set, the 'path' parameter is a list of directories to be used to search for
        the base package/module, exactly as in 'load_module'.
 
@@ -222,7 +234,7 @@ def load(name, path=None):
        Returns
        -------
        object
-           the loaded object
+           the loaded object, or a dictionary if obj_name is '*'
 """
     if ':' in name:
         module_name, obj_name = name.split(':', 1)
@@ -234,10 +246,24 @@ def load(name, path=None):
 
     # load object
     if obj_name:
-        if not hasattr(module, obj_name):
-            raise LoaderError("cannot load object {} from {}".format(
-                obj_name,
-                module.__name__))
-        return getattr(module, obj_name)
+        if obj_name == '*':
+            obj_dict = collections.OrderedDict()
+            if hasattr(module, '__all__'):
+                obj_names = getattr(module, '__all__')
+            else:
+                obj_names = [oname for oname in dir(module) if not oname.startswith('_')]
+            for obj_name in obj_names:
+                if not hasattr(module, obj_name):
+                    raise LoaderError("cannot load object {} from {}".format(
+                        obj_name,
+                        module.__name__))
+                obj_dict[obj_name] = getattr(module, obj_name)
+            return obj_dict
+        else:
+            if not hasattr(module, obj_name):
+                raise LoaderError("cannot load object {} from {}".format(
+                    obj_name,
+                    module.__name__))
+            return getattr(module, obj_name)
     else:
         return module

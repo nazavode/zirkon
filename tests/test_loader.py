@@ -120,3 +120,22 @@ def test_load_path_mypack_mymod_sixteen():
     obj = loader.load(path=[os.getcwd()], name='mypack.mymod:sixteen')
     assert inspect.isfunction(obj)
     assert obj() == 16
+
+def test_load_star():
+    obj_dict = loader.load('mypack.mymod:*')
+    assert 'five' in obj_dict
+    assert 'six' in obj_dict
+    assert 'ten' in obj_dict
+    assert 'sixteen' in obj_dict
+    assert len(obj_dict) == 4
+
+def test_load_star_all():
+    obj_dict = loader.load('mypack.mymod_all:*')
+    assert 'five' in obj_dict
+    assert 'sixteen' in obj_dict
+    assert len(obj_dict) == 2
+
+def test_load_star_all_error():
+    with pytest.raises(loader.LoaderError) as exc_info:
+        obj_dict = loader.load('mypack.mymod_all_error:*')
+    assert str(exc_info.value) == "cannot load object twenty from mypack.mymod_all_error"
