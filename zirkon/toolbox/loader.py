@@ -180,61 +180,61 @@ def load_module(name, path=None):
 
 
 def load(name, path=None):
-    """load(name, path=None) -> object
-       Load an object or module given a fully qualified name.
+    r"""load(name, path=None) -> object
+        Load an object or module given a fully qualified name.
 
-       The 'name' parameter has the following format:
-       [path/]absolute_module_name[:object_name]
-       where 'absolute_module_name' can contain dots.
+        The 'name' parameter has the following format:
+        [path/]absolute_module_name[:object_name]
+        where 'absolute_module_name' can contain dots.
 
-       If 'object_name' is not provided, this function behaves exactly as
-       'load_module'.
+        If 'object_name' is not provided, this function behaves exactly as
+        'load_module'.
 
-       >>> mod = load('zirkon.toolbox.loader')
-       >>> print(mod.__name__)
-       zirkon.toolbox.loader
-       >>>
+        >>> mod = load('zirkon.toolbox.loader')
+        >>> print(mod.__name__)
+        zirkon.toolbox.loader
+        >>>
 
-       Otherwise, the module 'absolute_module_name' is loaded,
-       and then the object named 'object_name' in it is returned.
+        Otherwise, the module 'absolute_module_name' is loaded,
+        and then the object named 'object_name' in it is returned.
 
-       >>> obj = load('zirkon.toolbox.loader:load')
-       >>> print(obj.__name__)
-       load
-       >>>
+        >>> obj = load('zirkon.toolbox.loader:load')
+        >>> print(obj.__name__)
+        load
+        >>>
 
-       If 'object_name' is '*', the function behaves like 'from module import *', and
-       a dictionary with the full module content is returned:
+        If 'object_name' is '\*', the function behaves like 'from module import \*', and
+        a dictionary with the full module content is returned:
 
-       >>> obj_dict = load('zirkon.toolbox.loader:*')
-       >>> for obj_name, obj in obj_dict.items():
-       ...     print(obj_name)
-       load_module_from_package
-       load_module
-       load
-       LoaderError
+        >>> obj_dict = load('zirkon.toolbox.loader:*')
+        >>> for obj_name, obj in obj_dict.items():
+        ...     print(obj_name)
+        load_module_from_package
+        load_module
+        load
+        LoaderError
 
-       If set, the 'path' parameter is a list of directories to be used to search for
-       the base package/module, exactly as in 'load_module'.
+        If set, the 'path' parameter is a list of directories to be used to search for
+        the base package/module, exactly as in 'load_module'.
 
-       Parameters
-       ----------
-       name: str
-           the module or object name, with the form
-           [path/]absolute_module_name[:object_name]
-       path: str-tuple, optional
-           an optional list of directories to be added to the python path
+        Parameters
+        ----------
+        name: str
+            the module or object name, with the form
+            [path/]absolute_module_name[:object_name]
+        path: str-tuple, optional
+            an optional list of directories to be added to the python path
 
-       Raises
-       ------
-       LoadError
-           cannot load object
+        Raises
+        ------
+        LoadError
+            cannot load object
 
 
-       Returns
-       -------
-       object
-           the loaded object, or a dictionary if obj_name is '*'
+        Returns
+        -------
+        object
+            the loaded object, or a dictionary if obj_name is '\*'
 """
     if ':' in name:
         module_name, obj_name = name.split(':', 1)
