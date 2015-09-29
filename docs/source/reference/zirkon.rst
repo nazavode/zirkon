@@ -1,5 +1,5 @@
-zirkon package
-==============
+The zirkon package
+==================
 
 .. include:: ../macros.txt
 
