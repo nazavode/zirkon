@@ -24,7 +24,7 @@ Zirkon requires python version 3.4.
 .. toctree::
     :maxdepth: 1
 
-    modules
+    reference/zirkon
 
 Indices and tables
 ==================
