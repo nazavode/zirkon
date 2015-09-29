@@ -88,6 +88,28 @@ def test_FlatMap_create_init_flat(flat_content):
     assert flatmap.dictionary is not flat_content
     assert isinstance(flatmap['a'], int)
 
+def test_FlatMap_update1():
+    upd1 = {'a': 1}
+    flatmap = FlatMap(dictionary=collections.OrderedDict())
+    flatmap.update(upd1)
+    assert flatmap == upd1
+    
+def test_FlatMap_update2():
+    upd1 = {'a': 1}
+    flatmap = FlatMap(dictionary=collections.OrderedDict())
+    flatmap.update(upd1.items())
+    assert flatmap == upd1
+    
+def test_FlatMap_update3():
+    upd1 = {'a': 1}
+    upd2 = {'b': 2}
+    flatmap = FlatMap(dictionary=collections.OrderedDict())
+    flatmap.update(upd1, **upd2)
+    upd = {}
+    upd.update(upd1)
+    upd.update(upd2)
+    assert flatmap == upd
+    
 def test_FlatMap_create_init(content):
     flatmap = FlatMap(collections.OrderedDict(), init=content)
     assert len(flatmap) == len(content)

@@ -41,6 +41,28 @@ def test_Section_create(generic_dictionary, string_io):
     section.dump(stream=string_io)
     assert string_io.getvalue() == ""
 
+def test_Section_update1():
+    upd1 = {'a': 1}
+    flatmap = Section(dictionary=collections.OrderedDict())
+    flatmap.update(upd1)
+    assert flatmap == upd1
+
+def test_Section_update2():
+    upd1 = {'a': 1}
+    flatmap = Section(dictionary=collections.OrderedDict())
+    flatmap.update(upd1.items())
+    assert flatmap == upd1
+
+def test_Section_update3():
+    upd1 = {'a': 1}
+    upd2 = {'b': 2}
+    flatmap = Section(dictionary=collections.OrderedDict())
+    flatmap.update(upd1, **upd2)
+    upd = {}
+    upd.update(upd1)
+    upd.update(upd2)
+    assert flatmap == upd
+
 def test_Section_create_init(dictionary, simple_config_content, string_io):
     section = Section(dictionary=dictionary, init=simple_config_content)
     section.dump(stream=string_io)

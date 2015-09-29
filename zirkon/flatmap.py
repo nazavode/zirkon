@@ -28,12 +28,11 @@ __all__ = [
 ]
 
 import collections
-import collections.abc
 
 from .toolbox.identifier import is_valid_identifier
 
 
-class FlatMap(collections.abc.Mapping):
+class FlatMap(collections.MutableMapping):
     """FlatMap implements a standard mapping using a flattened internal
        representation. The internal storage is provided by a standard dictionary
        (dict, OrderedDict).
@@ -392,15 +391,25 @@ class FlatMap(collections.abc.Mapping):
                 result[rel_key] = value
         return result
 
-    def update(self, dictionary):
-        """Updates with the content of the 'dictionary'.
+    def update(self, dictionary, **kwargs):
+        r"""Updates with the content of the 'dictionary'
 
-           Parameters
-           ----------
-           dictionary: Mapping
-               the dictionary
+            Parameters
+            ----------
+            dictionary: |Mapping|
+                the dictionary
+            \*\*kwargs: |Mapping|
+                additional key-value items
         """
-        for key, value in dictionary.items():
+        print(dictionary, kwargs)
+        if dictionary:
+            if isinstance(dictionary, collections.Mapping):
+                iterable = dictionary.items()
+            else:
+                iterable = dictionary
+            for key, value in iterable:
+                self[key] = value
+        for key, value in kwargs.items():
             self[key] = value
 
     def __repr__(self):

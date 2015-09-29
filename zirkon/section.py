@@ -60,7 +60,6 @@ __all__ = [
 ]
 
 import collections
-import collections.abc
 import sys
 
 from .toolbox.macro import Macro
@@ -69,7 +68,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.serializer import Serializer
 
 
-class Section(collections.abc.Mapping):  # pylint: disable=R0904
+class Section(collections.MutableMapping):  # pylint: disable=R0904
     """Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.
@@ -491,15 +490,24 @@ class Section(collections.abc.Mapping):  # pylint: disable=R0904
     def __iter__(self):
         yield from self.keys()
 
-    def update(self, dictionary):
-        """Updates with the content of the 'dictionary'
+    def update(self, dictionary, **kwargs):
+        r"""Updates with the content of the 'dictionary'
 
-           Parameters
-           ----------
-           dictionary: |Mapping|
-               the dictionary
+            Parameters
+            ----------
+            dictionary: |Mapping|
+                the dictionary
+            \*\*kwargs: |Mapping|
+                additional key-value items
         """
-        for key, value in dictionary.items():
+        if dictionary:
+            if isinstance(dictionary, collections.Mapping):
+                iterable = dictionary.items()
+            else:
+                iterable = dictionary
+            for key, value in iterable:
+                self[key] = value
+        for key, value in kwargs.items():
             self[key] = value
 
     def as_dict(self, *, dict_class=collections.OrderedDict, defaults=True, evaluate=True):
