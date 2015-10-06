@@ -116,7 +116,7 @@ def _setup_codecs():
             """
             return repr(validator)
 
-        def _validator_text_decode(type_name, repr_data):  # pylint: disable=W0613
+        def _validator_text_decode(type_name, repr_data):  # pylint: disable=unused-argument
             """Decodes validator from configobj/zirkon serializers.
                configobj/zirkon decoder for Validator instances
 

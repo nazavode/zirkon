@@ -66,7 +66,7 @@ from .config_section import ConfigSection
 from .macros import ROOT, SECTION
 
 
-class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I0011
+class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors
     """Config class.
 
        Parameters
@@ -91,7 +91,7 @@ class Config(ConfigBase, ConfigSection):  # pylint: disable=too-many-ancestors,I
                          macros=macros, schema=schema, validate=validate)
 
     @ConfigSection.defaults.setter
-    def defaults(self, value):  # pylint: disable=W0221
+    def defaults(self, value):  # pylint: disable=arguments-differ
         """defaults setter"""
         self._set_defaults(value)
 

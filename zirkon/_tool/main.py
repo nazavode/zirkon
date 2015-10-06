@@ -513,7 +513,7 @@ def _validate_args(logger, args):
             args.validation_filetype = validation_filetype._replace(protocol=ref_protocol)
 
 
-def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):  # pylint: disable=R0914
+def main_parse_args(log_stream=sys.stderr, out_stream=sys.stdout, argv=None):  # pylint: disable=too-many-locals
     """Parses command line arguments.
 
        Parameters

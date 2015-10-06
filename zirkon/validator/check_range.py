@@ -38,7 +38,7 @@ from .error import MinValueError, \
 from .option import Option
 
 
-class CheckRange(Check):  # pylint: disable=W0223
+class CheckRange(Check):  # pylint: disable=abstract-method
     """Base class for CheckMin, CheckMax, CheckMinLen, CheckMaxLen."""
 
     ATTRIBUTE_NAME = None
@@ -61,7 +61,7 @@ class CheckMin(CheckRange):
     """
     ATTRIBUTE_NAME = 'min'
 
-    def __init__(self, min=None):  # pylint: disable=W0622
+    def __init__(self, min=None):  # pylint: disable=redefined-builtin
         self.min = min
         super().__init__()
 
@@ -90,7 +90,7 @@ class CheckMax(CheckRange):
     """
     ATTRIBUTE_NAME = 'max'
 
-    def __init__(self, max=None):  # pylint: disable=W0622
+    def __init__(self, max=None):  # pylint: disable=redefined-builtin
         self.max = max
         super().__init__()
 

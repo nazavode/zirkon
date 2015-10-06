@@ -35,7 +35,7 @@ from . import serializer
 from .subclass import find_subclass
 
 
-class DeferredEval(object):  # pylint: disable=R0903
+class DeferredEval(object):  # pylint: disable=too-few-public-methods
     """Defers evaluation of expression. For instance:
 
        >>> lst = []
@@ -165,7 +165,7 @@ def _setup_codecs():  # pragma: no cover
             """
             return repr(deferred_object)
 
-        def _deferred_text_decode(type_name, repr_data):  # pylint: disable=W0613
+        def _deferred_text_decode(type_name, repr_data):  # pylint: disable=unused-argument
             """Decodes DeferredEval objects from configobj/zirkon serializers.
 
                Parameters

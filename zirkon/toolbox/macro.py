@@ -268,7 +268,7 @@ class Macro(metaclass=abc.ABCMeta):
         """
         if isinstance(operand, Macro):
             if wrap is None:
-                p_operand = operand._priority()  # pylint: disable=W0212
+                p_operand = operand._priority()  # pylint: disable=protected-access
                 p_cls = cls._priority()
                 if p_operand == p_cls:
                     right_associativity = cls._right_associativity()
@@ -278,7 +278,7 @@ class Macro(metaclass=abc.ABCMeta):
                         wrap = right
                 else:
                     wrap = (p_operand < p_cls)
-            return operand._impl_unparse_wrap(wrap=wrap)  # pylint: disable=W0212
+            return operand._impl_unparse_wrap(wrap=wrap)  # pylint: disable=protected-access
         else:
             return repr(operand)
 
@@ -351,7 +351,7 @@ class Macro(metaclass=abc.ABCMeta):
                the tree expression
         """
         if isinstance(operand, Macro):
-            return operand._impl_tree()  # pylint: disable=W0212
+            return operand._impl_tree()  # pylint: disable=protected-access
         else:
             return repr(operand)
 

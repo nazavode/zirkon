@@ -68,7 +68,7 @@ from .toolbox.identifier import is_valid_identifier
 from .toolbox.serializer import Serializer
 
 
-class Section(collections.MutableMapping):  # pylint: disable=R0904
+class Section(collections.MutableMapping):  # pylint: disable=too-many-public-methods
     """Dictionary-like object implementing storage of options/sections. The
        internal representation is stored onto a standard dictionary, which can
        be provided in construction.

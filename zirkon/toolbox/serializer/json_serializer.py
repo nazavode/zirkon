@@ -41,7 +41,7 @@ class JSONPluggableEncoder(json.JSONEncoder):
     """Implementation of JSON Pluggable encoder.
     """
 
-    def default(self, obj):  # pylint: disable=E0202
+    def default(self, obj):  # pylint: disable=method-hidden
         class_ = type(obj)
         codec = _CODEC_CATALOG.get_by_class(class_)
         if codec is None:

@@ -412,7 +412,7 @@ def _setup_codecs():
             macro_class = find_subclass(Macro, macro_class_name, include_self=True)
             if macro_class is None:
                 raise NameError("undefined Macro class {}".format(macro_class_name))
-            return eval(arguments['macro_expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=W0123
+            return eval(arguments['macro_expression'], {'ROOT': ROOT, 'SECTION': SECTION})  # pylint: disable=eval-used
 
         _json_serializer_module.JSONSerializer.codec_catalog().add_codec(
             class_type=Macro,
@@ -437,7 +437,7 @@ def _setup_codecs():
             """
             return repr(str_object)
 
-        def _str_text_decode(type_name, repr_data):  # pylint: disable=W0613
+        def _str_text_decode(type_name, repr_data):  # pylint: disable=unused-argument
             """Decodes a string from configobj/zirkon.
 
                Parameters

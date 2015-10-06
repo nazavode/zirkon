@@ -78,7 +78,7 @@ class TextSerializer(Serializer):
             value = codec.encode(value)
         return value
 
-    def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable=W0613
+    def decode_value(self, line_number, filename, key, value, *value_type_names):  # pylint: disable=unused-argument
         r"""Decodes a value from a string, using a codec or unrepr.
 
             Parameters

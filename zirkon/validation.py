@@ -30,6 +30,6 @@ from .config_base import ConfigBase
 from .validation_section import ValidationSection
 
 
-class Validation(ConfigBase, ValidationSection):  # pylint: disable=too-many-ancestors,I0011
+class Validation(ConfigBase, ValidationSection):  # pylint: disable=too-many-ancestors
     """Validation config, used to store validation errors.
     """

@@ -58,7 +58,7 @@ class Check(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError
 
-    def has_actual_value(self, value):  # pylint: disable=R0201
+    def has_actual_value(self, value):  # pylint: disable=no-self-use
         """Returns True if value is not a Macro instance.
 
            Parameters
@@ -83,7 +83,7 @@ class Check(metaclass=abc.ABCMeta):
         """
         pass
 
-    def get_value(self, value, section):  # pylint: disable=R0201
+    def get_value(self, value, section):  # pylint: disable=no-self-use
         """Returns an evaluated value
 
            Parameters

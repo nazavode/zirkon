@@ -94,9 +94,9 @@ class Registry(object):
                iterator over subclasses
         """
         if include_abstract:
-            filter = None  # pylint: disable=W0622
+            filter = None  # pylint: disable=redefined-builtin
         else:
-            filter = lambda x: not x.is_abstract()  # pylint: disable=W0622
+            filter = lambda x: not x.is_abstract()  # pylint: disable=redefined-builtin
         return subclass.subclasses(cls, include_self=include_self, filter=filter)
 
     @classmethod

@@ -39,7 +39,7 @@ __all__ = [
 from .singleton import Singleton
 
 
-class UndefinedType(metaclass=Singleton):  # pylint: disable=R0903
+class UndefinedType(metaclass=Singleton):  # pylint: disable=too-few-public-methods
     """UndefinedType singleton.
        To be used instead of None as placeholder where None is an acceptable value.
     """

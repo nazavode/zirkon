@@ -31,7 +31,7 @@ from .schema_section import SchemaSection
 from .validator import ValidatorInstance
 
 
-class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors,I0011
+class Schema(ConfigBase, SchemaSection):  # pylint: disable=too-many-ancestors
     """Schema config class.
 
        Parameters

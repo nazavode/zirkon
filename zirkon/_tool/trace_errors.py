@@ -29,7 +29,7 @@ __all__ = [
 import sys
 
 
-class TraceErrors(object):  # pylint: disable=R0903
+class TraceErrors(object):  # pylint: disable=too-few-public-methods
     """Context manager to trace errors.
 
        Parameters
