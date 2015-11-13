@@ -147,7 +147,7 @@ def unrepr(string, globals_d=None):
             ast.Mult: lambda x, y: x * y,
             ast.Div: lambda x, y: x / y,
             ast.FloorDiv: lambda x, y: x // y,
-            ast.Mod: lambda x, y: x // y,
+            ast.Mod: lambda x, y: x % y,
             ast.Pow: lambda x, y: x ** y,
         }
         ast_op = ast_body.op
