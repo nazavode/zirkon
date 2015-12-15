@@ -98,6 +98,10 @@ class _Stack(object):
         self._stack.append(frame_info)
         return tuple(frame_info) + (self.level(),)
 
+    def pop(self):
+        """pop()"""
+        self._stack.pop()
+
     def level(self):
         """level() -> stack level"""
         return len(self._stack) - 1
@@ -137,12 +141,28 @@ class ZirkonSerializer(TextSerializer):
                 # empty line or comment
                 continue
             if current_indentation is None:
-                # brand new mapping
-                current_indentation = indentation
-                stack.set_indentation(index=current_level, indentation=current_indentation)
+                p_frame = None
+                if len(stack) > 1:
+                    p_frame = stack[-2]
+                if p_frame and len(indentation) <= len(p_frame.indentation):
+                    # does not belong to empty parent frame
+                    stack.pop()
+                    current_indentation, current_mapping, current_level = stack.get_frame_level(
+                        indentation=indentation,
+                        line_number=line_number,
+                        filename=filename)
+                else:
+                    # brand new mapping
+                    current_indentation = indentation
+                    stack.set_indentation(index=current_level, indentation=current_indentation)
             else:
                 # old mapping
-                if indentation != current_indentation:
+                if indentation == current_indentation:
+                    current_indentation, current_mapping, current_level = stack.get_frame_level(
+                        indentation=indentation,
+                        line_number=line_number,
+                        filename=filename)
+                else:
                     if indentation.startswith(current_indentation):
                         raise IndentationError("line {}@{}: unexpected indentation".format(line_number, filename))
                     else:

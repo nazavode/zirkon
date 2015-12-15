@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import collections
 import inspect
 import os
 
@@ -51,3 +52,36 @@ def test_ZirkonSerializer_from_file(simple_config_content, serializer, tmp_text_
     obj = serializer.from_file(filename=tmp_text_file.name)
     assert obj == simple_config_content
 
+strings = collections.OrderedDict()
+strings['c0'] = """\
+[a]
+[b]
+    x = 10
+[c]
+    [d]
+    [e]
+        y = 10
+x = 9
+[f]
+xx = 9
+[g]
+    [h]
+        [i]
+    yy = 9
+[j]
+[k]
+[l]
+    [m]
+        [n]
+            [o]
+    zz = 1.2
+"""
+
+@pytest.fixture(params=list(strings.values()), ids=list(strings.keys()))
+def string(request):
+    return request.param
+
+def test_ZirkonSerializer(string, serializer):
+    obj = serializer.from_string(string)
+    string2 = serializer.to_string(obj=obj)
+    assert string == string2
